@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group 'ru.mirea'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.5'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.5'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.h2database:h2:2.1.214'
+    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+}

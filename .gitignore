@@ -1,0 +1,8 @@
+/project/client/node_modules/
+/project/client/.idea/
+/project/client/build/
+/project/server/build/
+/project/server/.idea/
+/project/server/.gradle/
+/project/server/gradle/
+/project/Доки

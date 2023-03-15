@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:~/db_test
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  mvc:
+    converters:
+      preferred-json: gson
+  h2:
+    console:
+      enabled: true
+      path: /console_db/
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate.ddl-auto: create
