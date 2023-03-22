@@ -57,7 +57,7 @@ public class NewsController {
                         list = syst.getNews();
                         schId = null;
                     }
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.NEWS, body.get("type").getAsString(), schId + "");
+                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.NEWS, schId + "", "main", "main", body.get("type").getAsString());
                 }
                 if(!ObjectUtils.isEmpty(list)){
                     for (Long i1 : list) {
@@ -84,8 +84,8 @@ public class NewsController {
                     Syst syst = datas.getSyst();
                     School school = datas.schoolById(user.getRoles().get(body.get("role").getAsLong()).getYO());
                     boolean b, b1;
-                    b = Objects.equals(subscriber.getPodTypeL1(), "Por") && user.getRoles().containsKey(4L) && syst != null;
-                    b1 = Objects.equals(subscriber.getPodTypeL1(), "Yo") && user.getRoles().containsKey(3L) && school != null;
+                    b = Objects.equals(subscriber.getLvlSch(), "Por") && user.getRoles().containsKey(4L) && syst != null;
+                    b1 = Objects.equals(subscriber.getLvlSch(), "Yo") && user.getRoles().containsKey(3L) && school != null;
                     if (user != null && (b || b1)) {
                         news = new News();
                         if (body.has("title")) news.setTitle(body.get("title").getAsString());
@@ -108,7 +108,7 @@ public class NewsController {
                         bodyAns.addProperty("img_url", news.getImg_url());
                         bodyAns.addProperty("text", news.getText());
 
-                        authController.sendMessageForAll("addNewsC", ans, TypesConnect.NEWS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
+                        authController.sendMessageForAll("addNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
                     }
                 }
                 if(news == null) {
@@ -121,8 +121,8 @@ public class NewsController {
                 User user = datas.userByLogin(subscriber.getLogin());
                 News news = datas.newsById(body.get("id").getAsLong());
                 if(user != null && news != null
-                        && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getPodTypeL1(), "Por")
-                        || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getPodTypeL1(), "Yo"))) {
+                        && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlSch(), "Por")
+                        || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlSch(), "Yo"))) {
                     switch (body.get("type").getAsString()){
                         case "title" -> news.setTitle(body.get("val").getAsString());
                         case "date" -> news.setDate(body.get("val").getAsString());
@@ -135,7 +135,7 @@ public class NewsController {
                     ans.add("type", body.get("type"));
                     ans.add("val", body.get("val"));
 
-                    authController.sendMessageForAll("chNewsC", ans, TypesConnect.NEWS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
+                    authController.sendMessageForAll("chNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -147,14 +147,14 @@ public class NewsController {
                 News news = datas.newsById(body.get("id").getAsLong());
                 Syst syst = datas.getSyst();
                 if(user != null && news != null && syst != null
-                        && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getPodTypeL1(), "Por")
-                        || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getPodTypeL1(), "Yo"))) {
+                        && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlSch(), "Por")
+                        || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlSch(), "Yo"))) {
                     datas.getNewsRepository().delete(news);
                     if(!ObjectUtils.isEmpty(syst.getNews())) syst.getNews().remove(news.getId());
                     datas.getSystemRepository().saveAndFlush(syst);
                     ans.add("id", body.get("id"));
 
-                    authController.sendMessageForAll("delNewsC", ans, TypesConnect.NEWS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
+                    authController.sendMessageForAll("delNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
                 } else {
                     ans.addProperty("error", true);
                 }

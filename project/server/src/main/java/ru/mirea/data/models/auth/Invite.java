@@ -2,7 +2,6 @@ package ru.mirea.data.models.auth;
 
 import lombok.*;
 import ru.mirea.data.converters.ListLongConverter;
-import ru.mirea.data.converters.ListStringConverter;
 import ru.mirea.data.converters.RoleConverter;
 import ru.mirea.data.json.Role;
 

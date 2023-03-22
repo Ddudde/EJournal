@@ -26,6 +26,10 @@ import java.util.List;
     @Column(name = "kidsInv")
     private List<Long> kidsInv;
 
+    @Convert(converter = ListLongConverter.class)
+    @Column(name = "daysOfWeek")
+    private List<Long> daysOfWeek;
+
     public Group(String name) {
         this.name = name;
     }
@@ -33,5 +37,11 @@ import java.util.List;
     public Group(String name, List<Long> kids) {
         this.name = name;
         this.kids = kids;
+    }
+
+    public Group(String name, List<Long> kids, List<Long> daysOfWeek) {
+        this.name = name;
+        this.kids = kids;
+        this.daysOfWeek = daysOfWeek;
     }
 }

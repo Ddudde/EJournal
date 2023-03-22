@@ -72,10 +72,10 @@ public class AuthController {
 
     @Scheduled(cron = "*/10 * * * * *")
     public void ping(){
-        sendMessageForAll("ping", "test", TypesConnect.MAIN, "main", "main");
+        sendMessageForAll("ping", "test", TypesConnect.MAIN, "main", "main", "main", "main");
     }
 
-    public void sendMessageForAll(String evName, Object data, TypesConnect type, String podTypeL1, String podTypeL2) {
+    public void sendMessageForAll(String evName, Object data, TypesConnect type, String lvlSch, String lvlGr, String lvlMore1, String lvlMore2) {
         ServerSentEvent<Object> event = ServerSentEvent
                 .builder()
                 .event(evName)
@@ -83,8 +83,10 @@ public class AuthController {
                 .build();
         subscriptions.forEach((uuid, subscriber) -> {
                 if ((type == TypesConnect.MAIN || Objects.equals(type, subscriber.getType()))
-                 && (Objects.equals(podTypeL1, "main") || Objects.equals(podTypeL1, subscriber.getPodTypeL1()))
-                 && (Objects.equals(podTypeL2, "main") || Objects.equals(podTypeL2, subscriber.getPodTypeL2()))) {
+                 && (Objects.equals(lvlSch, "main") || Objects.equals(lvlSch, subscriber.getLvlSch()))
+                 && (Objects.equals(lvlGr, "main") || Objects.equals(lvlGr, subscriber.getLvlGr()))
+                 && (Objects.equals(lvlMore1, "main") || Objects.equals(lvlMore1, subscriber.getLvlMore1()))
+                 && (Objects.equals(lvlMore2, "main") || Objects.equals(lvlMore2, subscriber.getLvlMore2()))) {
                     try {
                         subscriber.getFluxSink().next(event);
                     } catch (Error e) {
@@ -100,7 +102,7 @@ public class AuthController {
         return subscriptions.get(UUID.fromString(uuid));
     }
 
-    public void infCon(String uuid, String login, TypesConnect type, String podTypeL1, String podTypeL2){
+    public void infCon(String uuid, String login, TypesConnect type, String lvlSch, String lvlGr, String lvlMore1, String lvlMore2){
         if(uuid != null) {
             if(login != null) {
                 subscriptions.get(UUID.fromString(uuid))
@@ -112,15 +114,25 @@ public class AuthController {
                         .setType(type);
                 System.out.println("setType " + type + " subscription for " + uuid);
             }
-            if(podTypeL1 != null) {
+            if(lvlSch != null) {
                 subscriptions.get(UUID.fromString(uuid))
-                        .setPodTypeL1(podTypeL1);
-                System.out.println("setPodTypeL1 " + podTypeL1 + " subscription for " + uuid);
+                        .setLvlSch(lvlSch);
+                System.out.println("setLvlSch " + lvlSch + " subscription for " + uuid);
             }
-            if(podTypeL2 != null) {
+            if(lvlGr != null) {
                 subscriptions.get(UUID.fromString(uuid))
-                        .setPodTypeL2(podTypeL2);
-                System.out.println("setPodTypeL2 " + podTypeL2 + " subscription for " + uuid);
+                        .setLvlGr(lvlGr);
+                System.out.println("setLvlGr " + lvlGr + " subscription for " + uuid);
+            }
+            if(lvlMore1 != null) {
+                subscriptions.get(UUID.fromString(uuid))
+                        .setLvlMore1(lvlMore1);
+                System.out.println("setLvlMore1 " + lvlMore1 + " subscription for " + uuid);
+            }
+            if(lvlMore2 != null) {
+                subscriptions.get(UUID.fromString(uuid))
+                        .setLvlMore2(lvlMore2);
+                System.out.println("setLvlMore2 " + lvlMore2 + " subscription for " + uuid);
             }
         }
     }
@@ -147,7 +159,7 @@ public class AuthController {
                     }
                     if(body.has("podType")) {
                         subscriptions.get(UUID.fromString(body.get("uuid").getAsString()))
-                                .setPodTypeL1(body.get("podType").getAsString());
+                                .setLvlSch(body.get("podType").getAsString());
                         System.out.println("setPodType " + body.get("podType").getAsString() + " subscription for " + body.get("uuid").getAsString());
                     }
                 }
@@ -174,7 +186,7 @@ public class AuthController {
                         bodyAns.addProperty("ico", user.getIco());
                         bodyAns.addProperty("roles", !ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1);
                         bodyAns.addProperty("secFr", !ObjectUtils.isEmpty(user.getSecFr()));
-                        infCon(body.get("uuid").getAsString(), body.get("login").getAsString(), null, null, null);
+                        infCon(body.get("uuid").getAsString(), body.get("login").getAsString(), null, null, null, null, null);
                     }
                 }
                 return ans;
@@ -261,11 +273,14 @@ public class AuthController {
             case "exit" -> {
                 Subscriber subscriber = getSubscriber(body.get("uuid").getAsString());
                 subscriber.setLogin(null);
-                subscriber.setPodTypeL2(null);
+                subscriber.setLvlGr(null);
                 return ans;
             }
             case "checkInvCode" -> {
-                User user = datas.userByLogin(body.get("login").getAsString());
+                User user = null;
+                if(body.has("login")) {
+                    user = datas.userByLogin(body.get("login").getAsString());
+                }
                 Invite inv = datas.inviteByCode(body.get("code").getAsString());
                 if(inv == null) {
                     ans.addProperty("error", true);
@@ -320,8 +335,8 @@ public class AuthController {
 
                     ans.addProperty("code", uuid.toString());
                     ans.addProperty("id1", schId);
-                    sendMessageForAll("codPepL2C", ans, subscriber.getType(), "null", "adm");
-                    sendMessageForAll("codPepL1C", ans, subscriber.getType(), schId+"", "ht");
+                    sendMessageForAll("codPepL2C", ans, subscriber.getType(), "null", subscriber.getLvlGr(), "adm", "main");
+                    sendMessageForAll("codPepL1C", ans, subscriber.getType(), schId+"", subscriber.getLvlGr(), "ht", "main");
                 } else {
                     ans.addProperty("error", true);
                 }

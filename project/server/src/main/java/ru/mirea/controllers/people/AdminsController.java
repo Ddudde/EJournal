@@ -72,7 +72,7 @@ public class AdminsController {
                             bodyAns.add(i1+"", admO);
                         }
                     }
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.ADMINS, "null", user.getRoles().containsKey(4L) ? "adm" : "main");
+                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.ADMINS, "null", "main", user.getRoles().containsKey(4L) ? "adm" : "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -98,7 +98,7 @@ public class AdminsController {
                     ans.addProperty("id", inv.getId());
                     bodyAns.addProperty("name", body.get("name").getAsString());
 
-                    authController.sendMessageForAll("addPepC", ans, TypesConnect.ADMINS, "main", "main");
+                    authController.sendMessageForAll("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -124,7 +124,7 @@ public class AdminsController {
 
                     ans.addProperty("name", body.get("name").getAsString());
 
-                    authController.sendMessageForAll("chPepC", ans, TypesConnect.ADMINS, "main", "main");
+                    authController.sendMessageForAll("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -152,7 +152,7 @@ public class AdminsController {
                         ans.addProperty("id", inv.getId());
                     }
 
-                    authController.sendMessageForAll("remPepC", ans, TypesConnect.ADMINS, "main", "main");
+                    authController.sendMessageForAll("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }

@@ -17,9 +17,13 @@ public class Subscriber {
 
     private TypesConnect type;
 
-    private String podTypeL1;
+    private String lvlSch;//sch
 
-    private String podTypeL2;
+    private String lvlGr;//gr
+
+    private String lvlMore1;//role
+
+    private String lvlMore2;//more
 
     private FluxSink<ServerSentEvent> fluxSink;
 

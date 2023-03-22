@@ -15,8 +15,12 @@ public class Role implements Serializable {
     private Long YO;
     private Long group;
     private List<Long> kids;
+
+    private List<Long> kidsInv;
     private List<Long> parents;
-    private List<String> lessons;
+
+    private List<Long> parentsInv;
+    private List<Long> subjects;
 
     public Role(String email, Long YO, Long group, List<Long> parents) { // kid
         this.email = email;
@@ -31,10 +35,10 @@ public class Role implements Serializable {
         this.kids = kids;
     }
 
-    public Role(String email, List<String> lessons, Long YO) { // tea
+    public Role(String email, List<Long> subjects, Long YO) { // tea
         this.email = email;
         this.YO = YO;
-        this.lessons = lessons;
+        this.subjects = subjects;
     }
 
     public Role(String email, Long YO) { //zav

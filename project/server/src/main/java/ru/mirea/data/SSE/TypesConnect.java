@@ -11,5 +11,8 @@ public enum TypesConnect {
     CONTACTS,
     HTEACHERS,
     ADMINS,
-    STUDENTS
+    STUDENTS,
+    PARENTS,
+    TEACHERS,
+    SCHEDULE
 }

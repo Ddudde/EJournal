@@ -63,7 +63,7 @@ public class RequestController {
                     JsonObject ansToCl = new JsonObject();
                     ansToCl.addProperty("id", request.getId());
                     ansToCl.addProperty("text", request.getText());
-                    authController.sendMessageForAll("chText", ansToCl, TypesConnect.REQUESTS, "main", "main");
+                    authController.sendMessageForAll("chText", ansToCl, TypesConnect.REQUESTS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -81,7 +81,7 @@ public class RequestController {
                     JsonObject ansToCl = new JsonObject();
                     ansToCl.addProperty("id", request.getId());
                     ansToCl.addProperty("date", request.getDate());
-                    authController.sendMessageForAll("chDate", ansToCl, TypesConnect.REQUESTS, "main", "main");
+                    authController.sendMessageForAll("chDate", ansToCl, TypesConnect.REQUESTS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -99,7 +99,7 @@ public class RequestController {
                     JsonObject ansToCl = new JsonObject();
                     ansToCl.addProperty("id", request.getId());
                     ansToCl.addProperty("title", request.getEmail());
-                    authController.sendMessageForAll("chTitle", ansToCl, TypesConnect.REQUESTS, "main", "main");
+                    authController.sendMessageForAll("chTitle", ansToCl, TypesConnect.REQUESTS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -115,7 +115,7 @@ public class RequestController {
 
                     JsonObject ansToCl = new JsonObject();
                     ansToCl.addProperty("id", request.getId());
-                    authController.sendMessageForAll("delReq", ansToCl, TypesConnect.REQUESTS, "main", "main");
+                    authController.sendMessageForAll("delReq", ansToCl, TypesConnect.REQUESTS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -133,7 +133,7 @@ public class RequestController {
                     bodyAns.addProperty("title", request.getEmail());
                     bodyAns.addProperty("date", request.getDate());
                     bodyAns.addProperty("text", request.getText());
-                    authController.sendMessageForAll("addReq", ansToCl, TypesConnect.REQUESTS, "main", "main");
+                    authController.sendMessageForAll("addReq", ansToCl, TypesConnect.REQUESTS, "main", "main", "main", "main");
                 } else {
                     ans.addProperty("error", true);
                 }

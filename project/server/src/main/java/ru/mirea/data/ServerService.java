@@ -1,5 +1,6 @@
 package ru.mirea.data;
 
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -39,7 +40,17 @@ import static java.util.Arrays.asList;
 
     private final GroupRepository groupRepository;
 
-    public ServerService(UserRepository userRepository, InviteRepository inviteRepository, SchoolRepository schoolRepository, RequestRepository requestRepository, SystemRepository systemRepository, NewsRepository newsRepository, ContactsRepository contactsRepository, GroupRepository groupRepository) {
+    private final DayOfWeekRepository dayOfWeekRepository;
+
+    private final DayRepository dayRepository;
+
+    private final LessonRepository lessonRepository;
+
+    private final MarkRepository markRepository;
+
+    private final SubjectRepository subjectRepository;
+
+    public ServerService(UserRepository userRepository, InviteRepository inviteRepository, SchoolRepository schoolRepository, RequestRepository requestRepository, SystemRepository systemRepository, NewsRepository newsRepository, ContactsRepository contactsRepository, GroupRepository groupRepository, DayOfWeekRepository dayOfWeekRepository, DayRepository dayRepository, LessonRepository lessonRepository, MarkRepository markRepository, SubjectRepository subjectRepository) {
         this.userRepository = userRepository;
         this.inviteRepository = inviteRepository;
         this.schoolRepository = schoolRepository;
@@ -48,18 +59,23 @@ import static java.util.Arrays.asList;
         this.newsRepository = newsRepository;
         this.contactsRepository = contactsRepository;
         this.groupRepository = groupRepository;
+        this.dayOfWeekRepository = dayOfWeekRepository;
+        this.dayRepository = dayRepository;
+        this.lessonRepository = lessonRepository;
+        this.markRepository = markRepository;
+        this.subjectRepository = subjectRepository;
 
         createUser(new User("nm1", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
             put(0L, new Role("ex@ya.ru", 5L, 17L, new ArrayList<>(asList(1L, 2L))));
             put(1L, new Role("ex@ya.ru", 5L, new ArrayList<>(asList(1L, 2L))));
-            put(2L, new Role("ex@ya.ru", new ArrayList<>(asList("Англ. Яз.", "Математика")), 5L));
+            put(2L, new Role("ex@ya.ru", new ArrayList<>(asList()), 5L));
             put(3L, new Role("ex@ya.ru", 5L));
             put(4L, new Role("ex@ya.ru"));
         }}));
         createUser(new User("nm12", "1111", "Петров В.В.", 1, new HashMap<Long,Role>() {{
             put(0L, new Role("ex@ya.ru", 6L, 17L, new ArrayList<>(asList(1L, 2L))));
             put(1L, new Role("ex@ya.ru", 6L, new ArrayList<>(asList(1L, 2L))));
-            put(2L, new Role("ex@ya.ru", new ArrayList<>(asList("Англ. Яз.", "Математика")), 6L));
+            put(2L, new Role("ex@ya.ru", new ArrayList<>(asList()), 6L));
             put(3L, new Role("ex@ya.ru", 6L));
             put(4L, new Role("ex@ya.ru"));
         }}));
@@ -68,9 +84,9 @@ import static java.util.Arrays.asList;
         createReq(new Request("ex@ya.ru","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
         System.out.println(getRequests());
 
-        createSchool(new School("Школа", new ArrayList<>(asList(7L, 8L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L))));
-        createSchool(new School("Гимназия", new ArrayList<>(asList(1L)), new ArrayList<>(asList(9L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L))));
-        createSchool(new School("Лицей", new ArrayList<>(asList(2L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L))));
+        createSchool(new School("Школа", new ArrayList<>(asList(7L, 8L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L)), new ArrayList<>(asList(64L, 65L)), new ArrayList<>(asList(66L))));
+        createSchool(new School("Гимназия", new ArrayList<>(asList(1L)), new ArrayList<>(asList(9L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L)), new ArrayList<>(asList()), new ArrayList<>(asList())));
+        createSchool(new School("Лицей", new ArrayList<>(asList(2L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L)), new ArrayList<>(asList()), new ArrayList<>(asList())));
         System.out.println(getSchools());
 
         createUser(new User("nm13", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
@@ -117,8 +133,41 @@ import static java.util.Arrays.asList;
         System.out.println(getGroups());
 
         createUser(new User("nm16", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
-            put(0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(1L, 2L))));
+            put(0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(62L, 63L))));
         }}));//61L
+
+        createUser(new User("nm17", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
+            put(1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L))));
+        }}));//62L
+
+        createUser(new User("nm18", "1111", "Петрова В.В.", 2, new HashMap<Long,Role>() {{
+            put(1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L))));
+        }}));//63L
+
+        createSubject(new Subject("Англ. Яз.", 4L, new ArrayList<>(asList(67L))));
+        createSubject(new Subject("Математика", 4L, new ArrayList<>(asList(68L))));
+        System.out.println(getSubjects());
+
+        createUser(new User("nm19", "1111", "Петрова В1.В.", 2, new HashMap<Long,Role>() {{
+            put(2L, new Role("ex@ya.ru", new ArrayList<>(asList()), 4L));
+        }}));//66L
+
+        createUser(new User("nm20", "1111", "Петрова В2.В.", 2, new HashMap<Long,Role>() {{
+            put(2L, new Role("ex@ya.ru", new ArrayList<>(asList(64L)), 4L));
+        }}));//67L
+
+        createUser(new User("nm21", "1111", "Петрова В3.В.", 2, new HashMap<Long,Role>() {{
+            put(2L, new Role("ex@ya.ru", new ArrayList<>(asList(65L)), 4L));
+        }}));//68L
+
+        createLesson(new Lesson(64L, 67L, "300"));
+        createLesson(new Lesson(64L, 67L, "301"));
+        createLesson(new Lesson(65L, 68L, "302"));
+        createLesson(new Lesson(65L, 68L, "303"));
+        System.out.println(getLessons());
+        createDayOfWeek(new DayOfWeek(new ArrayList<>(asList(69L, 70L, 71L))));
+        createDayOfWeek(new DayOfWeek(new ArrayList<>(asList(72L))));
+        System.out.println(getDaysOfWeek());
     }
 
     private void checkDates(){
@@ -170,6 +219,17 @@ import static java.util.Arrays.asList;
         return id == null ? null : userRepository.findById(id).orElse(null);
     }
 
+    public void usersByList(List<Long> list, JsonObject obj){
+        for (Long i : list) {
+            JsonObject objO = new JsonObject();
+            User objU = userById(i);
+            objO.addProperty("name", objU.getFio());
+            objO.addProperty("login", objU.getLogin());
+            if (!ObjectUtils.isEmpty(objU.getCode())) objO.addProperty("link", objU.getCode());
+            obj.add(i + "", objO);
+        }
+    }
+
     public Long getFirstRoleId(Map<Long, Role> map){
         return (Long) map.keySet().toArray()[0];
     }
@@ -205,6 +265,16 @@ import static java.util.Arrays.asList;
 
     public Invite inviteById(Long id){
         return id == null ? null : inviteRepository.findById(id).orElse(null);
+    }
+
+    public void invitesByList(List<Long> list, JsonObject obj){
+        for (Long i : list) {
+            JsonObject objO = new JsonObject();
+            Invite objI = inviteById(i);
+            objO.addProperty("name", objI.getFio());
+            if (!ObjectUtils.isEmpty(objI.getCode())) objO.addProperty("link", objI.getCode());
+            obj.add(i + "", objO);
+        }
     }
 
     public List<Request> createReq(@RequestBody Request request) {
@@ -283,9 +353,25 @@ import static java.util.Arrays.asList;
         return id == null ? null : groupRepository.findById(id).orElse(null);
     }
 
+    public Long groupsByUser(User user, JsonObject bodyAns){
+        Long first = null;
+        if(user != null){
+            Long schId = getFirstRole(user.getRoles()).getYO();
+            School school = schoolById(schId);
+            if (!ObjectUtils.isEmpty(school.getGroups())) {
+                first = school.getGroups().get(0);
+                for (Long i : school.getGroups()) {
+                    Group gr = groupById(i);
+                    bodyAns.addProperty(i + "", gr.getName());
+                }
+            }
+        }
+        return first;
+    }
+
     public void createGroups(){
         createGroup(new Group("11A", new ArrayList<>(asList(1L, 2L, 16L))));//17L
-        createGroup(new Group("11Б", new ArrayList<>(asList(61L))));
+        createGroup(new Group("11Б", new ArrayList<>(asList(61L)), new ArrayList<>(asList(73L, 74L))));
         createGroup(new Group("11В"));
         createGroup(new Group("11Г"));
         createGroup(new Group("10А"));
@@ -328,5 +414,83 @@ import static java.util.Arrays.asList;
         createGroup(new Group("1Б"));
         createGroup(new Group("1В"));
         createGroup(new Group("1Г"));//60L
+    }
+
+    public void teachersBySchool(School school, JsonObject obj){
+        JsonObject nt = new JsonObject(),
+                tea = new JsonObject();
+        obj.add("nt", nt);
+        nt.add("tea", tea);
+        if (!ObjectUtils.isEmpty(school.getTeachers())) {
+            usersByList(school.getTeachers(), tea);
+        }
+        if (!ObjectUtils.isEmpty(school.getTeachersInv())) {
+            invitesByList(school.getTeachersInv(), tea);
+        }
+        if (!ObjectUtils.isEmpty(school.getSubjects())) {
+            for (Long i1 : school.getSubjects()) {
+                Subject subject = subjectById(i1);
+                if (subject != null) {
+                    JsonObject nt1 = new JsonObject();
+                    JsonObject tea1 = new JsonObject();
+                    obj.add(i1 + "", nt1);
+                    nt1.addProperty("name", subject.getName());
+                    nt1.add("tea", tea1);
+                    if (!ObjectUtils.isEmpty(subject.getTeachers())) {
+                        usersByList(subject.getTeachers(), tea1);
+                    }
+                    if (!ObjectUtils.isEmpty(subject.getTeachersInv())) {
+                        invitesByList(subject.getTeachersInv(), tea1);
+                    }
+                }
+            }
+        }
+    }
+
+    public void createSubject(Subject subject) {
+        Subject savedSubject = subjectRepository.saveAndFlush(subject);
+        System.out.println(savedSubject);
+    }
+
+    public List<Subject> getSubjects() {
+        return subjectRepository.findAll();
+    }
+
+    public Subject subjectById(Long id){
+        return id == null ? null : subjectRepository.findById(id).orElse(null);
+    }
+
+    public Subject subjectByNameAndSchool(String name, Long school){
+//        List<Subject> list = subjectRepository.findByNameAndSchool(name, school);
+        for(Subject subject : subjectRepository.findBySchool(school)){
+            if(Objects.equals(subject.getName(), name)) return subject;
+        }
+        return null;
+    }
+
+    public void createDayOfWeek(DayOfWeek dayOfWeek) {
+        DayOfWeek savedDayOfWeek = dayOfWeekRepository.saveAndFlush(dayOfWeek);
+        System.out.println(savedDayOfWeek);
+    }
+
+    public List<DayOfWeek> getDaysOfWeek() {
+        return dayOfWeekRepository.findAll();
+    }
+
+    public DayOfWeek dayOfWeekById(Long id){
+        return id == null ? null : dayOfWeekRepository.findById(id).orElse(null);
+    }
+
+    public void createLesson(Lesson lesson) {
+        Lesson savedLesson = lessonRepository.saveAndFlush(lesson);
+        System.out.println(savedLesson);
+    }
+
+    public List<Lesson> getLessons() {
+        return lessonRepository.findAll();
+    }
+
+    public Lesson lessonById(Long id){
+        return id == null ? null : lessonRepository.findById(id).orElse(null);
     }
 }

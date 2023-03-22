@@ -13,22 +13,19 @@ import ru.mirea.data.ServerService;
 import ru.mirea.data.json.Role;
 import ru.mirea.data.models.Group;
 import ru.mirea.data.models.School;
-import ru.mirea.data.models.Syst;
+import ru.mirea.data.models.Subject;
 import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/teachers")
 @NoArgsConstructor
 @CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000"})
-public class StudentsController {
+public class TeachersController {
 
     @Autowired
     private ServerService datas;
@@ -44,79 +41,91 @@ public class StudentsController {
         if(data.has("body") && data.get("body").isJsonObject()) body = data.get("body").getAsJsonObject();
         if(!data.has("type")) data.addProperty("type", "default");
         switch (data.get("type").getAsString()){
-            case "getStud" -> {
+            case "getTeachers" -> {
                 Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
                 bodyAns = new JsonObject();
                 ans.add("body", bodyAns);
                 User user = datas.userByLogin(subscriber.getLogin());
-                Group group = null;
                 Long schId = null;
                 if(user != null) {
                     schId = datas.getFirstRole(user.getRoles()).getYO();
                     School school = datas.schoolById(schId);
-                    if(user.getRoles().containsKey(3L)) {
-                        group = datas.groupById(body.get("group").getAsLong());
-                    } else {
-                        group = datas.groupById(datas.getFirstRole(user.getRoles()).getGroup());
-                    }
-                    if(group != null && school != null && school.getGroups().contains(group.getId())) {
-                        if (!ObjectUtils.isEmpty(group.getKids())) {
-                            for (Long i1 : group.getKids()) {
-                                if(Objects.equals(user.getId(), i1)) continue;
-                                JsonObject studO = new JsonObject();
-                                User studU = datas.userById(i1);
-                                studO.addProperty("name", studU.getFio());
-                                studO.addProperty("login", studU.getLogin());
-                                if (!ObjectUtils.isEmpty(studU.getCode())) studO.addProperty("link", studU.getCode());
-                                bodyAns.add(i1 + "", studO);
-                            }
-                        }
-                        if (!ObjectUtils.isEmpty(group.getKidsInv())) {
-                            for (Long i1 : group.getKidsInv()) {
-                                JsonObject studO = new JsonObject();
-                                Invite studI = datas.inviteById(i1);
-                                studO.addProperty("name", studI.getFio());
-                                if (!ObjectUtils.isEmpty(studI.getCode())) studO.addProperty("link", studI.getCode());
-                                bodyAns.add(i1 + "", studO);
-                            }
+                    if(school != null) {
+                        if (user.getRoles().containsKey(3L)) {
+                            datas.teachersBySchool(school, bodyAns);
+                        } else {
+
                         }
                     }
                 }
-                if(group == null){
+                if(ObjectUtils.isEmpty(bodyAns.keySet())){
                     ans.addProperty("error", true);
                 } else {
-
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.STUDENTS, schId+"", group.getId()+"", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
+                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.TEACHERS, schId+"", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
                 }
                 return ans;
             }
-            case "addPep" -> {
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
+            case "addTea" -> {
                 Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
                 User user = datas.userByLogin(subscriber.getLogin());
                 Invite inv = null;
                 if(user != null && user.getRoles().containsKey(3L)) {
-                    Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
-                    if(group != null) {
+                    School school = datas.schoolById(Long.parseLong(subscriber.getLvlSch()));
+                    if(school != null) {
                         Instant after = Instant.now().plus(Duration.ofDays(30));
                         Date dateAfter = Date.from(after);
                         inv = new Invite(body.get("name").getAsString(), new HashMap<>() {{
-                            put(0L, new Role(null, Long.parseLong(subscriber.getLvlSch()), group.getId(), null));
+                            put(2L, new Role(null, null, Long.parseLong(subscriber.getLvlSch())));
                         }}, Main.df.format(dateAfter));
                         datas.getInviteRepository().saveAndFlush(inv);
-                        if (group.getKidsInv() == null) group.setKidsInv(new ArrayList<>());
-                        group.getKidsInv().add(inv.getId());
-                        datas.getGroupRepository().saveAndFlush(group);
+                        if (school.getTeachersInv() == null) school.setTeachersInv(new ArrayList<>());
+                        school.getTeachersInv().add(inv.getId());
+                        datas.getSchoolRepository().saveAndFlush(school);
                     }
                 }
                 if(inv == null){
                     ans.addProperty("error", true);
                 } else {
                     ans.addProperty("id", inv.getId());
-                    bodyAns.addProperty("name", body.get("name").getAsString());
+                    ans.addProperty("name", body.get("name").getAsString());
 
-                    authController.sendMessageForAll("addPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+                    authController.sendMessageForAll("addTeaC", ans, TypesConnect.TEACHERS, subscriber.getLvlSch(), "main", "ht", "main");
+                }
+                return ans;
+            }
+            case "setCodePep" -> {
+                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
+                User user = datas.userByLogin(subscriber.getLogin());
+                User user1 = datas.userById(body.get("id1").getAsLong());
+                Invite inv = datas.inviteById(body.get("id1").getAsLong());
+                Long schId = null;
+                if(user != null && (user1 != null || inv != null)
+                        && body.get("role").getAsLong() == 3L && user.getRoles().containsKey(3L)) {
+                    UUID uuid = UUID.randomUUID();
+                    Instant after = Instant.now().plus(Duration.ofDays(30));
+                    Date dateAfter = Date.from(after);
+                    if(user1 != null){
+                        user1.setCode(uuid.toString());
+                        user1.setExpDate(Main.df.format(dateAfter));
+                        datas.getUserRepository().saveAndFlush(user1);
+                        schId = datas.getFirstRole(user1.getRoles()).getYO();
+
+                        ans.addProperty("id1", user1.getId());
+                    } else if(inv != null){
+                        inv.setCode(uuid.toString());
+                        inv.setExpDate(Main.df.format(dateAfter));
+                        datas.getInviteRepository().saveAndFlush(inv);
+                        schId = datas.getFirstRole(inv.getRole()).getYO();
+
+                        ans.addProperty("id1", inv.getId());
+                    }
+                    System.out.println("setCode " + uuid);
+
+                    ans.addProperty("code", uuid.toString());
+                    ans.add("id", body.get("id"));
+                    authController.sendMessageForAll("codPepL1C", ans, subscriber.getType(), schId+"", "main", "ht", "main");
+                } else {
+                    ans.addProperty("error", true);
                 }
                 return ans;
             }

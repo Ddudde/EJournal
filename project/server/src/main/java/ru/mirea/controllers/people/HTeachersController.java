@@ -118,7 +118,7 @@ public class HTeachersController {
                     } else {
                         l2 = "user";
                     }
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.HTEACHERS, schId+"", l2);
+                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.HTEACHERS, schId+"", "main", l2, "main");
                 }
                 return ans;
             }
@@ -134,7 +134,7 @@ public class HTeachersController {
                     ans.addProperty("id", school.getId());
                     bodyAns.addProperty("name", body.get("name").getAsString());
 
-                    authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
+                    authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -149,7 +149,7 @@ public class HTeachersController {
 
                     ans.addProperty("id", body.get("id").getAsLong());
 
-                    authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
+                    authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -166,7 +166,7 @@ public class HTeachersController {
                     ans.addProperty("id", body.get("id").getAsLong());
                     ans.addProperty("name", body.get("name").getAsString());
 
-                    authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
+                    authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
                 } else {
                     ans.addProperty("error", true);
                 }
@@ -208,14 +208,14 @@ public class HTeachersController {
                     ans.addProperty("error", true);
                 } else {
                     if(body.get("role").getAsLong() == 4L) {
-                        authController.sendMessageForAll("addInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
-                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, schId+"", "user");
-                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, schId+"", "ht");
+                        authController.sendMessageForAll("addInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
+                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, schId+"", "main", "user", "main");
+                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, schId+"", "main", "ht", "main");
                     }
                     if(body.get("role").getAsLong() == 3L) {
-                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
-                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), "user");
-                        authController.sendMessageForAll("addInfoL2C", ans, TypesConnect.HTEACHERS, "null", "adm");
+                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
+                        authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
+                        authController.sendMessageForAll("addInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
                     }
                 }
                 return ans;
@@ -254,14 +254,14 @@ public class HTeachersController {
                 }
                 if(ans.has("id")){
                     if(body.get("role").getAsLong() == 4L) {
-                        authController.sendMessageForAll("remInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
-                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "user");
-                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "ht");
+                        authController.sendMessageForAll("remInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
+                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "main", "user", "main");
+                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "main", "ht", "main");
                     }
                     if(body.get("role").getAsLong() == 3L) {
-                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
-                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), "user");
-                        authController.sendMessageForAll("remInfoL2C", ans, TypesConnect.HTEACHERS, "null", "adm");
+                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
+                        authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
+                        authController.sendMessageForAll("remInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
                     }
                 } else{
                     ans.addProperty("error", true);
@@ -300,14 +300,14 @@ public class HTeachersController {
                 }
                 if(ans.has("id")){
                     if(body.get("role").getAsLong() == 4L) {
-                        authController.sendMessageForAll("chInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
-                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "user");
-                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "ht");
+                        authController.sendMessageForAll("chInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
+                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "main", "user", "main");
+                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId()+"", "main", "ht", "main");
                     }
                     if(body.get("role").getAsLong() == 3L) {
-                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
-                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getPodTypeL1(), "user");
-                        authController.sendMessageForAll("chInfoL2C", ans, TypesConnect.HTEACHERS, "null", "adm");
+                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
+                        authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
+                        authController.sendMessageForAll("chInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
                     }
                 } else{
                     ans.addProperty("error", true);
@@ -317,21 +317,12 @@ public class HTeachersController {
             case "getGroups" -> {
                 Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
                 User user = datas.userByLogin(subscriber.getLogin());
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
-                Group gr = null;
-                Long schId = null;
                 if(user != null && (user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L))) {
-                    schId = datas.getFirstRole(user.getRoles()).getYO();
-                    School school = datas.schoolById(schId);
-                    if (!ObjectUtils.isEmpty(school.getGroups())) {
-                        for (Long i1 : school.getGroups()) {
-                            gr = datas.groupById(i1);
-                            bodyAns.addProperty(i1 + "", gr.getName());
-                        }
-                    }
+                    JsonObject grps = new JsonObject();
+                    datas.groupsByUser(user, grps);
+                    ans.add("body", grps);
                 }
-                if(gr == null){
+                if(!ans.has("body")){
                     ans.addProperty("error", true);
                 }
                 return ans;
@@ -339,19 +330,75 @@ public class HTeachersController {
             case "addGroup" -> {
                 Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
                 User user = datas.userByLogin(subscriber.getLogin());
+                Group group = null;
+                Long schId = null;
+                if(user != null && user.getRoles().containsKey(3L)) {
+                    schId = user.getRoles().get(3L).getYO();
+                    School school = datas.schoolById(schId);
+                    if(school != null) {
+                        group = new Group(body.get("name").getAsString());
+                        datas.getGroupRepository().saveAndFlush(group);
+                        if (school.getGroups() == null) school.setGroups(new ArrayList<>());
+                        school.getGroups().add(group.getId());
+                        datas.getSchoolRepository().saveAndFlush(school);
+                    }
+                }
+                if(group == null){
+                    ans.addProperty("error", true);
+                } else {
+                    ans.addProperty("id", group.getId());
+                    ans.addProperty("name", body.get("name").getAsString());
 
+                    authController.sendMessageForAll("addGroupC", ans, TypesConnect.MAIN, schId+"", "main", "ht", "main");
+                }
                 return ans;
             }
             case "chGroup" -> {
                 Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
                 User user = datas.userByLogin(subscriber.getLogin());
+                Group group = null;
+                Long schId = null;
+                if(user != null && user.getRoles().containsKey(3L)) {
+                    schId = user.getRoles().get(3L).getYO();
+                    School school = datas.schoolById(schId);
+                    if(school != null) {
+                        group = datas.groupById(body.get("id").getAsLong());
+                        group.setName(body.get("name").getAsString());
+                        datas.getGroupRepository().saveAndFlush(group);
+                    }
+                }
+                if(group == null){
+                    ans.addProperty("error", true);
+                } else {
+                    ans.addProperty("id", group.getId());
+                    ans.addProperty("name", body.get("name").getAsString());
 
+                    authController.sendMessageForAll("chGroupC", ans, TypesConnect.MAIN, schId+"", "main", "ht", "main");
+                }
                 return ans;
             }
             case "remGroup" -> {
                 Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
                 User user = datas.userByLogin(subscriber.getLogin());
+                Group group = null;
+                Long schId = null;
+                if(user != null && user.getRoles().containsKey(3L)) {
+                    schId = user.getRoles().get(3L).getYO();
+                    School school = datas.schoolById(schId);
+                    if(school != null) {
+                        group = datas.groupById(body.get("id").getAsLong());
+                        datas.getGroupRepository().delete(group);
+                        school.getGroups().remove(group.getId());
+                        datas.getSchoolRepository().saveAndFlush(school);
+                    }
+                }
+                if(group == null){
+                    ans.addProperty("error", true);
+                } else {
+                    ans.addProperty("id", group.getId());
 
+                    authController.sendMessageForAll("remGroupC", ans, TypesConnect.MAIN, schId+"", "main", "ht", "main");
+                }
                 return ans;
             }
             default -> {

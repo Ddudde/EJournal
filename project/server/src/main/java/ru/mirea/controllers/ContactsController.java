@@ -1,10 +1,8 @@
 package ru.mirea.controllers;
 
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
@@ -13,11 +11,7 @@ import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.School;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.reps.ContactsRepository;
-import ru.mirea.data.reps.SystemRepository;
-import ru.mirea.data.reps.auth.UserRepository;
 
-import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -61,7 +55,7 @@ public class ContactsController {
                         conId = syst.getContacts();
                         schId = null;
                     }
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.CONTACTS, body.get("type").getAsString(), schId + "");
+                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.CONTACTS, schId + "", "main", "main", body.get("type").getAsString());
                 }
                 if(conId != null) {
                     Contacts conM = datas.contactsById(conId);
@@ -79,10 +73,10 @@ public class ContactsController {
                 Syst syst = datas.getSyst();
                 Contacts contacts = null;
                 if(user != null) {
-                    if(user.getRoles().containsKey(4L) && Objects.equals(subscriber.getPodTypeL1(), "Por")){
+                    if(user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlSch(), "Por")){
                         contacts = datas.contactsById(syst.getContacts());
                     }
-                    if(user.getRoles().containsKey(3L) && Objects.equals(subscriber.getPodTypeL1(), "Yo")){
+                    if(user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlSch(), "Yo")){
                         Long schId = user.getRoles().get(body.get("role").getAsLong()).getYO();
                         School school = datas.schoolById(schId);
                         if(school != null) {
@@ -109,7 +103,7 @@ public class ContactsController {
                     ans.add("p", body.get("p"));
                     ans.add("p1", body.get("p1"));
 
-                    authController.sendMessageForAll("chContactC", ans, TypesConnect.CONTACTS, subscriber.getPodTypeL1(), subscriber.getPodTypeL2());
+                    authController.sendMessageForAll("chContactC", ans, TypesConnect.CONTACTS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
                 } else {
                     ans.addProperty("error", true);
                 }

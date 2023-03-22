@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import ru.mirea.data.SSE.TypesConnect;
+import ru.mirea.data.models.Day;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -9,13 +10,31 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 public class Test {
     public static void main(String[] args) throws ParseException {
-        dateTest();
+        jsonTest2();
+    }
+
+    private static void jsonTest2(){
+        JsonObject data = new JsonObject(), data1 = new JsonObject(), data2 = new JsonObject();
+        data1.addProperty("id", "fgd");
+        data.add("d", data1);
+        data1.addProperty("id1", "fgd");
+        data2.add("d", data1);
+        System.out.println(data);
+        System.out.println(data2);
+
+//        List<Day> day = new ArrayList<Day>();
+//        day.add(0, new Day("ret"));
+//        day.add(1, new Day("pet"));
+//        day.add(2, new Day("mek"));
+//        day.remove(1);
+//        System.out.println(day.get(1));
+//        for(Day day1 : day){
+//            System.out.println(day1);
+//        }
     }
 
     private static void dateTest() throws ParseException {

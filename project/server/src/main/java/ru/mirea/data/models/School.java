@@ -37,6 +37,18 @@ import java.util.List;
     @Column(name = "contacts")
     private Long contacts;
 
+    @Convert(converter = ListLongConverter.class)
+    @Column(name = "teachers")
+    private List<Long> teachers;
+
+    @Convert(converter = ListLongConverter.class)
+    @Column(name = "teachersInv")
+    private List<Long> teachersInv;
+
+    @Convert(converter = ListLongConverter.class)
+    @Column(name = "subjects")
+    private List<Long> subjects;
+
     public School(String name) {
         this.name = name;
     }
@@ -52,20 +64,24 @@ import java.util.List;
         this.hteachersInv = hteachersInv;
     }
 
-    public School(String name, List<Long> hteachers, List<Long> news, Long contacts, List<Long> groups) {
+    public School(String name, List<Long> hteachers, List<Long> news, Long contacts, List<Long> groups, List<Long> subjects, List<Long> teachers) {
         this.name = name;
         this.hteachers = hteachers;
         this.news = news;
         this.contacts = contacts;
         this.groups = groups;
+        this.subjects = subjects;
+        this.teachers = teachers;
     }
 
-    public School(String name, List<Long> hteachers, List<Long> hteachersInv, List<Long> news, Long contacts, List<Long> groups) {
+    public School(String name, List<Long> hteachers, List<Long> hteachersInv, List<Long> news, Long contacts, List<Long> groups, List<Long> subjects, List<Long> teachers) {
         this.name = name;
         this.hteachers = hteachers;
         this.hteachersInv = hteachersInv;
         this.news = news;
         this.contacts = contacts;
         this.groups = groups;
+        this.subjects = subjects;
+        this.teachers = teachers;
     }
 }
