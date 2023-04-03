@@ -1,0 +1,189 @@
+.AppHeader {
+	width: 100%;
+	height: 93vh;
+	display: flex;
+	position: relative;
+	top: 7vh;
+}
+
+.header {
+	width: 100%;
+	height: 86vh;
+	display: flex;
+	position: relative;
+	top: 7vh;
+}
+
+.blockPep{
+	text-align: center;
+	margin: auto;
+	width: 75%;
+}
+
+.pep{
+	background-color: var(--bgcV1);
+	padding: 10px;
+	border-radius: 5px;
+	transition: background-color 1s ease;
+	margin-block: 5vh;
+}
+
+.nav_i{
+	cursor: pointer;
+	color: var(--cV1);
+	font-size: 1.25vw;
+	font-weight: 500;
+	text-shadow: 1px 1px 3px var(--shdV1);
+	-webkit-transition: color 1s ease;
+	-o-transition: color 1s ease;
+	transition: color 1s ease;
+	transition-property: color, text-shadow;
+	margin: -0.5px;
+	padding: 5px;
+	position: relative;
+	backface-visibility: hidden;
+	perspective: 1000px;
+}
+
+#nav_i:hover{
+	color: #00ff00;
+	text-shadow: 0 0 2vw #66ff66;
+}
+
+.nav_iZag{
+	border: 1px solid var(--bcV1);
+	text-align: initial;
+	margin-block: 1vw;
+	border-radius: 5px;
+	position: relative;
+}
+
+.nav_iZag2{
+	text-align: initial;
+	margin-left: 2vw;
+	border: none;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.nav_iZag1{
+	margin-left: 1vw;
+}
+
+.profIm{
+	width: 2vw;
+	vertical-align: middle;
+	cursor: pointer;
+	margin-block: auto;
+}
+
+.add{
+	margin-left: 1vw;
+}
+
+.pepl {
+	color: var(--cV1);
+	margin-bottom:5px;
+	text-shadow: 1px 1px 3px var(--shdV1);
+	transition: color 1s ease;
+	font-size: initial;
+	font-weight: normal;
+	margin-block: 1em;
+	display: block;
+	transition-delay: unset;
+	border: none;
+	background-color: unset;
+	position: relative;
+}
+
+.link{
+	text-decoration: underline;
+	cursor: pointer;
+	transition-delay: unset;
+	background-color: unset;
+	display: none;
+	justify-content: center;
+}
+
+.field{
+	display: none;
+	vertical-align: middle;
+	margin-left: 5px;
+}
+
+.fi, .ed, .add[data-st='0'] > .pepl{
+	display: none;
+}
+
+.add[data-st='1'] > .pepl, .pepl[data-st='1'] > .ed{
+	display: block;
+}
+
+.add[data-st='0'] > .link, .pepl[data-st='0'] > .fi{
+	display: flex;
+}
+
+.imginp, .imgfield{
+	width: 1vw;
+	vertical-align: middle;
+	cursor: pointer;
+	margin-left: 1vw;
+	display: inline-block;
+	margin-block: auto;
+}
+
+.inp {
+	border-radius: 0.5vmax;
+	background-color: #4d4d4d;
+	user-select: none;
+	box-shadow: 0 1px #FFFFFFAA, inset 0 2px 2px #000000AA;
+	border: 1px solid var(--bcV2);
+	height: 90%;
+	position:relative;
+	transition: background-color 1s ease;
+	transition-property: background-color, border-color;
+	vertical-align: middle;
+	display: inline-block;
+	width: 50%;
+	font-size: 1.25vw;
+	padding: 0 0 0 1vw;
+	margin-left: 1vw;
+}
+
+.inp[data-mod='1']{
+	animation: but ease 1s;
+	outline: solid red;
+}
+
+@keyframes but {
+	0%{transform: rotateZ(-2deg);}
+	50%{transform: rotateZ(2deg);}
+	100%{transform: rotateZ(0deg);}
+}
+
+*[data-enable="0"] {
+	pointer-events: none;
+	opacity: 0.4;
+}
+
+.field, .preinf{
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 0.2vw;
+	color: var(--cV1);
+	text-shadow: 1px 1px 3px var(--shdV1);
+}
+
+.field{
+	margin-left: 5px;
+}
+
+.copyInp{
+	max-width: 25%;
+	align-self: center;
+	border-radius: unset;
+}
+
+.refrC{
+	width: 2vw;
+}

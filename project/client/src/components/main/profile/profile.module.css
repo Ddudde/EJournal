@@ -1,0 +1,130 @@
+.AppHeader {
+	width: 100%;
+	display: flex;
+	position: relative;
+	top: 7vh;
+	height: 93vh;
+}
+
+.nav_iZag{
+	border: 1px solid var(--bcV1);
+	border-radius: 5px;
+	margin-left: 0.5vw;
+	margin-block: 0.5vw;
+	padding-left: 0.5vw;
+	padding-block: 0.5vw;
+}
+
+.proImg{
+	width: 2vw;
+	vertical-align: middle;
+	cursor: pointer;
+	margin-left: 1vw;
+}
+
+.blockPro{
+	margin: auto;
+	width: 75%;
+}
+
+.pro{
+	background-color: var(--bgcV1);
+	padding: 20px;
+	margin-block: 5vh;
+	border-radius: 5px;
+	transition: background-color 1s ease;
+}
+
+.pro > img{
+	width: 8vw;
+	float: right;
+	opacity: 0.5;
+}
+
+.nav_i{
+	cursor: default;
+	color: var(--cV1);
+	font-size: 1.25vw;
+	font-weight: 500;
+    margin-block: 0.2vw;
+	text-shadow: 1px 1px 3px var(--shdV1);
+	-webkit-transition: color 1s ease;
+	-o-transition: color 1s ease;
+	transition: color 1s ease;
+	transition-property: color, text-shadow, border-color;
+	backface-visibility: hidden;
+	perspective: 1000px;
+}
+
+#nav_i:hover{
+	color: #00ff00 !important;
+	text-shadow: 0 0 2vw #66ff66;
+}
+
+.inp{
+	border-radius: 0.5vmax;
+	background-color: #4d4d4d;
+	user-select: none;
+	box-shadow: 0 1px #FFFFFFAA, inset 0 2px 2px #000000AA;
+	border: 1px solid var(--bcV2);
+	font-size: 2.2vmax;
+	height: 7vh;
+	margin-left: 1.5vmax;
+	padding-left: 1.5vmax;
+	width: 20vw;
+	position:relative;
+	transition: background-color 1s ease;
+	transition-property: background-color, border-color;
+    vertical-align: middle;
+	display: inline-block;
+}
+
+.inp[data-mod='1']{
+	animation: but ease 1s;
+	outline: solid red;
+}
+
+@keyframes but {
+	0%{transform: rotateZ(-2deg);}
+	50%{transform: rotateZ(2deg);}
+	100%{transform: rotateZ(0deg);}
+}
+
+.inparea{
+    font-size: 1.25vmax;
+    padding-left: 1vmax;
+    height: 20vh;
+	width: 50%;
+}
+
+.imginp, .imgfield{
+	width: 1vw;
+	vertical-align: middle;
+	cursor: pointer;
+	margin-left: 1vw;
+	display: inline-block;
+}
+
+.imginp[data-enable="0"] {
+	pointer-events: none;
+	opacity: 0.4;
+}
+
+.nav_i[data-mod='0'] > .inp, .nav_i[data-mod='0'] > .imginp,
+.nav_i[data-mod='1'] > .field, .nav_i[data-mod='1'] > .imgfield{
+	display: none;
+}
+
+.field, .preinf{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.field{
+    margin-left: 5px;
+}
+
+pre.field{
+    vertical-align: top;
+    margin-top: 0.3em;
+}

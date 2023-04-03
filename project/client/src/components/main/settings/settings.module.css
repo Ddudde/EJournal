@@ -1,0 +1,153 @@
+.AppHeader {
+	width: 100%;
+	display: flex;
+	position: relative;
+	top: 7vh;
+	height: 93vh;
+}
+
+.blockNotif[data-act='0']{
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.blockNotif[data-act='1']{
+	opacity: 1;
+	pointer-events: initial;
+}
+
+.blockPro{
+	margin: auto;
+	width: 75%;
+}
+
+.pro{
+	background-color: var(--bgcV1);
+	padding: 10px;
+	margin-block: 5vh;
+	border-radius: 5px;
+	transition: background-color 1s ease;
+}
+
+.nav_i{
+	cursor: default;
+	color: var(--cV1);
+	font-size: 1.25vw;
+	font-weight: 500;
+	margin-block: 0.2vw;
+	transition: color 1s ease;
+	transition-property: color, text-shadow, border-color;
+	text-shadow: 1px 1px 3px var(--shdV1);
+	backface-visibility: hidden;
+	perspective: 1000px;
+}
+
+#nav_i:hover{
+	color: #00ff00 !important;
+	text-shadow: 0 0 2vw #66ff66;
+}
+
+.nav_iZag{
+	border: 1px solid var(--bcV1);
+	border-radius: 5px;
+	margin-left: 0.5vw;
+	margin-block: 0.5vw;
+	padding-left: 0.5vw;
+	padding-block: 0.5vw;
+}
+
+.link{
+	text-decoration: underline;
+	cursor: pointer;
+	margin-block: 1vw;
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 5px;
+}
+
+.nav_iZag[data-mod='0'] > .block, .nav_iZag[data-mod='1'] > .link,
+.block[data-mod='0'] > .frp, .block[data-mod='1'] > .oldp{
+	display: none;
+}
+
+.pasBlock{
+	display: flex;
+	margin-bottom: 1vw;
+	align-items: center;
+}
+
+.marg{
+	margin-left: 9px;
+}
+
+.inp {
+	border-radius: 0.5vmax;
+	background-color: #4d4d4d;
+	user-select: none;
+	box-shadow: 0 1px #FFFFFFAA, inset 0 2px 2px #000000AA;
+	border: 1px solid var(--bcV2);
+	font-size: 2.2vmax;
+	height: 7vh;
+	margin-left: 1.5vmax;
+	padding-left: 1.5vmax;
+	width: 20vw;
+	position:relative;
+	transition: background-color 1s ease;
+	transition-property: background-color, border-color;
+	vertical-align: middle;
+}
+
+.inp[data-mod='1']{
+	animation: but ease 1s;
+	outline: solid red;
+}
+
+@keyframes but {
+	0%{transform: rotateZ(-2deg);}
+	50%{transform: rotateZ(2deg);}
+	100%{transform: rotateZ(0deg);}
+}
+
+.inpPass{
+	margin-bottom: 1vw;
+}
+
+.randimg{
+	width: 4vmin;
+	height: 4vmin;
+	pointer-events: none;
+}
+
+.blockKnops{
+	margin-left: 1.5vmax;
+	width: 21.5vw;
+	display: flex;
+	justify-content: space-between;
+}
+
+.logo{
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	color: var(--cV1);
+	font-size: 3vw;
+	font-weight: bolder;
+	margin-left: 9px;
+	margin-bottom: 9px;
+	transition: color 1s ease;
+}
+
+.logoi{
+	width: 8vw;
+	height: 8vw;
+}
+
+.blockAva{
+	display: inline-block;
+	cursor: pointer;
+}
+
+.blockAva *{
+	pointer-events: none;
+}

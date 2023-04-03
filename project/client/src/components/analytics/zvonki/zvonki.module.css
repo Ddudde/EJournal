@@ -1,0 +1,5 @@
+.smenaGrid{
+	display: grid;
+	grid-template: repeat(5, auto)/auto;
+	height: 100%;
+}

@@ -1,0 +1,13 @@
+.block{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.tex{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.inp{
+    vertical-align: middle;
+}

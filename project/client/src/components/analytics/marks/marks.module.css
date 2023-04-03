@@ -1,0 +1,113 @@
+.AppHeader {
+	width: 100%;
+	height: 86vh;
+	display: flex;
+	position: relative;
+	top: 7vh;
+}
+
+.blockPredm{
+	text-align: center;
+	margin: auto;
+	width: 75%;
+}
+
+.predm{
+	background-color: var(--bgcV1);
+	padding: 10px;
+	border-radius: 5px;
+	transition: background-color 1s ease;
+	margin-block: 5vh;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.predmGrid{
+	display: grid;
+	grid-template: 5vh /20vw repeat(auto-fit, 2vw);
+	transition: background-color 1s ease;
+	width: fit-content;
+}
+
+.predmGrid:hover{
+	background-color: #FF970055 !important;
+}
+
+.persGrid{
+	display: grid;
+	grid-template: 15vh /20vw repeat(auto-fit, 2vw);
+	width: fit-content;
+}
+
+.nav_i{
+	text-decoration: none;
+	border: 1px solid var(--bcV1);
+	cursor: pointer;
+	color: var(--cV1);
+	font-size: 1.25vw;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	align-self: stretch;
+	-webkit-transition: color 1s ease;
+	-o-transition: color 1s ease;
+	transition: color 1s ease;
+	transition-property: color, text-shadow, border-color;
+	margin: -0.5px;
+	padding: 5px;
+	position: relative;
+}
+
+#nav_i:hover, #nav_i:hover *{
+	color: #00ff00 !important;
+	text-shadow: 0 0 2vw #66ff66;
+}
+
+.nav_iText{
+	transform: rotateZ(270deg);
+	color: #990000;
+}
+
+.nav_iBr{
+	border: none;
+}
+
+.nam{
+	position: absolute;
+	width: 22vw;
+	height: 5vh;
+	padding: 0;
+	background-color: var(--bgcV1);
+	z-index: 1;
+}
+
+.nav_iTextM{
+	color: #990000;
+}
+
+.nav_iTextD{
+	font-size: 0.75vw;
+}
+
+.descr{
+	padding: 1vw;
+}
+
+.nav_iTextDescr{
+	font-size: 1vw;
+	width: fit-content;
+	border: none;
+	padding: 0;
+}
+
+.nav_iWeight{
+	border: none;
+	font-size: 0.75vw;
+	margin: initial;
+	padding: initial;
+	align-items: center;
+	top: 0.75vw;
+	position: relative;
+	margin-block: 0.75vw;
+}

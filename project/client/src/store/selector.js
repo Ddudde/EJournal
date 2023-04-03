@@ -1,0 +1,25 @@
+export const all = state => state
+export const states = state => state.states || {};
+export const profiles = state => state.profiles || {};
+export const indicators = state => state.indicators || {};
+export const checkbox = state => state.checkbox || {};
+export const themes = state => state.themes || {};
+export const groups = state => state.groups || {};
+export const dnevnik = state => state.dnevnik || {};
+export const periods = state => state.periods || {};
+export const teachers = state => state.teachers || {};
+export const dialog = state => state.dialog || {};
+export const classmates = state => state.classmates || {};
+export const parents = state => state.parents || {};
+export const admins = state => state.admins || {};
+export const hteachers = state => state.hteachers || {};
+export const schedules = state => state.schedules || {};
+export const marks = state => state.marks || {};
+export const requests = state => state.requests || {};
+export const journals = state => state.journals || {};
+export const pjournal = state => state.pjournal || {};
+export const pane = state => state.pane || {};
+export const events = state => state.events || {};
+export const zvonki = state => state.zvonki || {};
+export const news = state => state.news || {};
+export const contacts = state => state.contacts || {};

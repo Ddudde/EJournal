@@ -1,0 +1,112 @@
+.AppHeader {
+	width: 100%;
+	display: flex;
+	position: relative;
+	top: 7vh;
+	height: 93vh;
+}
+
+.nav_iZag{
+	border: 1px solid var(--bcV1);
+	border-radius: 5px;
+	margin-left: 0.5vw;
+	margin-block: 0.5vw;
+	padding-left: 0.5vw;
+	padding-block: 0.5vw;
+}
+
+.blockPro{
+	margin: auto;
+	width: 75%;
+}
+
+.pro{
+	background-color: var(--bgcV1);
+	padding: 20px;
+	margin-block: 5vh;
+	border-radius: 5px;
+	transition: background-color 1s ease;
+}
+
+.nav_i{
+	cursor: default;
+	color: var(--cV1);
+	font-size: 1vw;
+	text-shadow: 1px 1px 3px var(--shdV1);
+	font-weight: 500;
+}
+
+#nav_i:hover{
+	color: #00ff00 !important;
+	text-shadow: 0 0 2vw #66ff66;
+}
+
+.zag, .zag1{
+	-webkit-transition: color 1s ease;
+	-o-transition: color 1s ease;
+	transition: color 1s ease;
+	transition-property: color, text-shadow, border-color;
+	backface-visibility: hidden;
+	perspective: 1000px;
+}
+
+.zag1{
+	text-decoration: underline;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.zag{
+	font-size: 1.25vw;
+	margin-bottom: 0.5vw;
+}
+
+.block{
+    margin-inline: 2vw;
+}
+
+.blockOtv{
+	margin-inline: 2vw;
+}
+
+.blockOtv[data-act="0"]{
+	display: none;
+}
+
+.blockImg{
+	text-align: center;
+	margin-block: 1vw;
+}
+
+.blockImg > img{
+	max-width: 75%;
+	display: block;
+	margin: auto;
+}
+
+.GotCW{
+	position: fixed;
+	width: 12vw;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	text-align: center;
+}
+
+.GotCW img{
+	width: 8vw;
+	cursor: pointer;
+}
+
+.GotCWText{
+	color: var(--cV2);
+	font-size: 2vmax;
+	font-weight: bold;
+	text-shadow: 2px 2px 2px #000;
+	transition: color 1s ease;
+}
+
+.GotCW[data-act="0"]{
+	display: none;
+}

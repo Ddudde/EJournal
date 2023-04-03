@@ -1,0 +1,158 @@
+.AppHeader {
+	width: 100%;
+	display: flex;
+	position: relative;
+	top: 7vh;
+}
+
+.blockDay{
+	text-align: center;
+	margin-bottom: 5vh;
+}
+
+.day{
+	background-color: var(--bgcV1);
+	padding: 10px;
+	border-radius: 5px;
+	margin-bottom: 10px;
+	transition: background-color 1s ease;
+	display: grid;
+	grid-template: repeat(5, auto)/20% 1fr 10%;
+	margin-inline: auto;
+	width: 75%;
+}
+
+.day .dayHomework{
+	justify-content: initial;
+	text-align: left;
+}
+
+.nav_i{
+	text-decoration: none;
+	border: 1px solid var(--bcV1);
+	cursor: pointer;
+	color: var(--cV1);
+	font-size: 1.25vw;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	align-self: stretch;
+	-webkit-transition: color 1s ease;
+	-o-transition: color 1s ease;
+	transition: color 1s ease;
+	transition-property: color, text-shadow, border-color;
+	margin: -0.5px;
+	padding: 5px;
+	position: relative;
+}
+
+#nav_i:hover, #nav_i:hover *{
+	color: #00ff00 !important;
+	text-shadow: 0 0 2vw #66ff66;
+}
+
+.nav_iWeight{
+	border: none;
+	font-size: 0.75vw;
+	margin: initial;
+	padding: initial;
+	align-items: center;
+	top: 0.75vw;
+	position: relative;
+	margin-block: 0.75vw;
+}
+
+.nav_iType{
+	margin: initial;
+	border-color: #b3b3b3;
+	border-radius: 5px;
+	position: absolute;
+	left: 110%;
+	padding: 5px 10px;
+	align-self: center;
+	justify-content: stretch;
+	background-color: var(--bgcV2);
+	opacity: 0;
+	transition-property: opacity;
+}
+
+.blockL{
+	width: 100%;
+	position: relative;
+	left: 0;
+	overflow: hidden;
+}
+
+.blockLU{
+	margin-bottom: 1vh;
+}
+
+.blockLD{
+	margin-top: 1vh;
+	margin-bottom: -5px;
+}
+
+.blockLText{
+	text-align: center;
+	color:var(--cV2);
+	font-weight: bold;
+	font-size: 1.5vw;
+	text-shadow: 2px 2px 2px #000;
+	transition: color 1s ease;
+}
+
+.blockLTextD{
+	margin-bottom: 0.9vh;
+}
+
+.blockLine{
+	border-top: #F00 dashed 5px;
+	transform: scaleX(20);
+}
+
+.nav_i:hover .nav_iType{
+	opacity: 1;
+}
+
+.GotCW{
+	position: fixed;
+	width: 12vw;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+}
+
+.GotCW img{
+	width: 8vw;
+	cursor: pointer;
+}
+
+.GotCWText{
+	color: var(--cV2);
+	font-size: 2vmax;
+	font-weight: bold;
+	text-shadow: 2px 2px 2px #000;
+	transition: color 1s ease;
+}
+
+.block{
+	margin: auto;
+	text-align: center;
+}
+
+.block > img{
+	width: 30vmin;
+	height: 30vmin;
+}
+
+.block_text{
+	width: 70vmin;
+	color:var(--cV2);
+	font-weight: bold;
+	font-size: 1.5vw;
+	text-shadow: 2px 2px 2px #000;
+	transition: color 1s ease;
+	text-align: left;
+}

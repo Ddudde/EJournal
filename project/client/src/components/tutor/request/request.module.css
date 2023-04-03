@@ -1,0 +1,41 @@
+.preinf{
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 1.25vw;
+    margin-inline: 0.2vw;
+    color: var(--cV1);
+    text-shadow: 1px 1px 3px var(--shdV1);
+    white-space: nowrap;
+}
+
+.blockInp{
+    height: 4vh;
+    margin-block: 1vh;
+}
+
+.inp {
+    border-radius: 0.5vmax;
+    background-color: #4d4d4d;
+    user-select: none;
+    box-shadow: 0 1px #FFFFFFAA, inset 0 2px 2px #000000AA;
+    border: 1px solid var(--bcV2);
+    position: relative;
+    transition: background-color 1s ease;
+    transition-property: background-color, border-color;
+    vertical-align: middle;
+    display: inline-block;
+    font-size: 1.25vw;
+    padding: 0 0 0 1vw;
+    margin-left: 1vw;
+}
+
+.inp[data-mod='1']{
+    animation: but ease 1s;
+    outline: solid red;
+}
+
+@keyframes but {
+    0%{transform: rotateZ(-2deg);}
+    50%{transform: rotateZ(2deg);}
+    100%{transform: rotateZ(0deg);}
+}
