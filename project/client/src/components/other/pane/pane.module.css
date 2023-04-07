@@ -129,11 +129,11 @@
 .predBlock{
 	position: relative;
 	margin-inline: -0.5px;
-	display: flex;
 	align-items: center;
 	justify-content: center;
 	align-self: stretch;
 	width: 100%;
+    display: none;
 }
 
 .pred{

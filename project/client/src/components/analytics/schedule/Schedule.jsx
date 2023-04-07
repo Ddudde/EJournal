@@ -27,6 +27,7 @@ import no from "../../../media/no.png";
 import mapd from "../../../media/Map_symbolD.png";
 import mapl from "../../../media/Map_symbolL.png";
 import ed from "../../../media/edit.png";
+import {setEvGr} from "../../people/PeopleMain";
 
 let dispatch, cState, selGr, schedulesInfo, groupsInfo, errText, inps, teachersInfo, themeState, DoW;
 DoW = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
@@ -345,8 +346,9 @@ function setInfo() {
         .then(data => {
             console.log(data);
             if(data.error == false){
+                setEvGr(cState, dispatch);
                 dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
-                if(!data.bodyG[groupsInfo.group]) {
+                if(!data.bodyG[groupsInfo.els.group]) {
                     dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
                 }
                 dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.bodyT));
@@ -358,7 +360,7 @@ function setInfo() {
 function setSchedule() {
     send({
         uuid: cState.uuid,
-        group: groupsInfo.group
+        group: groupsInfo.els.group
     }, 'POST', "schedule", "getSchedule")
         .then(data => {
             console.log(data);

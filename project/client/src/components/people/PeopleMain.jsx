@@ -23,7 +23,7 @@ import parentsCSS from "./parents/parents.module.css";
 import {addKid, codPar} from "./parents/Parents";
 import {addTea, codTea} from "./teachers/Teachers";
 
-let gr, cState, dispatch, groupsInfo;
+let gr, cState, dispatch, groupsInfo, evsIni;
 gr = {
     group: 0
 };
@@ -197,7 +197,6 @@ export function onClose(e, type) {
         par.setAttribute('data-st', '0');
     }
 }
-
 export function chStatB(e, inps) {
     let el = e.target;
     inps[el.id] = !el.validity.patternMismatch && el.value.length != 0;
@@ -226,6 +225,30 @@ function chGroupC(e) {
 function addGroupC(e) {
     const msg = JSON.parse(e.data);
     dispatch(changeGroups(CHANGE_GROUPS_GRS, undefined, msg.name, msg.id));
+}
+
+function onCon(e) {
+    setGroups();
+}
+
+function setGroups() {
+    send({
+        uuid: cState.uuid
+    }, 'POST', "hteachers", "getGroups")
+        .then(data => {
+            console.log(data);
+            if(data.error == false){
+                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.body));
+                if(!data.body[groupsInfo.group]){
+                    let grs = Object.getOwnPropertyNames(data.body);
+                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(grs[0])));
+                }
+            }
+        });
+}
+
+export function setActNew(name) {
+    gr.group = name;
 }
 
 export function remGroup (id) {
@@ -265,28 +288,16 @@ export function addGroup (inp, par) {
         });
 }
 
-function onCon(e) {
-    setGroups();
-}
-
-function setGroups() {
-    send({
-        uuid: cState.uuid
-    }, 'POST', "hteachers", "getGroups")
-        .then(data => {
-            console.log(data);
-            if(data.error == false){
-                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.body));
-                if(!data.body[groupsInfo.group]){
-                    let grs = Object.getOwnPropertyNames(data.body);
-                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(grs[0])));
-                }
-            }
-        });
-}
-
-export function setActNew(name) {
-    gr.group = name;
+export function setEvGr(cS, dis) {
+    if(!evsIni) {
+        if(!cState) cState = cS;
+        if(!dispatch) dispatch = dis;
+        evsIni = true;
+        eventSource.addEventListener('connect', onCon, false);
+        eventSource.addEventListener('addGroupC', addGroupC, false);
+        eventSource.addEventListener('chGroupC', chGroupC, false);
+        eventSource.addEventListener('remGroupC', remGroupC, false);
+    }
 }
 
 export function PeopleMain() {
@@ -294,10 +305,7 @@ export function PeopleMain() {
     groupsInfo = useSelector(groups);
     if(!dispatch && cState.role > 1){
         if(eventSource.readyState == EventSource.OPEN) setGroups();
-        eventSource.addEventListener('connect', onCon, false);
-        eventSource.addEventListener('addGroupC', addGroupC, false);
-        eventSource.addEventListener('chGroupC', chGroupC, false);
-        eventSource.addEventListener('remGroupC', remGroupC, false);
+        setEvGr();
     }
     dispatch = useDispatch();
     gr.groups = {
@@ -332,6 +340,7 @@ export function PeopleMain() {
             eventSource.removeEventListener('addGroupC', addGroupC);
             eventSource.removeEventListener('chGroupC', chGroupC);
             eventSource.removeEventListener('remGroupC', remGroupC);
+            evsIni = false;
             console.log("I was triggered during componentWillUnmount PeopleMain.jsx");
         }
     }, []);
