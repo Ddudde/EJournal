@@ -239,7 +239,7 @@ function setGroups() {
             console.log(data);
             if(data.error == false){
                 dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.body));
-                if(!data.body[groupsInfo.group]){
+                if(!data.body[groupsInfo.els.group]){
                     let grs = Object.getOwnPropertyNames(data.body);
                     dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(grs[0])));
                 }
@@ -289,11 +289,10 @@ export function addGroup (inp, par) {
 }
 
 export function setEvGr(cS, dis) {
+    if(cS) cState = cS;
+    if(dis) dispatch = dis;
     if(!evsIni) {
-        if(!cState) cState = cS;
-        if(!dispatch) dispatch = dis;
         evsIni = true;
-        eventSource.addEventListener('connect', onCon, false);
         eventSource.addEventListener('addGroupC', addGroupC, false);
         eventSource.addEventListener('chGroupC', chGroupC, false);
         eventSource.addEventListener('remGroupC', remGroupC, false);
@@ -305,6 +304,7 @@ export function PeopleMain() {
     groupsInfo = useSelector(groups);
     if(!dispatch && cState.role > 1){
         if(eventSource.readyState == EventSource.OPEN) setGroups();
+        eventSource.addEventListener('connect', onCon, false);
         setEvGr();
     }
     dispatch = useDispatch();

@@ -333,7 +333,7 @@ function addLessonC(e) {
 function addLesson(day, obj) {
     send({
         uuid: cState.uuid,
-        group: groupsInfo.group,
+        group: groupsInfo.els.group,
         day: day,
         obj: obj
     }, 'POST', "schedule", "addLesson");
@@ -349,6 +349,7 @@ function setInfo() {
                 setEvGr(cState, dispatch);
                 dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
                 if(!data.bodyG[groupsInfo.els.group]) {
+                    selGr = data.firstG;
                     dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
                 }
                 dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.bodyT));
@@ -364,10 +365,8 @@ function setSchedule() {
     }, 'POST', "schedule", "getSchedule")
         .then(data => {
             console.log(data);
-            if(data.error == false){
-                selGr = groupsInfo.group;
-                dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body));
-            }
+            selGr = groupsInfo.els.group;
+            dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body));
         });
 }
 
@@ -405,7 +404,7 @@ export function Schedule() {
             isFirstUpdate.current = false;
             return;
         }
-        if(selGr != groupsInfo.group){
+        if(groupsInfo.els.group && selGr != groupsInfo.els.group){
             if(eventSource.readyState == EventSource.OPEN) setSchedule();
         }
         console.log('componentDidUpdate Schedule.jsx');

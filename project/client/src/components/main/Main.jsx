@@ -300,11 +300,11 @@ export function Main() {
         } : undefined,
         10: cState.auth && cState.role == 3 ? {
             nam: "Администрирование УО",
-            linke: "admYO"
+            linke: "/"
         } : undefined,
         11: cState.auth && cState.role == 4 ? {
             nam: "Заявки",
-            linke: "request"
+            linke: "/"
         } : undefined,
         12: cState.auth && cState.role < 2 ? {
             nam: "Дневник",

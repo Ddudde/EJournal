@@ -56,7 +56,7 @@ function App() {
                   <Route path="por" element={<ContactPor/>} />
                   {(cState.auth && cState.role != 4) && <Route path="yo" element={<ContactYo/>} />}
               </Route>
-              {(cState.auth && (cState.role < 2 || cState.role == 3)) && <Route path={cState.role == 3 ? "admYO" : "analytics"} element={<AnalyticsMain/>}>
+              {(cState.auth && (cState.role < 2 || cState.role == 3)) && <Route path={cState.role == 3 ? "/" : "analytics"} element={<AnalyticsMain/>}>
                   <Route index element={<Zvonki/>} />
                   <Route path="zvonki" element={<Zvonki/>} />
                   <Route path="periods" element={<Periods/>} />
@@ -77,7 +77,6 @@ function App() {
               {(cState.auth && cState.role == 2) && <Route path="journal" element={<Journal/>} />}
               <Route path="profiles/:log" element={<Profile/>} />
               {cState.auth && <Route path="settings" element={<Settings/>} />}
-              {(cState.auth && cState.role == 4) && <Route path="request" element={<Request/>} />}
               <Route path="invite/:code" element={<Start mod="inv"/>} />
               <Route path="reauth/:code" element={<Start mod="rea"/>} />
               <Route path="*" element={<ErrFound/>} />

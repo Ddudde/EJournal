@@ -59,6 +59,8 @@ public class ScheduleController {
                 }
                 if(ObjectUtils.isEmpty(bodyG.keySet()) || ObjectUtils.isEmpty(bodyT.keySet())){
                     ans.addProperty("error", true);
+                } else {
+                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.SCHEDULE, schId+"", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
                 }
                 return ans;
             }
@@ -106,7 +108,7 @@ public class ScheduleController {
                 if(prepod == null){
                     ans.addProperty("error", true);
                 } else {
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.SCHEDULE, schId+"", user.getRoles().containsKey(3L) ? "main" : group.getId()+"", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
+                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), subscriber.getType(), schId+"", user.getRoles().containsKey(3L) ? "main" : group.getId()+"", subscriber.getLvlMore1(), "main");
                 }
                 return ans;
             }
@@ -194,99 +196,6 @@ public class ScheduleController {
 
                     authController.sendMessageForAll("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), "main", "ht", "main");
                     authController.sendMessageForAll("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), group.getId()+"", "main", "main");
-                }
-                return ans;
-            }
-            case "setCodePep" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                User user = datas.userByLogin(subscriber.getLogin());
-                User user1 = datas.userById(body.get("id1").getAsLong());
-                Invite inv = datas.inviteById(body.get("id1").getAsLong());
-                Long schId = null;
-                if(user != null && (user1 != null || inv != null)
-                        && body.get("role").getAsLong() == 3L && user.getRoles().containsKey(3L)) {
-                    UUID uuid = UUID.randomUUID();
-                    Instant after = Instant.now().plus(Duration.ofDays(30));
-                    Date dateAfter = Date.from(after);
-                    if(user1 != null){
-                        user1.setCode(uuid.toString());
-                        user1.setExpDate(Main.df.format(dateAfter));
-                        datas.getUserRepository().saveAndFlush(user1);
-                        schId = datas.getFirstRole(user1.getRoles()).getYO();
-
-                        ans.addProperty("id1", user1.getId());
-                    } else if(inv != null){
-                        inv.setCode(uuid.toString());
-                        inv.setExpDate(Main.df.format(dateAfter));
-                        datas.getInviteRepository().saveAndFlush(inv);
-                        schId = datas.getFirstRole(inv.getRole()).getYO();
-
-                        ans.addProperty("id1", inv.getId());
-                    }
-                    System.out.println("setCode " + uuid);
-
-                    ans.addProperty("code", uuid.toString());
-                    ans.add("id", body.get("id"));
-                    authController.sendMessageForAll("codPepL1C", ans, subscriber.getType(), schId+"", "main", "ht", "main");
-                } else {
-                    ans.addProperty("error", true);
-                }
-                return ans;
-            }
-            case "chPep1" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                User user = datas.userByLogin(subscriber.getLogin());
-                User user1 = datas.userByLogin(body.get("id").getAsString());
-                Invite inv = datas.inviteById(body.get("id1").getAsLong());
-                if(user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
-                    if(user1 != null){
-                        user1.setFio(body.get("name").getAsString());
-                        datas.getUserRepository().saveAndFlush(user1);
-
-                        ans.addProperty("id", user1.getId());
-                    } else if(inv != null){
-                        inv.setFio(body.get("name").getAsString());
-                        datas.getInviteRepository().saveAndFlush(inv);
-
-                        ans.addProperty("id", inv.getId());
-                    }
-
-                    ans.addProperty("name", body.get("name").getAsString());
-
-                    authController.sendMessageForAll("chPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-                } else {
-                    ans.addProperty("error", true);
-                }
-                return ans;
-            }
-            case "remPep" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                User user = datas.userByLogin(subscriber.getLogin());
-                User user1 = datas.userByLogin(body.get("id").getAsString());
-                Invite inv = datas.inviteById(body.get("id1").getAsLong());
-                if(user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
-                    Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
-                    if(group != null) {
-                        if (user1 != null) {
-                            user1.getRoles().remove(3L);
-                            datas.getUserRepository().saveAndFlush(user1);
-                            if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
-                            datas.getGroupRepository().saveAndFlush(group);
-
-                            ans.addProperty("id", user1.getId());
-                        } else if (inv != null) {
-                            datas.getInviteRepository().delete(inv);
-                            if (!ObjectUtils.isEmpty(group.getKidsInv())) group.getKidsInv().remove(inv.getId());
-                            datas.getGroupRepository().saveAndFlush(group);
-
-                            ans.addProperty("id", inv.getId());
-                        }
-                    }
-                }
-                if(ans.has("id")){
-                    authController.sendMessageForAll("remPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-                } else {
-                    ans.addProperty("error", true);
                 }
                 return ans;
             }
