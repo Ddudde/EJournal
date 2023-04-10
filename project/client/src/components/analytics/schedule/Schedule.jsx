@@ -7,7 +7,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {eventSource, send, setActived} from "../../main/Main";
 import {chStatB, ele, onClose, onEdit, setActNew} from "../AnalyticsMain";
 import Pane from "../../other/pane/Pane";
-import ErrFound from "../../other/error/ErrFound";
 import yes from "../../../media/yes.png";
 import {
     CHANGE_EVENTS_CLEAR,
@@ -57,7 +56,7 @@ function onFin(e, type, info) {
             if(inps.sinpnpt_ && inps.sinpnkt_ && inps.nyid)
             {
                 let obj, param;
-                param = inp.getAttribute("data-id1");
+                param = inp.dataset.id.split("_");
                 obj = {
                     name: inps.sinpnpt_,
                     cabinet: inps.sinpnkt_,
@@ -108,12 +107,8 @@ function onFin(e, type, info) {
     }
 }
 
-function getSched(dI, b) {
-    if(dI.length < 7) {
-        for(let i = dI.length; i < 7; i++){
-            dI[i] = "";
-        }
-    }
+function getSched(b) {
+    let dI = [0, 1, 2, 3, 4, 5, 6];
     return b ?
         dI.map((param, i, x, dai = schedulesInfo[param], dLI = (dai ? Object.getOwnPropertyNames(dai):[])) =>
             <div className={analyticsCSS.l1+" "+scheduleCSS.day}>
@@ -180,7 +175,7 @@ function getSched(dI, b) {
                                 <div className={analyticsCSS.preinf}>
                                     Педагог:
                                 </div>
-                                {getPrep(param)}
+                                {getPrep()}
                                 <img className={analyticsCSS.imginp} data-enable={inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "prepod", id: param, id1: param1, st: schedulesInfo})} title="Подтвердить" alt=""/>
                                 <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                             </div>
@@ -198,17 +193,17 @@ function getSched(dI, b) {
                         <div className={analyticsCSS.preinf}>
                             Предмет:
                         </div>
-                        <input className={analyticsCSS.inp} data-id1={param} id={"sinpnpt_"} placeholder={"Математика"} defaultValue={inps.sinpnpt} onChange={(e)=>chStatB(e, inps, forceUpdate)} type="text"/>
+                        <input className={analyticsCSS.inp} data-id={i+"_"+param} id={"sinpnpt_"} placeholder={"Математика"} defaultValue={inps.sinpnpt} onChange={(e)=>chStatB(e, inps, forceUpdate)} type="text"/>
                         {ele(false, "sinpnpt_", inps)}
                         <div className={analyticsCSS.preinf}>
                             , Кабинет:
                         </div>
-                        <input className={analyticsCSS.inp} data-id1={param} id={"sinpnkt_"} placeholder={"300"} defaultValue={inps.sinpnkt} onChange={(e)=>chStatB(e, inps, forceUpdate)} type="text"/>
+                        <input className={analyticsCSS.inp} data-id={i+"_"+param} id={"sinpnkt_"} placeholder={"300"} defaultValue={inps.sinpnkt} onChange={(e)=>chStatB(e, inps, forceUpdate)} type="text"/>
                         {ele(false, "sinpnkt_", inps)}
                         <div className={analyticsCSS.preinf}>
                             , Педагог:
                         </div>
-                        {getPrep(param)}
+                        {getPrep()}
                         <img className={analyticsCSS.imginp} data-enable={inps.sinpnpt_ && inps.sinpnkt_ && inps && inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE, schedulesInfo)} title="Подтвердить" alt=""/>
                         <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                     </div>
@@ -290,7 +285,7 @@ function selecPrep(e, id, obj) {
     // dispatch(changeAnalytics(CHANGE_SCHEDULE_PARAM, param, "nw", "prepod", obj.name));
 }
 
-function getPrep(param) {
+function getPrep() {
     let ltI0 = Object.getOwnPropertyNames(teachersInfo);
     return (
         <div className={scheduleCSS.blockList}>
@@ -327,22 +322,24 @@ function onCon(e) {
 
 function addLessonC(e) {
     const msg = JSON.parse(e.data);
-    dispatch(changeAnalytics(CHANGE_SCHEDULE, msg.day, msg.id, undefined, msg.body));
+    console.log("dsf3", msg);
+    dispatch(changeAnalytics(CHANGE_SCHEDULE, msg.day, msg.les, undefined, msg.body));
 }
 
 function addLesson(day, obj) {
     send({
         uuid: cState.uuid,
         group: groupsInfo.els.group,
-        day: day,
+        day: day[0],
+        dayId: day[1],
         obj: obj
-    }, 'POST', "schedule", "addLesson");
+    }, 'POST', "schedule/addLesson");
 }
 
 function setInfo() {
     send({
         uuid: cState.uuid
-    }, 'POST', "schedule", "getInfo")
+    }, 'POST', "schedule/getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -362,7 +359,7 @@ function setSchedule() {
     send({
         uuid: cState.uuid,
         group: groupsInfo.els.group
-    }, 'POST', "schedule", "getSchedule")
+    }, 'POST', "schedule/getSchedule")
         .then(data => {
             console.log(data);
             selGr = groupsInfo.els.group;
@@ -409,26 +406,19 @@ export function Schedule() {
         }
         console.log('componentDidUpdate Schedule.jsx');
     });
-    let dI = Object.getOwnPropertyNames(schedulesInfo);
     return (
         <div className={analyticsCSS.header}>
             <Helmet>
                 <title>Расписание</title>
             </Helmet>
-            {dI.length == 0 && cState.role != 3 ?
-                    <ErrFound text={errText}/>
-                :
-                    <>
-                        {(cState.auth && cState.role == 3) &&
-                            <div className={scheduleCSS.pane}>
-                                <Pane cla={true}/>
-                            </div>
-                        }
-                        <div className={analyticsCSS.block} style={{marginTop: (cState.auth && cState.role == 3) ? "7vh" : undefined}}>
-                            {getSched(dI, cState.role == 3)}
-                        </div>
-                    </>
+            {(cState.auth && cState.role == 3) &&
+                <div className={scheduleCSS.pane}>
+                    <Pane cla={true}/>
+                </div>
             }
+            <div className={analyticsCSS.block} style={{marginTop: (cState.auth && cState.role == 3) ? "7vh" : undefined}}>
+                {getSched(cState.role == 3)}
+            </div>
         </div>
     )
 }
