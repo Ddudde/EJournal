@@ -24,8 +24,10 @@ import Events from "../other/events/Events";
 import Dialog from "../other/dialog/Dialog";
 import Pane from "../other/pane/Pane";
 
-let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling, timid, timidP, d1, warnErrNet;
+let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling, timid, timidP, d1, warnErrNet, server;
 scrolling = false;
+server = "http://localhost:8080";
+export let prefSite = "/DipvLom";
 gr = {
     group: 4
 };
@@ -48,7 +50,7 @@ function getLogin() {
     return (
         <div className={mainCSS.logBlock}>
             <div className={mainCSS.nav_i+' '+mainCSS.log} style={{width:"100%"}} id={mainCSS.nav_i}>
-                <img alt="ico" src={'/media/ls-icon'+ cState.ico +'.png'}/>
+                <img alt="ico" src={prefSite + '/media/ls-icon'+ cState.ico +'.png'}/>
                 <div className={mainCSS.logLog}>{cState.login}</div>
                 <div className={mainCSS.logText}>Я - {cState.roleDesc}</div>
             </div>
@@ -87,30 +89,30 @@ export function send(bod, typeC, url, type) {
     let sed = {method: typeC};
     if(bod){
         sed.headers = {'Content-Type': 'application/json'};
-        sed.body = JSON.stringify({
-            type: type,
-            body: bod
-        });
+        if(!type) {
+            sed.body = JSON.stringify(bod);
+        } else {
+            sed.body = JSON.stringify({
+                type: type,
+                body: bod
+            });
+        }
     }
-    return fetch("http://192.168.1.66:8080/"+(url ? url : ""), sed)
+    return fetch(server + "/"+(url ? url : ""), sed)
         .then(res => {
             if (!res.ok) {
-                throw new Error(
-                    `This is an HTTP error: The status is ${res.status}`
-                );
+                throw new Error(`This is an HTTP error: The status is ${res.status}`);
             }
             return res.json();
         })
-        .catch(data => {
-            return data;
-        });
+        .catch(data => {return data});
 }
 
 function chRoles() {
     send({
         login: cState.login,
         role: cState.role
-    }, 'POST', "auth", "chRole")
+    }, 'POST', "auth/chRole")
         .then(data => {
             if(data.error == false && data.body.role != undefined){
                 dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
@@ -122,7 +124,7 @@ function onExit() {
     dispatch(changeState(CHANGE_STATE_RESET));
     send({
         uuid: cState.uuid
-    }, 'POST', "auth", "exit");
+    }, 'POST', "auth/exit");
 }
 
 export function setActived(name) {
@@ -142,7 +144,9 @@ export function setActived(name) {
 
 function iniTheme(stat) {
     document.body.setAttribute(themeInfo.thP[stat].c, '');
-    if(document.body.hasAttribute(themeInfo.thP[stat].p)) document.body.removeAttribute(themeInfo.thP[stat].p)
+    if(document.body.hasAttribute(themeInfo.thP[stat].p)) {
+        document.body.removeAttribute(themeInfo.thP[stat].p)
+    }
     Object.getOwnPropertyNames(themeInfo.thP[stat].params).map(param =>
         document.documentElement.style.setProperty(param, themeInfo.thP[stat].params[param])
     );
@@ -178,10 +182,8 @@ function badPing() {
 }
 
 function iniNet() {
-    eventSource = new EventSource('http://192.168.1.66:8080/auth/open-stream');
-    eventSource.onopen = e => {
-        console.log('open');
-    };
+    eventSource = new EventSource(server + '/auth/open-stream');
+    eventSource.onopen = e => console.log('open');
     eventSource.onerror = e => {
         if (e.readyState == EventSource.CLOSED) {
             console.log('close');
@@ -199,7 +201,7 @@ function iniNet() {
             send({
                 login: cState.login,
                 uuid: msg
-            }, 'POST', "auth", "infCon");
+            }, 'POST', "auth/infCon");
         }
     }, false);
     eventSource.addEventListener('ping', e => {
@@ -214,15 +216,13 @@ function iniNet() {
 
 function closeStream() {
     if(!eventSource) return;
-    if(eventSource.readyState != EventSource.CLOSED) send({
-        uuid: cState.uuid
-    }, 'POST', "auth", "remCon")
-        .then(data => {
-            if(data.error == false){
-                dispatch(changeState(CHANGE_STATE, "uuid", undefined));
-            }
-        });
-    eventSource.close();
+    if(eventSource.readyState != EventSource.CLOSED) {
+        send({
+            uuid: cState.uuid
+        }, 'POST', "auth/remCon");
+        eventSource.close();
+        // dispatch(changeState(CHANGE_STATE, "uuid", undefined));
+    }
 }
 
 function openStream() {
@@ -319,6 +319,8 @@ export function Main() {
         console.log("I was triggered during componentDidMount Main.jsx");
         scr();
         iniTheme(themeInfo.theme_ch);
+        window.onpagehide = unMount;
+        window.onbeforeunload = unMount;
         window.onscroll = () => {
             if(!scrolling) {
                 scrolling = true;
@@ -326,8 +328,6 @@ export function Main() {
             }
         };
         timidP = setTimeout(badPing,15000);
-        window.onpagehide = unMount;
-        window.onbeforeunload = unMount;
         return unMount;
     }, []);
     useEffect(() => {

@@ -1,11 +1,8 @@
 package ru.mirea.data.models;
 
 import lombok.*;
-import ru.mirea.data.converters.RoleConverter;
-import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
-import java.util.Map;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

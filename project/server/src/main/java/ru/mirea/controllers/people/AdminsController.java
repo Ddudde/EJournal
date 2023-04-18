@@ -1,7 +1,6 @@
 package ru.mirea.controllers.people;
 
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
@@ -15,21 +14,17 @@ import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.json.Role;
-import ru.mirea.data.reps.auth.InviteRepository;
-import ru.mirea.data.reps.SystemRepository;
-import ru.mirea.data.reps.auth.UserRepository;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/admins")
 @NoArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io"})
 public class AdminsController {
 
     @Autowired
@@ -93,7 +88,7 @@ public class AdminsController {
                     datas.getInviteRepository().saveAndFlush(inv);
                     if(syst.getAdminsInv() == null) syst.setAdminsInv(new ArrayList<>());
                     syst.getAdminsInv().add(inv.getId());
-                    datas.getSystemRepository().saveAndFlush(syst);
+                    datas.getSystRepository().saveAndFlush(syst);
 
                     ans.addProperty("id", inv.getId());
                     bodyAns.addProperty("name", body.get("name").getAsString());
@@ -141,13 +136,13 @@ public class AdminsController {
                         user1.getRoles().remove(4L);
                         datas.getUserRepository().saveAndFlush(user1);
                         if(!ObjectUtils.isEmpty(syst.getAdmins())) syst.getAdmins().remove(user1.getId());
-                        datas.getSystemRepository().saveAndFlush(syst);
+                        datas.getSystRepository().saveAndFlush(syst);
 
                         ans.addProperty("id", user1.getId());
                     } else if(inv != null){
                         datas.getInviteRepository().delete(inv);
                         if(!ObjectUtils.isEmpty(syst.getAdminsInv())) syst.getAdminsInv().remove(inv.getId());
-                        datas.getSystemRepository().saveAndFlush(syst);
+                        datas.getSystRepository().saveAndFlush(syst);
 
                         ans.addProperty("id", inv.getId());
                     }

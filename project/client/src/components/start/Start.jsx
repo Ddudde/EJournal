@@ -104,7 +104,7 @@ function rego(e, props, code){
             ico: ch.value,
             mod: props.mod,
             code: code
-        }, 'POST', "auth", "reg")
+        }, 'POST', "auth/reg")
             .then(data => {
                 if(data.error == false){
                     onvxod({target: e.target.parentElement});
@@ -127,7 +127,7 @@ function vxo(){
         uuid: cState.uuid,
         login: elem.logv.value,
         password: elem.pasv.value
-    }, 'POST', "auth", "auth")
+    }, 'POST', "auth/auth")
         .then(data => {
             if(data.error == false && data.body.auth){
                 dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
@@ -229,7 +229,7 @@ function onRec(e) {
         login: els.logz,
         secFr: els.secz,
         par : els.pasnz
-    }, 'POST', "auth", "chPass")
+    }, 'POST', "auth/chPass")
         .then(data => {
             if(data.error == false){
                 onSmvz(e);
@@ -284,7 +284,7 @@ function onCon(e) {
     send({
         type: "AUTH",
         uuid: cState.uuid
-    }, 'POST', "auth", "infCon");
+    }, 'POST', "auth/infCon");
 }
 
 export function Start(props) {
@@ -304,7 +304,7 @@ export function Start(props) {
             send({
                 code: code,
                 login: cState.login
-            }, 'POST', "auth", "checkInvCode")
+            }, 'POST', "auth/checkInvCode")
                 .then(data => {
                     if(data.error == false){
                         if(cState.auth) {
@@ -320,7 +320,7 @@ export function Start(props) {
         if(props.mod == "rea" && code){
             send({
                 code: code
-            }, 'POST', "auth", "checkReaCode")
+            }, 'POST', "auth/checkReaCode")
                 .then(data => {
                     if(data.error == false){
                         addEvent("Аккаунт существует. Открыта возможность перерегистрации.", 10);

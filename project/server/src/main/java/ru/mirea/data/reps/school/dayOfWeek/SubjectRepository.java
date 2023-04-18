@@ -1,8 +1,7 @@
-package ru.mirea.data.reps;
+package ru.mirea.data.reps.school.dayOfWeek;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.yaml.snakeyaml.error.Mark;
-import ru.mirea.data.models.Subject;
+import ru.mirea.data.models.school.dayOfWeek.Subject;
 
 import java.util.List;
 

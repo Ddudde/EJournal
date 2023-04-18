@@ -55,8 +55,7 @@ function onFin(e, type, info) {
             let inpm = ["sinpnpt_", "sinpnkt_"];
             if(inps.sinpnpt_ && inps.sinpnkt_ && inps.nyid)
             {
-                let obj, param;
-                param = inp.dataset.id.split("_");
+                let obj;
                 obj = {
                     name: inps.sinpnpt_,
                     cabinet: inps.sinpnkt_,
@@ -65,12 +64,12 @@ function onFin(e, type, info) {
                         id: inps.nyid
                     }
                 }
-                addLesson(param, obj);
+                addLesson(info.id, info.id1, obj);
                 // dispatch(changeAnalytics(type, param, id, undefined, obj));
             } else {
                 for(let i = 0, inpf; i < inpm.length; i++) {
                     inpf = document.querySelector("." + analyticsCSS.edbl + " *[id='" + inpm[i] + "']")
-                    inpf.setAttribute("data-mod", '1');
+                    inpf.dataset.mod = '1';
                 }
             }
             return;
@@ -85,32 +84,31 @@ function onFin(e, type, info) {
             dispatch(changeAnalytics(type, info.id, info.id1, info.par, obj));
         }
         par = par.parentElement;
-        par.setAttribute('data-st', '0');
+        par.dataset.st = '0';
         return;
     }
     if (inps[inp.id]) {
-        inp.setAttribute("data-mod", '0');
+        inp.dataset.mod = '0';
         if(par.parentElement.classList.contains(analyticsCSS.edbl)) {
             par = par.parentElement;
             if(type){
-                if(inp.hasAttribute("data-id")){
-                    let id = inp.getAttribute("data-id").split("_");
+                if(inp.dataset.id){
                     if(type == CHANGE_SCHEDULE_PARAM) {
-                        dispatch(changeAnalytics(type, id[0], id[1], info, inp.value));
+                        dispatch(changeAnalytics(type, info.id, info.id1, info.par, inp.value));
                     }
                 }
             }
         }
-        par.setAttribute('data-st', '0');
+        par.dataset.st = '0';
     } else {
-        inp.setAttribute("data-mod", '1');
+        inp.dataset.mod = '1';
     }
 }
 
 function getSched(b) {
     let dI = [0, 1, 2, 3, 4, 5, 6];
     return b ?
-        dI.map((param, i, x, dai = schedulesInfo[param], dLI = (dai ? Object.getOwnPropertyNames(dai):[])) =>
+        dI.map((param, i, x, dai = schedulesInfo[param], dLI = (dai && dai.lessons ? Object.getOwnPropertyNames(dai.lessons):[])) =>
             <div className={analyticsCSS.l1+" "+scheduleCSS.day}>
                 <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
                     №
@@ -124,7 +122,7 @@ function getSched(b) {
                 <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i} style={{gridColumn: "4"}}>
                     Преподаватель
                 </div>
-                {dLI.map((param1, i1, x, les = dai[param1]) =>
+                {dLI.map((param1, i1, x, les = dai.lessons[param1]) =>
                     <>
                         <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
                             {i1 + 1}
@@ -140,9 +138,9 @@ function getSched(b) {
                                 <div className={analyticsCSS.preinf}>
                                     Предмет:
                                 </div>
-                                <input className={analyticsCSS.inp} data-id={param + "_" + param1} id={"sinpnpt_" + param + "_" + param1} placeholder={"Математика"} defaultValue={les.name} onChange={(e)=>chStatB(e, inps)} type="text"/>
+                                <input className={analyticsCSS.inp} id={"sinpnpt_" + param + "_" + param1} placeholder={"Математика"} defaultValue={les.name} onChange={e=>chStatB(e, inps)} type="text"/>
                                 {ele(false, "sinpnpt_" + param + "_" + param1, inps)}
-                                <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, "name")} title="Подтвердить" alt=""/>
+                                <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "name", id: param, id1: param1})} title="Подтвердить" alt=""/>
                                 <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                             </div>
                         </div>
@@ -157,9 +155,9 @@ function getSched(b) {
                                 <div className={analyticsCSS.preinf}>
                                     Кабинет:
                                 </div>
-                                <input className={analyticsCSS.inp} data-id={param + "_" + param1} id={"sinpnkt_" + param + "_" + param1} placeholder={"300"} defaultValue={les.cabinet} onChange={(e)=>chStatB(e, inps)} type="text"/>
+                                <input className={analyticsCSS.inp} id={"sinpnkt_" + param + "_" + param1} placeholder={"300"} defaultValue={les.cabinet} onChange={e=>chStatB(e, inps)} type="text"/>
                                 {ele(false, "sinpnkt_" + param + "_" + param1, inps)}
-                                <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, "cabinet")} title="Подтвердить" alt=""/>
+                                <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "cabinet", id: param, id1: param1})} title="Подтвердить" alt=""/>
                                 <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                             </div>
                         </div>
@@ -176,7 +174,7 @@ function getSched(b) {
                                     Педагог:
                                 </div>
                                 {getPrep()}
-                                <img className={analyticsCSS.imginp} data-enable={inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "prepod", id: param, id1: param1, st: schedulesInfo})} title="Подтвердить" alt=""/>
+                                <img className={analyticsCSS.imginp} data-enable={inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "prepod", id: param, id1: param1})} title="Подтвердить" alt=""/>
                                 <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                             </div>
                         </div>
@@ -193,18 +191,18 @@ function getSched(b) {
                         <div className={analyticsCSS.preinf}>
                             Предмет:
                         </div>
-                        <input className={analyticsCSS.inp} data-id={i+"_"+param} id={"sinpnpt_"} placeholder={"Математика"} defaultValue={inps.sinpnpt} onChange={(e)=>chStatB(e, inps, forceUpdate)} type="text"/>
+                        <input className={analyticsCSS.inp} id={"sinpnpt_"} placeholder={"Математика"} defaultValue={inps.sinpnpt} onChange={e=>chStatB(e, inps, forceUpdate)} type="text"/>
                         {ele(false, "sinpnpt_", inps)}
                         <div className={analyticsCSS.preinf}>
                             , Кабинет:
                         </div>
-                        <input className={analyticsCSS.inp} data-id={i+"_"+param} id={"sinpnkt_"} placeholder={"300"} defaultValue={inps.sinpnkt} onChange={(e)=>chStatB(e, inps, forceUpdate)} type="text"/>
+                        <input className={analyticsCSS.inp} id={"sinpnkt_"} placeholder={"300"} defaultValue={inps.sinpnkt} onChange={e=>chStatB(e, inps, forceUpdate)} type="text"/>
                         {ele(false, "sinpnkt_", inps)}
                         <div className={analyticsCSS.preinf}>
                             , Педагог:
                         </div>
                         {getPrep()}
-                        <img className={analyticsCSS.imginp} data-enable={inps.sinpnpt_ && inps.sinpnkt_ && inps && inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE, schedulesInfo)} title="Подтвердить" alt=""/>
+                        <img className={analyticsCSS.imginp} data-enable={inps.sinpnpt_ && inps.sinpnkt_ && inps && inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE, {id: i, id1: dai ? dai.dayId : undefined})} title="Подтвердить" alt=""/>
                         <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                     </div>
                 </div>
@@ -227,7 +225,7 @@ function getSched(b) {
             </div>
         )
     :
-        dI.map((param, i, x, dLI = (schedulesInfo[param] ? Object.getOwnPropertyNames(schedulesInfo[param]):[])) =>
+        dI.map((param, i, x, dai = schedulesInfo[param], dLI = (dai && dai.lessons ? Object.getOwnPropertyNames(dai.lessons):[])) =>
             <div className={analyticsCSS.l1+" "+scheduleCSS.day}>
                 <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
                     №
@@ -241,7 +239,7 @@ function getSched(b) {
                 <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i} style={{gridColumn: "4"}}>
                     {cState.role == 2 ? "Группа" : "Преподаватель"}
                 </div>
-                {dLI.map((param1, i1, x, les = schedulesInfo[param][param1]) =>
+                {dLI.map((param1, i1, x, les = dai.lessons[param1]) =>
                     <>
                         <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
                             {i1 + 1}
@@ -323,15 +321,15 @@ function onCon(e) {
 function addLessonC(e) {
     const msg = JSON.parse(e.data);
     console.log("dsf3", msg);
-    dispatch(changeAnalytics(CHANGE_SCHEDULE, msg.day, msg.les, undefined, msg.body));
+    dispatch(changeAnalytics(CHANGE_SCHEDULE, msg.day, msg.les, msg.dayId, msg.body));
 }
 
-function addLesson(day, obj) {
+function addLesson(day, dayId, obj) {
     send({
         uuid: cState.uuid,
         group: groupsInfo.els.group,
-        day: day[0],
-        dayId: day[1],
+        day: day,
+        dayId: dayId,
         obj: obj
     }, 'POST', "schedule/addLesson");
 }

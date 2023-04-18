@@ -1,18 +1,35 @@
 package ru.mirea.data;
 
 import com.google.gson.JsonObject;
+import com.google.gson.internal.bind.JsonTreeWriter;
+import com.google.gson.stream.JsonWriter;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.mirea.Main;
+import ru.mirea.controllers.CallInterface;
 import ru.mirea.data.json.Role;
 import ru.mirea.data.models.*;
 import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
+import ru.mirea.data.models.school.dayOfWeek.DayOfWeek;
+import ru.mirea.data.models.school.dayOfWeek.Lesson;
+import ru.mirea.data.models.school.dayOfWeek.Subject;
+import ru.mirea.data.models.school.Group;
+import ru.mirea.data.models.school.Request;
+import ru.mirea.data.models.school.School;
 import ru.mirea.data.reps.*;
 import ru.mirea.data.reps.auth.InviteRepository;
 import ru.mirea.data.reps.auth.UserRepository;
+import ru.mirea.data.reps.school.GroupRepository;
+import ru.mirea.data.reps.school.RequestRepository;
+import ru.mirea.data.reps.school.SchoolRepository;
+import ru.mirea.data.reps.school.day.DayRepository;
+import ru.mirea.data.reps.school.day.MarkRepository;
+import ru.mirea.data.reps.school.dayOfWeek.DayOfWeekRepository;
+import ru.mirea.data.reps.school.dayOfWeek.LessonRepository;
+import ru.mirea.data.reps.school.dayOfWeek.SubjectRepository;
 
 import java.text.ParseException;
 import java.time.Duration;
@@ -32,7 +49,7 @@ import static java.util.Arrays.asList;
 
     private final RequestRepository requestRepository;
 
-    private final SystemRepository systemRepository;
+    private final SystRepository systRepository;
 
     private final NewsRepository newsRepository;
 
@@ -50,12 +67,12 @@ import static java.util.Arrays.asList;
 
     private final SubjectRepository subjectRepository;
 
-    public ServerService(UserRepository userRepository, InviteRepository inviteRepository, SchoolRepository schoolRepository, RequestRepository requestRepository, SystemRepository systemRepository, NewsRepository newsRepository, ContactsRepository contactsRepository, GroupRepository groupRepository, DayOfWeekRepository dayOfWeekRepository, DayRepository dayRepository, LessonRepository lessonRepository, MarkRepository markRepository, SubjectRepository subjectRepository) {
+    public ServerService(UserRepository userRepository, InviteRepository inviteRepository, SchoolRepository schoolRepository, RequestRepository requestRepository, SystRepository systRepository, NewsRepository newsRepository, ContactsRepository contactsRepository, GroupRepository groupRepository, DayOfWeekRepository dayOfWeekRepository, DayRepository dayRepository, LessonRepository lessonRepository, MarkRepository markRepository, SubjectRepository subjectRepository) {
         this.userRepository = userRepository;
         this.inviteRepository = inviteRepository;
         this.schoolRepository = schoolRepository;
         this.requestRepository = requestRepository;
-        this.systemRepository = systemRepository;
+        this.systRepository = systRepository;
         this.newsRepository = newsRepository;
         this.contactsRepository = contactsRepository;
         this.groupRepository = groupRepository;
@@ -165,8 +182,14 @@ import static java.util.Arrays.asList;
         createLesson(new Lesson(65L, 68L, "302"));
         createLesson(new Lesson(65L, 68L, "303"));
         System.out.println(getLessons());
-        createDayOfWeek(new DayOfWeek(new ArrayList<>(asList(69L, 70L, 71L))));
-        createDayOfWeek(new DayOfWeek(new ArrayList<>(asList(72L))));
+        createDayOfWeek(new DayOfWeek(new HashMap<Long,Long>() {{
+            put(0L, 69L);
+            put(1L, 70L);
+            put(2L, 71L);
+        }}));
+        createDayOfWeek(new DayOfWeek(new HashMap<Long,Long>() {{
+            put(0L, 72L);
+        }}));
         System.out.println(getDaysOfWeek());
     }
 
@@ -230,6 +253,19 @@ import static java.util.Arrays.asList;
         }
     }
 
+    public void usersByList(List<Long> list, JsonWriter wrtr) throws Exception {
+        for (Long i : list) {
+            wrtr.name(i + "").beginObject();
+            User objU = userById(i);
+            wrtr.name("name").value(objU.getFio())
+                .name("login").value(objU.getLogin());
+            if (!ObjectUtils.isEmpty(objU.getCode())) {
+                wrtr.name("link").value(objU.getCode());
+            }
+            wrtr.endObject();
+        }
+    }
+
     public Long getFirstRoleId(Map<Long, Role> map){
         return (Long) map.keySet().toArray()[0];
     }
@@ -277,6 +313,18 @@ import static java.util.Arrays.asList;
         }
     }
 
+    public void invitesByList(List<Long> list, JsonWriter wrtr) throws Exception {
+        for (Long i : list) {
+            wrtr.name(i + "").beginObject();
+            Invite objI = inviteById(i);
+            wrtr.name("name").value(objI.getFio());
+            if (!ObjectUtils.isEmpty(objI.getCode())) {
+                wrtr.name("link").value(objI.getCode());
+            }
+            wrtr.endObject();
+        }
+    }
+
     public List<Request> createReq(@RequestBody Request request) {
         Request savedRequest = requestRepository.saveAndFlush(request);
         System.out.println(savedRequest);
@@ -305,12 +353,12 @@ import static java.util.Arrays.asList;
     }
 
     public void createSyst(Syst syst) {
-        Syst savedSyst = systemRepository.saveAndFlush(syst);
+        Syst savedSyst = systRepository.saveAndFlush(syst);
         System.out.println(savedSyst);
     }
 
     public Syst getSyst() {
-        List<Syst> systs = systemRepository.findAll();
+        List<Syst> systs = systRepository.findAll();
         return systs.isEmpty() ? null : systs.get(0);
     }
 
@@ -369,9 +417,29 @@ import static java.util.Arrays.asList;
         return first;
     }
 
+    public Long groupsByUser(User user, JsonWriter wrtr) throws Exception {
+        Long first = null;
+        if(user != null){
+            Long schId = getFirstRole(user.getRoles()).getYO();
+            School school = schoolById(schId);
+            if (!ObjectUtils.isEmpty(school.getGroups())) {
+                first = school.getGroups().get(0);
+                for (Long i : school.getGroups()) {
+                    Group gr = groupById(i);
+                    wrtr.name(i + "").value(gr.getName());
+                }
+            }
+        }
+        wrtr.endObject();
+        return first;
+    }
+
     public void createGroups(){
         createGroup(new Group("11A", new ArrayList<>(asList(1L, 2L, 16L))));//17L
-        createGroup(new Group("11Б", new ArrayList<>(asList(61L)), new ArrayList<>(asList(73L, 74L))));
+        createGroup(new Group("11Б", new ArrayList<>(asList(61L)), new HashMap<Long,Long>() {{
+            put(0L, 73L);
+            put(1L, 74L);
+        }}));
         createGroup(new Group("11В"));
         createGroup(new Group("11Г"));
         createGroup(new Group("10А"));
@@ -447,6 +515,35 @@ import static java.util.Arrays.asList;
         }
     }
 
+    public void teachersBySchool(School school, JsonWriter wrtr) throws Exception {
+        wrtr.name("nt").beginObject().name("tea").beginObject();
+        if (!ObjectUtils.isEmpty(school.getTeachers())) {
+            usersByList(school.getTeachers(), wrtr);
+        }
+        if (!ObjectUtils.isEmpty(school.getTeachersInv())) {
+            invitesByList(school.getTeachersInv(), wrtr);
+        }
+        wrtr.endObject().endObject();
+        if (!ObjectUtils.isEmpty(school.getSubjects())) {
+            for (Long i1 : school.getSubjects()) {
+                Subject subject = subjectById(i1);
+                if (subject != null) {
+                    wrtr.name(i1 + "").beginObject()
+                        .name("name").value(subject.getName())
+                        .name("tea").beginObject();
+                    if (!ObjectUtils.isEmpty(subject.getTeachers())) {
+                        usersByList(subject.getTeachers(), wrtr);
+                    }
+                    if (!ObjectUtils.isEmpty(subject.getTeachersInv())) {
+                        invitesByList(subject.getTeachersInv(), wrtr);
+                    }
+                    wrtr.endObject().endObject();
+                }
+            }
+        }
+        wrtr.endObject();
+    }
+
     public void createSubject(Subject subject) {
         Subject savedSubject = subjectRepository.saveAndFlush(subject);
         System.out.println(savedSubject);
@@ -493,4 +590,20 @@ import static java.util.Arrays.asList;
     public Lesson lessonById(Long id){
         return id == null ? null : lessonRepository.findById(id).orElse(null);
     }
+
+    public JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, Boolean bol) throws Exception {
+        JsonObject ans;
+        wrtr.endObject();
+        ans = wrtr.get().getAsJsonObject();
+        if(ans.keySet().size() > 1 && !ans.get("error").getAsBoolean() && bol){
+            callable.call(ans);
+        } else {
+            wrtr.beginObject().name("error").value(true).endObject();
+            ans = wrtr.get().getAsJsonObject();
+        }
+        System.out.println("dsf" + ans);
+        wrtr.close();
+        return ans;
+    }
+
 }

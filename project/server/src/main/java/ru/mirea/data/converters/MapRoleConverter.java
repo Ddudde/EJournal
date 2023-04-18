@@ -7,12 +7,9 @@ import ru.mirea.data.json.Role;
 
 import javax.persistence.AttributeConverter;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class RoleConverter implements AttributeConverter<Map<Long, Role>, String> {
+public class MapRoleConverter implements AttributeConverter<Map<Long, Role>, String> {
 
     @Autowired
     private Gson g;

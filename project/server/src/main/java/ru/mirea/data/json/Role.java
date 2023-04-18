@@ -3,7 +3,10 @@ package ru.mirea.data.json;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Getter
 @Setter
@@ -21,6 +24,13 @@ public class Role implements Serializable {
 
     private List<Long> parentsInv;
     private List<Long> subjects;
+
+    public List<Long> getSubjects() {
+        if(subjects == null) {
+            subjects = new ArrayList<>(asList());
+        }
+        return subjects;
+    }
 
     public Role(String email, Long YO, Long group, List<Long> parents) { // kid
         this.email = email;

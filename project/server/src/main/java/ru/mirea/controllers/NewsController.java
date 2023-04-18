@@ -9,7 +9,7 @@ import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.ServerService;
 import ru.mirea.data.models.News;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.School;
+import ru.mirea.data.models.school.School;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.User;
 
@@ -20,7 +20,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/news")
 @NoArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io"})
 public class NewsController {
 
     @Autowired
@@ -96,7 +96,7 @@ public class NewsController {
                         if (b) {
                             if (syst.getNews() == null) syst.setNews(new ArrayList<>());
                             syst.getNews().add(news.getId());
-                            datas.getSystemRepository().saveAndFlush(syst);
+                            datas.getSystRepository().saveAndFlush(syst);
                         } else if (b1) {
                             if (school.getNews() == null) school.setNews(new ArrayList<>());
                             school.getNews().add(news.getId());
@@ -151,7 +151,7 @@ public class NewsController {
                         || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlSch(), "Yo"))) {
                     datas.getNewsRepository().delete(news);
                     if(!ObjectUtils.isEmpty(syst.getNews())) syst.getNews().remove(news.getId());
-                    datas.getSystemRepository().saveAndFlush(syst);
+                    datas.getSystRepository().saveAndFlush(syst);
                     ans.add("id", body.get("id"));
 
                     authController.sendMessageForAll("delNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());

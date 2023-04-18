@@ -4,7 +4,7 @@ import {Outlet} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {states} from "../../store/selector";
 import Pane from "../other/pane/Pane";
-import {eventSource, send, setActived} from "../main/Main";
+import {eventSource, prefSite, send, setActived} from "../main/Main";
 import {CHANGE_CONTACT_GL, CHANGE_CONTACT_PARAM, changeContacts} from "../../store/actions";
 import ed from "../../media/edit.png";
 import yes from "../../media/yes.png";
@@ -72,7 +72,7 @@ export function getEdCon(info, inps, forceUpdate) {
                     {getEdField(telMFi, "Текст:", telM, "inpntt_m", info, inps, forceUpdate)}
                     {info[type].mapPr && info[type].mapPr.imgUrl ?
                             <span className={contactCSS.banner}>
-                                <img alt="banner" src={info[type].mapPr.imgUrl} onError={errLoadAddIm}/>
+                                <img alt="banner" src={prefSite+info[type].mapPr.imgUrl} onError={errLoadAddIm}/>
                                 <div className={contactCSS.upr}>
                                     <img className={contactCSS.imgfield} src={ed} onClick={(e)=>onEdit(e, inps, info)} title="Редактировать" alt=""/>
                                     <img className={contactCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onDel} title="Удалить изображение" alt=""/>

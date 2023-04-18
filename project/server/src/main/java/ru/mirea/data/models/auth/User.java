@@ -1,7 +1,7 @@
 package ru.mirea.data.models.auth;
 
 import lombok.*;
-import ru.mirea.data.converters.RoleConverter;
+import ru.mirea.data.converters.MapRoleConverter;
 import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
@@ -37,7 +37,7 @@ import java.util.Map;
     @Column(name = "ico")
     private int ico;
 
-    @Convert(converter = RoleConverter.class)
+    @Convert(converter = MapRoleConverter.class)
     @Column(name = "roles")
     private Map<Long, Role> roles;
 

@@ -1,20 +1,83 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.internal.bind.JsonTreeWriter;
+import com.google.gson.stream.JsonReader;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.Day;
+import ru.mirea.data.models.school.day.Day;
 
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Test {
-    public static void main(String[] args) throws ParseException {
-        jsonTest2();
+    public static void main(String[] args) throws Exception {
+        jsonTest4();
+    }
+
+    private static void mapTest(){
+        Map<Integer, Day> day = new HashMap<>();
+        day.put(2, new Day("ret"));
+        day.put(0, new Day("pet"));
+        day.put(1, new Day("mek"));
+        day.remove(1);
+        System.out.println(day);
+        System.out.println(day.get(1));
+        for(Map.Entry<Integer, Day> entr : day.entrySet()){
+            System.out.println(entr.getKey()+" "+entr.getValue());
+        }
+        day.put(3, new Day("qek"));
+        System.out.println(day);
+        for(Map.Entry<Integer, Day> entr : day.entrySet()){
+            System.out.println(entr.getKey()+" "+entr.getValue());
+        }
+    }
+
+    private static void jsonTest4() throws Exception {
+        JsonTreeWriter wrtr = new JsonTreeWriter();
+        try{
+            wrtr.beginObject().name("name").value("BMW")
+                .name("year").value(2016)
+                .name("colors").beginArray().value("WHITE")
+                .value("BLACK").value("GRAY").endArray();
+        } catch (Exception e) {
+            wrtr.name("name").value("df1");
+            System.out.println(e.fillInStackTrace());
+        } finally {
+            wrtr.endObject();
+            System.out.println("dsf" + wrtr.get().getAsJsonObject());
+            System.out.println("dsf" + wrtr.get().getAsJsonObject().toString());
+            System.out.println("dsf" + wrtr.get().getAsJsonObject().get("year").toString());
+            wrtr.close();
+        }
+    }
+
+    private static void jsonTest3(){
+        String json = "{\"name\":\"BMW\",\"model\":\"X1\",\"year\":\"2016\",\"colors\":[\"WHITE\",\"BLACK\",\"GRAY\"]}";
+        try (JsonReader rdr = new JsonReader(new StringReader(json))){
+            rdr.beginObject();
+            while (rdr.hasNext()) {
+                switch (rdr.nextName()) {
+                    case "name", "model", "year" -> {
+                        System.out.println(rdr.nextString());
+                    }
+                    case "colors" -> {
+                        rdr.beginArray();
+                        while (rdr.hasNext()){
+                            System.out.println("\t" + rdr.nextString());
+                        }
+                        rdr.endArray();
+                    }
+                    default -> rdr.skipValue();
+                }
+            }
+            rdr.endObject();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void jsonTest2(){
@@ -25,16 +88,6 @@ public class Test {
         data2.add("d", data1);
         System.out.println(data);
         System.out.println(data2);
-
-//        List<Day> day = new ArrayList<Day>();
-//        day.add(0, new Day("ret"));
-//        day.add(1, new Day("pet"));
-//        day.add(2, new Day("mek"));
-//        day.remove(1);
-//        System.out.println(day.get(1));
-//        for(Day day1 : day){
-//            System.out.println(day1);
-//        }
     }
 
     private static void dateTest() throws ParseException {

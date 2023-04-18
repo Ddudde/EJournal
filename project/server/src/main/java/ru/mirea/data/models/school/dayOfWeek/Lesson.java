@@ -1,4 +1,4 @@
-package ru.mirea.data.models;
+package ru.mirea.data.models.school.dayOfWeek;
 
 import lombok.*;
 import ru.mirea.data.converters.ListLongConverter;

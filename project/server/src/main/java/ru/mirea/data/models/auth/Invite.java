@@ -1,12 +1,10 @@
 package ru.mirea.data.models.auth;
 
 import lombok.*;
-import ru.mirea.data.converters.ListLongConverter;
-import ru.mirea.data.converters.RoleConverter;
+import ru.mirea.data.converters.MapRoleConverter;
 import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Map;
 
 @Getter @Setter
@@ -27,7 +25,7 @@ import java.util.Map;
     @Column(name = "date")
     private String expDate;
 
-    @Convert(converter = RoleConverter.class)
+    @Convert(converter = MapRoleConverter.class)
     @Column(name = "role")
     private Map<Long, Role> role;
 

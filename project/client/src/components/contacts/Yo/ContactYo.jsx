@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {chStatB, errorLoad, getEdCon, setActNew, setTyp} from "../ContactMain";
 import ErrFound from "../../other/error/ErrFound";
 import {CHANGE_EVENTS_CLEAR, changeEvents} from "../../../store/actions";
+import {prefSite} from "../../main/Main";
 
 let dispatch, contactsInfo, type, cState, inps, errText;
 type = "Yo";
@@ -67,7 +68,7 @@ export function ContactYo() {
                                             {contactsInfo[type].mapPr.text}
                                         </pre>
                                         <span className={contactCSS.banner}>
-                                            <img alt="banner" src={contactsInfo[type].mapPr.imgUrl+''} onError={errorLoad}/>
+                                            <img alt="banner" src={prefSite+contactsInfo[type].mapPr.imgUrl+''} onError={errorLoad}/>
                                         </span>
                                     </div>
                                 </section>

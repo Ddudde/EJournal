@@ -1,8 +1,7 @@
-package ru.mirea.data.reps;
+package ru.mirea.data.reps.school.dayOfWeek;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.mirea.data.models.Day;
-import ru.mirea.data.models.Lesson;
+import ru.mirea.data.models.school.dayOfWeek.Lesson;
 
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
 }

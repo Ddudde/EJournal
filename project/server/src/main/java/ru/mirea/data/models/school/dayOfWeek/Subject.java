@@ -1,10 +1,13 @@
-package ru.mirea.data.models;
+package ru.mirea.data.models.school.dayOfWeek;
 
 import lombok.*;
 import ru.mirea.data.converters.ListLongConverter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -32,6 +35,20 @@ import java.util.List;
     @Convert(converter = ListLongConverter.class)
     @Column(name = "days")
     private List<Long> days;
+
+    public List<Long> getTeachersInv() {
+        if(teachersInv == null) {
+            teachersInv = new ArrayList<>(asList());
+        }
+        return teachersInv;
+    }
+
+    public List<Long> getTeachers() {
+        if(teachers == null) {
+            teachers = new ArrayList<>(asList());
+        }
+        return teachers;
+    }
 
     public Subject(String name, List<Long> teachers) {
         this.name = name;

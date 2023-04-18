@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {chStatB, errorLoad, getAdd, setActNew, setTyp} from "../NewsMain";
 import ErrFound from "../../other/error/ErrFound";
 import {CHANGE_EVENTS_CLEAR, changeEvents} from "../../../store/actions";
+import {prefSite} from "../../main/Main";
 
 let dispatch, newsInfo, type, errText, inps, cState;
 type = "Por";
@@ -61,7 +62,7 @@ export function NewsPor() {
                                             <span className={newsCSS.date}>{newsInfo[type][param].date}</span>
                                             <div className={newsCSS.te}>
                                                 <span className={newsCSS.banner}>
-                                                    <img alt="banner" src={newsInfo[type][param].img_url + ''} onError={errorLoad}/>
+                                                    <img alt="banner" src={prefSite+newsInfo[type][param].img_url + ''} onError={errorLoad}/>
                                                 </span>
                                                 <pre className={newsCSS.field}>
                                                     {newsInfo[type][param].text}

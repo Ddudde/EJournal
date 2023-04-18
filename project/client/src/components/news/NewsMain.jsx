@@ -4,7 +4,7 @@ import {Outlet} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {states} from "../../store/selector";
 import Pane from "../other/pane/Pane";
-import {eventSource, send, setActived} from "../main/Main";
+import {eventSource, prefSite, send, setActived} from "../main/Main";
 import {CHANGE_NEWS, CHANGE_NEWS_DEL, CHANGE_NEWS_GL, CHANGE_NEWS_PARAM, changeNews} from "../../store/actions";
 import ed from "../../media/edit.png";
 import yes from "../../media/yes.png";
@@ -70,7 +70,7 @@ export function getAdd(info, inps, forceUpdate, x) {
             <div className={newsCSS.te} data-st="0">
                 {im ?
                         <span className={newsCSS.banner}>
-                            <img alt="banner" data-id={x} src={im} onError={(e)=>errLoadAddIm(e, inps, forceUpdate)}/>
+                            <img alt="banner" data-id={x} src={prefSite+im} onError={(e)=>errLoadAddIm(e, inps, forceUpdate)}/>
                             <div className={newsCSS.upr}>
                                 <img className={newsCSS.imgfield} src={ed} onClick={(e)=>onEdit(e, inps, forceUpdate, info)} title="Редактировать" alt=""/>
                                 <img className={newsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={(e)=>onDel(e, inps, forceUpdate)} title="Удалить изображение" alt=""/>

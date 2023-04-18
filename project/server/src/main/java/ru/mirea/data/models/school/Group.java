@@ -1,10 +1,14 @@
-package ru.mirea.data.models;
+package ru.mirea.data.models.school;
 
 import lombok.*;
 import ru.mirea.data.converters.ListLongConverter;
+import ru.mirea.data.converters.MapLongConverter;
+import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -26,9 +30,16 @@ import java.util.List;
     @Column(name = "kidsInv")
     private List<Long> kidsInv;
 
-    @Convert(converter = ListLongConverter.class)
+    @Convert(converter = MapLongConverter.class)
     @Column(name = "daysOfWeek")
-    private List<Long> daysOfWeek;
+    private Map<Long, Long> daysOfWeek;
+
+    public Map<Long, Long> getDaysOfWeek() {
+        if(daysOfWeek == null) {
+            daysOfWeek = new HashMap<>();
+        }
+        return daysOfWeek;
+    }
 
     public Group(String name) {
         this.name = name;
@@ -39,7 +50,7 @@ import java.util.List;
         this.kids = kids;
     }
 
-    public Group(String name, List<Long> kids, List<Long> daysOfWeek) {
+    public Group(String name, List<Long> kids, Map<Long, Long> daysOfWeek) {
         this.name = name;
         this.kids = kids;
         this.daysOfWeek = daysOfWeek;

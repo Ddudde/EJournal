@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.ServerService;
-import ru.mirea.data.models.Group;
-import ru.mirea.data.models.School;
+import ru.mirea.data.models.school.Group;
+import ru.mirea.data.models.school.School;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.json.Role;
 
@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/profiles")
 @NoArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io"})
 public class ProfileController {
 
     @Autowired

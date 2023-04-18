@@ -210,6 +210,9 @@ export default function scheduleReducer(state = initialState, action) {
             if(!fd[action.payload.l0]){
                 fd[action.payload.l0] = {};
             }
+            if(!fd[action.payload.l0].lessons){
+                fd[action.payload.l0].lessons = {};
+            }
             if(!fd[action.payload.l0].lessons[action.payload.l1]){
                 fd[action.payload.l0].lessons[action.payload.l1] = {};
             }
@@ -222,7 +225,13 @@ export default function scheduleReducer(state = initialState, action) {
             if(!fd[action.payload.l0]){
                 fd[action.payload.l0] = {};
             }
+            if(!fd[action.payload.l0].lessons){
+                fd[action.payload.l0].lessons = {};
+            }
             fd[action.payload.l0].lessons[action.payload.l1] = action.payload.state;
+            if(action.payload.l2) {
+                fd[action.payload.l0].dayId = action.payload.l2;
+            }
             return fd;
         case CHANGE_SCHEDULE_DEL:
             delete fd[action.payload.l0].lessons[action.payload.l1];
