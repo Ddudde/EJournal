@@ -94,7 +94,16 @@ function installF(e) {
             console.log(urlsToCache);
             return cache.addAll(urlsToCache)
                 .then(r => console.log('cached'))
-                .catch(message => console.log(message))
+                .catch(message => {
+                    console.log(message)
+                    for (let i of urlsToCache) {
+                        try {
+                            const val = cache.add(i);
+                        } catch (err) {
+                            console.warn('sw: cache.add',i);
+                        }
+                    }
+                })
         }))
     );
 }
