@@ -52,6 +52,9 @@ function init() {
                 urlsToCache.push(val);
             });
         });
+    prom.then(e=>{
+        console.log("dsfh");
+    })
     // Delete old caches that are not our current one!
     this.addEventListener("activate", activateF);
     // The first time the user starts up the PWA, 'install' is triggered.
