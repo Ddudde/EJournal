@@ -11,7 +11,7 @@ function init() {
         console.log('tick', num);
         num++;
     }, 2000);
-    prom = fetch("/DipvLom/asset-manifest.json")
+    prom = fetch("./asset-manifest.json")
         .then(response => response.json())
         .then(assets => {
             urlsToCache = [
@@ -90,11 +90,10 @@ function activateF(e) {
 
 function installF(e) {
     e.waitUntil(caches.open(CACHE_NAME)
-        .then(cache => prom.then(bool => {
-            return cache.addAll(urlsToCache)
-                .then(r => console.log('cached'))
-                .catch(message => console.log(message));
-        }))
+        .then(cache => cache.addAll([])
+            .then(r => console.log('cached'))
+            .catch(message => console.log(message))
+        )
     );
 }
 
