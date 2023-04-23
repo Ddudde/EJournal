@@ -11,44 +11,43 @@ function init() {
         console.log('tick', num);
         num++;
     }, 2000);
-    urlsToCache = [
-        "/DipvLom/",
-        "/DipvLom/news/",
-        "/DipvLom/news/por/",
-        "/DipvLom/news/yo/",
-        "/DipvLom/contacts/",
-        "/DipvLom/contacts/por/",
-        "/DipvLom/contacts/yo/",
-        "/DipvLom/zvonki/",
-        "/DipvLom/periods/",
-        "/DipvLom/schedule/",
-        "/DipvLom/journal/",
-        "/DipvLom/analytics/zvonki/",
-        "/DipvLom/analytics/periods/",
-        "/DipvLom/people/",
-        "/DipvLom/people/teachers/",
-        "/DipvLom/people/hteachers/",
-        "/DipvLom/people/class/",
-        "/DipvLom/people/parents/",
-        "/DipvLom/people/admins/",
-        "/DipvLom/tutor/kid/",
-        "/DipvLom/tutor/par/",
-        "/DipvLom/tutor/tea/",
-        "/DipvLom/tutor/sch/",
-        "/DipvLom/profiles/",
-        "/DipvLom/settings/",
-        "/DipvLom/request/",
-        "/DipvLom/invite/",
-        "/DipvLom/reauth/",
-        "/DipvLom/fav32.png",
-        "/DipvLom/fav16.png",
-        "/DipvLom/manifest.json",
-        "/DipvLom/app.js"
-    ];
-    console.log(this.registration.scope + "/asset-manifest.json");
-    prom = fetch(this.registration.scope + "/asset-manifest.json")
+    prom = fetch("/DipvLom/asset-manifest.json")
         .then(response => response.json())
         .then(assets => {
+            urlsToCache = [
+                "/DipvLom/",
+                "/DipvLom/news/",
+                "/DipvLom/news/por/",
+                "/DipvLom/news/yo/",
+                "/DipvLom/contacts/",
+                "/DipvLom/contacts/por/",
+                "/DipvLom/contacts/yo/",
+                "/DipvLom/zvonki/",
+                "/DipvLom/periods/",
+                "/DipvLom/schedule/",
+                "/DipvLom/journal/",
+                "/DipvLom/analytics/zvonki/",
+                "/DipvLom/analytics/periods/",
+                "/DipvLom/people/",
+                "/DipvLom/people/teachers/",
+                "/DipvLom/people/hteachers/",
+                "/DipvLom/people/class/",
+                "/DipvLom/people/parents/",
+                "/DipvLom/people/admins/",
+                "/DipvLom/tutor/kid/",
+                "/DipvLom/tutor/par/",
+                "/DipvLom/tutor/tea/",
+                "/DipvLom/tutor/sch/",
+                "/DipvLom/profiles/",
+                "/DipvLom/settings/",
+                "/DipvLom/request/",
+                "/DipvLom/invite/",
+                "/DipvLom/reauth/",
+                "/DipvLom/fav32.png",
+                "/DipvLom/fav16.png",
+                "/DipvLom/manifest.json",
+                "/DipvLom/app.js"
+            ];
             Object.getOwnPropertyNames(assets.files).map((key, i, x, val = assets.files[key]) => {
                 urlsToCache.push(val);
             });
@@ -91,10 +90,11 @@ function activateF(e) {
 
 function installF(e) {
     e.waitUntil(caches.open(CACHE_NAME)
-        .then(cache => cache.addAll(urlsToCache)
+        .then(cache => prom.then(bool => {
+            return cache.addAll(urlsToCache)
                 .then(r => console.log('cached'))
-                .catch(message => console.log(message))
-        )
+                .catch(message => console.log(message));
+        }))
     );
 }
 
