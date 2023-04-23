@@ -36,6 +36,17 @@ import static java.util.Arrays.asList;
     @Column(name = "days")
     private List<Long> days;
 
+    public Subject(String name, List<Long> teachers) {
+        this.name = name;
+        this.teachers = teachers;
+    }
+
+    public Subject(String name, Long school, List<Long> teachers) {
+        this.name = name;
+        this.school = school;
+        this.teachers = teachers;
+    }
+
     public List<Long> getTeachersInv() {
         if(teachersInv == null) {
             teachersInv = new ArrayList<>(asList());
@@ -48,16 +59,5 @@ import static java.util.Arrays.asList;
             teachers = new ArrayList<>(asList());
         }
         return teachers;
-    }
-
-    public Subject(String name, List<Long> teachers) {
-        this.name = name;
-        this.teachers = teachers;
-    }
-
-    public Subject(String name, Long school, List<Long> teachers) {
-        this.name = name;
-        this.school = school;
-        this.teachers = teachers;
     }
 }

@@ -6,9 +6,12 @@ import ru.mirea.data.converters.MapLongConverter;
 import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -34,13 +37,6 @@ import java.util.Map;
     @Column(name = "daysOfWeek")
     private Map<Long, Long> daysOfWeek;
 
-    public Map<Long, Long> getDaysOfWeek() {
-        if(daysOfWeek == null) {
-            daysOfWeek = new HashMap<>();
-        }
-        return daysOfWeek;
-    }
-
     public Group(String name) {
         this.name = name;
     }
@@ -54,5 +50,26 @@ import java.util.Map;
         this.name = name;
         this.kids = kids;
         this.daysOfWeek = daysOfWeek;
+    }
+
+    public Map<Long, Long> getDaysOfWeek() {
+        if(daysOfWeek == null) {
+            daysOfWeek = new HashMap<>();
+        }
+        return daysOfWeek;
+    }
+
+    public List<Long> getKids() {
+        if(kids == null) {
+            kids = new ArrayList<>(asList());
+        }
+        return kids;
+    }
+
+    public List<Long> getKidsInv() {
+        if(kidsInv == null) {
+            kidsInv = new ArrayList<>(asList());
+        }
+        return kidsInv;
     }
 }

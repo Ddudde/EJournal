@@ -77,7 +77,6 @@ public class TeachersController {
                             put(2L, new Role(null, null, Long.parseLong(subscriber.getLvlSch())));
                         }}, Main.df.format(dateAfter));
                         datas.getInviteRepository().saveAndFlush(inv);
-                        if (school.getTeachersInv() == null) school.setTeachersInv(new ArrayList<>());
                         school.getTeachersInv().add(inv.getId());
                         datas.getSchoolRepository().saveAndFlush(school);
                     }

@@ -94,11 +94,9 @@ public class NewsController {
                         if (body.has("text")) news.setText(body.get("text").getAsString());
                         datas.getNewsRepository().saveAndFlush(news);
                         if (b) {
-                            if (syst.getNews() == null) syst.setNews(new ArrayList<>());
                             syst.getNews().add(news.getId());
                             datas.getSystRepository().saveAndFlush(syst);
                         } else if (b1) {
-                            if (school.getNews() == null) school.setNews(new ArrayList<>());
                             school.getNews().add(news.getId());
                             datas.getSchoolRepository().saveAndFlush(school);
                         }

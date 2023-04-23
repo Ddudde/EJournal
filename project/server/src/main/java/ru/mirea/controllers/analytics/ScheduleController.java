@@ -63,6 +63,7 @@ public class ScheduleController {
                     if(subject == null) {
                         subject = new Subject(obj.get("name").getAsString(), schId, new ArrayList<>(asList(teaId)));
                         datas.getSubjectRepository().saveAndFlush(subject);
+                        school.getSubjects().add(subject.getId());
                     }
                     lesson.setSubject(subject.getId());
                     lesson.setKab(obj.get("cabinet").getAsString());
@@ -78,7 +79,6 @@ public class ScheduleController {
                         datas.getUserRepository().saveAndFlush(teaU);
                         subject.getTeachers().add(teaU.getId());
                         datas.getSubjectRepository().saveAndFlush(subject);
-
                     } else if(teaI != null){
                         lesson.setTeacherInv(teaId);
                         if(!ObjectUtils.isEmpty(school.getTeachersInv())
@@ -91,6 +91,7 @@ public class ScheduleController {
                         datas.getSubjectRepository().saveAndFlush(subject);
                     }
                     datas.getLessonRepository().saveAndFlush(lesson);
+                    datas.getSchoolRepository().saveAndFlush(school);
                     if(body.has("dayId")) {
                         dayOfWeek = datas.dayOfWeekById(body.get("dayId").getAsLong());
                     }
@@ -109,6 +110,8 @@ public class ScheduleController {
                         dayOfWeek.getLessons().put(lesN, lesson.getId());
                         datas.getDayOfWeekRepository().saveAndFlush(dayOfWeek);
                     }
+                    wrtr.name("bodyT").beginObject();
+                    datas.teachersBySchool(school, wrtr);
                     obj.addProperty("group", group.getId());
                     wrtr.name("day").value(body.get("day").toString())
                         .name("dayId").value(dayOfWeek.getId())
@@ -134,54 +137,71 @@ public class ScheduleController {
         JsonTreeWriter wrtr = new JsonTreeWriter();
         Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
         User user = datas.userByLogin(subscriber.getLogin());
-        Group group = datas.groupById(body.get("group").getAsLong());
+        Group group = null;
         Long schId = null;
         try {
             wrtr.beginObject().name("error").value(false);
-            if(user != null && group != null && !ObjectUtils.isEmpty(group.getDaysOfWeek())){
-                schId = datas.getFirstRole(user.getRoles()).getYO();
-                wrtr.name("body").beginObject();
-                for(Map.Entry<Long, Long> entrD : group.getDaysOfWeek().entrySet()) {
-                    DayOfWeek dayOfWeek = datas.dayOfWeekById(entrD.getValue());
-                    if(dayOfWeek == null || ObjectUtils.isEmpty(dayOfWeek.getLessons())) {
-                        continue;
+            if(user != null) {
+                if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
+                    group = datas.groupById(user.getRoles().get(0L).getGroup());
+                } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
+                    User kidU = datas.userById(user.getSelKid());
+                    Invite kidI = datas.inviteById(user.getSelKid());
+                    if(kidU != null) {
+                        group = datas.groupById(kidU.getRoles().get(0L).getGroup());
                     }
-                    wrtr.name(entrD.getKey()+"").beginObject()
-                        .name("dayId").value(entrD.getValue())
-                        .name("lessons").beginObject();
-                    for(Map.Entry<Long, Long> entrL : dayOfWeek.getLessons().entrySet()) {
-                        Lesson lessonM = datas.lessonById(entrL.getValue());
-                        if(lessonM == null) continue;
-                        wrtr.name(entrL.getKey()+"").beginObject();
-                        Subject subject = datas.subjectById(lessonM.getSubject());
-                        if(subject != null) {
-                            wrtr.name("name").value(subject.getName());
-                        }
-                        User teaU = datas.userById(lessonM.getTeacher());
-                        Invite teaI = datas.inviteById(lessonM.getTeacherInv());
-                        wrtr.name("cabinet").value(lessonM.getKab())
-                            .name("prepod").beginObject();
-                        if(teaU != null) {
-                            wrtr.name("name").value(teaU.getFio())
-                                .name("id").value(teaU.getId());
-                        } else if(teaI != null) {
-                            wrtr.name("name").value(teaI.getFio())
-                                .name("id").value(teaI.getId());
-                        }
-                        wrtr.endObject().name("group").value(group.getName())
-                            .endObject();
+                    if(kidI != null) {
+                        group = datas.groupById(kidI.getRole().get(0L).getGroup());
                     }
-                    wrtr.endObject().endObject();
+                } else if(user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
+                    group = datas.groupById(body.get("group").getAsLong());
                 }
-                wrtr.endObject();
+                if (group != null && !ObjectUtils.isEmpty(group.getDaysOfWeek())) {
+                    schId = datas.getFirstRole(user.getRoles()).getYO();
+                    wrtr.name("body").beginObject();
+                    for (Map.Entry<Long, Long> entrD : group.getDaysOfWeek().entrySet()) {
+                        DayOfWeek dayOfWeek = datas.dayOfWeekById(entrD.getValue());
+                        if (dayOfWeek == null || ObjectUtils.isEmpty(dayOfWeek.getLessons())) {
+                            continue;
+                        }
+                        wrtr.name(entrD.getKey() + "").beginObject()
+                                .name("dayId").value(entrD.getValue())
+                                .name("lessons").beginObject();
+                        for (Map.Entry<Long, Long> entrL : dayOfWeek.getLessons().entrySet()) {
+                            Lesson lessonM = datas.lessonById(entrL.getValue());
+                            if (lessonM == null) continue;
+                            wrtr.name(entrL.getKey() + "").beginObject();
+                            Subject subject = datas.subjectById(lessonM.getSubject());
+                            if (subject != null) {
+                                wrtr.name("name").value(subject.getName());
+                            }
+                            User teaU = datas.userById(lessonM.getTeacher());
+                            Invite teaI = datas.inviteById(lessonM.getTeacherInv());
+                            wrtr.name("cabinet").value(lessonM.getKab())
+                                    .name("prepod").beginObject();
+                            if (teaU != null) {
+                                wrtr.name("name").value(teaU.getFio())
+                                        .name("id").value(teaU.getId());
+                            } else if (teaI != null) {
+                                wrtr.name("name").value(teaI.getFio())
+                                        .name("id").value(teaI.getId());
+                            }
+                            wrtr.endObject().name("group").value(group.getName())
+                                    .endObject();
+                        }
+                        wrtr.endObject().endObject();
+                    }
+                    wrtr.endObject();
+                }
             }
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             wrtr.name("error").value(true);
         }
         Long finalSchId = schId;
+        Group finalGroup = group;
         return datas.getObj(ans -> {
-            authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), subscriber.getType(), finalSchId +"", user.getRoles().containsKey(3L) ? "main" : group.getId()+"", subscriber.getLvlMore1(), "main");
+            authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), subscriber.getType(), finalSchId +"", user.getRoles().containsKey(3L) ? "main" : finalGroup.getId()+"", subscriber.getLvlMore1(), "main");
         }, wrtr, true);
     }
 
@@ -194,14 +214,19 @@ public class ScheduleController {
         Long schId = null, firstG;
         try {
             wrtr.beginObject().name("error").value(false);
-            if(user != null && (user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L))) {
-                wrtr.name("bodyG").beginObject();
-                firstG = datas.groupsByUser(user, wrtr);
-                wrtr.name("firstG").value(firstG);
-                schId = datas.getFirstRole(user.getRoles()).getYO();
-                School school = datas.schoolById(schId);
-                wrtr.name("bodyT").beginObject();
-                datas.teachersBySchool(school, wrtr);
+            if(user != null) {
+                if(user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L)) {
+                    wrtr.name("bodyG").beginObject();
+                    firstG = datas.groupsByUser(user, wrtr);
+                    schId = datas.getFirstRole(user.getRoles()).getYO();
+                    School school = datas.schoolById(schId);
+                    wrtr.name("firstG").value(firstG)
+                            .name("bodyT").beginObject();
+                    datas.teachersBySchool(school, wrtr);
+                }
+                if(user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L)) {
+                    wrtr.name("role").value(true);
+                }
             }
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());

@@ -5,6 +5,7 @@ import ru.mirea.data.converters.MapRoleConverter;
 import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter @Setter
@@ -34,6 +35,12 @@ import java.util.Map;
     @Column(name = "secFr")
     private String secFr;
 
+    @Column(name = "selRole")
+    private long selRole;
+
+    @Column(name = "selKid")
+    private long selKid;
+
     @Column(name = "ico")
     private int ico;
 
@@ -50,11 +57,29 @@ import java.util.Map;
         this.ico = ico;
     }
 
-    public User(String login, String password, String fio, int ico, Map<Long,Role> roles) {
+    public User(String login, String password, String fio, int ico, Map<Long, Role> roles, long selRole) {
         this.login = login;
-        this.fio = fio;
         this.password = password;
+        this.fio = fio;
+        this.selRole = selRole;
         this.ico = ico;
         this.roles = roles;
+    }
+
+    public User(String login, String password, String fio, int ico, Map<Long, Role> roles, long selRole, long selKid) {
+        this.login = login;
+        this.password = password;
+        this.fio = fio;
+        this.selRole = selRole;
+        this.selKid = selKid;
+        this.ico = ico;
+        this.roles = roles;
+    }
+
+    public Map<Long, Role> getRoles() {
+        if(roles == null) {
+            roles = new HashMap<>();
+        }
+        return roles;
     }
 }

@@ -4,7 +4,10 @@ import lombok.*;
 import ru.mirea.data.converters.ListLongConverter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -38,5 +41,26 @@ import java.util.List;
         this.admins = admins;
         this.news = news;
         this.contacts = contacts;
+    }
+
+    public List<Long> getAdmins() {
+        if(admins == null) {
+            admins = new ArrayList<>(asList());
+        }
+        return admins;
+    }
+
+    public List<Long> getAdminsInv() {
+        if(adminsInv == null) {
+            adminsInv = new ArrayList<>(asList());
+        }
+        return adminsInv;
+    }
+
+    public List<Long> getNews() {
+        if(news == null) {
+            news = new ArrayList<>(asList());
+        }
+        return news;
     }
 }

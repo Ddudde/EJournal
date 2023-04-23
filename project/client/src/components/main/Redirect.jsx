@@ -6,7 +6,7 @@ export function Redirect() {
     const navigate = useNavigate();
     useEffect(() => {
         console.log("I was triggered during componentDidMount Redirect.jsx");
-        navigate("/DipvLom");
+        navigate("/DipvLom/");
         return function() {
             console.log("I was triggered during componentWillUnmount Redirect.jsx");
         }

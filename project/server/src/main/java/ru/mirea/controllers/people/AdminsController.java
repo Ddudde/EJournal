@@ -86,7 +86,6 @@ public class AdminsController {
                         put(4L, new Role(null));
                     }}, Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    if(syst.getAdminsInv() == null) syst.setAdminsInv(new ArrayList<>());
                     syst.getAdminsInv().add(inv.getId());
                     datas.getSystRepository().saveAndFlush(syst);
 

@@ -28,7 +28,7 @@ import mapl from "../../../media/Map_symbolL.png";
 import ed from "../../../media/edit.png";
 import {setEvGr} from "../../people/PeopleMain";
 
-let dispatch, cState, selGr, schedulesInfo, groupsInfo, errText, inps, teachersInfo, themeState, DoW;
+let dispatch, cState, selGr, schedulesInfo, groupsInfo, errText, inps, teachersInfo, themeState, DoW, selKid;
 DoW = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
 inps = {sinpnpt : "Математика", sinpnkt: "300"};
 selGr = 0;
@@ -106,7 +106,9 @@ function onFin(e, type, info) {
 }
 
 function getSched(b) {
-    let dI = [0, 1, 2, 3, 4, 5, 6];
+    let dI, preps;
+    dI = [0, 1, 2, 3, 4, 5, 6];
+    preps = getPrep();
     return b ?
         dI.map((param, i, x, dai = schedulesInfo[param], dLI = (dai && dai.lessons ? Object.getOwnPropertyNames(dai.lessons):[])) =>
             <div className={analyticsCSS.l1+" "+scheduleCSS.day}>
@@ -173,7 +175,7 @@ function getSched(b) {
                                 <div className={analyticsCSS.preinf}>
                                     Педагог:
                                 </div>
-                                {getPrep()}
+                                {preps}
                                 <img className={analyticsCSS.imginp} data-enable={inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "prepod", id: param, id1: param1})} title="Подтвердить" alt=""/>
                                 <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                             </div>
@@ -201,7 +203,7 @@ function getSched(b) {
                         <div className={analyticsCSS.preinf}>
                             , Педагог:
                         </div>
-                        {getPrep()}
+                        {preps}
                         <img className={analyticsCSS.imginp} data-enable={inps.sinpnpt_ && inps.sinpnkt_ && inps && inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE, {id: i, id1: dai ? dai.dayId : undefined})} title="Подтвердить" alt=""/>
                         <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                     </div>
@@ -280,7 +282,6 @@ function selecPrep(e, id, obj) {
     if(!inps.nw) inps.nw = {};
     inps.nw.prepod = obj.name;
     forceUpdate();
-    // dispatch(changeAnalytics(CHANGE_SCHEDULE_PARAM, param, "nw", "prepod", obj.name));
 }
 
 function getPrep() {
@@ -293,15 +294,14 @@ function getPrep() {
                 <img className={scheduleCSS.mapImg} data-enablem={ltI0.length < 2 ? "0" : "1"} src={themeState.theme_ch ? mapd : mapl} alt=""/>
             </div>
             <div className={scheduleCSS.list}>
-                {ltI0.map((param1, i, x, info = teachersInfo[param1], lltI = Object.getOwnPropertyNames(teachersInfo[param1].tea)) =>
+                {ltI0.map((param1, i, x, info = teachersInfo[param1], lltI = (info && info.tea ? Object.getOwnPropertyNames(info.tea) : [])) =>
                     <>
-                        {lltI.length > 0 && !(lltI.length == 1 && lltI[0] == inps.nyid) &&
+                        {lltI.length > 0 &&
                             <div className={analyticsCSS.nav_i+' '+scheduleCSS.listZag} id={analyticsCSS.nav_i}>
                                 <div className={scheduleCSS.elInf}>{param1 == "nt" ? "Нераспределённые" : info.name}:</div>
                             </div>
                         }
                         {lltI.map((param2, i, x, tO = info.tea[param2]) =>
-                            param2 != inps.nyid &&
                             <div className={analyticsCSS.nav_i+' '+scheduleCSS.listEl} key={param2} id={analyticsCSS.nav_i} onClick={e => (selecPrep(e, param2, tO))}>
                                 <div className={scheduleCSS.elInf}>Педагог:</div>
                                 <div className={scheduleCSS.elText}>{tO.name}</div>
@@ -322,6 +322,7 @@ function addLessonC(e) {
     const msg = JSON.parse(e.data);
     console.log("dsf3", msg);
     dispatch(changeAnalytics(CHANGE_SCHEDULE, msg.day, msg.les, msg.dayId, msg.body));
+    dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, msg.bodyT));
 }
 
 function addLesson(day, dayId, obj) {
@@ -341,13 +342,15 @@ function setInfo() {
         .then(data => {
             console.log(data);
             if(data.error == false){
-                setEvGr(cState, dispatch);
-                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
-                if(!data.bodyG[groupsInfo.els.group]) {
-                    selGr = data.firstG;
-                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
+                if(!data.role) {
+                    setEvGr(cState, dispatch);
+                    dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
+                    if (!data.bodyG[groupsInfo.els.group]) {
+                        selGr = data.firstG;
+                        dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
+                    }
+                    dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.bodyT));
                 }
-                dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.bodyT));
                 setSchedule();
             }
         });
@@ -356,11 +359,13 @@ function setInfo() {
 function setSchedule() {
     send({
         uuid: cState.uuid,
-        group: groupsInfo.els.group
+        group: groupsInfo.els.group,
+        role: cState.role
     }, 'POST', "schedule/getSchedule")
         .then(data => {
             console.log(data);
             selGr = groupsInfo.els.group;
+            if(cState.role == 1 && cState.kid) selKid = cState.kid;
             dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body));
         });
 }
@@ -391,13 +396,17 @@ export function Schedule() {
             dispatch = undefined;
             eventSource.removeEventListener('connect', onCon);
             eventSource.removeEventListener('addLessonC', addLessonC);
-            console.log("I was triggered during componentWillUnmount Schedule.jsx");
+            console.log("I was triggered during 1componentWillUnmount Schedule.jsx");
         }
     }, []);
     useEffect(() => {
         if (isFirstUpdate.current) {
             isFirstUpdate.current = false;
             return;
+        }
+        if(cState.role == 1 && cState.kid && selKid != cState.kid) {
+            selKid = cState.kid;
+            setSchedule();
         }
         if(groupsInfo.els.group && selGr != groupsInfo.els.group){
             if(eventSource.readyState == EventSource.OPEN) setSchedule();

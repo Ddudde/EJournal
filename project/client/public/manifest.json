@@ -1,15 +1,24 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "fav32.png",
-      "sizes": "32x32 24x24 16x16",
-      "type": "image/png"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+	"short_name": "React App",
+	"name": "Create React App Sample",
+	"description": "Описание...",
+	"icons": [
+		{
+			"src": "fav32.png",
+			"sizes": "32x32",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "fav16.png",
+			"sizes": "16x16",
+			"type": "image/png",
+			"purpose": "any"
+		}
+	],
+	"id": "/DipvLom/",
+	"start_url": "/DipvLom/",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#ffffff"
 }

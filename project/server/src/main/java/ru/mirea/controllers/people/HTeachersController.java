@@ -195,7 +195,6 @@ public class HTeachersController {
                             put(3L, new Role(null, finalSchId));
                         }}, Main.df.format(dateAfter));
                         datas.getInviteRepository().saveAndFlush(inv);
-                        if (sch.getHteachersInv() == null) sch.setHteachersInv(new ArrayList<>());
                         sch.getHteachersInv().add(inv.getId());
                         datas.getSchoolRepository().saveAndFlush(sch);
 
@@ -338,7 +337,6 @@ public class HTeachersController {
                     if(school != null) {
                         group = new Group(body.get("name").getAsString());
                         datas.getGroupRepository().saveAndFlush(group);
-                        if (school.getGroups() == null) school.setGroups(new ArrayList<>());
                         school.getGroups().add(group.getId());
                         datas.getSchoolRepository().saveAndFlush(school);
                     }

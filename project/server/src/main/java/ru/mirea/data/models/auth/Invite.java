@@ -5,6 +5,7 @@ import ru.mirea.data.converters.MapRoleConverter;
 import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter @Setter
@@ -33,5 +34,12 @@ import java.util.Map;
         this.fio = fio;
         this.expDate = expDate;
         this.role = role;
+    }
+
+    public Map<Long, Role> getRole() {
+        if(role == null) {
+            role = new HashMap<>();
+        }
+        return role;
     }
 }

@@ -25,13 +25,6 @@ public class Role implements Serializable {
     private List<Long> parentsInv;
     private List<Long> subjects;
 
-    public List<Long> getSubjects() {
-        if(subjects == null) {
-            subjects = new ArrayList<>(asList());
-        }
-        return subjects;
-    }
-
     public Role(String email, Long YO, Long group, List<Long> parents) { // kid
         this.email = email;
         this.YO = YO;
@@ -58,5 +51,40 @@ public class Role implements Serializable {
 
     public Role(String email) { //adm
         this.email = email;
+    }
+
+    public List<Long> getSubjects() {
+        if(subjects == null) {
+            subjects = new ArrayList<>(asList());
+        }
+        return subjects;
+    }
+
+    public List<Long> getKids() {
+        if(kids == null) {
+            kids = new ArrayList<>(asList());
+        }
+        return kids;
+    }
+
+    public List<Long> getKidsInv() {
+        if(kidsInv == null) {
+            kidsInv = new ArrayList<>(asList());
+        }
+        return kidsInv;
+    }
+
+    public List<Long> getParents() {
+        if(parents == null) {
+            parents = new ArrayList<>(asList());
+        }
+        return parents;
+    }
+
+    public List<Long> getParentsInv() {
+        if(parentsInv == null) {
+            parentsInv = new ArrayList<>(asList());
+        }
+        return parentsInv;
     }
 }

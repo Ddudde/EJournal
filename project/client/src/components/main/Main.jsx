@@ -75,7 +75,7 @@ function getKids() {
             </div>
             <div className={mainCSS.logMenu}>
                 {Object.getOwnPropertyNames(cState.kids).map(param1 =>
-                    <div className={mainCSS.nav_i+' '+mainCSS.log+' '+mainCSS.kidBlock} id={mainCSS.nav_i} onClick={() => (dispatch(changeState(CHANGE_STATE, "kid", param1)))}>
+                    <div className={mainCSS.nav_i+' '+mainCSS.log+' '+mainCSS.kidBlock} id={mainCSS.nav_i} onClick={e => selKid(param1)}>
                         <img className={mainCSS.kidImg} src={themeInfo.theme_ch ? profd : profl} title="Перейти в профиль" alt=""/>
                         <div className={mainCSS.kidInf}>Информация о:</div>
                         <div className={mainCSS.kidText}>{cState.kids[param1]}</div>
@@ -83,6 +83,19 @@ function getKids() {
                 )}
             </div>
         </div>
+}
+
+function selKid(kid) {
+    send({
+        uuid: cState.uuid,
+        id: kid
+    }, 'POST', "auth/chKid")
+        .then(data => {
+            if(data.error == false) {
+                console.log(data);
+                dispatch(changeState(CHANGE_STATE, "kid", data.kid));
+            }
+        });
 }
 
 export function send(bod, typeC, url, type) {
@@ -105,12 +118,12 @@ export function send(bod, typeC, url, type) {
             }
             return res.json();
         })
-        .catch(data => {return data});
+        .catch(data => data);
 }
 
 function chRoles() {
     send({
-        login: cState.login,
+        uuid: cState.uuid,
         role: cState.role
     }, 'POST', "auth/chRole")
         .then(data => {
@@ -128,7 +141,9 @@ function onExit() {
 }
 
 export function setActived(name) {
-    if(document.querySelector(act)) document.querySelector(act).setAttribute('data-act', '0');
+    if(document.querySelector(act)) {
+        document.querySelector(act).setAttribute('data-act', '0');
+    }
     if(typeof name != "number"){
         if(document.querySelector(name)) {
             act = name;
@@ -188,8 +203,7 @@ function iniNet() {
         if (e.readyState == EventSource.CLOSED) {
             console.log('close');
             closeStream();
-        }
-        else {
+        } else {
             console.log('try to reconnect...');
         }
     };
@@ -201,7 +215,12 @@ function iniNet() {
             send({
                 login: cState.login,
                 uuid: msg
-            }, 'POST', "auth/infCon");
+            }, 'POST', "auth/infCon")
+                .then(data => {
+                    if(data.error == false){
+                        dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
+                    }
+                });
         }
     }, false);
     eventSource.addEventListener('ping', e => {

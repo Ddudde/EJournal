@@ -167,7 +167,9 @@ public class ParentsController {
                             parO.addProperty("name", inv.getFio());
                             parA.add(inv.getId()+"", parO);
 
-                            if (kidU.getRoles().get(0L).getParentsInv() == null) kidU.getRoles().get(0L).setParentsInv(new ArrayList<>(asList(kidU.getId())));
+                            if (!kidU.getRoles().get(0L).getParentsInv().contains(kidU.getId())) {
+                                kidU.getRoles().get(0L).getParentsInv().add(kidU.getId());
+                            }
                             kidU.getRoles().get(0L).getParentsInv().add(inv.getId());
                             datas.getUserRepository().saveAndFlush(kidU);
                         }
@@ -188,7 +190,9 @@ public class ParentsController {
                             parO.addProperty("name", inv.getFio());
                             parA.add(inv.getId()+"", parO);
 
-                            if (kidI.getRole().get(0L).getParentsInv() == null) kidI.getRole().get(0L).setParentsInv(new ArrayList<>(asList(kidI.getId())));
+                            if (!kidI.getRole().get(0L).getParentsInv().contains(kidI.getId())) {
+                                kidI.getRole().get(0L).getParentsInv().add(kidI.getId());
+                            }
                             kidI.getRole().get(0L).getParentsInv().add(inv.getId());
                             datas.getInviteRepository().saveAndFlush(kidI);
                         }

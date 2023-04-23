@@ -88,14 +88,14 @@ import static java.util.Arrays.asList;
             put(2L, new Role("ex@ya.ru", new ArrayList<>(asList()), 5L));
             put(3L, new Role("ex@ya.ru", 5L));
             put(4L, new Role("ex@ya.ru"));
-        }}));
+        }}, 4L, 1L));
         createUser(new User("nm12", "1111", "Петров В.В.", 1, new HashMap<Long,Role>() {{
             put(0L, new Role("ex@ya.ru", 6L, 17L, new ArrayList<>(asList(1L, 2L))));
             put(1L, new Role("ex@ya.ru", 6L, new ArrayList<>(asList(1L, 2L))));
             put(2L, new Role("ex@ya.ru", new ArrayList<>(asList()), 6L));
             put(3L, new Role("ex@ya.ru", 6L));
             put(4L, new Role("ex@ya.ru"));
-        }}));
+        }}, 4L, 1L));
         System.out.println(getUsers());
 
         createReq(new Request("ex@ya.ru","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
@@ -108,10 +108,10 @@ import static java.util.Arrays.asList;
 
         createUser(new User("nm13", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
             put(3L, new Role("ex@ya.ru", 4L));
-        }}));
+        }}, 3L));
         createUser(new User("nm14", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
             put(3L, new Role("ex@ya.ru", 4L));
-        }}));
+        }}, 3L));
 
         Instant after = Instant.now().plus(Duration.ofDays(30));
         Date dateAfter = Date.from(after);
@@ -144,22 +144,22 @@ import static java.util.Arrays.asList;
 
         createUser(new User("nm15", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
             put(0L, new Role("ex@ya.ru", 4L, 17L, new ArrayList<>(asList(1L, 2L))));
-        }}));//16L
+        }}, 0L));//16L
 
         createGroups();//60L
         System.out.println(getGroups());
 
         createUser(new User("nm16", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
             put(0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(62L, 63L))));
-        }}));//61L
+        }}, 0L));//61L
 
         createUser(new User("nm17", "1111", "Петров В.В.", 2, new HashMap<Long,Role>() {{
-            put(1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L))));
-        }}));//62L
+            put(1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 75L))));
+        }}, 1L, 61L));//62L
 
         createUser(new User("nm18", "1111", "Петрова В.В.", 2, new HashMap<Long,Role>() {{
-            put(1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L))));
-        }}));//63L
+            put(1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 75L))));
+        }}, 1L, 61L));//63L
 
         createSubject(new Subject("Англ. Яз.", 4L, new ArrayList<>(asList(67L))));
         createSubject(new Subject("Математика", 4L, new ArrayList<>(asList(68L))));
@@ -167,15 +167,15 @@ import static java.util.Arrays.asList;
 
         createUser(new User("nm19", "1111", "Петрова В1.В.", 2, new HashMap<Long,Role>() {{
             put(2L, new Role("ex@ya.ru", new ArrayList<>(asList()), 4L));
-        }}));//66L
+        }}, 2L));//66L
 
         createUser(new User("nm20", "1111", "Петрова В2.В.", 2, new HashMap<Long,Role>() {{
             put(2L, new Role("ex@ya.ru", new ArrayList<>(asList(64L)), 4L));
-        }}));//67L
+        }}, 2L));//67L
 
         createUser(new User("nm21", "1111", "Петрова В3.В.", 2, new HashMap<Long,Role>() {{
             put(2L, new Role("ex@ya.ru", new ArrayList<>(asList(65L)), 4L));
-        }}));//68L
+        }}, 2L));//68L
 
         createLesson(new Lesson(64L, 67L, "300"));
         createLesson(new Lesson(64L, 67L, "301"));
@@ -191,6 +191,10 @@ import static java.util.Arrays.asList;
             put(0L, 72L);
         }}));
         System.out.println(getDaysOfWeek());
+
+        createUser(new User("nm22", "1111", "Петров В.Вa.", 2, new HashMap<Long,Role>() {{
+            put(0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(62L, 63L))));
+        }}, 0L));//75L
     }
 
     private void checkDates(){
@@ -282,9 +286,6 @@ import static java.util.Arrays.asList;
     public void delInv(Invite inv) {
         if(inv != null){
             School school = schoolById(getFirstRole(inv.getRole()).getYO());
-            if(ObjectUtils.isEmpty(school.getHteachersInv())) {
-                school.setHteachersInv(new ArrayList<>());
-            }
             school.getHteachersInv().remove(inv.getId());
             schoolRepository.saveAndFlush(school);
             inviteRepository.delete(inv);
@@ -436,7 +437,7 @@ import static java.util.Arrays.asList;
 
     public void createGroups(){
         createGroup(new Group("11A", new ArrayList<>(asList(1L, 2L, 16L))));//17L
-        createGroup(new Group("11Б", new ArrayList<>(asList(61L)), new HashMap<Long,Long>() {{
+        createGroup(new Group("11Б", new ArrayList<>(asList(61L, 75L)), new HashMap<Long,Long>() {{
             put(0L, 73L);
             put(1L, 74L);
         }}));

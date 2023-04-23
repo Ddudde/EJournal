@@ -4,7 +4,10 @@ import lombok.*;
 import ru.mirea.data.converters.ListLongConverter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -83,5 +86,54 @@ import java.util.List;
         this.groups = groups;
         this.subjects = subjects;
         this.teachers = teachers;
+    }
+
+    public List<Long> getHteachers() {
+        if(hteachers == null) {
+            hteachers = new ArrayList<>(asList());
+        }
+        return hteachers;
+    }
+
+    public List<Long> getHteachersInv() {
+        if(hteachersInv == null) {
+            hteachersInv = new ArrayList<>(asList());
+        }
+        return hteachersInv;
+    }
+
+    public List<Long> getNews() {
+        if(news == null) {
+            news = new ArrayList<>(asList());
+        }
+        return news;
+    }
+
+    public List<Long> getGroups() {
+        if(groups == null) {
+            groups = new ArrayList<>(asList());
+        }
+        return groups;
+    }
+
+    public List<Long> getTeachers() {
+        if(teachers == null) {
+            teachers = new ArrayList<>(asList());
+        }
+        return teachers;
+    }
+
+    public List<Long> getTeachersInv() {
+        if(teachersInv == null) {
+            teachersInv = new ArrayList<>(asList());
+        }
+        return teachersInv;
+    }
+
+    public List<Long> getSubjects() {
+        if(subjects == null) {
+            subjects = new ArrayList<>(asList());
+        }
+        return subjects;
     }
 }

@@ -155,7 +155,29 @@ public class AuthController {
                 type = TypesConnect.valueOf(body.get("type").getAsString());
             }
             infCon(uuid, login, type, null, null, null, null);
-            wrtr.name("yes").value(true);
+            Subscriber subscriber = getSubscriber(body.get("uuid").getAsString());
+            User user = datas.userByLogin(subscriber.getLogin());
+            wrtr.name("body").beginObject()
+                .name("role").value(user.getSelRole());
+            if(user.getSelRole() == 1L) {
+                Role role = user.getRoles().get(1L);
+                wrtr.name("kid").value(user.getSelKid())
+                        .name("kids").beginObject();
+                if (!ObjectUtils.isEmpty(role.getKids())) {
+                    for (Long i1 : role.getKids()) {
+                        User kid = datas.userById(i1);
+                        wrtr.name(i1 + "").value(kid.getFio());
+                    }
+                }
+                if (!ObjectUtils.isEmpty(role.getKidsInv())) {
+                    for (Long i1 : role.getKidsInv()) {
+                        Invite kid = datas.inviteById(i1);
+                        wrtr.name(i1 + "").value(kid.getFio());
+                    }
+                }
+                wrtr.endObject();
+            }
+            wrtr.endObject();
         } catch (Exception e) {
             wrtr.name("error").value(true);
 //            System.out.println(e.fillInStackTrace());
@@ -195,10 +217,28 @@ public class AuthController {
                     wrtr.name("auth").value(true)
                         .name("login").value(user.getLogin())
 //                        bodyAns.addProperty("role", ObjectUtils.isEmpty(user.getRoles()) ? 0 : ((Long) user.getRoles().keySet().toArray()[4]));
-                        .name("role").value(ObjectUtils.isEmpty(user.getRoles()) ? 0 : datas.getFirstRoleId(user.getRoles()))
+                        .name("role").value(user.getSelRole())
                         .name("ico").value(user.getIco())
                         .name("roles").value(!ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1)
                         .name("secFr").value(!ObjectUtils.isEmpty(user.getSecFr()));
+                    if(user.getSelRole() == 1L) {
+                        Role role = user.getRoles().get(1L);
+                        wrtr.name("kid").value(user.getSelKid())
+                                .name("kids").beginObject();
+                        if (!ObjectUtils.isEmpty(role.getKids())) {
+                            for (Long i1 : role.getKids()) {
+                                User kid = datas.userById(i1);
+                                wrtr.name(i1 + "").value(kid.getFio());
+                            }
+                        }
+                        if (!ObjectUtils.isEmpty(role.getKidsInv())) {
+                            for (Long i1 : role.getKidsInv()) {
+                                Invite kid = datas.inviteById(i1);
+                                wrtr.name(i1 + "").value(kid.getFio());
+                            }
+                        }
+                        wrtr.endObject();
+                    }
                     infCon(body.get("uuid").getAsString(), body.get("login").getAsString(), null, null, null, null, null);
                 }
             }
@@ -214,9 +254,8 @@ public class AuthController {
     public JsonObject reg(@RequestBody JsonObject body) throws Exception {
         System.out.println("Post! " + body);
         JsonTreeWriter wrtr = new JsonTreeWriter();
-        User user = datas.userByLogin(body.get("login").getAsString());
+        User user = datas.userByLogin(body.get("login").getAsString()), user1 = null;
         Invite inv = null;
-        User user1 = null;
         if(Objects.equals(body.get("mod").getAsString(), "inv")){
             inv = datas.inviteByCode(body.get("code").getAsString());
         }
@@ -227,18 +266,24 @@ public class AuthController {
             wrtr.beginObject().name("error").value(false);
             if(inv == null && user1 == null){
                 wrtr.name("error").value(2);
-                wrtr.name("yes").value(false);
+                wrtr.name("yes").value(true);
                 return datas.getObj(ans -> {}, wrtr, true);
             }
             if(user == null) {
                 if(inv != null) {
                     user = new User(body.get("login").getAsString(), body.get("par").getAsString(), body.get("ico").getAsInt());
                     user.setRoles(inv.getRole());
+                    user.setSelRole(datas.getFirstRoleId(inv.getRole()));
+                    if(inv.getRole().containsKey(1L)) {
+                        if(!ObjectUtils.isEmpty(inv.getRole().get(1L).getKids())) {
+                            user.setSelKid(inv.getRole().get(1L).getKids().get(0));
+                        } else if(!ObjectUtils.isEmpty(inv.getRole().get(1L).getKidsInv())) {
+                            user.setSelKid(inv.getRole().get(1L).getKidsInv().get(0));
+                        }
+                    }
                     user.setFio(inv.getFio());
                     datas.getUserRepository().saveAndFlush(user);
                     School school = datas.schoolById(datas.getFirstRole(inv.getRole()).getYO());
-                    if(ObjectUtils.isEmpty(school.getHteachersInv())) school.setHteachersInv(new ArrayList<>());
-                    if(ObjectUtils.isEmpty(school.getHteachers())) school.setHteachers(new ArrayList<>());
                     school.getHteachersInv().remove(inv.getId());
                     school.getHteachers().add(user.getId());
                     datas.getSchoolRepository().saveAndFlush(school);
@@ -253,7 +298,7 @@ public class AuthController {
                     datas.getUserRepository().saveAndFlush(user1);
                 }
             }
-            wrtr.name("yes").value(false);
+            wrtr.name("yes").value(true);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             wrtr.name("error").value(true);
@@ -271,7 +316,27 @@ public class AuthController {
             if(user != null && Objects.equals(user.getSecFr(), body.get("secFr").getAsString())) {
                 user.setPassword(body.get("par").getAsString());
                 datas.getUserRepository().saveAndFlush(user);
-                wrtr.name("yes").value(false);
+                wrtr.name("yes").value(true);
+            }
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+            wrtr.name("error").value(true);
+        }
+        return datas.getObj(ans -> {}, wrtr, true);
+    }
+
+    @PostMapping(value = "/chKid")
+    public JsonObject chKid(@RequestBody JsonObject body) throws Exception {
+        System.out.println("Post! " + body);
+        JsonTreeWriter wrtr = new JsonTreeWriter();
+        Subscriber subscriber = getSubscriber(body.get("uuid").getAsString());
+        User user = datas.userByLogin(subscriber.getLogin());
+        try {
+            wrtr.beginObject().name("error").value(false);
+            if(user != null && user.getSelRole() == 1L && body.has("id")) {
+                user.setSelKid(body.get("id").getAsLong());
+                wrtr.name("kid").value(user.getSelKid());
+                datas.getUserRepository().saveAndFlush(user);
             }
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
@@ -284,8 +349,9 @@ public class AuthController {
     public JsonObject chRole(@RequestBody JsonObject body) throws Exception {
         System.out.println("Post! " + body);
         JsonTreeWriter wrtr = new JsonTreeWriter();
-        User user = datas.userByLogin(body.get("login").getAsString());
-        long curRol = body.get("role").getAsLong();
+        Subscriber subscriber = getSubscriber(body.get("uuid").getAsString());
+        User user = datas.userByLogin(subscriber.getLogin());
+        long curRol = user.getSelRole();
         try {
             wrtr.beginObject().name("error").value(false);
             if(user != null && user.getRoles().containsKey(curRol)) {
@@ -293,13 +359,23 @@ public class AuthController {
                 for(long i = (curRol == 4 ? 0 : curRol+1L); i < 5; i++){
                     if(!user.getRoles().containsKey(i)) continue;
                     wrtr.name("role").value(i);
+                    user.setSelRole(i);
+                    datas.getUserRepository().saveAndFlush(user);
                     Role role = user.getRoles().get(i);
-                    if(role.getKids() != null && !role.getKids().isEmpty()){
-                        wrtr.name("kid").value(role.getKids().get(0))
-                            .name("kids").beginObject();
-                        for(Long i1 : role.getKids()){
-                            User kid = datas.userById(i1);
-                            wrtr.name(i1+"").value(kid.getFio());
+                    if(i == 1L) {
+                        wrtr.name("kid").value(user.getSelKid())
+                                .name("kids").beginObject();
+                        if (!ObjectUtils.isEmpty(role.getKids())) {
+                            for (Long i1 : role.getKids()) {
+                                User kid = datas.userById(i1);
+                                wrtr.name(i1 + "").value(kid.getFio());
+                            }
+                        }
+                        if (!ObjectUtils.isEmpty(role.getKidsInv())) {
+                            for (Long i1 : role.getKidsInv()) {
+                                Invite kid = datas.inviteById(i1);
+                                wrtr.name(i1 + "").value(kid.getFio());
+                            }
                         }
                         wrtr.endObject();
                     }
@@ -323,7 +399,7 @@ public class AuthController {
         subscriber.setLvlGr(null);
         try {
             wrtr.beginObject().name("error").value(false)
-                .name("yes").value(false);
+                .name("yes").value(true);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             wrtr.name("error").value(true);
@@ -346,13 +422,11 @@ public class AuthController {
                 user.getRoles().putAll(inv.getRole());
                 datas.getUserRepository().saveAndFlush(user);
                 School school = datas.schoolById(((Role) inv.getRole().values().toArray()[0]).getYO());
-                if(ObjectUtils.isEmpty(school.getHteachersInv())) school.setHteachersInv(new ArrayList<>());
-                if(ObjectUtils.isEmpty(school.getHteachers())) school.setHteachers(new ArrayList<>());
                 school.getHteachersInv().remove(inv.getId());
                 school.getHteachers().add(user.getId());
                 datas.getSchoolRepository().saveAndFlush(school);
                 datas.getInviteRepository().delete(inv);
-                wrtr.name("yes").value(false);
+                wrtr.name("yes").value(true);
             }
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
@@ -368,7 +442,7 @@ public class AuthController {
         User user = datas.userByCode(body.get("code").getAsString());
         try {
             wrtr.beginObject().name("error").value(false);
-            if(user != null) wrtr.name("yes").value(false);
+            if(user != null) wrtr.name("yes").value(true);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             wrtr.name("error").value(true);

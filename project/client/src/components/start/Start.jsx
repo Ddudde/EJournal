@@ -130,6 +130,7 @@ function vxo(){
     }, 'POST', "auth/auth")
         .then(data => {
             if(data.error == false && data.body.auth){
+                console.log(data);
                 dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
             } else {
                 addEvent("Неверный логин или пароль", 10);

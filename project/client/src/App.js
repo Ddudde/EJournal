@@ -58,7 +58,7 @@ function App() {
                   <Route path="por" element={<ContactPor/>} />
                   {(cState.auth && cState.role != 4) && <Route path="yo" element={<ContactYo/>} />}
               </Route>
-              {(cState.auth && (cState.role < 2 || cState.role == 3)) && <Route path={cState.role == 3 ? "admYO" : "analytics"} element={<AnalyticsMain/>}>
+              {(cState.auth && (cState.role < 2 || cState.role == 3)) && <Route path={cState.role == 3 ? "" : "analytics"} element={<AnalyticsMain/>}>
                   <Route index element={<Zvonki/>} />
                   <Route path="zvonki" element={<Zvonki/>} />
                   <Route path="periods" element={<Periods/>} />

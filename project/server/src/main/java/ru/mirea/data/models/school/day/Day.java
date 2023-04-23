@@ -4,7 +4,10 @@ import lombok.*;
 import ru.mirea.data.converters.ListLongConverter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -36,5 +39,12 @@ import java.util.List;
 
     public Day(String date) {
         this.date = date;
+    }
+
+    public List<Long> getMarks() {
+        if(marks == null) {
+            marks = new ArrayList<>(asList());
+        }
+        return marks;
     }
 }

@@ -104,7 +104,6 @@ public class StudentsController {
                             put(0L, new Role(null, Long.parseLong(subscriber.getLvlSch()), group.getId(), null));
                         }}, Main.df.format(dateAfter));
                         datas.getInviteRepository().saveAndFlush(inv);
-                        if (group.getKidsInv() == null) group.setKidsInv(new ArrayList<>());
                         group.getKidsInv().add(inv.getId());
                         datas.getGroupRepository().saveAndFlush(group);
                     }

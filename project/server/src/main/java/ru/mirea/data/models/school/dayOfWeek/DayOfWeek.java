@@ -22,14 +22,14 @@ import java.util.Map;
     @Column(name = "lessons")
     private Map<Long, Long> lessons;
 
+    public DayOfWeek(Map<Long, Long> lessons) {
+        this.lessons = lessons;
+    }
+
     public Map<Long, Long> getLessons() {
         if(lessons == null) {
             lessons = new HashMap<>();
         }
         return lessons;
-    }
-
-    public DayOfWeek(Map<Long, Long> lessons) {
-        this.lessons = lessons;
     }
 }
