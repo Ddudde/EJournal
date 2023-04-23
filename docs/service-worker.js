@@ -91,7 +91,7 @@ function activateF(e) {
 function installF(e) {
     e.waitUntil(caches.open(CACHE_NAME)
         .then(cache => prom.then(e=> {
-            return cache.addAll([])
+            return cache.addAll(urlsToCache)
                 .then(r => console.log('cached'))
                 .catch(message => console.log(message))
         }))
