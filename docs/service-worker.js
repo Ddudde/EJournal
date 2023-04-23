@@ -48,9 +48,9 @@ function init() {
                 "/DipvLom/manifest.json",
                 "/DipvLom/app.js"
             ];
-            Object.getOwnPropertyNames(assets.files).map((key, i, x, val = assets.files[key]) => {
-                urlsToCache.push(val);
-            });
+            // Object.getOwnPropertyNames(assets.files).map((key, i, x, val = assets.files[key]) => {
+            //     urlsToCache.push(val);
+            // });
         })
     // Delete old caches that are not our current one!
     this.addEventListener("activate", activateF);
@@ -91,7 +91,7 @@ function activateF(e) {
 function installF(e) {
     e.waitUntil(caches.open(CACHE_NAME)
         .then(cache => prom.then(e=> {
-            return cache.addAll(["/DipvLom/"])
+            return cache.addAll(urlsToCache)
                 .then(r => console.log('cached'))
                 .catch(message => console.log(message))
         }))
