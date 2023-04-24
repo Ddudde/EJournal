@@ -23,7 +23,7 @@ import HTeachers from "./components/people/hteachers/HTeachers";
 import Classmates from "./components/people/classmates/Classmates";
 import Parents from "./components/people/parents/Parents";
 import Admins from "./components/people/admins/Admins";
-import React from "react";
+import React, {useEffect, useRef} from "react";
 import Profile from "./components/main/profile/Profile";
 import Settings from "./components/main/settings/Settings";
 import Tutor from "./components/tutor/Tutor";
@@ -34,14 +34,8 @@ import Redirect from "./components/main/Redirect";
 function App() {
     const cState = useSelector(states);
     const navigate = useNavigate();
-    let indexComp;
-    let path = localStorage.getItem('path');
-    if(path) {
-        localStorage.removeItem('path');
-        console.log("path....");
-        console.log(path);
-        navigate(path);
-    }
+    const isFirstUpdate = useRef(true);
+    let indexComp, path;
     if(!cState.auth) {
         indexComp = <Start/>;
     } else {
@@ -50,6 +44,26 @@ function App() {
         if(cState.role == 3) indexComp = <AnalyticsMain comp={<Zvonki/>}/>;
         if(cState.role == 4) indexComp = <Request/>;
     }
+    useEffect(() => {
+        console.log("I was triggered during componentDidMount App");
+        path = localStorage.getItem('path');
+        if(path) {
+            localStorage.removeItem('path');
+            console.log("path....");
+            console.log(path);
+            navigate(path);
+        }
+        return function() {
+            console.log("I was triggered during componentWillUnmount App")
+        }
+    }, []);
+    useEffect(() => {
+        if (isFirstUpdate.current) {
+            isFirstUpdate.current = false;
+            return;
+        }
+        console.log('componentDidUpdate App');
+    });
     return <Routes>
           <Route path="/" element={<Redirect/>}/>
           <Route path="DipvLom" element={<Main/>}>
