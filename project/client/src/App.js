@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import Main from "./components/main/Main";
 import Start from "./components/start/Start.jsx";
 import NewsMain from "./components/news/NewsMain";
@@ -33,9 +33,16 @@ import Redirect from "./components/main/Redirect";
 
 function App() {
     const cState = useSelector(states);
+    const navigate = useNavigate();
     let indexComp;
-    if(!cState.auth)
-    {
+    let path = localStorage.getItem('path');
+    if(path) {
+        localStorage.removeItem('path');
+        console.log("path...");
+        console.log(path);
+        navigate([path]);
+    }
+    if(!cState.auth) {
         indexComp = <Start/>;
     } else {
         if(cState.role < 2) indexComp = <Dnevnik/>;
@@ -43,8 +50,7 @@ function App() {
         if(cState.role == 3) indexComp = <AnalyticsMain comp={<Zvonki/>}/>;
         if(cState.role == 4) indexComp = <Request/>;
     }
-    return (
-      <Routes>
+    return <Routes>
           <Route path="/" element={<Redirect/>}/>
           <Route path="DipvLom" element={<Main/>}>
               <Route index element={indexComp}/>
@@ -84,8 +90,7 @@ function App() {
               <Route path="reauth/:code" element={<Start mod="rea"/>} />
               <Route path="*" element={<ErrFound/>} />
           </Route>
-      </Routes>
-    );
+    </Routes>;
 }
 
 export default App;

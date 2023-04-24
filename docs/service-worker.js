@@ -93,14 +93,17 @@ function installF(e) {
         .then(cache => prom.then(e=> {
             console.log(urlsToCache);
             return cache.addAll(urlsToCache)
-                .then(r => console.log('cached'))
+                .then(r => {
+                    console.log('cached');
+                    return r;
+                })
                 .catch(message => {
                     console.log(message)
                     for (let i of urlsToCache) {
                         try {
                             const val = cache.add(i);
                         } catch (err) {
-                            console.warn('sw: cache.add',i);
+                            console.log('sw: cache.add',i);
                         }
                     }
                 })
@@ -123,9 +126,8 @@ function getCache(e) {
     return caches.match(e.request)
         .then(responseCache => {
             return responseCache || fetch(e.request.url)
-                .then(req => {
-                    return req;
-                }).catch(message => console.log(message));
+                .then(req => console.log("fetch!"))
+                .catch(message => console.log(message));
         })
 }
 
