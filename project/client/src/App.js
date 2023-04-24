@@ -38,9 +38,9 @@ function App() {
     let path = localStorage.getItem('path');
     if(path) {
         localStorage.removeItem('path');
-        console.log("path...");
+        console.log("path....");
         console.log(path);
-        navigate([path]);
+        navigate(path);
     }
     if(!cState.auth) {
         indexComp = <Start/>;
