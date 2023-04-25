@@ -20,7 +20,8 @@
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <script>
             localStorage.setItem('path', window.location.pathname);
-            window.location.href=window.location.origin+"/DipvLom/";
+            console.log("404 redir from", window.location.pathname);
+            window.location.replace(window.location.origin+"/DipvLom/");
         </script>
         <!--
           This HTML file is a template.
