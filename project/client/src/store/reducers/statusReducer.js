@@ -1,12 +1,12 @@
 import {CHANGE_STATE, CHANGE_STATE_GL, CHANGE_STATE_RESET} from '../actions';
 
 const initialState = {
-        auth: true,
+        auth: false,
         // invErr: false,
         // reaYes: false,
-        login: "nm17",
-        ico: 2,
-        role: 1,
+        // login: "nm13",
+        // ico: 2,
+        // role: 3,
         // uuid: "sdfds",
         // roles: true,
         // secFr: false,

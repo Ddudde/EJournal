@@ -70,9 +70,8 @@ function refreshLink(e) {
         send({
             uuid: cState.uuid,
             id: id[0],
-            id1: id[1],
-            role: cState.role
-        }, 'POST', "auth", "setCodePep")
+            id1: id[1]
+        }, 'POST', "auth/setCodePep")
             .then(data => {
                 console.log(data);
                 if(data.error == false){
@@ -86,9 +85,8 @@ function refreshLink(e) {
         send({
             uuid: cState.uuid,
             id: id[1],
-            id1: id[0],
-            role: cState.role
-        }, 'POST', "auth", "setCodePep")
+            id1: id[0]
+        }, 'POST', "auth/setCodePep")
             .then(data => {
                 console.log(data);
                 if(data.error == false){

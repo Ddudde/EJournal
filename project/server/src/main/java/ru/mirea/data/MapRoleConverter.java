@@ -1,4 +1,4 @@
-package ru.mirea.data.converters;
+package ru.mirea.data;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -9,19 +9,19 @@ import javax.persistence.AttributeConverter;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-public class MapLongConverter implements AttributeConverter<Map<Long, Long>, String> {
+public class MapRoleConverter implements AttributeConverter<Map<Long, Role>, String> {
 
     @Autowired
     private Gson g;
 
-    private final Type ex = new TypeToken<Map<Long,Long>>(){}.getType();
+    private final Type ex = new TypeToken<Map<Long,Role>>(){}.getType();
 
-    public String convertToDatabaseColumn(Map<Long,Long> map) {
+    public String convertToDatabaseColumn(Map<Long,Role> map) {
         return g.toJson(map, ex);
     }
 
     @Override
-    public Map<Long,Long> convertToEntityAttribute(String dbData) {
+    public Map<Long,Role> convertToEntityAttribute(String dbData) {
         return g.fromJson(dbData, ex);
     }
 }

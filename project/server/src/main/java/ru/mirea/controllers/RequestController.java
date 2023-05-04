@@ -3,17 +3,18 @@ package ru.mirea.controllers;
 import com.google.gson.JsonObject;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.ServerService;
-import ru.mirea.data.models.school.Request;
 import ru.mirea.data.models.auth.User;
+import ru.mirea.data.models.school.Request;
+import ru.mirea.services.ServerService;
 
-@RestController
 @RequestMapping("/requests")
 @NoArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io"})
-public class RequestController {
+@RestController public class RequestController {
 
     @Autowired
     private ServerService datas;

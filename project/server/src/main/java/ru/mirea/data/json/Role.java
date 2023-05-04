@@ -6,12 +6,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @ToString
 public class Role implements Serializable {
     private String email;
@@ -55,35 +51,35 @@ public class Role implements Serializable {
 
     public List<Long> getSubjects() {
         if(subjects == null) {
-            subjects = new ArrayList<>(asList());
+            subjects = new ArrayList<>();
         }
         return subjects;
     }
 
     public List<Long> getKids() {
         if(kids == null) {
-            kids = new ArrayList<>(asList());
+            kids = new ArrayList<>();
         }
         return kids;
     }
 
     public List<Long> getKidsInv() {
         if(kidsInv == null) {
-            kidsInv = new ArrayList<>(asList());
+            kidsInv = new ArrayList<>();
         }
         return kidsInv;
     }
 
     public List<Long> getParents() {
         if(parents == null) {
-            parents = new ArrayList<>(asList());
+            parents = new ArrayList<>();
         }
         return parents;
     }
 
     public List<Long> getParentsInv() {
         if(parentsInv == null) {
-            parentsInv = new ArrayList<>(asList());
+            parentsInv = new ArrayList<>();
         }
         return parentsInv;
     }

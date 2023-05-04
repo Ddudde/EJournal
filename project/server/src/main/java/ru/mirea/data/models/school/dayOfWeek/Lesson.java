@@ -1,10 +1,11 @@
 package ru.mirea.data.models.school.dayOfWeek;
 
 import lombok.*;
-import ru.mirea.data.converters.ListLongConverter;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -15,16 +16,8 @@ import java.util.List;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "subject")
-    private Long subject;
+    private Long subject, teacher, teacherInv;
 
-    @Column(name = "teacher")
-    private Long teacher;
-
-    @Column(name = "teacherInv")
-    private Long teacherInv;
-
-    @Column(name = "kab")
     private String kab;
 
     public Lesson(Long subject, Long teacher, String kab) {

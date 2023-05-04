@@ -1,13 +1,11 @@
 package ru.mirea.data.models;
 
 import lombok.*;
-import ru.mirea.data.converters.ListLongConverter;
+import ru.mirea.data.ListLongConverter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -19,18 +17,9 @@ import static java.util.Arrays.asList;
     private Long id;
 
     @Convert(converter = ListLongConverter.class)
-    @Column(name = "admins")
-    private List<Long> admins;
+    @Column(columnDefinition="CLOB")
+    private List<Long> admins, adminsInv, news;
 
-    @Convert(converter = ListLongConverter.class)
-    @Column(name = "adminsInv")
-    private List<Long> adminsInv;
-
-    @Convert(converter = ListLongConverter.class)
-    @Column(name = "news")
-    private List<Long> news;
-
-    @Column(name = "contacts")
     private Long contacts;
 
     public Syst(List<Long> admins) {
@@ -44,23 +33,17 @@ import static java.util.Arrays.asList;
     }
 
     public List<Long> getAdmins() {
-        if(admins == null) {
-            admins = new ArrayList<>(asList());
-        }
+        if(admins == null) new ArrayList<>();
         return admins;
     }
 
     public List<Long> getAdminsInv() {
-        if(adminsInv == null) {
-            adminsInv = new ArrayList<>(asList());
-        }
+        if(adminsInv == null) adminsInv = new ArrayList<>();
         return adminsInv;
     }
 
     public List<Long> getNews() {
-        if(news == null) {
-            news = new ArrayList<>(asList());
-        }
+        if(news == null) news = new ArrayList<>();
         return news;
     }
 }

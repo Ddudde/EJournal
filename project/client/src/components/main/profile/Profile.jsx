@@ -19,7 +19,7 @@ import {
     changeProfile,
     changeState
 } from "../../../store/actions";
-import {addEvent, eventSource, send, setActived} from "../Main";
+import {addEvent, eventSource, prefSite, send, setActived} from "../Main";
 import ErrFound from "../../other/error/ErrFound";
 
 let profilesInfo, dispatch, moore, errText, cState, navigate;
@@ -188,7 +188,7 @@ export function Profile() {
                 :
                     <div className={profileCSS.blockPro}>
                         <div className={profileCSS.pro}>
-                            <img alt="ico" src={'/media/ls-icon'+ profilesInfo.ico +'.png'}/>
+                            <img alt="ico" src={prefSite + '/static/media/ls-icon'+ profilesInfo.ico +'.png'}/>
                             <div className={profileCSS.nav_i} id={profileCSS.nav_i} data-mod='0'>
                                 <div className={profileCSS.preinf}>
                                     Логин:

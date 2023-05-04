@@ -13,13 +13,9 @@ import javax.persistence.*;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "email")
-    private String email;//title
+    private String email, date;
 
-    @Column(name = "date")
-    private String date;
-
-    @Column(name = "text")
+    @Column(columnDefinition="CLOB")
     private String text;//FIO
 
     public Request(String email, String date, String text) {

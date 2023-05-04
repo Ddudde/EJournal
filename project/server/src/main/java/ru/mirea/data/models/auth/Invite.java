@@ -1,7 +1,7 @@
 package ru.mirea.data.models.auth;
 
 import lombok.*;
-import ru.mirea.data.converters.MapRoleConverter;
+import ru.mirea.data.MapRoleConverter;
 import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
@@ -17,17 +17,10 @@ import java.util.Map;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "fio")
-    private String fio;
-
-    @Column(name = "code")
-    private String code;
-
-    @Column(name = "date")
-    private String expDate;
+    private String fio, code, expDate;
 
     @Convert(converter = MapRoleConverter.class)
-    @Column(name = "role")
+    @Column(columnDefinition="CLOB")
     private Map<Long, Role> role;
 
     public Invite(String fio, Map<Long, Role> role, String expDate) {
@@ -37,9 +30,7 @@ import java.util.Map;
     }
 
     public Map<Long, Role> getRole() {
-        if(role == null) {
-            role = new HashMap<>();
-        }
+        if(role == null) role = new HashMap<>();
         return role;
     }
 }

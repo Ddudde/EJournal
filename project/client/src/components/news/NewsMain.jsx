@@ -266,9 +266,8 @@ function onCon() {
 function setInfo() {
     send({
         type: type,
-        role: cState.role,
         uuid: cState.uuid
-    }, 'POST', "news", "getNews")
+    }, 'POST', "news/getNews")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -297,7 +296,7 @@ function delNews (id) {
     send({
         uuid: cState.uuid,
         id: id
-    }, 'POST', "news", "delNews")
+    }, 'POST', "news/delNews")
 }
 
 function chNews (id, inps, typ) {
@@ -307,7 +306,7 @@ function chNews (id, inps, typ) {
         type: typ,
         val: inps,
         id: id
-    }, 'POST', "news", "chNews")
+    }, 'POST', "news/chNews")
 }
 
 function addNews (inps) {
@@ -317,9 +316,8 @@ function addNews (inps) {
         title: inps.inpnzt,
         date: inps.inpndt,
         img_url: inps.addIm,
-        text: inps.inpntt,
-        role: cState.role
-    }, 'POST', "news", "addNews")
+        text: inps.inpntt
+    }, 'POST', "news/addNews")
 }
 
 export function setActNew(name) {

@@ -27,14 +27,14 @@ const initialState = {
         // contact: contYO,
         // mapPr: {
         //     text: mapTextYO,
-        //     imgUrl: "/media/map.jpg"
+        //     imgUrl: "/static/media/map.jpg"
         // }
     },
     "Por": {
         // contact: contPOR,
         // mapPr: {
         //     text: mapTextPOR,
-        //     imgUrl: "/media/map.jpg"
+        //     imgUrl: "/static/media/map.jpg"
         // }
     }
 };

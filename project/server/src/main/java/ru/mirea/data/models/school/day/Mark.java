@@ -16,15 +16,9 @@ import javax.persistence.*;
     @Column(name = "usr")
     private Long user;
 
-    @Column(name = "usrInv")
     private Long userInv;
 
-    @Column(name = "mark")
-    private int mark;
+    private int mark, weight;
 
-    @Column(name = "weight")
-    private int weight;
-
-    @Column(name = "type")
     private String type;
 }

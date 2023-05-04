@@ -1,21 +1,20 @@
 package ru.mirea.controllers.main;
 
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import ru.mirea.data.ServerService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.reps.auth.UserRepository;
+import ru.mirea.services.ServerService;
 
 import java.util.Objects;
 
-@RestController
 @RequestMapping("/settings")
 @NoArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io"})
-public class SettingsController {
+@RestController public class SettingsController {
 
     @Autowired
     private ServerService datas;

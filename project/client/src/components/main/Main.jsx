@@ -50,7 +50,7 @@ function getLogin() {
     return (
         <div className={mainCSS.logBlock}>
             <div className={mainCSS.nav_i+' '+mainCSS.log} style={{width:"100%"}} id={mainCSS.nav_i}>
-                <img alt="ico" src={prefSite + '/media/ls-icon'+ cState.ico +'.png'}/>
+                <img alt="ico" src={prefSite + '/static/media/ls-icon'+ cState.ico +'.png'}/>
                 <div className={mainCSS.logLog}>{cState.login}</div>
                 <div className={mainCSS.logText}>Я - {cState.roleDesc}</div>
             </div>
@@ -88,7 +88,7 @@ function getKids() {
 function selKid(kid) {
     send({
         uuid: cState.uuid,
-        id: kid
+        idL: kid
     }, 'POST', "auth/chKid")
         .then(data => {
             if(data.error == false) {
@@ -136,7 +136,8 @@ function chRoles() {
 function onExit() {
     dispatch(changeState(CHANGE_STATE_RESET));
     send({
-        uuid: cState.uuid
+        uuid: cState.uuid,
+        notifToken: localStorage.getItem("notifToken")
     }, 'POST', "auth/exit");
 }
 
@@ -214,7 +215,9 @@ function iniNet() {
         if(cState.login){
             send({
                 login: cState.login,
-                uuid: msg
+                uuid: msg,
+                notifToken: localStorage.getItem("notifToken"),
+                permis: Notification.permission == "granted"
             }, 'POST', "auth/infCon")
                 .then(data => {
                     if(data.error == false){

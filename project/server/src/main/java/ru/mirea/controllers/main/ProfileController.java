@@ -5,23 +5,24 @@ import com.google.gson.JsonObject;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.ServerService;
+import ru.mirea.data.json.Role;
+import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
-import ru.mirea.data.models.auth.User;
-import ru.mirea.data.json.Role;
+import ru.mirea.services.ServerService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
 @RequestMapping("/profiles")
 @NoArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io"})
-public class ProfileController {
+@RestController public class ProfileController {
 
     @Autowired
     private Gson gson;

@@ -126,7 +126,9 @@ function vxo(){
     send({
         uuid: cState.uuid,
         login: elem.logv.value,
-        password: elem.pasv.value
+        password: elem.pasv.value,
+        notifToken: localStorage.getItem("notifToken"),
+        permis: Notification.permission == "granted"
     }, 'POST', "auth/auth")
         .then(data => {
             if(data.error == false && data.body.auth){
@@ -304,7 +306,7 @@ export function Start(props) {
         if(props.mod == "inv" && code){
             send({
                 code: code,
-                login: cState.login
+                uuid: cState.uuid
             }, 'POST', "auth/checkInvCode")
                 .then(data => {
                     if(data.error == false){

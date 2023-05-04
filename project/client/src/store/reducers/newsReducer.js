@@ -19,7 +19,7 @@ const initialState = {
     //     1: {
     //         title: 'А проект вышел большим...',
     //         date: '02.12.2022',
-    //         img_url: '/media/tuman.jpg',
+    //         img_url: '/static/media/tuman.jpg',
     //         text: 'Да-да, всё ещё не конец...'
     //     }
     }

@@ -1,3 +1,7 @@
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -6,16 +10,144 @@ import com.google.gson.stream.JsonReader;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.school.day.Day;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
+import static java.util.Arrays.asList;
+
 public class Test {
+
+    private static final InputStream config = Test.class.getResourceAsStream("e-journalfcm-firebase-auth.json");
+
     public static void main(String[] args) throws Exception {
-        jsonTest4();
+        notifTest1();
+    }
+
+    private static void notifTest1(){
+        initialize();
+        List<String> registrationTokens = asList(
+            "c_LTPBf7O7LVs63ZKCrFlC:APA01bEs2EPiVtS-HAG9YPaxsj9YhOXhxAEcEVAsID1X_G8gUniOc8nLiHsOgIhwjZZfX7RbRnBD3uWxVkct2h4VtbWP4oRAuY2IBZRy3GSf_g8-Jax34UeGZRqg3LO1HjKIbaAdHWiB",
+            "c_LTPBf7O7LVs63ZKCrFlC:APA91bEs2EPiVtS-HAG9YPaxsj9YhOXhxAEcEVAsID1X_G8gUniOc8nLiHsOgIhwjZZfX7RbRnBD3uWxVkct2h4VtbWP4oRAuY2IBZRy3GSf_g8-Jax34UeGZRqg3LO1HjKIbaAdHWiB",
+            "c_LTPBf7O7LVs63ZKCrFlC:APA31bEs2EPiVtS-HAG9YPaxsj9YhOXhxAEcEVAsID1X_G8gUniOc8nLiHsOgIhwjZZfX7RbRnBD3uWxVkct2h4VtbWP4oRAuY2IBZRy3GSf_g8-Jax34UeGZRqg3LO1HjKIbaAdHWiB",
+            "c_LTPBf7O7LVs63ZKCrFlC:APA61bEs2EPiVtS-HAG9YPaxsj9YhOXhxAEcEVAsID1X_G8gUniOc8nLiHsOgIhwjZZfX7RbRnBD3uWxVkct2h4VtbWP4oRAuY2IBZRy3GSf_g8-Jax34UeGZRqg3LO1HjKIbaAdHWiB"
+        );
+        unsubscribe(registrationTokens, "readers-club");
+        try {
+            List<Message> messages = asList(
+                Message.builder()
+                    .setNotification(Notification.builder()
+                        .setTitle("Price drop")
+                        .setBody("2% off all books")
+                        .build())
+                    .setTopic("readers-club")
+                    .build()
+            );
+            FirebaseMessaging.getInstance().sendAll(messages);
+            System.out.println("Successfully sent message: ");
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void subscribe(List<String> registrationTokens, String topic) {
+        try {
+            TopicManagementResponse response = FirebaseMessaging.getInstance().subscribeToTopic(
+                    registrationTokens, topic);
+            System.out.println(response.getSuccessCount() + " tokens were subscribed successfully");
+            if (response != null && response.getFailureCount() > 0) {
+                System.out.println("List of tokens that caused failures: " + response.getErrors());
+            }
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void unsubscribe(List<String> registrationTokens, String topic) {
+        try {
+            TopicManagementResponse response = FirebaseMessaging.getInstance().unsubscribeFromTopic(
+                    registrationTokens, topic);
+            System.out.println(response.getSuccessCount() + " tokens were unsubscribed successfully");
+            if (response != null && response.getFailureCount() > 0) {
+                System.out.println("List of tokens that caused failures: " + response.getErrors());
+            }
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void listTest() {
+        ArrayList<String> test1 = new ArrayList<>(asList("Jan", "March"));
+        ArrayList<String> test = new ArrayList<>();
+        test1.remove("March");
+    }
+
+    private static void setTest(){
+        Set<String> stringSet = new HashSet<>();
+
+        // Добавляем несколько элементов в set
+        stringSet.add("Jan");
+        stringSet.add("Feb");
+        stringSet.add("March");
+        stringSet.add("April");
+        System.out.println(stringSet);
+        stringSet.add("April");
+        System.out.println(stringSet);
+        stringSet.remove("April");
+        System.out.println(stringSet);
+    }
+
+    private static void notifTest(){
+        initialize();
+        BatchResponse response = null;
+        List<String> registrationTokens = asList(
+            "c_LTPBf7O7LVs63ZKCrFlC:APA01bEs2EPiVtS-HAG9YPaxsj9YhOXhxAEcEVAsID1X_G8gUniOc8nLiHsOgIhwjZZfX7RbRnBD3uWxVkct2h4VtbWP4oRAuY2IBZRy3GSf_g8-Jax34UeGZRqg3LO1HjKIbaAdHWiB",
+            "c_LTPBf7O7LVs63ZKCrFlC:APA91bEs2EPiVtS-HAG9YPaxsj9YhOXhxAEcEVAsID1X_G8gUniOc8nLiHsOgIhwjZZfX7RbRnBD3uWxVkct2h4VtbWP4oRAuY2IBZRy3GSf_g8-Jax34UeGZRqg3LO1HjKIbaAdHWiB"
+        );
+        try {
+            MulticastMessage message = MulticastMessage.builder()
+                .setNotification(Notification.builder()
+                    .setTitle("Price drop")
+                    .setBody("5% off all electronics")
+                    .build())
+                .addAllTokens(registrationTokens)
+                .build();
+            response = FirebaseMessaging.getInstance().sendMulticast(message);
+            System.out.println("Successfully sent message: ");
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+        if (response != null && response.getFailureCount() > 0) {
+            List<SendResponse> responses = response.getResponses();
+            List<String> failedTokens = new ArrayList<>();
+            for (int i = 0; i < responses.size(); i++) {
+                if (!responses.get(i).isSuccessful()) {
+                    failedTokens.add(registrationTokens.get(i));
+                }
+            }
+
+            System.out.println("List of tokens that caused failures: " + failedTokens);
+        }
+    }
+
+    private static void initialize() {
+        try {
+            FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(config))
+                .build();
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+                System.out.println("Firebase application has been initialized");
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private static void mapTest(){

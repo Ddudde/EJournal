@@ -1,24 +1,33 @@
 {
-	"short_name": "React App",
-	"name": "Create React App Sample",
-	"description": "Описание...",
+	"short_name": "Электронный журнал",
+	"name": "Электронный журнал",
+	"description": "Приложение 'Электронный журнал'. Продолжение следует...",
 	"icons": [
 		{
-			"src": "fav32.png",
+			"src": "/DipvLom/static/media/fav32.png",
 			"sizes": "32x32",
 			"type": "image/png",
 			"purpose": "any"
 		},
 		{
-			"src": "fav16.png",
+			"src": "/DipvLom/static/media/fav16.png",
 			"sizes": "16x16",
 			"type": "image/png",
 			"purpose": "any"
+		},
+		{
+			"src": "/DipvLom/static/media/fav512.png",
+			"sizes": "512x512",
+			"type": "image/png"
 		}
 	],
 	"id": "/DipvLom/",
+	"scope": "/DipvLom/",
 	"start_url": "/DipvLom/",
-	"display": "standalone",
+	"display": "minimal-ui",
+	"gcm_sender_id": "781991460409",
+	"lang": "ru",
+	"dir": "ltr",
 	"theme_color": "#000000",
 	"background_color": "#ffffff"
 }

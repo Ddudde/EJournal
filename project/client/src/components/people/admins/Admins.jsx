@@ -58,9 +58,8 @@ function refreshLink(e) {
         send({
             uuid: cState.uuid,
             id: id[0],
-            id1: id[1],
-            role: cState.role
-        }, 'POST', "auth", "setCodePep")
+            id1: id[1]
+        }, 'POST', "auth/setCodePep")
             .then(data => {
                 console.log(data);
                 if(data.error == false){

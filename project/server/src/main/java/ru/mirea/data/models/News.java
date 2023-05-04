@@ -13,16 +13,9 @@ import javax.persistence.*;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "title")
-    private String title;
+    private String title, date, img_url;
 
-    @Column(name = "date")
-    private String date;
-
-    @Column(name = "img_url")
-    private String img_url;
-
-    @Column(name = "text")
+    @Column(columnDefinition="CLOB")
     private String text;
 
     public News(String title, String date, String text) {

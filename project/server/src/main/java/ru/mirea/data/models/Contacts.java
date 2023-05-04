@@ -13,13 +13,9 @@ import javax.persistence.*;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "contact")
-    private String contact;
+    @Column(columnDefinition="CLOB")
+    private String contact, text;
 
-    @Column(name = "text")
-    private String text;
-
-    @Column(name = "imgUrl")
     private String imgUrl;
 
     public Contacts(String contact, String text) {
