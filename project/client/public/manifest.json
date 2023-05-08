@@ -19,13 +19,18 @@
 			"src": "/DipvLom/static/media/fav512.png",
 			"sizes": "512x512",
 			"type": "image/png"
+		},
+		{
+			"src": "/DipvLom/static/media/fav32.png",
+			"sizes": "32x32",
+			"type": "image/png",
+			"purpose": "maskable"
 		}
 	],
 	"id": "/DipvLom/",
 	"scope": "/DipvLom/",
 	"start_url": "/DipvLom/",
 	"display": "minimal-ui",
-	"gcm_sender_id": "781991460409",
 	"lang": "ru",
 	"dir": "ltr",
 	"theme_color": "#000000",
