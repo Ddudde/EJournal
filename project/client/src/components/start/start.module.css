@@ -45,7 +45,7 @@
 	left: 0;
 	right: 0;
 	margin: 0 auto;
-	width: fit-content;
+	height: 20%;
 	cursor: pointer;
 	text-align: center;
 }
@@ -62,10 +62,15 @@
 	position: relative;
 	cursor: pointer;
 	top: 5%;
-	left: 20%;
-	height: fit-content;
-	width: 60%;
+	max-width: 90%;
+	max-height: 75%;
+	margin-inline: auto;
+}
+
+.gH{
+	position: relative;
 	aspect-ratio: 16/9;
+	max-height: 100%;
 }
 
 .g_block{
@@ -125,7 +130,7 @@
 	transform: rotate(180deg);
 }
 
-.g:hover > .pic_l, .g:hover > .pic_r, .g:hover > .g_block_shad{
+.gH:hover > .pic_l, .gH:hover > .pic_r, .gH:hover > .g_block_shad{
 	opacity: 1;
 }
 

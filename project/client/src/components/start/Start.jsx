@@ -373,23 +373,25 @@ export function Start(props) {
                     <ErrFound text={textYesInvNR}/>
                 }
                 {(cState.invErr || cState.reaYes) ? undefined : <>
-                    <div className={start.g} ref={el=>elem.g_id=el}>
-                        {blocks.map((param, i) =>
-                            <Link className={start.g_block} to={param.link} key={i} data-act={indicInfo.actived == i ? "1" : "0"}>
-                                <img src={param.img} className={start.pic_g} alt=""/>
-                                <div className={start.g_block_text} data-text={param.name} data-textm={param.text}>
-                                    {param.name}
-                                </div>
-                            </Link>
-                        )}
-                        <div className={start.g_block_shad}/>
-                        <img src={left} className={start.pic_l} alt="" onClick={() => {dispatch(changeIndPrev(indicInfo.actived, reset_timer))}}/>
-                        <img src={left} className={start.pic_r} alt="" onClick={() => {dispatch(changeIndNext(indicInfo.actived, reset_timer))}}/>
-                        <div className={start.indic}>
-                            <div className={start.indic_bl} id="ind_0" data-act={!indicInfo.actived ? "1" : "0"} onClick={() => {dispatch(changeInd(0, reset_timer))}}/>
-                            <div className={start.indic_bl} id="ind_1" data-act={indicInfo.actived == 1 ? "1" : "0"} onClick={() => {dispatch(changeInd(1, reset_timer))}}/>
-                            <div className={start.indic_bl} id="ind_2" data-act={indicInfo.actived == 2 ? "1" : "0"} onClick={() => {dispatch(changeInd(2, reset_timer))}}/>
-                            <div className={start.indic_bl} id="ind_3" data-act={indicInfo.actived == 3 ? "1" : "0"} onClick={() => {dispatch(changeInd(3, reset_timer))}}/>
+                    <div className={start.g}>
+                        <div className={start.gH} ref={el=>elem.g_id=el}>
+                            {blocks.map((param, i) =>
+                                <Link className={start.g_block} to={param.link} key={i} data-act={indicInfo.actived == i ? "1" : "0"}>
+                                    <img src={param.img} className={start.pic_g} alt=""/>
+                                    <div className={start.g_block_text} data-text={param.name} data-textm={param.text}>
+                                        {param.name}
+                                    </div>
+                                </Link>
+                            )}
+                            <div className={start.g_block_shad}/>
+                            <img src={left} className={start.pic_l} alt="" onClick={() => {dispatch(changeIndPrev(indicInfo.actived, reset_timer))}}/>
+                            <img src={left} className={start.pic_r} alt="" onClick={() => {dispatch(changeIndNext(indicInfo.actived, reset_timer))}}/>
+                            <div className={start.indic}>
+                                <div className={start.indic_bl} id="ind_0" data-act={!indicInfo.actived ? "1" : "0"} onClick={() => {dispatch(changeInd(0, reset_timer))}}/>
+                                <div className={start.indic_bl} id="ind_1" data-act={indicInfo.actived == 1 ? "1" : "0"} onClick={() => {dispatch(changeInd(1, reset_timer))}}/>
+                                <div className={start.indic_bl} id="ind_2" data-act={indicInfo.actived == 2 ? "1" : "0"} onClick={() => {dispatch(changeInd(2, reset_timer))}}/>
+                                <div className={start.indic_bl} id="ind_3" data-act={indicInfo.actived == 3 ? "1" : "0"} onClick={() => {dispatch(changeInd(3, reset_timer))}}/>
+                            </div>
                         </div>
                     </div>
                     <div className={start.startimg}>
