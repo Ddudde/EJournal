@@ -29,6 +29,13 @@ import java.util.Map;
         this.role = role;
     }
 
+    public Invite(String fio, Map<Long, Role> role, String expDate, String code) {
+        this.fio = fio;
+        this.code = code;
+        this.expDate = expDate;
+        this.role = role;
+    }
+
     public Map<Long, Role> getRole() {
         if(role == null) role = new HashMap<>();
         return role;

@@ -4,7 +4,7 @@ import analyticsCSS from '../analyticsMain.module.css';
 import scheduleCSS from './schedule.module.css';
 import {groups, schedules, states, teachers, themes} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {eventSource, send, setActived} from "../../main/Main";
+import {eventSource, sendToServer, setActived} from "../../main/Main";
 import {chStatB, ele, onClose, onEdit, setActNew} from "../AnalyticsMain";
 import Pane from "../../other/pane/Pane";
 import yes from "../../../media/yes.png";
@@ -326,7 +326,7 @@ function addLessonC(e) {
 }
 
 function addLesson(day, dayId, obj) {
-    send({
+    sendToServer({
         uuid: cState.uuid,
         group: groupsInfo.els.group,
         day: day,
@@ -336,7 +336,7 @@ function addLesson(day, dayId, obj) {
 }
 
 function setInfo() {
-    send({
+    sendToServer({
         uuid: cState.uuid
     }, 'POST', "schedule/getInfo")
         .then(data => {
@@ -357,7 +357,7 @@ function setInfo() {
 }
 
 function setSchedule() {
-    send({
+    sendToServer({
         uuid: cState.uuid,
         group: groupsInfo.els.group,
         role: cState.role

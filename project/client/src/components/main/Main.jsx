@@ -85,8 +85,31 @@ function getKids() {
         </div>
 }
 
+export function sendToServer(bod, typeC, url, type) {
+    let sed = {method: typeC};
+    if (bod) {
+        sed.headers = {'Content-Type': 'application/json'};
+        if (!type) {
+            sed.body = JSON.stringify(bod);
+        } else {
+            sed.body = JSON.stringify({
+                type: type,
+                body: bod
+            });
+        }
+    }
+    return fetch(server + "/" + (url ? url : ""), sed)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`This is an HTTP error: The status is ${res.status}`);
+            }
+            return res.json();
+        })
+        .catch(data => data);
+}
+
 function selKid(kid) {
-    send({
+    sendToServer({
         uuid: cState.uuid,
         idL: kid
     }, 'POST', "auth/chKid")
@@ -98,31 +121,8 @@ function selKid(kid) {
         });
 }
 
-export function send(bod, typeC, url, type) {
-    let sed = {method: typeC};
-    if(bod){
-        sed.headers = {'Content-Type': 'application/json'};
-        if(!type) {
-            sed.body = JSON.stringify(bod);
-        } else {
-            sed.body = JSON.stringify({
-                type: type,
-                body: bod
-            });
-        }
-    }
-    return fetch(server + "/"+(url ? url : ""), sed)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`This is an HTTP error: The status is ${res.status}`);
-            }
-            return res.json();
-        })
-        .catch(data => data);
-}
-
 function chRoles() {
-    send({
+    sendToServer({
         uuid: cState.uuid,
         role: cState.role
     }, 'POST', "auth/chRole")
@@ -135,7 +135,7 @@ function chRoles() {
 
 function onExit() {
     dispatch(changeState(CHANGE_STATE_RESET));
-    send({
+    sendToServer({
         uuid: cState.uuid,
         notifToken: localStorage.getItem("notifToken")
     }, 'POST', "auth/exit");
@@ -213,7 +213,7 @@ function iniNet() {
         console.log(msg);
         dispatch(changeState(CHANGE_STATE, "uuid", msg));
         if(cState.login){
-            send({
+            sendToServer({
                 login: cState.login,
                 uuid: msg,
                 notifToken: localStorage.getItem("notifToken"),
@@ -239,7 +239,7 @@ function iniNet() {
 function closeStream() {
     if(!eventSource) return;
     if(eventSource.readyState != EventSource.CLOSED) {
-        send({
+        sendToServer({
             uuid: cState.uuid
         }, 'POST', "auth/remCon");
         eventSource.close();

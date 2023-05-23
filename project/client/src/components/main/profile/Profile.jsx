@@ -19,7 +19,7 @@ import {
     changeProfile,
     changeState
 } from "../../../store/actions";
-import {addEvent, eventSource, prefSite, send, setActived} from "../Main";
+import {addEvent, eventSource, prefSite, sendToServer, setActived} from "../Main";
 import ErrFound from "../../other/error/ErrFound";
 
 let profilesInfo, dispatch, moore, errText, cState, navigate;
@@ -52,19 +52,18 @@ function onEdit(e) {
     par.setAttribute('data-mod', '1');
 }
 
-function onFin(e, param) {
+function onFin(e) {
     let par, inp;
     par = e.target.parentElement;
     inp = par.querySelector("." + profileCSS.inp);
-    if(inp.tagName == "TEXTAREA")
-    {
-        send({
+    if(inp.tagName == "TEXTAREA") {
+        sendToServer({
             login: cState.login,
-            info: inp.value
-        }, 'POST', "profiles", "chInfo")
+            info: inp.value,
+            uuid: cState.uuid
+        }, 'POST', "profiles/chInfo")
             .then(data => {
                 if(data.error == false){
-                    dispatch(changeProfile(CHANGE_PROFILE, "more", inp.value));
                     par.setAttribute('data-mod', '0');
                 }
             });
@@ -75,28 +74,27 @@ function onFin(e, param) {
         inp.setAttribute("data-mod", '0');
         // warner.style.display = "none";
         if (inp.type == "email") {
-            send({
+            sendToServer({
                 login: cState.login,
                 email: inp.value,
-                role: param
-            }, 'POST', "profiles", "chEmail")
+                uuid: cState.uuid
+            }, 'POST', "profiles/chEmail")
                 .then(data => {
                     if(data.error == false){
-                        dispatch(changeProfile(CHANGE_PROFILE_ROLES, "email", inp.value, param));
                         par.setAttribute('data-mod', '0');
                     }
                 });
         } else {
-            send({
+            sendToServer({
                 oLogin: cState.login,
-                nLogin: inp.value
-            }, 'POST', "profiles", "chLogin")
+                nLogin: inp.value,
+                uuid: cState.uuid
+            }, 'POST', "profiles/chLogin")
                 .then(data => {
                     if(data.error == false){
-                        dispatch(changeState(CHANGE_STATE, "login", inp.value));
-                        dispatch(changeProfile(CHANGE_PROFILE, "login", inp.value));
+                        dispatch(changeState(CHANGE_STATE, "login", data.body.login));
                         par.setAttribute('data-mod', '0');
-                        navigate("/profiles");
+                        navigate(prefSite + "/profiles");
                     } else {
                         addEvent("Логин занят, попробуйте изменить", 10);
                     }
@@ -113,34 +111,34 @@ function onClose(e) {
 
 function chInfo(e) {
     const msg = JSON.parse(e.data);
-    dispatch(changeProfile(CHANGE_PROFILE, "more", msg.more));
+    dispatch(changeProfile(CHANGE_PROFILE, "more", msg.body.more));
 }
 
 function chLogin(e) {
     const msg = JSON.parse(e.data);
-    dispatch(changeProfile(CHANGE_PROFILE, "login", msg.login));
+    dispatch(changeProfile(CHANGE_PROFILE, "login", msg.body.login));
 }
 
 function chEmail(e) {
     const msg = JSON.parse(e.data);
-    dispatch(changeProfile(CHANGE_PROFILE_ROLES, "email", msg.email, msg.role));
+    dispatch(changeProfile(CHANGE_PROFILE_ROLES, "email", msg.body.email, msg.body.role));
+}
+
+function goToProf(log) {
+    if(log) navigate(prefSite + "/profiles/" + log);
 }
 
 function onCon(e, log) {
-    setInfo(log ? log : cState.login);
+    setInfo(log);
 }
 
 function setInfo(log) {
-    send({
-        type: "PROFILES",
-        uuid: cState.uuid,
-        podType: log
-    }, 'POST', "auth", "infCon");
-    send({
-        login: log
-    }, 'POST', "profiles", "getProfile")
+    sendToServer({
+        login: log,
+        uuid: cState.uuid
+    }, 'POST', "profiles/getProfile")
         .then(data => {
-            if(data.error == false && data.body.login){
+            if(data.error == false){
                 dispatch(changeProfile(CHANGE_PROFILE_GL, undefined, data.body));
             }
         });
@@ -156,7 +154,7 @@ export function Profile() {
     const isFirstUpdate = useRef(true);
     useEffect(() => {
         setActived(".panPro");
-        setInfo(log ? log : cState.login);
+        if(eventSource.readyState == EventSource.OPEN) setInfo();
         console.log("I was triggered during1 componentDidMount Profile.jsx");
         eventSource.addEventListener('connect', e=>onCon(e, log), false);
         eventSource.addEventListener('chEmail', chEmail, false);
@@ -175,7 +173,9 @@ export function Profile() {
             isFirstUpdate.current = false;
             return;
         }
-        if(log && log != profilesInfo.login) setInfo(log);
+        if(log && profilesInfo.login && log != profilesInfo.login) {
+            setInfo(log);
+        }
         console.log('componentDidUpdate Profile.jsx');
     });
     return (
@@ -237,7 +237,7 @@ export function Profile() {
                                         </div>
                                         {(!log || log == cState.login) && <>
                                             <input className={profileCSS.inp} onInput={inpchr} placeholder="ex@gmail.com" defaultValue={role.email} type="email"/>
-                                            <img className={profileCSS.imginp+" yes"} src={yes} onClick={e => onFin(e, param)} title="Подтвердить изменения" alt=""/>
+                                            <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
                                             <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                                             <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
                                         </>}
@@ -254,7 +254,7 @@ export function Profile() {
                                                 <div className={profileCSS.nav_i+" "+profileCSS.preinf} id={profileCSS.nav_i}>
                                                     {role.parents[param1].name}
                                                 </div>
-                                                <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>navigate("/profiles/" + role.parents[param1].login)} title="Перейти в профиль" alt=""/>
+                                                <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(role.parents[param1].login)} title="Перейти в профиль" alt=""/>
                                             </div>)}
                                         </div>
                                     </>}
@@ -267,7 +267,7 @@ export function Profile() {
                                                 <div className={profileCSS.nav_i+" "+profileCSS.preinf} id={profileCSS.nav_i}>
                                                     {role.kids[param1].name}
                                                 </div>
-                                                <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>navigate("/profiles/" + role.kids[param1].login)} title="Перейти в профиль" alt=""/>
+                                                <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(role.kids[param1].login)} title="Перейти в профиль" alt=""/>
                                             </div>)}
                                         </div>
                                     </>}

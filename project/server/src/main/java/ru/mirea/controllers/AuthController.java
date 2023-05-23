@@ -89,7 +89,10 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 
     public Subscriber getSubscriber(String uuid) {
-        return subscriptions.get(UUID.fromString(uuid));
+        if(!ObjectUtils.isEmpty(uuid)) {
+            return subscriptions.get(UUID.fromString(uuid));
+        }
+        return null;
     }
 
     public void infCon(String uuid, String login, TypesConnect type, String lvlSch, String lvlGr, String lvlMore1, String lvlMore2){
@@ -131,15 +134,20 @@ import java.util.concurrent.ConcurrentHashMap;
             }
             infCon(body.uuid, body.login, type, null, null, null, null);
             Subscriber subscriber = getSubscriber(body.uuid);
-            User user = datas.userByLogin(subscriber.getLogin());
+            User user = null;
+            if(subscriber != null) {
+                user = datas.userByLogin(subscriber.getLogin());
+            }
             if(user != null) {
                 if (!ObjectUtils.isEmpty(body.notifToken)) {
-                    if(body.permis) {
+                    if(body.permis && !user.getTokens().contains(body.notifToken)) {
                         datas.addToken(user, body.notifToken);
-                    } else {
-                        datas.remToken(user, body.notifToken);
+                        datas.getUserRepository().saveAndFlush(user);
                     }
-                    datas.getUserRepository().saveAndFlush(user);
+                    if(!body.permis && user.getTokens().contains(body.notifToken)){
+                        datas.remToken(user, body.notifToken);
+                        datas.getUserRepository().saveAndFlush(user);
+                    }
                 }
                 body.wrtr.name("body").beginObject()
                     .name("role").value(user.getSelRole());
@@ -368,21 +376,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @PostMapping(value = "/checkInvCode")
     public JsonObject checkInvCode(@RequestBody DataAuth body) {
-        Subscriber subscriber = getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
         Invite inv = datas.inviteByCode(body.code);
         try {
             body.wrtr = datas.ini(body.toString());
-            if (user != null) {
-                user.getRoles().putAll(inv.getRole());
-                datas.getUserRepository().saveAndFlush(user);
-                School school = datas.schoolById(((Role) inv.getRole().values().toArray()[0]).getYO());
-                school.getHteachersInv().remove(inv.getId());
-                school.getHteachers().add(user.getId());
-                datas.getSchoolRepository().saveAndFlush(school);
-                datas.getInviteRepository().delete(inv);
-                body.wrtr.name("yes").value(true);
-            }
+            if(inv != null) body.wrtr.name("yes").value(true);
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {}, body.wrtr, body.bol);
     }

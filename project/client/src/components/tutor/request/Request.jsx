@@ -5,13 +5,13 @@ import {useDispatch, useSelector} from "react-redux";
 import {states, themes} from "../../../store/selector";
 import button from "../../button.module.css";
 import {CHANGE_EVENT, changeEvents} from "../../../store/actions";
-import {send} from "../../main/Main";
+import {sendToServer} from "../../main/Main";
 
 let dispatch, cState, inps;
 inps = {};
 
 function addReq(e) {
-    send({
+    sendToServer({
         text: inps.inpnnt_,
         title: inps.inpnet_,
         dat: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})

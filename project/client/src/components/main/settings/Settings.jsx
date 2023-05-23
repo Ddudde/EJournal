@@ -10,7 +10,7 @@ import CheckBox from "../../other/checkBox/CheckBox";
 import ls1 from "../../../media/ls-icon1.png";
 import ls2 from "../../../media/ls-icon2.png";
 import ls3 from "../../../media/ls-icon3.png";
-import {addEvent, eventSource, remEvent, send, setActived} from "../Main";
+import {addEvent, eventSource, remEvent, sendToServer, setActived} from "../Main";
 
 let dispatch, elem, cState, oldPasSt, els;
 oldPasSt = true;
@@ -65,7 +65,7 @@ function onChSF(e) {
     let par, inp;
     par = e.target.parentElement.parentElement;
     inp = par.querySelector("input");
-    send({
+    sendToServer({
         login: cState.login,
         secFR: inp.value
     }, 'POST', "settings", "chSecFR")
@@ -99,7 +99,7 @@ function chStatB(e) {
 }
 
 function chStatAv(e) {
-    send({
+    sendToServer({
         login: cState.login,
         ico: e.target.firstChild.value
     }, 'POST', "settings", "chIco")
@@ -120,7 +120,7 @@ function onCloseChPar(e) {
 }
 
 function onFinChPar(e) {
-    send({
+    sendToServer({
         login: cState.login,
         oPar: oldPasSt ? els.oldinp : undefined,
         secFr: oldPasSt ? undefined : els.secinp,
@@ -151,7 +151,7 @@ function chStatSb1(e) {
 }
 
 function onCon(e) {
-    send({
+    sendToServer({
         type: "SETTINGS",
         uuid: cState.uuid
     }, 'POST', "auth", "infCon");

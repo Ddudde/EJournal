@@ -2,10 +2,21 @@ import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
 import peopleCSS from '../peopleMain.module.css';
 import parentsCSS from './parents.module.css';
-import {useNavigate} from "react-router-dom";
 import {classmates, groups, parents, states, themes} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {chStatB, copyLink, ele, onClose, onDel, onEdit, onFin, refreshLink, setActNew, sit} from "../PeopleMain";
+import {
+    chStatB,
+    copyLink,
+    ele,
+    goToProf,
+    onClose,
+    onDel,
+    onEdit,
+    onFin,
+    refreshLink,
+    setActNew,
+    sit
+} from "../PeopleMain";
 import profl from "../../../media/profl.png";
 import profd from "../../../media/profd.png";
 import Pane from "../../other/pane/Pane";
@@ -33,9 +44,9 @@ import refreshCd from "../../../media/refreshCd.png";
 import refreshCl from "../../../media/refreshCl.png";
 import copyd from "../../../media/copyd.png";
 import copyl from "../../../media/copyl.png";
-import {eventSource, send} from "../../main/Main";
+import {eventSource, sendToServer} from "../../main/Main";
 
-let dispatch, parentsInfo, navigate, groupsInfo, selGr, classmatesInfo, errText, inps, themeState, cState;
+let dispatch, parentsInfo, groupsInfo, selGr, classmatesInfo, errText, inps, themeState, cState;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 inps = {nyid : undefined, inpnpt : "Фамилия И.О."};
 selGr = 0;
@@ -171,7 +182,7 @@ function getParents (pI, b) {
                             </div>
                         </div>
                         {getAddPred(param)}
-                        {ppI.map((param1, i1, xs1, info1 = info.par[param1]) =>
+                        {ppI.map((param1, i1, xs1, info1 = info.par[param1], codeLink = info1 && info1.link ? sit + (info1.login ? "/reauth/" : "/invite/") + info1.link : undefined) =>
                             <div className={peopleCSS.pepl} data-st="0" key={param1}>
                                 <div className={peopleCSS.fi}>
                                     <div className={peopleCSS.nav_i+" "+peopleCSS.nav_iZag2} id={peopleCSS.nav_i}>
@@ -180,7 +191,7 @@ function getParents (pI, b) {
                                     {info1.login && <img className={peopleCSS.profIm} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(info1.login)} title="Перейти в профиль" alt=""/>}
                                     <img className={peopleCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
                                     <img className={peopleCSS.imginp} data-id={param + "_" + param1} style={{marginRight: "1vw"}} src={no} onClick={(e)=>onDel(e, CHANGE_PARENTS_DEL, parentsInfo)} title="Удалить" alt=""/>
-                                    <input className={peopleCSS.inp+" "+peopleCSS.copyInp} data-id={param + "_" + param1} id={"inpcpt_" + param + "_" + param1} placeholder="Ссылка не создана" defaultValue={info1.link ? sit + (info1.login ? "/reauth/" : "/invite/") + info1.link : undefined} type="text" readOnly/>
+                                    <input className={peopleCSS.inp+" "+peopleCSS.copyInp} data-id={param + "_" + param1} id={"inpcpt_" + param + "_" + param1} placeholder="Ссылка не создана" defaultValue={codeLink} type="text" readOnly/>
                                     <img className={peopleCSS.imginp+" "+peopleCSS.refrC} src={themeState.theme_ch ? refreshCd : refreshCl} onClick={(e)=>refreshLink(e, sit, CHANGE_PARENTS)} title="Создать ссылку-приглашение" alt=""/>
                                     <img className={peopleCSS.imginp} src={themeState.theme_ch ? copyd : copyl} title="Копировать" data-enable={info1.link ? "1" : "0"} onClick={(e)=>copyLink(e, info1.link, info1.name)} alt=""/>
                                 </div>
@@ -226,10 +237,6 @@ function getParents (pI, b) {
             )
 }
 
-function goToProf(log) {
-    if(log) navigate("/profiles/" + log);
-}
-
 function codPepL1C(e) {
     const msg = JSON.parse(e.data);
     dispatch(changePeople(CHANGE_PARENTS, msg.id, "par", msg.id1, msg.code, "link"));
@@ -237,7 +244,7 @@ function codPepL1C(e) {
 
 export function codPar (id, id1, title, text) {
     console.log("codPar");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         id: id,
         id1: id1,
@@ -259,7 +266,7 @@ function addKidC(e) {
 
 export function addKid (bod, id, par) {
     console.log("addKid");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         bod: bod,
         id: id
@@ -280,7 +287,7 @@ function onCon(e) {
 }
 
 function setInfo() {
-    send({
+    sendToServer({
         uuid: cState.uuid,
         group: groupsInfo.group
     }, 'POST', "parents", "getInfo")
@@ -300,7 +307,6 @@ export function Parents() {
     themeState = useSelector(themes);
     cState = useSelector(states);
     groupsInfo = useSelector(groups);
-    navigate = useNavigate();
     if(!dispatch) {
         setActNew(3);
         if(eventSource.readyState == EventSource.OPEN) setInfo();

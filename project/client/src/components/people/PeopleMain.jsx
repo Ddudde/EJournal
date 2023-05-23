@@ -1,15 +1,13 @@
 import React, {useEffect, useRef} from "react";
 import peopleCSS from './peopleMain.module.css';
-import {Outlet} from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {groups, states} from "../../store/selector";
 import Pane from "../other/pane/Pane";
-import {eventSource, send, setActived} from "../main/Main";
+import {eventSource, prefSite, sendToServer, setActived} from "../main/Main";
 import {
     CHANGE_EVENT,
     CHANGE_GROUPS_DEL_GRS,
-    CHANGE_GROUPS_GL,
-    CHANGE_GROUPS_GR,
     CHANGE_GROUPS_GRS,
     CHANGE_PARENTS,
     CHANGE_PARENTS_DEL,
@@ -23,12 +21,12 @@ import parentsCSS from "./parents/parents.module.css";
 import {addKid, codPar} from "./parents/Parents";
 import {addTea, codTea} from "./teachers/Teachers";
 
-let gr, cState, dispatch, groupsInfo, evsIni;
+let gr, cState, dispatch, groupsInfo, evsIni, navigate;
 gr = {
     group: 0
 };
 
-export let sit = "http://localhost:3000";
+export let sit = window.location.origin;
 
 export function copyLink(e, link, name) {
     let title, text;
@@ -212,6 +210,10 @@ export function ele (x, par, inps) {
     if(!inps[par]) inps[par] = x;
 }
 
+export function goToProf(log) {
+    if(log) navigate(prefSite + "/profiles/" + log);
+}
+
 function remGroupC(e) {
     const msg = JSON.parse(e.data);
     dispatch(changeGroups(CHANGE_GROUPS_DEL_GRS, undefined, undefined, msg.id));
@@ -227,45 +229,25 @@ function addGroupC(e) {
     dispatch(changeGroups(CHANGE_GROUPS_GRS, undefined, msg.name, msg.id));
 }
 
-function onCon(e) {
-    setGroups();
-}
-
-function setGroups() {
-    send({
-        uuid: cState.uuid
-    }, 'POST', "hteachers", "getGroups")
-        .then(data => {
-            console.log(data);
-            if(data.error == false){
-                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.body));
-                if(!data.body[groupsInfo.els.group]){
-                    let grs = Object.getOwnPropertyNames(data.body);
-                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(grs[0])));
-                }
-            }
-        });
-}
-
 export function setActNew(name) {
     gr.group = name;
 }
 
 export function remGroup (id) {
     console.log("remGroup");
-    send({
+    sendToServer({
         uuid: cState.uuid,
-        id: id
-    }, 'POST', "hteachers", "remGroup")
+        grId: id
+    }, 'POST', "hteachers/remGroup")
 }
 
 export function chGroup (id, inp, par) {
     console.log("chGroup");
-    send({
+    sendToServer({
         uuid: cState.uuid,
-        id: id,
+        grId: id,
         name: inp
-    }, 'POST', "hteachers", "chGroup")
+    }, 'POST', "hteachers/chGroup")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -276,10 +258,10 @@ export function chGroup (id, inp, par) {
 
 export function addGroup (inp, par) {
     console.log("addGroup");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "hteachers", "addGroup")
+    }, 'POST', "hteachers/addGroup")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -302,11 +284,7 @@ export function setEvGr(cS, dis) {
 export function PeopleMain() {
     cState = useSelector(states);
     groupsInfo = useSelector(groups);
-    if(!dispatch && cState.role > 1){
-        if(eventSource.readyState == EventSource.OPEN) setGroups();
-        eventSource.addEventListener('connect', onCon, false);
-        setEvGr();
-    }
+    navigate = useNavigate();
     dispatch = useDispatch();
     gr.groups = {
         0: cState.auth && (cState.role < 2 || cState.role == 3) ? {
@@ -336,7 +314,6 @@ export function PeopleMain() {
         setActived(3);
         return function() {
             dispatch = undefined;
-            eventSource.removeEventListener('connect', onCon);
             eventSource.removeEventListener('addGroupC', addGroupC);
             eventSource.removeEventListener('chGroupC', chGroupC);
             eventSource.removeEventListener('remGroupC', remGroupC);

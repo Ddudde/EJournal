@@ -2,8 +2,7 @@ import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
 import {classmates, groups, states, themes} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {useNavigate} from "react-router-dom";
-import {ele, setActNew, sit} from "../PeopleMain";
+import {ele, goToProf, setActNew, sit} from "../PeopleMain";
 import profl from "../../../media/profl.png";
 import profd from "../../../media/profd.png";
 import Pane from "../../other/pane/Pane";
@@ -26,9 +25,9 @@ import refreshCl from "../../../media/refreshCl.png";
 import copyd from "../../../media/copyd.png";
 import copyl from "../../../media/copyl.png";
 import yes from "../../../media/yes.png";
-import {eventSource, send} from "../../main/Main";
+import {eventSource, sendToServer} from "../../main/Main";
 
-let dispatch, classmatesInfo, groupsInfo, selGr, errText, navigate, inps, themeState, cState, tps;
+let dispatch, classmatesInfo, groupsInfo, selGr, errText, inps, themeState, cState, tps;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 inps = {inpnpt : "Фамилия И.О."};
 selGr = 0;
@@ -57,7 +56,7 @@ function refreshLink(e) {
         id = inp.getAttribute("data-id").split("_");
         // dispatch(changePeople(type, 0, id[0], id[1], sit + "/invite/" + gen_cod(), "link"));
         // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
-        send({
+        sendToServer({
             uuid: cState.uuid,
             id: id[0],
             id1: id[1]
@@ -152,10 +151,6 @@ function chStatB(e) {
     el.parentElement.querySelector(".yes").setAttribute("data-enable", +inps[el.id]);
 }
 
-function goToProf(log) {
-    if(log) navigate("/profiles/" + log);
-}
-
 function codPepC(e) {
     const msg = JSON.parse(e.data);
     dispatch(changePeople(tps.ch, 0, msg.id, undefined, msg.code, "link"));
@@ -178,7 +173,7 @@ function addPepC(e) {
 
 function remInv (type, id, id1) {
     console.log("remInv");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         id: id,
         id1: id1
@@ -187,7 +182,7 @@ function remInv (type, id, id1) {
 
 function changeInv (type, id, id1, inp, par) {
     console.log("changeInv");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         id: id,
         id1: id1,
@@ -203,7 +198,7 @@ function changeInv (type, id, id1, inp, par) {
 
 function addInv (type, inp, par) {
     console.log("addInv");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         name: inp
     }, 'POST', "students", "addPep")
@@ -220,7 +215,7 @@ function onCon(e) {
 }
 
 function setInfo() {
-    send({
+    sendToServer({
         uuid: cState.uuid,
         group: groupsInfo.group
     }, 'POST', "students", "getStud")
@@ -237,8 +232,11 @@ function setInfo() {
 }
 
 function getBlock(x, b) {
-    let edFi, info;
+    let edFi, info, codeLink;
     info = classmatesInfo[x];
+    if(info && info.link) {
+        codeLink = sit + (info.login ? "/reauth/" : "/invite/") + info.link;
+    }
     edFi = <div className={peopleCSS.pepl} key={x} data-st="0">
         {x ?
             <div className={peopleCSS.fi}>
@@ -248,9 +246,9 @@ function getBlock(x, b) {
                 {info.login && <img className={peopleCSS.profIm} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(info.login)} title="Перейти в профиль" alt=""/>}
                 <img className={peopleCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
                 <img className={peopleCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={e=>onDel(e, tps.del)} title="Удалить" alt=""/>
-                <input className={peopleCSS.inp+" "+peopleCSS.copyInp} data-id={x ? info.login+"_"+x : undefined} id={"inpcpt_" + x} placeholder="Ссылка не создана" defaultValue={info.link ? sit + (info.login ? "/reauth/" : "/invite/") + info.link : undefined} type="text" readOnly/>
+                <input className={peopleCSS.inp+" "+peopleCSS.copyInp} data-id={x ? info.login+"_"+x : undefined} id={"inpcpt_" + x} placeholder="Ссылка не создана" defaultValue={codeLink} type="text" readOnly/>
                 <img className={peopleCSS.imginp+" "+peopleCSS.refrC} src={themeState.theme_ch ? refreshCd : refreshCl} onClick={refreshLink} title="Создать ссылку-приглашение" alt=""/>
-                <img className={peopleCSS.imginp} src={themeState.theme_ch ? copyd : copyl} title="Копировать" data-enable={info.link ? "1" : "0"} onClick={(e)=>copyLink(e, info.link ? sit + (info.login ? "/reauth/" : "/invite/") + info.link : undefined, info.name)} alt=""/>
+                <img className={peopleCSS.imginp} src={themeState.theme_ch ? copyd : copyl} title="Копировать" data-enable={info.link ? "1" : "0"} onClick={(e)=>copyLink(e, codeLink, info.name)} alt=""/>
             </div>
             :
             <div className={peopleCSS.fi}>
@@ -287,7 +285,6 @@ export function Classmates() {
     cState = useSelector(states);
     themeState = useSelector(themes);
     groupsInfo = useSelector(groups);
-    navigate = useNavigate();
     if(!dispatch) {
         setActNew(2);
         if(eventSource.readyState == EventSource.OPEN) setInfo();

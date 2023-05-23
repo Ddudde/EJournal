@@ -150,18 +150,22 @@ import static java.util.Arrays.asList;
             User objU = userById(i);
             objO.addProperty("name", objU.getFio());
             objO.addProperty("login", objU.getLogin());
-            if (!ObjectUtils.isEmpty(objU.getCode())) objO.addProperty("link", objU.getCode());
+            if (!ObjectUtils.isEmpty(objU.getCode())) {
+                objO.addProperty("link", objU.getCode());
+            }
             obj.add(i + "", objO);
         }
     }
 
-    public void usersByList(List<Long> list, JsonWriter wrtr) throws Exception {
+    public void usersByList(List<Long> list, JsonWriter wrtr, boolean lin) throws Exception {
+        if (ObjectUtils.isEmpty(list)) return;
         for (Long i : list) {
             wrtr.name(i + "").beginObject();
             User objU = userById(i);
+            if (objU == null) continue;
             wrtr.name("name").value(objU.getFio())
                 .name("login").value(objU.getLogin());
-            if (!ObjectUtils.isEmpty(objU.getCode())) {
+            if (lin && !ObjectUtils.isEmpty(objU.getCode())) {
                 wrtr.name("link").value(objU.getCode());
             }
             wrtr.endObject();
@@ -198,17 +202,21 @@ import static java.util.Arrays.asList;
             JsonObject objO = new JsonObject();
             Invite objI = inviteById(i);
             objO.addProperty("name", objI.getFio());
-            if (!ObjectUtils.isEmpty(objI.getCode())) objO.addProperty("link", objI.getCode());
+            if (!ObjectUtils.isEmpty(objI.getCode())) {
+                objO.addProperty("link", objI.getCode());
+            }
             obj.add(i + "", objO);
         }
     }
 
-    public void invitesByList(List<Long> list, JsonWriter wrtr) throws Exception {
+    public void invitesByList(List<Long> list, JsonWriter wrtr, boolean lin) throws Exception {
+        if (ObjectUtils.isEmpty(list)) return;
         for (Long i : list) {
             wrtr.name(i + "").beginObject();
             Invite objI = inviteById(i);
+            if(objI == null) continue;
             wrtr.name("name").value(objI.getFio());
-            if (!ObjectUtils.isEmpty(objI.getCode())) {
+            if (lin && !ObjectUtils.isEmpty(objI.getCode())) {
                 wrtr.name("link").value(objI.getCode());
             }
             wrtr.endObject();
@@ -357,12 +365,8 @@ import static java.util.Arrays.asList;
 
     public void teachersBySchool(School school, JsonWriter wrtr) throws Exception {
         wrtr.name("nt").beginObject().name("tea").beginObject();
-        if (!ObjectUtils.isEmpty(school.getTeachers())) {
-            usersByList(school.getTeachers(), wrtr);
-        }
-        if (!ObjectUtils.isEmpty(school.getTeachersInv())) {
-            invitesByList(school.getTeachersInv(), wrtr);
-        }
+        usersByList(school.getTeachers(), wrtr, true);
+        invitesByList(school.getTeachersInv(), wrtr, true);
         wrtr.endObject().endObject();
         if (!ObjectUtils.isEmpty(school.getSubjects())) {
             for (Long i1 : school.getSubjects()) {
@@ -371,12 +375,8 @@ import static java.util.Arrays.asList;
                     wrtr.name(i1 + "").beginObject()
                         .name("name").value(subject.getName())
                         .name("tea").beginObject();
-                    if (!ObjectUtils.isEmpty(subject.getTeachers())) {
-                        usersByList(subject.getTeachers(), wrtr);
-                    }
-                    if (!ObjectUtils.isEmpty(subject.getTeachersInv())) {
-                        invitesByList(subject.getTeachersInv(), wrtr);
-                    }
+                    usersByList(subject.getTeachers(), wrtr, true);
+                    invitesByList(subject.getTeachersInv(), wrtr, true);
                     wrtr.endObject().endObject();
                 }
             }

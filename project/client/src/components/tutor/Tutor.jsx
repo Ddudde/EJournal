@@ -69,7 +69,7 @@ import hizo33 from "../../media/tutor/hteachers/izo33.png";
 import hizo34 from "../../media/tutor/hteachers/izo34.png";
 import hizo35 from "../../media/tutor/hteachers/izo35.png";
 import hizo36 from "../../media/tutor/hteachers/izo36.png";
-import {eventSource, send, setActived} from "../main/Main";
+import {eventSource, sendToServer, setActived} from "../main/Main";
 import knopka from "../../media/dnevnik/knopka.png";
 import Request from "./request/Request";
 
@@ -777,7 +777,7 @@ function getZag(text, link, b) {
 }
 
 function onCon(e) {
-    send({
+    sendToServer({
         type: "TUTOR",
         uuid: cState.uuid
     }, 'POST', "auth", "infCon");

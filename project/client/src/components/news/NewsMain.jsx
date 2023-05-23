@@ -4,7 +4,7 @@ import {Outlet} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {states} from "../../store/selector";
 import Pane from "../other/pane/Pane";
-import {eventSource, prefSite, send, setActived} from "../main/Main";
+import {eventSource, prefSite, sendToServer, setActived} from "../main/Main";
 import {CHANGE_NEWS, CHANGE_NEWS_DEL, CHANGE_NEWS_GL, CHANGE_NEWS_PARAM, changeNews} from "../../store/actions";
 import ed from "../../media/edit.png";
 import yes from "../../media/yes.png";
@@ -264,7 +264,7 @@ function onCon() {
 }
 
 function setInfo() {
-    send({
+    sendToServer({
         type: type,
         uuid: cState.uuid
     }, 'POST', "news/getNews")
@@ -293,7 +293,7 @@ function addNewsC(e) {
 
 function delNews (id) {
     console.log("delNews");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         id: id
     }, 'POST', "news/delNews")
@@ -301,7 +301,7 @@ function delNews (id) {
 
 function chNews (id, inps, typ) {
     console.log("chNews");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         type: typ,
         val: inps,
@@ -311,7 +311,7 @@ function chNews (id, inps, typ) {
 
 function addNews (inps) {
     console.log("addNews");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         title: inps.inpnzt,
         date: inps.inpndt,

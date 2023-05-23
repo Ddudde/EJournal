@@ -18,10 +18,7 @@ import ru.mirea.data.models.school.dayOfWeek.Subject;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 
@@ -70,7 +67,7 @@ public class IniDB {
         Date dateAfter = Date.from(after);
         serv.createInvite(new Invite("Петров А.А.", Map.of(
             3L, new Role(null, 5L)
-            ), Main.df.format(dateAfter)));
+            ), Main.df.format(dateAfter), UUID.randomUUID().toString()));
         System.out.println(serv.getInvites());
         checkDates();
         System.out.println(serv.getInvites());

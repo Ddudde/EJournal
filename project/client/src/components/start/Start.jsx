@@ -28,7 +28,7 @@ import {
     changeIndPrev,
     changeState
 } from "../../store/actions";
-import {addEvent, eventSource, remEvent, send, setActived} from "../main/Main";
+import {addEvent, eventSource, remEvent, sendToServer, setActived} from "../main/Main";
 import {Link, useNavigate, useParams} from "react-router-dom"
 import ErrFound from "../other/error/ErrFound";
 
@@ -98,7 +98,7 @@ function rego(e, props, code){
     ch = par.querySelector("input[checked]");
     console.log(props);
     if(els.pasr && els.logr){
-        send({
+        sendToServer({
             login: els.logr,
             par: els.pasr,
             ico: ch.value,
@@ -123,7 +123,7 @@ function rego(e, props, code){
 }
 
 function vxo(){
-    send({
+    sendToServer({
         uuid: cState.uuid,
         login: elem.logv.value,
         password: elem.pasv.value,
@@ -228,7 +228,7 @@ function chStatAv(e) {
 }
 
 function onRec(e) {
-    send({
+    sendToServer({
         login: els.logz,
         secFr: els.secz,
         par : els.pasnz
@@ -284,7 +284,7 @@ function onsetText(e) {
 }
 
 function onCon(e) {
-    send({
+    sendToServer({
         type: "AUTH",
         uuid: cState.uuid
     }, 'POST', "auth/infCon");
@@ -304,9 +304,8 @@ export function Start(props) {
         chStatVb({target: elem.logv});
         chStatZb({target: elem.logz});
         if(props.mod == "inv" && code){
-            send({
-                code: code,
-                uuid: cState.uuid
+            sendToServer({
+                code: code
             }, 'POST', "auth/checkInvCode")
                 .then(data => {
                     if(data.error == false){
@@ -321,7 +320,7 @@ export function Start(props) {
                 });
         }
         if(props.mod == "rea" && code){
-            send({
+            sendToServer({
                 code: code
             }, 'POST', "auth/checkReaCode")
                 .then(data => {

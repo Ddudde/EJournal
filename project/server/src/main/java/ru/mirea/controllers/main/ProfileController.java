@@ -2,16 +2,22 @@ package ru.mirea.controllers.main;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.internal.bind.JsonTreeWriter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
+import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.json.Role;
+import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
@@ -19,6 +25,7 @@ import ru.mirea.services.ServerService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("/profiles")
 @NoArgsConstructor
@@ -33,128 +40,148 @@ import java.util.List;
     @Autowired
     private AuthController authController;
 
-    @PostMapping
-    public JsonObject post(@RequestBody JsonObject data) {
-        System.out.println("Post! " + data);
-        JsonObject ans = new JsonObject(), body = null, bodyAns;
-        ans.addProperty("error", false);
-        if(data.has("body") && data.get("body").isJsonObject()) body = data.get("body").getAsJsonObject();
-        if(!data.has("type")) data.addProperty("type", "default");
-        switch (data.get("type").getAsString()){
-            case "getProfile" -> {
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
-                User user = datas.userByLogin(body.get("login").getAsString());
-                if(user != null) {
-                    bodyAns.addProperty("login", user.getLogin());
-                    bodyAns.addProperty("ico", user.getIco());
-                    bodyAns.addProperty("id", user.getId());
-                    if(!ObjectUtils.isEmpty(user.getFio())) bodyAns.addProperty("fio", user.getFio());
-                    if(!ObjectUtils.isEmpty(user.getInfo())) bodyAns.addProperty("more", user.getInfo());
-                    JsonObject roles = new JsonObject();
-                    for(long i = 0; i < 5; i++){
-                        if(!user.getRoles().containsKey(i)) continue;
-                        JsonObject roleO = new JsonObject();
-                        Role role = user.getRoles().get(i);
-                        if(!ObjectUtils.isEmpty(role.getEmail())) roleO.addProperty("email", role.getEmail());
-                        if(!ObjectUtils.isEmpty(role.getYO())) {
-                            School school = datas.schoolById(role.getYO());
-                            if(school != null) roleO.addProperty("yo", school.getName());
-                        }
-                        if(!ObjectUtils.isEmpty(role.getGroup())) {
-                            Group group = datas.groupById(role.getGroup());
-                            if(group != null) roleO.addProperty("group", role.getGroup());
-                        }
-                        if(!ObjectUtils.isEmpty(role.getSubjects())) {
-                            List<String> subjects = new ArrayList<>();
-                            for(Long i1 : role.getSubjects()) {
-                                subjects.add(datas.subjectById(i1).getName());
-                            }
-                            roleO.add("lessons", gson.toJsonTree(subjects));
-                        }
-                        if(!ObjectUtils.isEmpty(role.getKids())){
-                            JsonObject kids = new JsonObject();
-                            for(Long i1 : role.getKids()){
-                                JsonObject kid = new JsonObject();
-                                User kidU = datas.userById(i1);
-                                kid.addProperty("name", kidU.getFio());
-                                kid.addProperty("login", kidU.getLogin());
-                                kids.add(i1+"", kid);
-                            }
-                            roleO.add("kids", kids);
-                        }
-                        if(!ObjectUtils.isEmpty(role.getParents())){
-                            JsonObject parents = new JsonObject();
-                            for(Long i1 : role.getParents()){
-                                JsonObject parent = new JsonObject();
-                                User parentU = datas.userById(i1);
-                                parent.addProperty("name", parentU.getFio());
-                                parent.addProperty("login", parentU.getLogin());
-                                parents.add(i1+"", parent);
-                            }
-                            roleO.add("parents", parents);
-                        }
-                        roles.add(i+"", roleO);
-                    }
-                    bodyAns.add("roles", roles);
-                }
-                return ans;
-            }
-            case "chLogin" -> {
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
-                User user = datas.userByLogin(body.get("oLogin").getAsString());
-                User userN = datas.userByLogin(body.get("nLogin").getAsString());
-                if(user != null && userN == null){
-                    user.setLogin(body.get("nLogin").getAsString());
-                    datas.getUserRepository().saveAndFlush(user);
-
-                    JsonObject ansToCl = new JsonObject();
-                    ansToCl.addProperty("login", user.getLogin());
-                    authController.sendMessageForAll("chLogin", ansToCl, TypesConnect.PROFILES, user.getLogin(), "main", "main", "main");
-                } else {
-                    ans.addProperty("error", true);
-                }
-                return ans;
-            }
-            case "chInfo" -> {
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
-                User user = datas.userByLogin(body.get("login").getAsString());
-                if(user != null) {
-                    user.setInfo(body.get("info").getAsString());
-                    datas.getUserRepository().saveAndFlush(user);
-
-                    JsonObject ansToCl = new JsonObject();
-                    ansToCl.addProperty("more", user.getInfo());
-                    authController.sendMessageForAll("chInfo", ansToCl, TypesConnect.PROFILES, user.getLogin(), "main", "main", "main");
-                } else {
-                    ans.addProperty("error", true);
-                }
-                return ans;
-            }
-            case "chEmail" -> {
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
-                User user = datas.userByLogin(body.get("login").getAsString());
-                if(user != null) {
-                    user.getRoles().get(body.get("role").getAsLong()).setEmail(body.get("email").getAsString());
-                    datas.getUserRepository().saveAndFlush(user);
-
-                    JsonObject ansToCl = new JsonObject();
-                    ansToCl.addProperty("email", body.get("email").getAsString());
-                    ansToCl.addProperty("role", body.get("role").getAsLong());
-                    authController.sendMessageForAll("chEmail", ansToCl, TypesConnect.PROFILES, user.getLogin(), "main", "main", "main");
-                } else {
-                    ans.addProperty("error", true);
-                }
-                return ans;
-            }
-            default -> {
-                System.out.println("Error Type" + data.get("type"));
-                ans.addProperty("error", true);
-                return ans;
-            }
+    @PostMapping(value = "/chEmail")
+    public JsonObject chEmail(@RequestBody DataProfile body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        if(ObjectUtils.isEmpty(body.login)) {
+            body.login = subscriber.getLogin();
         }
+        User user = datas.userByLogin(body.login);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            body.wrtr.name("body").beginObject();
+            if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
+                user.getRoles().get(user.getSelRole()).setEmail(body.email);
+                datas.getUserRepository().saveAndFlush(user);
+                body.wrtr.name("email").value(body.email)
+                    .name("role").value(user.getSelRole());
+            }
+            body.wrtr.endObject();
+        } catch (Exception e) { body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.sendMessageForAll("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getLogin());
+        }, body.wrtr, body.bol);
     }
+
+    @PostMapping(value = "/chInfo")
+    public JsonObject chInfo(@RequestBody DataProfile body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        if(ObjectUtils.isEmpty(body.login)) {
+            body.login = subscriber.getLogin();
+        }
+        User user = datas.userByLogin(body.login);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            body.wrtr.name("body").beginObject();
+            if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
+                user.setInfo(body.info);
+                datas.getUserRepository().saveAndFlush(user);
+                body.wrtr.name("more").value(user.getInfo());
+            }
+            body.wrtr.endObject();
+        } catch (Exception e) { body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.sendMessageForAll("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getLogin());
+        }, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/chLogin")
+    public JsonObject chLogin(@RequestBody DataProfile body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        if(ObjectUtils.isEmpty(body.oLogin)) {
+            body.oLogin = subscriber.getLogin();
+        }
+        User user = datas.userByLogin(body.oLogin);
+        User userN = datas.userByLogin(body.nLogin);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            body.wrtr.name("body").beginObject();
+            if (user != null && userN == null && Objects.equals(body.oLogin, subscriber.getLogin())) {
+                user.setLogin(body.nLogin);
+                subscriber.setLogin(body.nLogin);
+                datas.getUserRepository().saveAndFlush(user);
+                body.wrtr.name("login").value(user.getLogin());
+            }
+            body.wrtr.endObject();
+        } catch (Exception e) { body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.sendMessageForAll("chLogin", ans, TypesConnect.PROFILES, "main", "main", "main", body.oLogin);
+        }, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/getProfile")
+    public JsonObject getProfile(@RequestBody DataProfile body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        if(ObjectUtils.isEmpty(body.login)) {
+            body.login = subscriber.getLogin();
+        }
+        User user = datas.userByLogin(body.login);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            body.wrtr.name("body").beginObject();
+            if (user != null) {
+                body.wrtr.name("login").value(user.getLogin())
+                    .name("ico").value(user.getIco())
+                    .name("id").value(user.getId());
+                if (!ObjectUtils.isEmpty(user.getFio())) {
+                    body.wrtr.name("fio").value(user.getFio());
+                }
+                if (!ObjectUtils.isEmpty(user.getInfo())) {
+                    body.wrtr.name("more").value(user.getInfo());
+                }
+                body.wrtr.name("roles").beginObject();
+                for (long i = 0; i < 5; i++) {
+                    if (!user.getRoles().containsKey(i)) continue;
+                    body.wrtr.name(i + "").beginObject();
+                    Role role = user.getRoles().get(i);
+                    if (!ObjectUtils.isEmpty(role.getEmail())) {
+                        body.wrtr.name("email").value(role.getEmail());
+                    }
+                    if (!ObjectUtils.isEmpty(role.getYO())) {
+                        School school = datas.schoolById(role.getYO());
+                        if (school != null) {
+                            body.wrtr.name("yo").value(school.getName());
+                        }
+                    }
+                    if (!ObjectUtils.isEmpty(role.getGroup())) {
+                        Group group = datas.groupById(role.getGroup());
+                        if (group != null) {
+                            body.wrtr.name("group").value(group.getName());
+                        }
+                    }
+                    if (!ObjectUtils.isEmpty(role.getSubjects())) {
+                        body.wrtr.name("lessons").beginArray();
+                        for (Long i1 : role.getSubjects()) {
+                            body.wrtr.value(datas.subjectById(i1).getName());
+                        }
+                        body.wrtr.endArray();
+                    }
+                    if(!ObjectUtils.isEmpty(role.getKids())) {
+                        body.wrtr.name("kids").beginObject();
+                        datas.usersByList(role.getKids(), body.wrtr, false);
+                        body.wrtr.endObject();
+                    }
+                    if(!ObjectUtils.isEmpty(role.getParents())) {
+                        body.wrtr.name("parents").beginObject();
+                        datas.usersByList(role.getParents(), body.wrtr, false);
+                        body.wrtr.endObject();
+                    }
+                    body.wrtr.endObject();
+                }
+                body.wrtr.endObject();
+            }
+            body.wrtr.endObject();
+        } catch (Exception e) { body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.infCon(body.uuid, subscriber.getLogin(), TypesConnect.PROFILES, "main", "main", "main", body.login);
+        }, body.wrtr, body.bol);
+    }
+}
+
+@ToString
+@NoArgsConstructor @AllArgsConstructor
+class DataProfile {
+    public String login, nLogin, oLogin, info, email, uuid;
+    public transient boolean bol = true;
+    public transient JsonTreeWriter wrtr;
 }

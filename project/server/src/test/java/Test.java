@@ -27,7 +27,28 @@ public class Test {
     private static final InputStream config = Test.class.getResourceAsStream("e-journalfcm-firebase-auth.json");
 
     public static void main(String[] args) throws Exception {
-        notifTest1();
+        jsonTest5();
+    }
+
+    private static void jsonTest5() throws Exception {
+        JsonTreeWriter wrtr = new JsonTreeWriter();
+        String json = "{\"name\":\"BMW\",\"model\":\"X1\",\"year\":\"2016\",\"colors\":[\"WHITE\",\"BLACK\",\"GRAY\"]}";
+        try{
+            wrtr.beginObject().name("name").value("BMW")
+                    .name("year").value(2016)
+                    .name("test1").value(json)
+                    .name("colors").beginArray().value("WHITE")
+                    .value("BLACK").value("GRAY").endArray();
+        } catch (Exception e) {
+            wrtr.name("name").value("df1");
+            System.out.println(e.fillInStackTrace());
+        } finally {
+            wrtr.endObject();
+            System.out.println("dsf" + wrtr.get().getAsJsonObject());
+            System.out.println("dsf" + wrtr.get().getAsJsonObject().toString());
+            System.out.println("dsf" + wrtr.get().getAsJsonObject().get("year").toString());
+            wrtr.close();
+        }
     }
 
     private static void notifTest1(){

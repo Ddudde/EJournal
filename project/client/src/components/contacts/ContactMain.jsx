@@ -4,7 +4,7 @@ import {Outlet} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {states} from "../../store/selector";
 import Pane from "../other/pane/Pane";
-import {eventSource, prefSite, send, setActived} from "../main/Main";
+import {eventSource, prefSite, sendToServer, setActived} from "../main/Main";
 import {CHANGE_CONTACT_GL, CHANGE_CONTACT_PARAM, changeContacts} from "../../store/actions";
 import ed from "../../media/edit.png";
 import yes from "../../media/yes.png";
@@ -194,7 +194,7 @@ function onCon() {
 }
 
 function setInfo() {
-    send({
+    sendToServer({
         type: type,
         role: cState.role,
         uuid: cState.uuid
@@ -209,7 +209,7 @@ function setInfo() {
 
 function chContact (inp, p, p1) {
     console.log("chContact");
-    send({
+    sendToServer({
         uuid: cState.uuid,
         p: p,
         p1: p1,

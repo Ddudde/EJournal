@@ -1,12 +1,23 @@
+let fireApp, messag;
 async function init() {
     if ("serviceWorker" in navigator) {
         try {
+            fireApp = await firebase.initializeApp({
+                messagingSenderId: "781991460409",
+                apiKey: "AIzaSyBrH7xUOxnVjhFGeVTIM9gZB0kxr-2xOwc",
+                projectId: "e-journalfcm",
+                appId: "1:781991460409:web:a900bf500869ddd6f097e8"
+            });
+            const reg = await navigator.serviceWorker.register("/DipvLom/service-worker.js")
             navigator.serviceWorker.addEventListener('message', event => {
                 console.log(`The service worker sent me a message: ${event.data}`);
             });
-            const reg = await navigator.serviceWorker.register("/DipvLom/service-worker.js")
             if (reg.installing) {
                 console.log("Service worker installing");
+                console.log("try notif app");
+                messag = fireApp.messaging();
+                messag.useServiceWorker(reg);
+                requestPerm(messag);
             } else if (reg.waiting) {
                 console.log("Service worker installed");
             } else if (reg.active) {
@@ -36,17 +47,10 @@ async function init() {
                     });
                 }
             });
-            if(!localStorage.getItem("notifToken")) {
-                console.log("try notif app");
-                firebase.initializeApp({
-                    messagingSenderId: "781991460409",
-                    apiKey: "AIzaSyBrH7xUOxnVjhFGeVTIM9gZB0kxr-2xOwc",
-                    projectId: "e-journalfcm",
-                    appId: "1:781991460409:web:a900bf500869ddd6f097e8"
-                });
-                const messaging = firebase.messaging();
-                messaging.useServiceWorker(reg);
-                requestPerm(messaging);
+            if(!messag && !localStorage.getItem("notifToken") || Notification.permission != "granted") {
+                messag = fireApp.messaging();
+                messag.useServiceWorker(reg);
+                requestPerm(messag);
             }
         } catch (error) {
             console.log(`Registration failed with ${error}`);
@@ -64,10 +68,10 @@ async function requestPerm(messaging) {
         await messaging.requestPermission();
         const token = await messaging.getToken();
         console.log('Your token is:', token);
-        localStorage.setItem("notifToken", token);
-
+        if(token) localStorage.setItem("notifToken", token);
         return token;
     } catch (error) {
         console.log(error);
     }
 }
+

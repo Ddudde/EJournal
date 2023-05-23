@@ -16,7 +16,7 @@ import {
     changeEvents,
     changeReq
 } from "../../store/actions";
-import {eventSource, send, setActived} from "../main/Main";
+import {eventSource, sendToServer, setActived} from "../main/Main";
 
 let dispatch, requestInfo, inps, cState, errText;
 inps = {inpntt : "Текст", inpnzt : "Заголовок", inpndt: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})};
@@ -104,7 +104,7 @@ function onFin(e) {
         inp.setAttribute("data-mod", '0');
         if(bul) {
             par = par.parentElement;
-            send({
+            sendToServer({
                 login: cState.login,
                 id: inp.getAttribute("data-id"),
                 text: inp.value
@@ -117,7 +117,7 @@ function onFin(e) {
         }
         if(par.parentElement.classList.contains(requestCSS.da)){
             par = par.parentElement;
-            send({
+            sendToServer({
                 login: cState.login,
                 id: inp.getAttribute("data-id"),
                 date: inp.value
@@ -130,7 +130,7 @@ function onFin(e) {
         }
         if(par.parentElement.classList.contains(requestCSS.za)){
             par = par.parentElement;
-            send({
+            sendToServer({
                 login: cState.login,
                 id: inp.getAttribute("data-id"),
                 title: inp.value
@@ -151,7 +151,7 @@ function onDel(e) {
     let par = e.target.parentElement;
     if(par.classList.contains(requestCSS.upr)){
         if (par.hasAttribute("data-id")) {
-            send({
+            sendToServer({
                 login: cState.login,
                 id: par.getAttribute("data-id")
             }, 'POST', "requests", "delReq")
@@ -177,11 +177,11 @@ function onClose(e) {
 }
 
 function setInfo() {
-    send({
+    sendToServer({
         type: "REQUESTS",
         uuid: cState.uuid
     }, 'POST', "auth", "infCon");
-    send({
+    sendToServer({
         login: cState.login
     }, 'POST', "requests", "getRequests")
         .then(data => {
