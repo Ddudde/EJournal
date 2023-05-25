@@ -119,7 +119,6 @@ export function onDel(e, inps, forceUpdate) {
         ima = par.querySelector("img");
         if (ima.hasAttribute("data-id")) {
             chNews(ima.getAttribute("data-id"), "", "img_url");
-            // dispatch(changeNews(CHANGE_NEWS_PARAM, type, ima.getAttribute("data-id"), "", "img_url"));
         } else {
             inps.addIm = undefined;
             forceUpdate();
@@ -160,7 +159,6 @@ export function onFin(e, inps, forceUpdate) {
     bul = par.parentElement.classList.contains(newsCSS.te);
     inp = par.querySelector(bul ? "textarea" : "input");
     if(par.classList.contains(newsCSS.upr)){
-        // dispatch(changeNews(CHANGE_NEWS, type, news.length == 0 ? 0 : parseInt(news[news.length-1]) + 1, obj));
         addNews(inps);
         return;
     }
@@ -170,7 +168,6 @@ export function onFin(e, inps, forceUpdate) {
             if (inps.edAddIm) inps.edAddIm = undefined;
             if (inp.hasAttribute("data-id")) {
                 chNews(inp.getAttribute("data-id"), inp.value, "img_url");
-                // dispatch(changeNews(CHANGE_NEWS_PARAM, type, inp.getAttribute("data-id"), inp.value, "img_url"));
             } else {
                 inps.addIm = inp.value;
                 forceUpdate();
@@ -180,7 +177,6 @@ export function onFin(e, inps, forceUpdate) {
             par = par.parentElement;
             if(inp.hasAttribute("data-id")){
                 chNews(inp.getAttribute("data-id"), inp.value, "text");
-                // dispatch(changeNews(CHANGE_NEWS_PARAM, type, inp.getAttribute("data-id"), inp.value,"text"));
             }else {
                 inps.inpntt = inp.value;
                 forceUpdate();
@@ -190,7 +186,6 @@ export function onFin(e, inps, forceUpdate) {
             par = par.parentElement;
             if(inp.hasAttribute("data-id")){
                 chNews(inp.getAttribute("data-id"), inp.value, "date");
-                // dispatch(changeNews(CHANGE_NEWS_PARAM, type, inp.getAttribute("data-id"), inp.value,"date"));
             }else {
                 inps.inpndt = inp.value;
                 forceUpdate();
@@ -200,7 +195,6 @@ export function onFin(e, inps, forceUpdate) {
             par = par.parentElement;
             if(inp.hasAttribute("data-id")){
                 chNews(inp.getAttribute("data-id"), inp.value, "title");
-                // dispatch(changeNews(CHANGE_NEWS_PARAM, type, inp.getAttribute("data-id"), inp.value,"title"));
             }else{
                 inps.inpnzt = inp.value;
                 forceUpdate();
@@ -227,7 +221,6 @@ export function onClose(e, inps, forceUpdate) {
     if(par.classList.contains(newsCSS.upr)){
         if (par.hasAttribute("data-id")) {
             delNews(par.getAttribute("data-id"));
-            // dispatch(changeNews(CHANGE_NEWS_DEL, type, par.getAttribute("data-id")));
         }else {
             par = par.parentElement.parentElement;
             par.setAttribute('data-st', '0');

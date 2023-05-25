@@ -26,7 +26,8 @@ import Pane from "../other/pane/Pane";
 
 let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling, timid, timidP, d1, warnErrNet, server;
 scrolling = false;
-server = "http://localhost:8080";
+// eslint-disable-next-line no-undef
+server = servLink;
 export let prefSite = "/DipvLom";
 gr = {
     group: 4
@@ -86,26 +87,8 @@ function getKids() {
 }
 
 export function sendToServer(bod, typeC, url, type) {
-    let sed = {method: typeC};
-    if (bod) {
-        sed.headers = {'Content-Type': 'application/json'};
-        if (!type) {
-            sed.body = JSON.stringify(bod);
-        } else {
-            sed.body = JSON.stringify({
-                type: type,
-                body: bod
-            });
-        }
-    }
-    return fetch(server + "/" + (url ? url : ""), sed)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`This is an HTTP error: The status is ${res.status}`);
-            }
-            return res.json();
-        })
-        .catch(data => data);
+    // eslint-disable-next-line no-undef
+    return sendToServerApp(bod, typeC, url, type);
 }
 
 function selKid(kid) {
@@ -222,6 +205,10 @@ function iniNet() {
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
+                        // eslint-disable-next-line no-undef
+                        userServFin = msg;
+                        // eslint-disable-next-line no-undef
+                        appApp.dispatchEvent(new Event("op"));
                     }
                 });
         }
@@ -242,6 +229,8 @@ function closeStream() {
         sendToServer({
             uuid: cState.uuid
         }, 'POST', "auth/remCon");
+        // eslint-disable-next-line no-undef
+        userServFin = undefined;
         eventSource.close();
         // dispatch(changeState(CHANGE_STATE, "uuid", undefined));
     }

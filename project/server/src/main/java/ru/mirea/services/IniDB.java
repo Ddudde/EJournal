@@ -67,7 +67,7 @@ public class IniDB {
         Date dateAfter = Date.from(after);
         serv.createInvite(new Invite("Петров А.А.", Map.of(
             3L, new Role(null, 5L)
-            ), Main.df.format(dateAfter), UUID.randomUUID().toString()));
+        ), Main.df.format(dateAfter), UUID.randomUUID().toString()));
         System.out.println(serv.getInvites());
         checkDates();
         System.out.println(serv.getInvites());

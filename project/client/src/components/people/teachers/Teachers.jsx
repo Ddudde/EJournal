@@ -37,7 +37,7 @@ import no from "../../../media/no.png";
 import ErrFound from "../../other/error/ErrFound";
 import {eventSource, sendToServer} from "../../main/Main";
 
-let dispatch, teachersInfo, cState, themeState, inps, errText;
+let dispatch, teachersInfo, cState, themeState, inps, errText, selKid;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 inps = {inpnpt : "Фамилия И.О."};
 let [_, forceUpdate] = [];
@@ -162,14 +162,12 @@ export function codTea (id, id1, title, text) {
     sendToServer({
         uuid: cState.uuid,
         id: id,
-        id1: id1,
-        role: cState.role
-    }, 'POST', "teachers", "setCodePep")
+        id1: id1
+    }, 'POST', "teachers/setCodePep")
         .then(data => {
             console.log(data);
             if(data.error == false){
                 dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
-                // dispatch(changePeople(CHANGE_PARENTS_L1, undefined, data.id, undefined, data.body));
             }
         });
 }
@@ -179,11 +177,10 @@ export function addTea(inp, par) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "teachers", "addTea")
+    }, 'POST', "teachers/addTea")
         .then(data => {
             console.log(data);
             if(data.error == false){
-                // dispatch(changePeople(CHANGE_TEACHERS, "nt", data.id, undefined, data.name));
                 par.setAttribute('data-st', '0');
             }
         });
@@ -196,10 +193,11 @@ function onCon(e) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "teachers", "getTeachers")
+    }, 'POST', "teachers/getTeachers")
         .then(data => {
             console.log(data);
             if(data.error == false){
+                if(cState.role == 1 && cState.kid) selKid = cState.kid;
                 dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.body));
             }
         });
@@ -237,6 +235,10 @@ export function Teachers() {
         if (isFirstUpdate.current) {
             isFirstUpdate.current = false;
             return;
+        }
+        if(cState.role == 1 && cState.kid && selKid != cState.kid) {
+            selKid = cState.kid;
+            setInfo();
         }
         console.log('componentDidUpdate Teachers.jsx');
     });

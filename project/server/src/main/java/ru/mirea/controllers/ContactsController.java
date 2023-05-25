@@ -1,12 +1,16 @@
 package ru.mirea.controllers;
 
 import com.google.gson.JsonObject;
+import com.google.gson.internal.bind.JsonTreeWriter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.Contacts;
@@ -27,94 +31,90 @@ import java.util.Objects;
     @Autowired
     private AuthController authController;
 
-    @PostMapping
-    public JsonObject post(@RequestBody JsonObject data) {
-        System.out.println("Post! " + data);
-        JsonObject ans = new JsonObject(), body = null, bodyAns;
-        ans.addProperty("error", false);
-        if(data.has("body") && data.get("body").isJsonObject()) body = data.get("body").getAsJsonObject();
-        if(!data.has("type")) data.addProperty("type", "default");
-        switch (data.get("type").getAsString()){
-            case "getContacts" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                bodyAns = new JsonObject();
-                JsonObject map = new JsonObject();
-                Long conId = null, schId = null;
-                if(subscriber != null) {
-                    ans.add("body", bodyAns);
-                    bodyAns.add("mapPr", map);
-                    User user = datas.userByLogin(subscriber.getLogin());
-                    Syst syst = datas.getSyst();
-                    if (user != null) {
-                        schId = user.getRoles().get(body.get("role").getAsLong()).getYO();
-                        School school = datas.schoolById(schId);
-                        if (Objects.equals(body.get("type").getAsString(), "Yo") && school != null) {
-                            conId = school.getContacts();
-                        }
-                    }
-                    if (Objects.equals(body.get("type").getAsString(), "Por") && syst != null) {
-                        conId = syst.getContacts();
-                        schId = null;
-                    }
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.CONTACTS, schId + "", "main", "main", body.get("type").getAsString());
+    @PostMapping(value = "/chContact")
+    public JsonObject chContact(@RequestBody DataContacts body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        User user = datas.userByLogin(subscriber.getLogin());
+        Syst syst = datas.getSyst();
+        Contacts contacts = null;
+        try {
+            body.wrtr = datas.ini(body.toString());
+            if(user != null) {
+                if(user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")){
+                    contacts = datas.contactsById(syst.getContacts());
                 }
-                if(conId != null) {
-                    Contacts conM = datas.contactsById(conId);
-                    bodyAns.addProperty("contact", conM.getContact());
-                    map.addProperty("text", conM.getText());
-                    map.addProperty("imgUrl", conM.getImgUrl());
-                } else {
-                    ans.addProperty("error", true);
+                if(user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo")){
+                    Long schId = user.getRoles().get(user.getSelRole()).getYO();
+                    School school = datas.schoolById(schId);
+                    if(school != null) {
+                        contacts = datas.contactsById(school.getContacts());
+                    }
                 }
-                return ans;
             }
-            case "chContact" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
+            if(contacts != null) {
+                if(Objects.equals(body.p, "contact")) {
+                    contacts.setContact(body.val);
+                }
+                if(Objects.equals(body.p, "mapPr")) {
+                    if(Objects.equals(body.p1, "text")) {
+                        contacts.setText(body.val);
+                    }
+                    if(Objects.equals(body.p1, "imgUrl")) {
+                        contacts.setImgUrl(body.val);
+                    }
+                }
+                datas.getContactsRepository().saveAndFlush(contacts);
+                body.wrtr.name("val").value(body.val)
+                    .name("p").value(body.p)
+                    .name("p1").value(body.p1);
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.sendMessageForAll("chContactC", ans, TypesConnect.CONTACTS, subscriber.getLvlSch(), "main", "main", subscriber.getLvlMore2());
+        }, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/getContacts")
+    public JsonObject getContacts(@RequestBody DataContacts body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        final var ref = new Object() {
+            Long schId = null, conId = null;
+        };
+        try {
+            body.wrtr = datas.ini(body.toString());
+            if(subscriber != null) {
                 User user = datas.userByLogin(subscriber.getLogin());
                 Syst syst = datas.getSyst();
-                Contacts contacts = null;
-                if(user != null) {
-                    if(user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlSch(), "Por")){
-                        contacts = datas.contactsById(syst.getContacts());
-                    }
-                    if(user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlSch(), "Yo")){
-                        Long schId = user.getRoles().get(body.get("role").getAsLong()).getYO();
-                        School school = datas.schoolById(schId);
-                        if(school != null) {
-                            contacts = datas.contactsById(school.getContacts());
-                        }
-                    }
+                if (Objects.equals(body.type, "Yo") && user != null) {
+                    ref.schId = user.getRoles().get(user.getSelRole()).getYO();
+                    School school = datas.schoolById(ref.schId);
+                    if(school != null) ref.conId = school.getContacts();
                 }
-                if(contacts != null) {
-                    String p = body.get("p").getAsString();
-                    String p1 = body.has("p1") ? body.get("p1").getAsString() : null;
-                    if(Objects.equals(p, "contact")) {
-                        contacts.setContact(body.get("val").getAsString());
-                    }
-                    if(Objects.equals(p, "mapPr")) {
-                        if(Objects.equals(p1, "text")) {
-                            contacts.setText(body.get("val").getAsString());
-                        }
-                        if(Objects.equals(p1, "imgUrl")) {
-                            contacts.setImgUrl(body.get("val").getAsString());
-                        }
-                    }
-                    datas.getContactsRepository().saveAndFlush(contacts);
-                    ans.add("val", body.get("val"));
-                    ans.add("p", body.get("p"));
-                    ans.add("p1", body.get("p1"));
-
-                    authController.sendMessageForAll("chContactC", ans, TypesConnect.CONTACTS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
-                } else {
-                    ans.addProperty("error", true);
+                if (Objects.equals(body.type, "Por") && syst != null) {
+                    ref.conId = syst.getContacts();
+                    ref.schId = null;
                 }
-                return ans;
+                if(ref.conId != null) {
+                    Contacts conM = datas.contactsById(ref.conId);
+                    body.wrtr.name("body").beginObject()
+                        .name("contact").value(conM.getContact())
+                        .name("mapPr").beginObject()
+                        .name("text").value(conM.getText())
+                        .name("imgUrl").value(conM.getImgUrl())
+                        .endObject().endObject();
+                }
             }
-            default -> {
-                System.out.println("Error Type" + data.get("type"));
-                ans.addProperty("error", true);
-                return ans;
-            }
-        }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.infCon(body.uuid, subscriber.getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", body.type);
+        }, body.wrtr, body.bol);
     }
+}
+
+@ToString
+@NoArgsConstructor @AllArgsConstructor
+class DataContacts {
+    public String uuid, type, p, p1, val;
+    public transient boolean bol = true;
+    public transient JsonTreeWriter wrtr;
 }

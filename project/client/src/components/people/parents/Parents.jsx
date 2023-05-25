@@ -14,7 +14,7 @@ import {
     onEdit,
     onFin,
     refreshLink,
-    setActNew,
+    setActNew, setEvGr,
     sit
 } from "../PeopleMain";
 import profl from "../../../media/profl.png";
@@ -26,15 +26,15 @@ import mapl from "../../../media/Map_symbolL.png";
 import {
     CHANGE_CLASSMATES_GL,
     CHANGE_EVENT,
-    CHANGE_EVENTS_CLEAR,
+    CHANGE_EVENTS_CLEAR, CHANGE_GROUPS_GL, CHANGE_GROUPS_GR,
     CHANGE_PARENTS,
     CHANGE_PARENTS_DEL,
     CHANGE_PARENTS_DEL_L0,
     CHANGE_PARENTS_DEL_L1,
     CHANGE_PARENTS_GL,
     CHANGE_PARENTS_L1,
-    CHANGE_PARENTS_L1_PARAM,
-    changeEvents,
+    CHANGE_PARENTS_L1_PARAM, CHANGE_SCHEDULE_GL, CHANGE_TEACHERS_GL, changeAnalytics,
+    changeEvents, changeGroups,
     changePeople
 } from "../../../store/actions";
 import ed from "../../../media/edit.png";
@@ -58,29 +58,18 @@ function selecKid(e, id) {
 }
 
 function getKids() {
-    let lpI = Object.getOwnPropertyNames(classmatesInfo);
-    for(let i = 0; i < lpI.length; i++){
-        if(parentsInfo[lpI[i]]) {
-            lpI.splice(i, 1);
-            i--;
-        }
-    }
-    if(lpI.length > 0 && !inps.nyid) {
-        inps.nyid = lpI[0];
-        dispatch(changePeople(CHANGE_PARENTS_L1_PARAM, undefined, "nw", undefined, classmatesInfo[inps.nyid].name));
-    }
     inps.ppI = inps.nyid && parentsInfo.nw.par ? Object.getOwnPropertyNames(parentsInfo.nw.par) : [];
     return (inps.nyid &&
         <div className={parentsCSS.blockList}>
             <div className={peopleCSS.nav_i+' '+parentsCSS.selEl} id={peopleCSS.nav_i}>
                 <div className={parentsCSS.elInf}>Ученик:</div>
                 <div className={parentsCSS.elText}>{parentsInfo.nw.name}</div>
-                <img className={parentsCSS.mapImg} data-enablem={lpI.length < 2 ? "0" : "1"} src={themeState.theme_ch ? mapd : mapl} alt=""/>
+                <img className={parentsCSS.mapImg} data-enablem={inps.lpI.length < 2 ? "0" : "1"} src={themeState.theme_ch ? mapd : mapl} alt=""/>
             </div>
             <div className={parentsCSS.list}>
-                {parentsInfo && lpI.map(param1 =>
+                {parentsInfo && inps.lpI.map(param1 =>
                     param1 != inps.nyid &&
-                    <div className={peopleCSS.nav_i+' '+parentsCSS.listEl} key={param1} id={peopleCSS.nav_i} onClick={(e) => (selecKid(e, param1))}>
+                    <div className={peopleCSS.nav_i+' '+parentsCSS.listEl} key={param1} id={peopleCSS.nav_i} onClick={e => (selecKid(e, param1))}>
                         <div className={parentsCSS.elInf}>Ученик:</div>
                         <div className={parentsCSS.elText}>{classmatesInfo[param1].name}</div>
                     </div>
@@ -102,16 +91,16 @@ function getAddPred(param) {
                         {inps.inpnpt}
                     </div>
                     <img className={peopleCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                    <img className={peopleCSS.imginp+" yes "} src={yes} onClick={(e)=>onFin(e, inps, forceUpdate, CHANGE_PARENTS, parentsInfo)} title="Подтвердить" alt=""/>
+                    <img className={peopleCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, inps, forceUpdate, CHANGE_PARENTS, parentsInfo)} title="Подтвердить" alt=""/>
                     <img className={peopleCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Выйти из режима создания" alt=""/>
                 </div>
                 <div className={peopleCSS.ed}>
                     <div className={peopleCSS.preinf}>
                         ФИО:
                     </div>
-                    <input className={peopleCSS.inp} data-id1={param ? param : undefined} id={"inpnpt_"} placeholder={"Фамилия И.О."} defaultValue={inps.inpnpt} onChange={(e)=>chStatB(e, inps)} type="text"/>
+                    <input className={peopleCSS.inp} data-id1={param ? param : undefined} id={"inpnpt_"} placeholder={"Фамилия И.О."} defaultValue={inps.inpnpt} onChange={e=>chStatB(e, inps)} type="text"/>
                     {ele(false, "inpnpt_", inps)}
-                    <img className={peopleCSS.imginp+" yes "} src={yes} onClick={(e)=>onFin(e, inps, forceUpdate)} title="Подтвердить" alt=""/>
+                    <img className={peopleCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, inps, forceUpdate)} title="Подтвердить" alt=""/>
                     <img className={peopleCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                 </div>
             </div>
@@ -143,15 +132,15 @@ function getAdd() {
                                 {info.name}
                             </div>
                             <img className={peopleCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                            <img className={peopleCSS.imginp} data-id={param1} style={{marginRight: "1vw"}} src={no} onClick={(e)=>onDel(e, CHANGE_PARENTS_DEL)} title="Удалить" alt=""/>
+                            <img className={peopleCSS.imginp} data-id={param1} style={{marginRight: "1vw"}} src={no} onClick={e=>onDel(e, CHANGE_PARENTS_DEL)} title="Удалить" alt=""/>
                         </div>
                         <div className={peopleCSS.ed}>
                             <div className={peopleCSS.preinf}>
                                 ФИО:
                             </div>
-                            <input className={peopleCSS.inp} data-id1={param1} id={"inpnpt_" + param1} placeholder={"Фамилия И.О."} defaultValue={info.name} onChange={(e)=>chStatB(e, inps)} type="text"/>
+                            <input className={peopleCSS.inp} data-id1={param1} id={"inpnpt_" + param1} placeholder={"Фамилия И.О."} defaultValue={info.name} onChange={e=>chStatB(e, inps)} type="text"/>
                             {ele(false, "inpnpt_" + param1, inps)}
-                            <img className={peopleCSS.imginp+" yes "} src={yes} onClick={(e)=>onFin(e, inps, forceUpdate, CHANGE_PARENTS, parentsInfo)} title="Подтвердить" alt=""/>
+                            <img className={peopleCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, inps, forceUpdate, CHANGE_PARENTS, parentsInfo)} title="Подтвердить" alt=""/>
                             <img className={peopleCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                         </div>
                     </div>
@@ -247,9 +236,8 @@ export function codPar (id, id1, title, text) {
     sendToServer({
         uuid: cState.uuid,
         id: id,
-        id1: id1,
-        role: cState.role
-    }, 'POST', "parents", "setCodePep")
+        id1: id1
+    }, 'POST', "parents/setCodePep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -270,7 +258,7 @@ export function addKid (bod, id, par) {
         uuid: cState.uuid,
         bod: bod,
         id: id
-    }, 'POST', "parents", "addKid")
+    }, 'POST', "parents/addKid")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -283,20 +271,52 @@ export function addKid (bod, id, par) {
 }
 
 function onCon(e) {
-    if(groupsInfo.group) setInfo();
+    setInfo();
+}
+
+function setParents(firstG, bodyG) {
+    selGr = firstG != undefined ? firstG : groupsInfo.els.group;
+    sendToServer({
+        uuid: cState.uuid,
+        group: selGr
+    }, 'POST', "parents/getParents")
+        .then(data => {
+            console.log(data);
+            dispatch(changePeople(CHANGE_PARENTS_GL, undefined, undefined, undefined, data.bodyP));
+            if(firstG != undefined) {
+                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, bodyG));
+                dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, firstG));
+            }
+            if(data.error == false) {
+                dispatch(changePeople(CHANGE_CLASSMATES_GL, undefined, undefined, undefined, data.bodyC));
+                inps.lpI = Object.getOwnPropertyNames(data.bodyC);
+                for(let i = 0; i < inps.lpI.length; i++){
+                    if(data.bodyP[inps.lpI[i]]) {
+                        inps.lpI.splice(i, 1);
+                        i--;
+                    }
+                }
+                if(inps.lpI.length > 0 && !data.bodyC[inps.nyid]) {
+                    inps.nyid = inps.lpI[0];
+                    dispatch(changePeople(CHANGE_PARENTS_L1_PARAM, undefined, "nw", undefined, data.bodyC[inps.nyid].name));
+                }
+            }
+        });
 }
 
 function setInfo() {
     sendToServer({
-        uuid: cState.uuid,
-        group: groupsInfo.group
-    }, 'POST', "parents", "getInfo")
+        uuid: cState.uuid
+    }, 'POST', "parents/getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){
-                selGr = groupsInfo.group;
-                dispatch(changePeople(CHANGE_CLASSMATES_GL, undefined, undefined, undefined, data.bodyC));
-                dispatch(changePeople(CHANGE_PARENTS_GL, undefined, undefined, undefined, data.bodyP));
+                if(cState.role == 3) {
+                    setEvGr(cState, dispatch);
+                    setParents(parseInt(data.firstG), data.bodyG);
+                } else {
+                    setParents();
+                }
             }
         });
 }
@@ -334,8 +354,8 @@ export function Parents() {
             isFirstUpdate.current = false;
             return;
         }
-        if(selGr != groupsInfo.group){
-            if(eventSource.readyState == EventSource.OPEN) setInfo();
+        if(groupsInfo.els.group && selGr != groupsInfo.els.group && eventSource.readyState == EventSource.OPEN){
+            setParents();
         }
         console.log('componentDidUpdate Parents.jsx');
     });

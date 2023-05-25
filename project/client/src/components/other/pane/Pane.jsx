@@ -90,23 +90,17 @@ export function Pane(props) {
             panJs.refes.lin.style.display = "";
         }
     };
-    const setGr = (bol) => {
+    const setGr = () => {
         if(panJs.info.groups[panJs.info.group]){
-            if (panJs.act != panJs.info.group || !bol) {
-                setActivedMy(panJs.info.group);
-            }
+            setActivedMy(panJs.info.group);
         } else {
-            if(props.main) {
-                setActivedMy(undefined);
-                return;
-            }
             if(panJs.lGroups.length == 0){
                 if(panJs.refes.lin) {
                     panJs.refes.lin.style.width = "0";
                 }
-                return;
+            } else {
+                setActivedMy(props.main ? undefined : panJs.lGroups[0]);
             }
-            setActivedMy(panJs.lGroups[0]);
         }
     };
     const updMor = () => {
@@ -291,9 +285,7 @@ export function Pane(props) {
             panJs.pari.paels = panJs.lGroups.length;
             overpan();
         }
-        if(panJs.info) {
-            setGr();
-        }
+        setGr();
         console.log('componentDidUpdate Pane.jsx ke: ' + panJs.ke);
     });
     useEffect(() => {

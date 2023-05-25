@@ -50,37 +50,27 @@ public class Role implements Serializable {
     }
 
     public List<Long> getSubjects() {
-        if(subjects == null) {
-            subjects = new ArrayList<>();
-        }
+        if(subjects == null) subjects = new ArrayList<>();
         return subjects;
     }
 
     public List<Long> getKids() {
-        if(kids == null) {
-            kids = new ArrayList<>();
-        }
+        if(kids == null) kids = new ArrayList<>();
         return kids;
     }
 
     public List<Long> getKidsInv() {
-        if(kidsInv == null) {
-            kidsInv = new ArrayList<>();
-        }
+        if(kidsInv == null) kidsInv = new ArrayList<>();
         return kidsInv;
     }
 
     public List<Long> getParents() {
-        if(parents == null) {
-            parents = new ArrayList<>();
-        }
+        if(parents == null) parents = new ArrayList<>();
         return parents;
     }
 
     public List<Long> getParentsInv() {
-        if(parentsInv == null) {
-            parentsInv = new ArrayList<>();
-        }
+        if(parentsInv == null) parentsInv = new ArrayList<>();
         return parentsInv;
     }
 }

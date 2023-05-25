@@ -53,22 +53,19 @@ export default function parentsReducer(state = initialState, action) {
     let fd = {...state};
     switch(action.type) {
         case CHANGE_PARENTS_GL:
-            let nw = {...fd.nw};
-            action.payload.state.nw = nw;
+            if(!action.payload.state) action.payload.state = {};
+            action.payload.state.nw = {name : "Фамилия И.О."};
             return action.payload.state;
         case CHANGE_PARENTS_L1_PARAM:
-            if(!fd[action.payload.l1]){
-                fd[action.payload.l1] = {};
-            }
+            console.log(fd);
+            if(!fd[action.payload.l1]) fd[action.payload.l1] = {};
             fd[action.payload.l1][action.payload.param] = action.payload.state;
             return fd;
         case CHANGE_PARENTS_L1:
             fd[action.payload.l1] = action.payload.state;
             return fd;
         case CHANGE_PARENTS:
-            if(!fd[action.payload.l0]){
-                fd[action.payload.l0] = {};
-            }
+            if(!fd[action.payload.l0]) fd[action.payload.l0] = {};
             if(!fd[action.payload.l0][action.payload.l1]){
                 fd[action.payload.l0][action.payload.l1] = {};
             }

@@ -1,4 +1,7 @@
-let fireApp, messag;
+let fireApp, messag, servLink, appApp, userServFin;
+servLink = "http://localhost:8080";
+appApp = this;
+userServFin = false;
 async function init() {
     if ("serviceWorker" in navigator) {
         try {
@@ -68,10 +71,62 @@ async function requestPerm(messaging) {
         await messaging.requestPermission();
         const token = await messaging.getToken();
         console.log('Your token is:', token);
-        if(token) localStorage.setItem("notifToken", token);
+        if(token) {
+            if(userServFin){
+                delNotifToken();
+                addNotifToken(token);
+            } else {
+                appApp.addEventListener('op', e=> {
+                    delNotifToken();
+                    addNotifToken(token);
+                }, {once: true});
+            }
+        }
         return token;
     } catch (error) {
         console.log(error);
     }
 }
 
+function delNotifToken() {
+    if(localStorage.getItem("notifToken")) {
+        console.log("delNotifToken", localStorage.getItem("notifToken"));
+        sendToServerApp({
+            uuid: userServFin,
+            notifToken: localStorage.getItem("notifToken")
+        }, 'POST', "auth/remNotifToken")
+        localStorage.removeItem("notifToken");
+    }
+}
+
+function addNotifToken(token) {
+    console.log("addNotifToken", token);
+    sendToServerApp({
+        uuid: userServFin,
+        notifToken: token
+    }, 'POST', "auth/addNotifToken")
+    localStorage.setItem("notifToken", token);
+}
+
+function sendToServerApp(bod, typeC, url, type) {
+    let sed = {method: typeC};
+    if (bod) {
+        sed.headers = {'Content-Type': 'application/json'};
+        if (!type) {
+            sed.body = JSON.stringify(bod);
+        } else {
+            sed.body = JSON.stringify({
+                type: type,
+                body: bod
+            });
+        }
+    }
+    return fetch(servLink + "/" + (url ? url : ""), sed)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`This is an HTTP error: The status is ${res.status}`);
+            }
+            return res.json();
+        })
+        .catch(data => data);
+}

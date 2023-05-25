@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +15,6 @@ import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.json.Role;
-import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
@@ -26,7 +24,6 @@ import ru.mirea.services.ServerService;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @RequestMapping("/hteachers")
@@ -120,20 +117,6 @@ import java.util.Map;
             authController.sendMessageForAll("chGroupC", ans, TypesConnect.MAIN, ref.schId + "", "main", "ht", "main");
         }, body.wrtr, body.bol);
     }
-
-//    @PostMapping(value = "/getGroups")
-//    public JsonObject getGroups(@RequestBody DataHTeachers body) {
-//        Subscriber subscriber = authController.getSubscriber(body.uuid);
-//        User user = datas.userByLogin(subscriber.getLogin());
-//        try {
-//            body.wrtr = datas.ini(body.toString());
-//            if (user != null && (user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L))) {
-//                body.wrtr.name("body").beginObject();
-//                datas.groupsByUser(user, body.wrtr);
-//            }
-//        } catch (Exception e) {body.bol = Main.excp(e);}
-//        return datas.getObj(ans -> {}, body.wrtr, body.bol);
-//    }
 
     @PostMapping(value = "/chPep")
     public JsonObject chPep(@RequestBody DataHTeachers body) {

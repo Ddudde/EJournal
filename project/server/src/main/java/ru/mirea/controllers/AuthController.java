@@ -49,12 +49,12 @@ import java.util.concurrent.ConcurrentHashMap;
                 .event("chck").data(uuid).build();
             fluxSink.next(event);
             fluxSink.onCancel(() -> {
-                    subscriptions.remove(uuid);
-                    System.out.println("subscription " + uuid + " was closed from onCancel");
+                subscriptions.remove(uuid);
+                System.out.println("subscription " + uuid + " was closed from onCancel");
             });
             fluxSink.onDispose(() -> {
-                    subscriptions.remove(uuid);
-                    System.out.println("subscription " + uuid + " was closed from onDispose");
+                subscriptions.remove(uuid);
+                System.out.println("subscription " + uuid + " was closed from onDispose");
             });
             ServerSentEvent<Object> event1 = ServerSentEvent.builder()
                 .event("connect").data("").build();
@@ -71,21 +71,24 @@ import java.util.concurrent.ConcurrentHashMap;
     public void sendMessageForAll(String evName, Object data, TypesConnect type, String lvlSch, String lvlGr, String lvlMore1, String lvlMore2) {
         ServerSentEvent<Object> event = ServerSentEvent.builder()
             .event(evName).data(data).build();
-        subscriptions.forEach((uuid, subscriber) -> {
-            if ((type == TypesConnect.MAIN || Objects.equals(type, subscriber.getType()))
-             && (Objects.equals(lvlSch, "main") || Objects.equals(lvlSch, subscriber.getLvlSch()))
-             && (Objects.equals(lvlGr, "main") || Objects.equals(lvlGr, subscriber.getLvlGr()))
-             && (Objects.equals(lvlMore1, "main") || Objects.equals(lvlMore1, subscriber.getLvlMore1()))
-             && (Objects.equals(lvlMore2, "main") || Objects.equals(lvlMore2, subscriber.getLvlMore2()))) {
-                try {
+        final var ref = new Object() {
+            UUID id;
+        };
+        try {
+            subscriptions.forEach((uuid, subscriber) -> {
+                if ((type == TypesConnect.MAIN || Objects.equals(type, subscriber.getType()))
+                 && (Objects.equals(lvlSch, "main") || Objects.equals(lvlSch, subscriber.getLvlSch()))
+                 && (Objects.equals(lvlGr, "main") || Objects.equals(lvlGr, subscriber.getLvlGr()))
+                 && (Objects.equals(lvlMore1, "main") || Objects.equals(lvlMore1, subscriber.getLvlMore1()))
+                 && (Objects.equals(lvlMore2, "main") || Objects.equals(lvlMore2, subscriber.getLvlMore2()))) {
+                    ref.id = uuid;
                     subscriber.getFluxSink().next(event);
-                } catch (Error e) {
-                    subscriptions.remove(uuid);
-                    System.out.println("subscription " + uuid + " was closed from Ping");
                 }
-            }
-            }
-        );
+            });
+        } catch (Error e) {
+            subscriptions.remove(ref.id);
+            System.out.println("subscription " + ref.id + " was closed from Ping");
+        }
     }
 
     public Subscriber getSubscriber(String uuid) {
@@ -97,28 +100,29 @@ import java.util.concurrent.ConcurrentHashMap;
 
     public void infCon(String uuid, String login, TypesConnect type, String lvlSch, String lvlGr, String lvlMore1, String lvlMore2){
         if(uuid != null) {
+            Subscriber sub = subscriptions.get(UUID.fromString(uuid));
             if(login != null) {
-                subscriptions.get(UUID.fromString(uuid)).setLogin(login);
+                sub.setLogin(login);
                 System.out.println("setLog " + login + " subscription for " + uuid);
             }
             if(type != null) {
-                subscriptions.get(UUID.fromString(uuid)).setType(type);
+                sub.setType(type);
                 System.out.println("setType " + type + " subscription for " + uuid);
             }
             if(lvlSch != null) {
-                subscriptions.get(UUID.fromString(uuid)).setLvlSch(lvlSch);
+                sub.setLvlSch(lvlSch);
                 System.out.println("setLvlSch " + lvlSch + " subscription for " + uuid);
             }
             if(lvlGr != null) {
-                subscriptions.get(UUID.fromString(uuid)).setLvlGr(lvlGr);
+                sub.setLvlGr(lvlGr);
                 System.out.println("setLvlGr " + lvlGr + " subscription for " + uuid);
             }
             if(lvlMore1 != null) {
-                subscriptions.get(UUID.fromString(uuid)).setLvlMore1(lvlMore1);
+                sub.setLvlMore1(lvlMore1);
                 System.out.println("setLvlMore1 " + lvlMore1 + " subscription for " + uuid);
             }
             if(lvlMore2 != null) {
-                subscriptions.get(UUID.fromString(uuid)).setLvlMore2(lvlMore2);
+                sub.setLvlMore2(lvlMore2);
                 System.out.println("setLvlMore2 " + lvlMore2 + " subscription for " + uuid);
             }
         }
@@ -249,10 +253,7 @@ import java.util.concurrent.ConcurrentHashMap;
             body.wrtr = datas.ini(body.toString());
             if(inv == null && user1 == null){
                 body.wrtr.name("error").value(2);
-                body.wrtr.name("yes").value(true);
-                return datas.getObj(ans -> {}, body.wrtr, body.bol);
-            }
-            if(user == null) {
+            } else if(user == null) {
                 if(inv != null) {
                     user = new User(body.login, body.par, body.ico);
                     user.setRoles(inv.getRole());
@@ -360,13 +361,45 @@ import java.util.concurrent.ConcurrentHashMap;
     @PostMapping(value = "/exit")
     public JsonObject exit(@RequestBody DataAuth body) {
         Subscriber subscriber = getSubscriber(body.uuid);
+        if(subscriber != null) {
+            if (!ObjectUtils.isEmpty(body.notifToken)) {
+                User user = datas.userByLogin(subscriber.getLogin());
+                datas.remToken(user, body.notifToken);
+                datas.getUserRepository().saveAndFlush(user);
+            }
+            subscriber.setLogin(null);
+            subscriber.setLvlGr(null);
+        }
+        try {
+            body.wrtr = datas.ini(body.toString());
+            body.wrtr.name("yes").value(true);
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {}, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/remNotifToken")
+    public JsonObject remNotifToken(@RequestBody DataAuth body) {
+        Subscriber subscriber = getSubscriber(body.uuid);
         if(!ObjectUtils.isEmpty(body.notifToken)) {
             User user = datas.userByLogin(subscriber.getLogin());
             datas.remToken(user, body.notifToken);
             datas.getUserRepository().saveAndFlush(user);
         }
-        subscriber.setLogin(null);
-        subscriber.setLvlGr(null);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            body.wrtr.name("yes").value(true);
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {}, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/addNotifToken")
+    public JsonObject addNotifToken(@RequestBody DataAuth body) {
+        Subscriber subscriber = getSubscriber(body.uuid);
+        if(!ObjectUtils.isEmpty(body.notifToken)) {
+            User user = datas.userByLogin(subscriber.getLogin());
+            datas.addToken(user, body.notifToken);
+            datas.getUserRepository().saveAndFlush(user);
+        }
         try {
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("yes").value(true);

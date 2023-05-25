@@ -66,9 +66,9 @@ function onChSF(e) {
     par = e.target.parentElement.parentElement;
     inp = par.querySelector("input");
     sendToServer({
-        login: cState.login,
+        uuid: cState.uuid,
         secFR: inp.value
-    }, 'POST', "settings", "chSecFR")
+    }, 'POST', "settings/chSecFR")
         .then(data => {
             if(data.error == false){
                 onClosePas(e);
@@ -100,9 +100,9 @@ function chStatB(e) {
 
 function chStatAv(e) {
     sendToServer({
-        login: cState.login,
+        uuid: cState.uuid,
         ico: e.target.firstChild.value
-    }, 'POST', "settings", "chIco")
+    }, 'POST', "settings/chIco")
         .then(data => {
             if(data.error == false){
                 e.target.firstChild.checked = true;
@@ -121,11 +121,11 @@ function onCloseChPar(e) {
 
 function onFinChPar(e) {
     sendToServer({
-        login: cState.login,
+        uuid: cState.uuid,
         oPar: oldPasSt ? els.oldinp : undefined,
         secFr: oldPasSt ? undefined : els.secinp,
         nPar : els.npasinp
-    }, 'POST', "settings", "chPass")
+    }, 'POST', "settings/chPass")
         .then(data => {
             if(data.error == false){
                 onClosePas(e);
@@ -152,9 +152,8 @@ function chStatSb1(e) {
 
 function onCon(e) {
     sendToServer({
-        type: "SETTINGS",
         uuid: cState.uuid
-    }, 'POST', "auth", "infCon");
+    }, 'POST', "settings/setInfo");
 }
 
 export function gen_pas(e){
@@ -180,6 +179,7 @@ export function Settings() {
     const isFirstUpdate = useRef(true);
     useEffect(() => {
         setActived(".panSet");
+        if(eventSource.readyState == EventSource.OPEN) onCon();
         console.log("I was triggered during componentDidMount Settings.jsx");
         document.querySelector("#ch" + cState.ico).checked = true;
         eventSource.addEventListener('connect', onCon, false);
@@ -203,25 +203,27 @@ export function Settings() {
             </Helmet>
             <div className={settingsCSS.blockPro}>
                 <div className={settingsCSS.pro}>
-                    <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                        <CheckBox text={"Включить уведомления"} checkbox_id={"checkbox_notify"}/>
-                    </div>
-                    <div className={settingsCSS.nav_iZag+" "+settingsCSS.blockNotif} data-act={(checkBoxInfo.checkbox_notify || false) ? '1' : '0'}>
-                        {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                            <CheckBox state={+true} text={"Уведомления о изменении в расписании"} checkbox_id={"checkbox_notify_sched"}/>
-                        </div>}
-                        {(cState.role < 2) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                            <CheckBox state={+true} text={"Уведомления о новых оценках"} checkbox_id={"checkbox_notify_marks"}/>
-                        </div>}
-                        {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                            <CheckBox state={+true} text={"Присылать новые объявления учебного центра"} checkbox_id={"checkbox_notify_yo"}/>
-                        </div>}
-                        {(cState.role < 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                            <CheckBox state={+true} text={"Присылать новые объявления портала"} checkbox_id={"checkbox_notify_por"}/>
-                        </div>}
-                        {(cState.role == 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                            <CheckBox state={+true} text={"Присылать уведомления о новых заявках школ"} checkbox_id={"checkbox_notify_new_sch"}/>
-                        </div>}
+                    <div className={settingsCSS.nav_iZag}>
+                        <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
+                            <CheckBox text={"Включить уведомления"} checkbox_id={"checkbox_notify"}/>
+                        </div>
+                        <div className={settingsCSS.nav_iZag+" "+settingsCSS.blockNotif} data-act={(checkBoxInfo.checkbox_notify || false) ? '1' : '0'}>
+                            {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
+                                <CheckBox state={+true} text={"Уведомления о изменении в расписании"} checkbox_id={"checkbox_notify_sched"}/>
+                            </div>}
+                            {(cState.role < 2) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
+                                <CheckBox state={+true} text={"Уведомления о новых оценках"} checkbox_id={"checkbox_notify_marks"}/>
+                            </div>}
+                            {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
+                                <CheckBox state={+true} text={"Присылать новые объявления учебного центра"} checkbox_id={"checkbox_notify_yo"}/>
+                            </div>}
+                            {(cState.role < 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
+                                <CheckBox state={+true} text={"Присылать новые объявления портала"} checkbox_id={"checkbox_notify_por"}/>
+                            </div>}
+                            {(cState.role == 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
+                                <CheckBox state={+true} text={"Присылать уведомления о новых заявках школ"} checkbox_id={"checkbox_notify_new_sch"}/>
+                            </div>}
+                        </div>
                     </div>
                     <div className={settingsCSS.nav_iZag} data-mod="0">
                         <div className={settingsCSS.nav_i+" "+settingsCSS.link} id={settingsCSS.nav_i} data-act='1' onClick={onEditPass}>

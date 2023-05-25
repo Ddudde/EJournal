@@ -2,7 +2,7 @@ import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
 import {classmates, groups, states, themes} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {ele, goToProf, setActNew, sit} from "../PeopleMain";
+import {ele, goToProf, setActNew, setEvGr, sit} from "../PeopleMain";
 import profl from "../../../media/profl.png";
 import profd from "../../../media/profd.png";
 import Pane from "../../other/pane/Pane";
@@ -14,8 +14,8 @@ import {
     CHANGE_CLASSMATES_EL_GL,
     CHANGE_CLASSMATES_GL,
     CHANGE_EVENT,
-    CHANGE_EVENTS_CLEAR,
-    changeEvents,
+    CHANGE_EVENTS_CLEAR, CHANGE_GROUPS_GL, CHANGE_GROUPS_GR,
+    changeEvents, changeGroups,
     changePeople
 } from "../../../store/actions";
 import ed from "../../../media/edit.png";
@@ -177,7 +177,7 @@ function remInv (type, id, id1) {
         uuid: cState.uuid,
         id: id,
         id1: id1
-    }, 'POST', "students", "remPep")
+    }, 'POST', "students/remPep")
 }
 
 function changeInv (type, id, id1, inp, par) {
@@ -187,7 +187,7 @@ function changeInv (type, id, id1, inp, par) {
         id: id,
         id1: id1,
         name: inp
-    }, 'POST', "students", "chPep")
+    }, 'POST', "students/chPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -201,7 +201,7 @@ function addInv (type, inp, par) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "students", "addPep")
+    }, 'POST', "students/addPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -214,19 +214,38 @@ function onCon(e) {
     setInfo();
 }
 
-function setInfo() {
+function setStud(firstG, bodyG) {
+    selGr = firstG != undefined ? firstG : groupsInfo.els.group;
     sendToServer({
         uuid: cState.uuid,
-        group: groupsInfo.group
-    }, 'POST', "students", "getStud")
+        group: selGr
+    }, 'POST', "students/getStud")
         .then(data => {
             console.log(data);
-            if(data.error == false){
-                selGr = groupsInfo.group;
-                dispatch(changePeople(tps.gl, undefined, undefined, undefined, data.body));
+            dispatch(changePeople(tps.gl, undefined, undefined, undefined, data.body));
+            if(firstG != undefined) {
+                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, bodyG));
+                dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, firstG));
             }
             for(let el of document.querySelectorAll("." + peopleCSS.ed + " > *[id^='inpn']")){
                 chStatB({target: el});
+            }
+        });
+}
+
+function setInfo() {
+    sendToServer({
+        uuid: cState.uuid
+    }, 'POST', "students/getInfo")
+        .then(data => {
+            console.log(data);
+            if(data.error == false){
+                if(cState.role == 3) {
+                    setEvGr(cState, dispatch);
+                    setStud(parseInt(data.firstG), data.bodyG);
+                } else {
+                    setStud();
+                }
             }
         });
 }
@@ -318,8 +337,8 @@ export function Classmates() {
             isFirstUpdate.current = false;
             return;
         }
-        if(selGr != groupsInfo.group){
-            if(eventSource.readyState == EventSource.OPEN) setInfo();
+        if(groupsInfo.els.group && selGr != groupsInfo.els.group && eventSource.readyState == EventSource.OPEN){
+            setStud();
         }
         console.log('componentDidUpdate Classmates.jsx');
     });

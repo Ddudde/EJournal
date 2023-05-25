@@ -29,7 +29,7 @@ import copyd from "../../../media/copyd.png";
 import copyl from "../../../media/copyl.png";
 import {eventSource, sendToServer} from "../../main/Main";
 
-let dispatch, errText, cState, inps, hteachersInfo, themeState, tps;
+let dispatch, errText, cState, inps, selKid, hteachersInfo, themeState, tps;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 inps = {inpnpt : "Поле для ввода"};
 tps = {
@@ -335,6 +335,7 @@ function setInfo() {
         .then(data => {
             console.log(data);
             if(data.error == false){
+                if(cState.role == 1 && cState.kid) selKid = cState.kid;
                 dispatch(changePeople(CHANGE_HTEACHERS_GL, undefined, undefined, undefined, data.body));
             }
         });
@@ -434,6 +435,10 @@ export function HTeachers() {
         if (isFirstUpdate.current) {
             isFirstUpdate.current = false;
             return;
+        }
+        if(cState.role == 1 && cState.kid && selKid != cState.kid) {
+            selKid = cState.kid;
+            setInfo();
         }
         console.log('componentDidUpdate HTeachers.jsx');
     });

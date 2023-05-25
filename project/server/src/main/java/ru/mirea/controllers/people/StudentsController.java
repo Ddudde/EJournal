@@ -1,7 +1,10 @@
 package ru.mirea.controllers.people;
 
 import com.google.gson.JsonObject;
+import com.google.gson.internal.bind.JsonTreeWriter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +25,7 @@ import ru.mirea.services.ServerService;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.Map;
 
 @RequestMapping("/students")
 @NoArgsConstructor
@@ -35,151 +37,152 @@ import java.util.Objects;
     @Autowired
     private AuthController authController;
 
-    @PostMapping
-    public JsonObject post(@RequestBody JsonObject data) {
-        System.out.println("Post! " + data);
-        JsonObject ans = new JsonObject(), body = null, bodyAns;
-        ans.addProperty("error", false);
-        if(data.has("body") && data.get("body").isJsonObject()) body = data.get("body").getAsJsonObject();
-        if(!data.has("type")) data.addProperty("type", "default");
-        switch (data.get("type").getAsString()){
-            case "getStud" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
-                User user = datas.userByLogin(subscriber.getLogin());
-                Group group = null;
-                Long schId = null;
-                if(user != null) {
-                    schId = datas.getFirstRole(user.getRoles()).getYO();
-                    School school = datas.schoolById(schId);
-                    if(user.getRoles().containsKey(3L)) {
-                        group = datas.groupById(body.get("group").getAsLong());
-                    } else {
-                        group = datas.groupById(datas.getFirstRole(user.getRoles()).getGroup());
-                    }
-                    if(group != null && school != null && school.getGroups().contains(group.getId())) {
-                        if (!ObjectUtils.isEmpty(group.getKids())) {
-                            for (Long i1 : group.getKids()) {
-                                if(Objects.equals(user.getId(), i1)) continue;
-                                JsonObject studO = new JsonObject();
-                                User studU = datas.userById(i1);
-                                studO.addProperty("name", studU.getFio());
-                                studO.addProperty("login", studU.getLogin());
-                                if (!ObjectUtils.isEmpty(studU.getCode())) studO.addProperty("link", studU.getCode());
-                                bodyAns.add(i1 + "", studO);
-                            }
-                        }
-                        if (!ObjectUtils.isEmpty(group.getKidsInv())) {
-                            for (Long i1 : group.getKidsInv()) {
-                                JsonObject studO = new JsonObject();
-                                Invite studI = datas.inviteById(i1);
-                                studO.addProperty("name", studI.getFio());
-                                if (!ObjectUtils.isEmpty(studI.getCode())) studO.addProperty("link", studI.getCode());
-                                bodyAns.add(i1 + "", studO);
-                            }
-                        }
-                    }
-                }
-                if(group == null){
-                    ans.addProperty("error", true);
-                } else {
-
-                    authController.infCon(body.get("uuid").getAsString(), subscriber.getLogin(), TypesConnect.STUDENTS, schId+"", group.getId()+"", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
-                }
-                return ans;
-            }
-            case "addPep" -> {
-                bodyAns = new JsonObject();
-                ans.add("body", bodyAns);
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                User user = datas.userByLogin(subscriber.getLogin());
-                Invite inv = null;
-                if(user != null && user.getRoles().containsKey(3L)) {
-                    Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
-                    if(group != null) {
-                        Instant after = Instant.now().plus(Duration.ofDays(30));
-                        Date dateAfter = Date.from(after);
-                        inv = new Invite(body.get("name").getAsString(), new HashMap<>() {{
-                            put(0L, new Role(null, Long.parseLong(subscriber.getLvlSch()), group.getId(), null));
-                        }}, Main.df.format(dateAfter));
-                        datas.getInviteRepository().saveAndFlush(inv);
-                        group.getKidsInv().add(inv.getId());
-                        datas.getGroupRepository().saveAndFlush(group);
-                    }
-                }
-                if(inv == null){
-                    ans.addProperty("error", true);
-                } else {
-                    ans.addProperty("id", inv.getId());
-                    bodyAns.addProperty("name", body.get("name").getAsString());
-
-                    authController.sendMessageForAll("addPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-                }
-                return ans;
-            }
-            case "chPep" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                User user = datas.userByLogin(subscriber.getLogin());
-                User user1 = datas.userByLogin(body.get("id").getAsString());
-                Invite inv = datas.inviteById(body.get("id1").getAsLong());
-                if(user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
-                    if(user1 != null){
-                        user1.setFio(body.get("name").getAsString());
+    @PostMapping(value = "/remPep")
+    public JsonObject remPep(@RequestBody DataStudents body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        User user = datas.userByLogin(subscriber.getLogin());
+        User user1 = datas.userByLogin(body.id);
+        Invite inv = datas.inviteById(body.id1);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            if (user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
+                Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
+                if (group != null) {
+                    if (user1 != null) {
+                        user1.getRoles().remove(3L);
                         datas.getUserRepository().saveAndFlush(user1);
+                        if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
+                        datas.getGroupRepository().saveAndFlush(group);
 
-                        ans.addProperty("id", user1.getId());
-                    } else if(inv != null){
-                        inv.setFio(body.get("name").getAsString());
-                        datas.getInviteRepository().saveAndFlush(inv);
+                        body.wrtr.name("id").value(user1.getId());
+                    } else if (inv != null) {
+                        datas.getInviteRepository().delete(inv);
+                        if (!ObjectUtils.isEmpty(group.getKidsInv())) group.getKidsInv().remove(inv.getId());
+                        datas.getGroupRepository().saveAndFlush(group);
 
-                        ans.addProperty("id", inv.getId());
-                    }
-
-                    ans.addProperty("name", body.get("name").getAsString());
-
-                    authController.sendMessageForAll("chPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-                } else {
-                    ans.addProperty("error", true);
-                }
-                return ans;
-            }
-            case "remPep" -> {
-                Subscriber subscriber = authController.getSubscriber(body.get("uuid").getAsString());
-                User user = datas.userByLogin(subscriber.getLogin());
-                User user1 = datas.userByLogin(body.get("id").getAsString());
-                Invite inv = datas.inviteById(body.get("id1").getAsLong());
-                if(user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
-                    Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
-                    if(group != null) {
-                        if (user1 != null) {
-                            user1.getRoles().remove(3L);
-                            datas.getUserRepository().saveAndFlush(user1);
-                            if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
-                            datas.getGroupRepository().saveAndFlush(group);
-
-                            ans.addProperty("id", user1.getId());
-                        } else if (inv != null) {
-                            datas.getInviteRepository().delete(inv);
-                            if (!ObjectUtils.isEmpty(group.getKidsInv())) group.getKidsInv().remove(inv.getId());
-                            datas.getGroupRepository().saveAndFlush(group);
-
-                            ans.addProperty("id", inv.getId());
-                        }
+                        body.wrtr.name("id").value(inv.getId());
                     }
                 }
-                if(ans.has("id")){
-                    authController.sendMessageForAll("remPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-                } else {
-                    ans.addProperty("error", true);
-                }
-                return ans;
             }
-            default -> {
-                System.out.println("Error Type" + data.get("type"));
-                ans.addProperty("error", true);
-                return ans;
-            }
-        }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.sendMessageForAll("remPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+        }, body.wrtr, body.bol);
     }
+
+    @PostMapping(value = "/chPep")
+    public JsonObject chPep(@RequestBody DataStudents body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        User user = datas.userByLogin(subscriber.getLogin());
+        User user1 = datas.userByLogin(body.id);
+        Invite inv = datas.inviteById(body.id1);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            if (user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
+                if (user1 != null) {
+                    user1.setFio(body.name);
+                    datas.getUserRepository().saveAndFlush(user1);
+
+                    body.wrtr.name("id").value(user1.getId());
+                } else if (inv != null) {
+                    inv.setFio(body.name);
+                    datas.getInviteRepository().saveAndFlush(inv);
+
+                    body.wrtr.name("id").value(inv.getId());
+                }
+                body.wrtr.name("name").value(body.name);
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.sendMessageForAll("chPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+        }, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/addPep")
+    public JsonObject addPep(@RequestBody DataStudents body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        User user = datas.userByLogin(subscriber.getLogin());
+        try {
+            body.wrtr = datas.ini(body.toString());
+            if (user != null && user.getRoles().containsKey(3L)) {
+                Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
+                if (group != null) {
+                    Instant after = Instant.now().plus(Duration.ofDays(30));
+                    Date dateAfter = Date.from(after);
+                    Invite inv = new Invite(body.name, Map.of(
+                        0L, new Role(null, Long.parseLong(subscriber.getLvlSch()), group.getId(), null)
+                    ), Main.df.format(dateAfter));
+                    datas.getInviteRepository().saveAndFlush(inv);
+                    group.getKidsInv().add(inv.getId());
+                    datas.getGroupRepository().saveAndFlush(group);
+
+                    body.wrtr.name("id").value(inv.getId())
+                        .name("body").beginObject()
+                        .name("name").value(body.name).endObject();
+                }
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.sendMessageForAll("addPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+        }, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/getStud")
+    public JsonObject getStud(@RequestBody DataStudents body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        User user = datas.userByLogin(subscriber.getLogin());
+        final var ref = new Object() {
+            Long schId = null, grId = body.group;
+        };
+        try {
+            body.wrtr = datas.ini(body.toString());
+            if (user != null) {
+                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
+                School school = datas.schoolById(ref.schId);
+                if (!user.getRoles().containsKey(3L)) {
+                    ref.grId = datas.getFirstRole(user.getRoles()).getGroup();
+                }
+                Group group = datas.groupById(ref.grId);
+                if (group != null && school != null && school.getGroups().contains(group.getId())) {
+                    body.wrtr.name("body").beginObject();
+                    datas.usersByList(group.getKids(), body.wrtr, true);
+                    datas.invitesByList(group.getKidsInv(), body.wrtr, true);
+                    body.wrtr.endObject();
+                }
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.infCon(body.uuid, null, null, ref.schId + "", ref.grId + "", null, null);
+        }, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/getInfo")
+    public JsonObject getInfo(@RequestBody DataStudents body) {
+        Subscriber subscriber = authController.getSubscriber(body.uuid);
+        User user = datas.userByLogin(subscriber.getLogin());
+        try {
+            body.wrtr = datas.ini(body.toString());
+            if (user != null) {
+                if(user.getSelRole() == 3L) {
+                    body.wrtr.name("bodyG").beginObject();
+                    Long firstG = datas.groupsByUser(user, body.wrtr);
+                    body.wrtr.name("firstG").value(firstG);
+                } else {
+                    body.wrtr.name("yes").value(true);
+                }
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {
+            authController.infCon(body.uuid, null, TypesConnect.STUDENTS, "main", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
+        }, body.wrtr, body.bol);
+    }
+}
+
+@ToString
+@NoArgsConstructor @AllArgsConstructor
+class DataStudents {
+    public String uuid, name, id;
+    public Long group, id1;
+    public transient boolean bol = true;
+    public transient JsonTreeWriter wrtr;
 }

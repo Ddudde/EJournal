@@ -42,16 +42,14 @@ import java.util.Objects;
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && news != null && syst != null
-                    && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
-                    || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
+                && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
+                || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
                 datas.getNewsRepository().delete(news);
                 if (!ObjectUtils.isEmpty(syst.getNews())) syst.getNews().remove(news.getId());
                 datas.getSystRepository().saveAndFlush(syst);
                 body.wrtr.name("id").value(body.id);
             }
-        } catch (Exception e) {
-            body.bol = Main.excp(e);
-        }
+        } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             authController.sendMessageForAll("delNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
         }, body.wrtr, body.bol);
@@ -65,24 +63,21 @@ import java.util.Objects;
             User user = datas.userByLogin(subscriber.getLogin());
             News news = datas.newsById(body.id);
             if (user != null && news != null
-                    && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
-                    || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
+                && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
+                || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
                 switch (body.type) {
                     case "title" -> news.setTitle(body.val);
                     case "date" -> news.setDate(body.val);
                     case "img_url" -> news.setImg_url(body.val);
                     case "text" -> news.setText(body.val);
-                    default -> {
-                    }
+                    default -> {}
                 }
                 datas.getNewsRepository().saveAndFlush(news);
                 body.wrtr.name("id").value(body.id)
-                        .name("type").value(body.type)
-                        .name("val").value(body.val);
+                    .name("type").value(body.type)
+                    .name("val").value(body.val);
             }
-        } catch (Exception e) {
-            body.bol = Main.excp(e);
-        }
+        } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             authController.sendMessageForAll("chNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
         }, body.wrtr, body.bol);
@@ -98,9 +93,8 @@ import java.util.Objects;
                 User user = datas.userByLogin(subscriber.getLogin());
                 Syst syst = datas.getSyst();
                 School school = datas.schoolById(user.getRoles().get(user.getSelRole()).getYO());
-                boolean b, b1;
-                b = Objects.equals(subscriber.getLvlMore2(), "Por") && user.getRoles().containsKey(4L) && syst != null;
-                b1 = Objects.equals(subscriber.getLvlMore2(), "Yo") && user.getRoles().containsKey(3L) && school != null;
+                boolean b = Objects.equals(subscriber.getLvlMore2(), "Por") && user.getRoles().containsKey(4L) && syst != null,
+                        b1 = Objects.equals(subscriber.getLvlMore2(), "Yo") && user.getRoles().containsKey(3L) && school != null;
                 if (user != null && (b || b1)) {
                     News news = new News();
                     if (!ObjectUtils.isEmpty(body.title)) {
@@ -130,9 +124,7 @@ import java.util.Objects;
                         .name("id").value(news.getId());
                 }
             }
-        } catch (Exception e) {
-            body.bol = Main.excp(e);
-        }
+        } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             if(!ObjectUtils.isEmpty(subscriber.getLvlSch())) {
                 datas.getPushService().send(subscriber.getLvlSch()+"_news", "Новые объявления!", "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'", "/DipvLom/static/media/info.jpg");
@@ -180,17 +172,15 @@ import java.util.Objects;
                         continue;
                     }
                     body.wrtr.name(i1 + "").beginObject()
-                            .name("title").value(newsU.getTitle())
-                            .name("date").value(newsU.getDate())
-                            .name("img_url").value(newsU.getImg_url())
-                            .name("text").value(newsU.getText())
-                            .endObject();
+                        .name("title").value(newsU.getTitle())
+                        .name("date").value(newsU.getDate())
+                        .name("img_url").value(newsU.getImg_url())
+                        .name("text").value(newsU.getText())
+                        .endObject();
                 }
             }
             body.wrtr.endObject();
-        } catch (Exception e) {
-            body.bol = Main.excp(e);
-        }
+        } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             authController.infCon(body.uuid, subscriber.getLogin(), TypesConnect.NEWS, ref.schId + "", "main", "main", body.type);
         }, body.wrtr, body.bol);

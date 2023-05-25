@@ -70,7 +70,7 @@ import static java.util.Arrays.asList;
                     if(teaU != null) {
                         ref.lesson.setTeacher(teaId);
                         if(!ObjectUtils.isEmpty(school.getTeachers())
-                                && school.getTeachers().contains(teaId)){
+                            && school.getTeachers().contains(teaId)){
                             school.getTeachers().remove(teaId);
                         }
                         teaU.getRoles().get(2L).getSubjects().add(subject.getId());
@@ -80,7 +80,7 @@ import static java.util.Arrays.asList;
                     } else if(teaI != null){
                         ref.lesson.setTeacherInv(teaId);
                         if(!ObjectUtils.isEmpty(school.getTeachersInv())
-                                && school.getTeachersInv().contains(teaId)){
+                            && school.getTeachersInv().contains(teaId)){
                             school.getTeachersInv().remove(teaId);
                         }
                         teaI.getRole().get(2L).getSubjects().add(subject.getId());
@@ -186,7 +186,7 @@ import static java.util.Arrays.asList;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.infCon(body.uuid, subscriber.getLogin(), subscriber.getType(), ref.schId +"", user.getRoles().containsKey(3L) ? "main" : ref.group.getId()+"", subscriber.getLvlMore1(), "main");
+            authController.infCon(body.uuid, null, null, null, user.getRoles().containsKey(3L) ? null : ref.group.getId()+"", null, null);
         }, body.wrtr, body.bol);
     }
 
@@ -210,12 +210,12 @@ import static java.util.Arrays.asList;
                     datas.teachersBySchool(school, body.wrtr);
                 }
                 if(user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L)) {
-                    body.wrtr.name("role").value(true);
+                    body.wrtr.name("yes").value(true);
                 }
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.infCon(body.uuid, subscriber.getLogin(), TypesConnect.SCHEDULE, ref.schId +"", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
+            authController.infCon(body.uuid, null, TypesConnect.SCHEDULE, ref.schId +"", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
         }, body.wrtr, body.bol);
     }
 }

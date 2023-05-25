@@ -342,7 +342,7 @@ function setInfo() {
         .then(data => {
             console.log(data);
             if(data.error == false){
-                if(!data.role) {
+                if(!data.yes) {
                     setEvGr(cState, dispatch);
                     dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
                     if (!data.bodyG[groupsInfo.els.group]) {
@@ -359,8 +359,7 @@ function setInfo() {
 function setSchedule() {
     sendToServer({
         uuid: cState.uuid,
-        group: groupsInfo.els.group,
-        role: cState.role
+        group: groupsInfo.els.group
     }, 'POST', "schedule/getSchedule")
         .then(data => {
             console.log(data);
@@ -408,8 +407,8 @@ export function Schedule() {
             selKid = cState.kid;
             setSchedule();
         }
-        if(groupsInfo.els.group && selGr != groupsInfo.els.group){
-            if(eventSource.readyState == EventSource.OPEN) setSchedule();
+        if(groupsInfo.els.group && selGr != groupsInfo.els.group && eventSource.readyState == EventSource.OPEN){
+            setSchedule();
         }
         console.log('componentDidUpdate Schedule.jsx');
     });

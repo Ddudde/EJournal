@@ -95,7 +95,6 @@ export function errorLoad(e) {
 
 export function errLoadAddIm(e) {
     chContact("", "mapPr", "imgUrl");
-    // dispatch(changeContacts(CHANGE_CONTACT_PARAM, type, "", "mapPr", "imgUrl"));
 }
 
 export function onDel(e) {
@@ -103,7 +102,6 @@ export function onDel(e) {
     par = e.target.parentElement.parentElement;
     if(par.classList.contains(contactCSS.banner)){
         chContact("", "mapPr", "imgUrl");
-        // dispatch(changeContacts(CHANGE_CONTACT_PARAM, type, "", "mapPr", "imgUrl"));
     }
 }
 
@@ -121,7 +119,6 @@ export function onEdit(e, inps, info) {
     if(par.classList.contains(contactCSS.upr)){
         inps.edAddIm = info[type].mapPr.imgUrl;
         chContact("", "mapPr", "imgUrl");
-        // dispatch(changeContacts(CHANGE_CONTACT_PARAM, type, "", "mapPr", "imgUrl"));
     }
 }
 
@@ -135,16 +132,13 @@ export function onFin(e, inps) {
         if(par.parentElement.classList.contains(contactCSS.im)) {
             if (inps.edAddIm) inps.edAddIm = undefined;
             chContact(inp.value, "mapPr", "imgUrl");
-            // dispatch(changeContacts(CHANGE_CONTACT_PARAM, type, inp.value, "mapPr", "imgUrl"));
         }
         if(bul) {
             par = par.parentElement;
             if(par.classList.contains("mapt")){
                 chContact(inp.value, "mapPr", "text");
-                // dispatch(changeContacts(CHANGE_CONTACT_PARAM, type, inp.value, "mapPr", "text"));
             } else {
                 chContact(inp.value, "contact");
-                // dispatch(changeContacts(CHANGE_CONTACT_PARAM, type, inp.value, "contact"));
             }
         }
         par.setAttribute('data-st', '0');
@@ -196,9 +190,8 @@ function onCon() {
 function setInfo() {
     sendToServer({
         type: type,
-        role: cState.role,
         uuid: cState.uuid
-    }, 'POST', "contacts", "getContacts")
+    }, 'POST', "contacts/getContacts")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -213,9 +206,8 @@ function chContact (inp, p, p1) {
         uuid: cState.uuid,
         p: p,
         p1: p1,
-        val: inp,
-        role: cState.role
-    }, 'POST', "contacts", "chContact");
+        val: inp
+    }, 'POST', "contacts/chContact");
 }
 
 function chContactC(e) {
