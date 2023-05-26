@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 @EnableScheduling
 public class Main {
 
-    private static ConfigurableApplicationContext ctx;
+    public static ConfigurableApplicationContext ctx;
 
     private final static boolean debug = true;
 

@@ -12,10 +12,10 @@ inps = {};
 
 function addReq(e) {
     sendToServer({
-        text: inps.inpnnt_,
-        title: inps.inpnet_,
-        dat: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})
-    }, 'POST', "requests", "addReq")
+        fio: inps.inpnnt_,
+        email: inps.inpnet_,
+        date: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})
+    }, 'POST', "requests/addReq")
         .then(data => {
             if(data.error == false){
                 let title, text;

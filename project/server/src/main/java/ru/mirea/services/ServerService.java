@@ -15,6 +15,7 @@ import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.News;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.Request;
@@ -26,6 +27,7 @@ import ru.mirea.data.reps.ContactsRepository;
 import ru.mirea.data.reps.NewsRepository;
 import ru.mirea.data.reps.SystRepository;
 import ru.mirea.data.reps.auth.InviteRepository;
+import ru.mirea.data.reps.auth.SettingUserRepository;
 import ru.mirea.data.reps.auth.UserRepository;
 import ru.mirea.data.reps.school.GroupRepository;
 import ru.mirea.data.reps.school.RequestRepository;
@@ -36,7 +38,6 @@ import ru.mirea.data.reps.school.dayOfWeek.DayOfWeekRepository;
 import ru.mirea.data.reps.school.dayOfWeek.LessonRepository;
 import ru.mirea.data.reps.school.dayOfWeek.SubjectRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,12 +73,14 @@ import static java.util.Arrays.asList;
 
     private final SubjectRepository subjectRepository;
 
+    private final SettingUserRepository settingUserRepository;
+
     private final JsonObject errObj = new JsonObject();
 
     @Autowired
     private PushService pushService;
 
-    public ServerService(UserRepository userRepository, InviteRepository inviteRepository, SchoolRepository schoolRepository, RequestRepository requestRepository, SystRepository systRepository, NewsRepository newsRepository, ContactsRepository contactsRepository, GroupRepository groupRepository, DayOfWeekRepository dayOfWeekRepository, DayRepository dayRepository, LessonRepository lessonRepository, MarkRepository markRepository, SubjectRepository subjectRepository) {
+    public ServerService(UserRepository userRepository, InviteRepository inviteRepository, SchoolRepository schoolRepository, RequestRepository requestRepository, SystRepository systRepository, NewsRepository newsRepository, ContactsRepository contactsRepository, GroupRepository groupRepository, DayOfWeekRepository dayOfWeekRepository, DayRepository dayRepository, LessonRepository lessonRepository, MarkRepository markRepository, SubjectRepository subjectRepository, SettingUserRepository settingUserRepository) {
         this.userRepository = userRepository;
         this.inviteRepository = inviteRepository;
         this.schoolRepository = schoolRepository;
@@ -91,6 +94,7 @@ import static java.util.Arrays.asList;
         this.lessonRepository = lessonRepository;
         this.markRepository = markRepository;
         this.subjectRepository = subjectRepository;
+        this.settingUserRepository = settingUserRepository;
 
         errObj.addProperty("error", true);
 
@@ -106,30 +110,44 @@ import static java.util.Arrays.asList;
         return userRepository.findAll();
     }
 
-    public void addToken(User user, String token) {
-        user.getTokens().add(token);
-        user.getTopics().forEach((topic) -> {
-            if(pushService.subscribe(asList(token), topic) > 0) {
-                user.getTokens().remove(token);
+    public SettingUser createSettingUser(SettingUser settingUser) {
+        SettingUser savedSettingUser = settingUserRepository.saveAndFlush(settingUser);
+        System.out.println(savedSettingUser);
+        return savedSettingUser;
+    }
+
+    public SettingUser settingUserById(Long id) {
+        return id == null ? null : settingUserRepository.findById(id).orElse(null);
+    }
+
+    public void addToken(SettingUser settingUser, String token) {
+        settingUser.getTokens().add(token);
+        settingUser.getTopics().forEach((topic) -> {
+            if(settingUser.getNotif()
+            && ((topic.contains("News") && settingUser.getNNewNewsYO())
+            || (topic.contains("news") && settingUser.getNNewNewsPor()))) {
+                if (pushService.subscribe(asList(token), topic) > 0) {
+                    settingUser.getTokens().remove(token);
+                }
             }
         });
     }
 
-    public void remToken(User user, String token){
-        user.getTokens().remove(token);
-        user.getTopics().forEach((topic) -> {
+    public void remToken(SettingUser settingUser, String token){
+        settingUser.getTokens().remove(token);
+        settingUser.getTopics().forEach((topic) -> {
             pushService.unsubscribe(asList(token), topic);
         });
     }
 
-    public void addTopic(User user, String topic) {
-        user.getTopics().add(topic);
-        pushService.subscribe(new ArrayList<>(user.getTokens()), topic);
+    public void addTopic(SettingUser settingUser, String topic) {
+        settingUser.getTopics().add(topic);
+//        pushService.subscribe(new ArrayList<>(settingUser.getTokens()), topic);
     }
 
-    public void remTopic(User user, String topic){
-        user.getTopics().remove(topic);
-        pushService.unsubscribe(new ArrayList<>(user.getTokens()), topic);
+    public void remTopic(SettingUser settingUser, String topic){
+        settingUser.getTopics().remove(topic);
+//        pushService.unsubscribe(new ArrayList<>(settingUser.getTokens()), topic);
     }
 
     public User userByLogin(String login){

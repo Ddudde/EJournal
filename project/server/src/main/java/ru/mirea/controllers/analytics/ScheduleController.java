@@ -83,7 +83,7 @@ import static java.util.Arrays.asList;
                             && school.getTeachersInv().contains(teaId)){
                             school.getTeachersInv().remove(teaId);
                         }
-                        teaI.getRole().get(2L).getSubjects().add(subject.getId());
+                        teaI.getRoles().get(2L).getSubjects().add(subject.getId());
                         datas.getInviteRepository().saveAndFlush(teaI);
                         subject.getTeachersInv().add(teaI.getId());
                         datas.getSubjectRepository().saveAndFlush(subject);
@@ -141,7 +141,7 @@ import static java.util.Arrays.asList;
                         ref.group = datas.groupById(kidU.getRoles().get(0L).getGroup());
                     }
                     if(kidI != null) {
-                        ref.group = datas.groupById(kidI.getRole().get(0L).getGroup());
+                        ref.group = datas.groupById(kidI.getRoles().get(0L).getGroup());
                     }
                 } else if(user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
                     ref.group = datas.groupById(body.group);

@@ -86,6 +86,9 @@ import java.util.Objects;
     @PostMapping(value = "/addNews")
     public JsonObject addNews(@RequestBody DataNews body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
+        final var ref = new Object() {
+            boolean b, b1;
+        };
         try {
             body.wrtr = datas.ini(body.toString());
             if (subscriber != null) {
@@ -93,9 +96,9 @@ import java.util.Objects;
                 User user = datas.userByLogin(subscriber.getLogin());
                 Syst syst = datas.getSyst();
                 School school = datas.schoolById(user.getRoles().get(user.getSelRole()).getYO());
-                boolean b = Objects.equals(subscriber.getLvlMore2(), "Por") && user.getRoles().containsKey(4L) && syst != null,
-                        b1 = Objects.equals(subscriber.getLvlMore2(), "Yo") && user.getRoles().containsKey(3L) && school != null;
-                if (user != null && (b || b1)) {
+                ref.b = Objects.equals(subscriber.getLvlMore2(), "Por") && user.getRoles().containsKey(4L) && syst != null;
+                ref.b1 = Objects.equals(subscriber.getLvlMore2(), "Yo") && user.getRoles().containsKey(3L) && school != null;
+                if (user != null && (ref.b || ref.b1)) {
                     News news = new News();
                     if (!ObjectUtils.isEmpty(body.title)) {
                         news.setTitle(body.title);
@@ -110,10 +113,10 @@ import java.util.Objects;
                         news.setText(body.text);
                     }
                     datas.getNewsRepository().saveAndFlush(news);
-                    if (b) {
+                    if (ref.b) {
                         syst.getNews().add(news.getId());
                         datas.getSystRepository().saveAndFlush(syst);
-                    } else if (b1) {
+                    } else if (ref.b1) {
                         school.getNews().add(news.getId());
                         datas.getSchoolRepository().saveAndFlush(school);
                     }
@@ -126,8 +129,10 @@ import java.util.Objects;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            if(!ObjectUtils.isEmpty(subscriber.getLvlSch())) {
-                datas.getPushService().send(subscriber.getLvlSch()+"_news", "Новые объявления!", "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'", "/DipvLom/static/media/info.jpg");
+            if(ref.b1 && !ObjectUtils.isEmpty(subscriber.getLvlSch())) {
+                datas.getPushService().send(subscriber.getLvlSch()+"News", "Новые объявления!", "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'", "/DipvLom/static/media/info.jpg");
+            } else if(ref.b) {
+                datas.getPushService().send("news", "Новые объявления!", "На портале появилось новое объявление!\nУведомления можно регулировать на странице 'Настройки'", "/DipvLom/static/media/info.jpg");
             }
             authController.sendMessageForAll("addNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
         }, body.wrtr, body.bol);

@@ -55,7 +55,7 @@ export function Events() {
         console.log('componentDidUpdate Events.jsx');
     });
     return (
-        <div className={eventsCSS.evHeader} style={{top: (7*eventsInfo.steps) + "vh", left: eventsInfo.right ? "" : "1vw", right: eventsInfo.right ? "1vw" : ""}} ref={(el)=>(evHeader = el)}>
+        <div className={eventsCSS.evHeader} style={{top: (7*eventsInfo.steps) + "vh", left: eventsInfo.right ? "" : "1vw", right: eventsInfo.right ? "1vw" : "", display: eventsInfo.visible ? "block" : "none"}} ref={el=>evHeader = el}>
             {Object.getOwnPropertyNames(eventsInfo.evs).reverse().map(param =>
                 <div className={eventsCSS.warne} key={param}>
                     <img src={warn} className={eventsCSS.warnimg} alt=""/>

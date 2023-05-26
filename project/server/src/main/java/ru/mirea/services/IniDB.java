@@ -7,6 +7,7 @@ import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.News;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.Request;
@@ -29,21 +30,21 @@ public class IniDB {
     public IniDB(ServerService serverService) {
         serv = serverService;
         serv.createUser(new User("nm1", "1111",
-            "Петров В.В.", 2, Map.of(
+            "Петров В.В.", Map.of(
             0L, new Role("ex@ya.ru", 5L, 17L, new ArrayList<>(asList(1L, 2L))),
             1L, new Role("ex@ya.ru", 5L, new ArrayList<>(asList(1L, 2L))),
             2L, new Role("ex@ya.ru", new ArrayList<>(), 5L),
             3L, new Role("ex@ya.ru", 5L),
             4L, new Role("ex@ya.ru")
-            ), 4L, 1L));
+        ), 4L, 1L, 76L));
         serv.createUser(new User("nm12", "1111",
-            "Петров В.В.", 1, Map.of(
+            "Петров В.В.", Map.of(
             0L, new Role("ex@ya.ru", 6L, 17L, new ArrayList<>(asList(1L, 2L))),
             1L, new Role("ex@ya.ru", 6L, new ArrayList<>(asList(1L, 2L))),
             2L, new Role("ex@ya.ru", new ArrayList<>(), 6L),
             3L, new Role("ex@ya.ru", 6L),
             4L, new Role("ex@ya.ru")
-            ), 4L, 1L));
+        ), 4L, 1L, 77L));
         System.out.println(serv.getUsers());
 
         serv.createReq(new Request("ex@ya.ru","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
@@ -55,13 +56,13 @@ public class IniDB {
         System.out.println(serv.getSchools());
 
         serv.createUser(new User("nm13", "1111",
-            "Петров В.В.", 2, Map.of(
+            "Петров В.В.", Map.of(
             3L, new Role("ex@ya.ru", 4L)
-            ), 3L, null, Set.of("4_news")));
+        ), 3L, 78L));
         serv.createUser(new User("nm14", "1111",
-            "Петров В.В.", 2, Map.of(
+            "Петров В.В.", Map.of(
             3L, new Role("ex@ya.ru", 4L)
-            ), 3L));
+        ), 3L, 79L));
 
         Instant after = Instant.now().plus(Duration.ofDays(30));
         Date dateAfter = Date.from(after);
@@ -93,46 +94,46 @@ public class IniDB {
             "/static/media/map.jpg"));
 
         serv.createUser(new User("nm15", "1111",
-            "Петров В.В.", 2, Map.of(
+            "Петров В.В.", Map.of(
             0L, new Role("ex@ya.ru", 4L, 17L, new ArrayList<>(asList(1L, 2L)))
-            ), 0L));//16L
+        ), 0L, 80L));//16L
 
         createGroups();//60L
         System.out.println(serv.getGroups());
 
         serv.createUser(new User("nm16", "1111",
-            "Петров В.В.", 2, Map.of(
+            "Петров В.В.", Map.of(
             0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(62L, 63L)))
-            ), 0L));//61L
+        ), 0L, 81L));//61L
 
         serv.createUser(new User("nm17", "1111",
-            "Петров В.В.", 2, Map.of(
+            "Петров В.В.", Map.of(
             1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 75L)))
-            ), 1L, 61L));//62L
+        ), 1L, 61L, 81L));//62L
 
         serv.createUser(new User("nm18", "1111",
-            "Петрова В.В.", 2, Map.of(
+            "Петрова В.В.", Map.of(
             1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 75L)))
-            ), 1L, 61L));//63L
+        ), 1L, 61L, 82L));//63L
 
         serv.createSubject(new Subject("Англ. Яз.", 4L, new ArrayList<>(asList(67L))));
         serv.createSubject(new Subject("Математика", 4L, new ArrayList<>(asList(68L))));
         System.out.println(serv.getSubjects());
 
         serv.createUser(new User("nm19", "1111",
-            "Петрова В1.В.", 2, Map.of(
+            "Петрова В1.В.", Map.of(
             2L, new Role("ex@ya.ru", new ArrayList<>(), 4L)
-            ), 2L));//66L
+        ), 2L, 83L));//66L
 
         serv.createUser(new User("nm20", "1111",
-            "Петрова В2.В.", 2, Map.of(
+            "Петрова В2.В.", Map.of(
             2L, new Role("ex@ya.ru", new ArrayList<>(asList(64L)), 4L)
-            ), 2L));//67L
+        ), 2L, 84L));//67L
 
         serv.createUser(new User("nm21", "1111",
-            "Петрова В3.В.", 2, Map.of(
+            "Петрова В3.В.", Map.of(
             2L, new Role("ex@ya.ru", new ArrayList<>(asList(65L)), 4L)
-            ), 2L));//68L
+        ), 2L, 85L));//68L
 
         serv.createLesson(new Lesson(64L, 67L, "300"));
         serv.createLesson(new Lesson(64L, 67L, "301"));
@@ -144,9 +145,21 @@ public class IniDB {
         System.out.println(serv.getDaysOfWeek());
 
         serv.createUser(new User("nm22", "1111",
-            "Петров В.Вa.", 2, Map.of(
+            "Петров В.Вa.", Map.of(
             0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(62L, 63L)))
-            ), 0L));//75L
+        ), 0L, 86L));//75L
+
+        serv.createSettingUser(new SettingUser(2));//76L
+        serv.createSettingUser(new SettingUser(1));//77L
+        serv.createSettingUser(new SettingUser(2, Set.of("4News", "news")));//78L
+        serv.createSettingUser(new SettingUser(2));//79L
+        serv.createSettingUser(new SettingUser(2));//80L
+        serv.createSettingUser(new SettingUser(2));//81L
+        serv.createSettingUser(new SettingUser(2));//82L
+        serv.createSettingUser(new SettingUser(2));//83L
+        serv.createSettingUser(new SettingUser(2));//84L
+        serv.createSettingUser(new SettingUser(2));//85L
+        serv.createSettingUser(new SettingUser(2));//86L
     }
 
     private void checkDates(){
@@ -179,7 +192,7 @@ public class IniDB {
 
     public void delInv(Invite inv) {
         if(inv != null){
-            School school = serv.schoolById(serv.getFirstRole(inv.getRole()).getYO());
+            School school = serv.schoolById(serv.getFirstRole(inv.getRoles()).getYO());
             school.getHteachersInv().remove(inv.getId());
             serv.getSchoolRepository().saveAndFlush(school);
             serv.getInviteRepository().delete(inv);

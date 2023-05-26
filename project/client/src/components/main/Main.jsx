@@ -23,6 +23,7 @@ import up from "../../media/up.png";
 import Events from "../other/events/Events";
 import Dialog from "../other/dialog/Dialog";
 import Pane from "../other/pane/Pane";
+import {setSettings} from "./settings/Settings";
 
 let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling, timid, timidP, d1, warnErrNet, server;
 scrolling = false;
@@ -106,8 +107,7 @@ function selKid(kid) {
 
 function chRoles() {
     sendToServer({
-        uuid: cState.uuid,
-        role: cState.role
+        uuid: cState.uuid
     }, 'POST', "auth/chRole")
         .then(data => {
             if(data.error == false && data.body.role != undefined){
@@ -209,6 +209,7 @@ function iniNet() {
                         userServFin = msg;
                         // eslint-disable-next-line no-undef
                         appApp.dispatchEvent(new Event("op"));
+                        setSettings(msg, dispatch);
                     }
                 });
         }

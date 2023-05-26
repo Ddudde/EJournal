@@ -6,12 +6,13 @@ import {
     CHANGE_EVENTS,
     CHANGE_EVENTS_CLEAR,
     CHANGE_EVENTS_RL,
-    CHANGE_EVENTS_STEP
+    CHANGE_EVENTS_STEP, CHANGE_EVENTS_VISIBLE
 } from '../../actions';
 
 const initialState = {
     steps: 0,
     right: true,
+    visible: true,
     evs: {
         // 0: {
         //     title: 'Внимание1!',
@@ -87,6 +88,9 @@ export default function eventsReducer(state = initialState, action) {
             return fd;
         case CHANGE_EVENTS_RL:
             fd.right = action.payload.state;
+            return fd;
+        case CHANGE_EVENTS_VISIBLE:
+            fd.visible = action.payload.state;
             return fd;
         default:
             return state;

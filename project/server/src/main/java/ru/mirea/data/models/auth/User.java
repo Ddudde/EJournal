@@ -2,14 +2,11 @@ package ru.mirea.data.models.auth;
 
 import lombok.*;
 import ru.mirea.data.MapRoleConverter;
-import ru.mirea.data.SetStringConverter;
 import ru.mirea.data.json.Role;
 
 import javax.persistence.*;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -20,68 +17,41 @@ import java.util.Set;
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    private String login, password, code, expDate, fio, secFr, info;
+    private String login, password, code, expDate, fio;
 
-    private Long selRole, selKid;
-
-    private int ico;
+    private Long selRole, selKid, settings;
 
     @Convert(converter = MapRoleConverter.class)
     @Column(columnDefinition="CLOB")
     private Map<Long, Role> roles;
 
-    @Convert(converter = SetStringConverter.class)
-    @Column(columnDefinition="CLOB")
-    private Set<String> tokens, topics;
-
-    public User(String login, String password, int ico) {
+    public User(String login, String password, Long settings) {
         this.login = login;
         this.password = password;
-        this.ico = ico;
+        this.settings = settings;
     }
 
-    public User(String login, String password, String fio, int ico, Map<Long, Role> roles, Long selRole) {
+    public User(String login, String password, String fio, Map<Long, Role> roles, Long selRole, Long settings) {
         this.login = login;
         this.password = password;
         this.fio = fio;
         this.selRole = selRole;
-        this.ico = ico;
         this.roles = roles;
+        this.settings = settings;
     }
 
-    public User(String login, String password, String fio, int ico, Map<Long, Role> roles, Long selRole, Long selKid) {
+    public User(String login, String password, String fio, Map<Long, Role> roles, Long selRole, Long selKid, Long settings) {
         this.login = login;
         this.password = password;
         this.fio = fio;
         this.selRole = selRole;
         this.selKid = selKid;
-        this.ico = ico;
         this.roles = roles;
-    }
-
-    public User(String login, String password, String fio, int ico, Map<Long, Role> roles, Long selRole, Long selKid, Set<String> topics) {
-        this.login = login;
-        this.password = password;
-        this.fio = fio;
-        this.selRole = selRole;
-        this.selKid = selKid;
-        this.ico = ico;
-        this.roles = roles;
-        this.topics = topics;
+        this.settings = settings;
     }
 
     public Map<Long, Role> getRoles() {
         if(roles == null) roles = new HashMap<>();
         return roles;
-    }
-
-    public Set<String> getTokens() {
-        if(tokens == null) tokens = new HashSet<>();
-        return tokens;
-    }
-
-    public Set<String> getTopics() {
-        if(topics == null) topics = new HashSet<>();
-        return topics;
     }
 }

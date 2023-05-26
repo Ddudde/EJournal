@@ -17,6 +17,7 @@ import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.json.Role;
 import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.School;
 import ru.mirea.services.ServerService;
@@ -144,13 +145,14 @@ import java.util.concurrent.ConcurrentHashMap;
             }
             if(user != null) {
                 if (!ObjectUtils.isEmpty(body.notifToken)) {
-                    if(body.permis && !user.getTokens().contains(body.notifToken)) {
-                        datas.addToken(user, body.notifToken);
-                        datas.getUserRepository().saveAndFlush(user);
+                    SettingUser settingUser = datas.settingUserById(user.getSettings());
+                    if(body.permis && !settingUser.getTokens().contains(body.notifToken)) {
+                        datas.addToken(settingUser, body.notifToken);
+                        datas.getSettingUserRepository().saveAndFlush(settingUser);
                     }
-                    if(!body.permis && user.getTokens().contains(body.notifToken)){
-                        datas.remToken(user, body.notifToken);
-                        datas.getUserRepository().saveAndFlush(user);
+                    if(!body.permis && settingUser.getTokens().contains(body.notifToken)){
+                        datas.remToken(settingUser, body.notifToken);
+                        datas.getSettingUserRepository().saveAndFlush(settingUser);
                     }
                 }
                 body.wrtr.name("body").beginObject()
@@ -200,20 +202,22 @@ import java.util.concurrent.ConcurrentHashMap;
             body.wrtr.name("body").beginObject();
             if(user != null && Objects.equals(user.getPassword(), body.password)) {
                 if(!ObjectUtils.isEmpty(body.notifToken)) {
+                    SettingUser settingUser = datas.settingUserById(user.getSettings());
                     if(body.permis) {
-                        datas.addToken(user, body.notifToken);
+                        datas.addToken(settingUser, body.notifToken);
                     } else {
-                        datas.remToken(user, body.notifToken);
+                        datas.remToken(settingUser, body.notifToken);
                     }
-                    datas.getUserRepository().saveAndFlush(user);
+                    datas.getSettingUserRepository().saveAndFlush(settingUser);
                 }
+                SettingUser settingUser = datas.settingUserById(user.getSettings());
                 body.wrtr.name("auth").value(true)
                     .name("login").value(user.getLogin())
 //                        bodyAns.addProperty("role", ObjectUtils.isEmpty(user.getRoles()) ? 0 : ((Long) user.getRoles().keySet().toArray()[4]));
                     .name("role").value(user.getSelRole())
-                    .name("ico").value(user.getIco())
+                    .name("ico").value(settingUser.getIco())
                     .name("roles").value(!ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1)
-                    .name("secFr").value(!ObjectUtils.isEmpty(user.getSecFr()));
+                    .name("secFr").value(!ObjectUtils.isEmpty(settingUser.getSecFr()));
                 if(user.getSelRole() == 1L) {
                     Role role = user.getRoles().get(1L);
                     body.wrtr.name("kid").value(user.getSelKid())
@@ -255,33 +259,46 @@ import java.util.concurrent.ConcurrentHashMap;
                 body.wrtr.name("error").value(2);
             } else if(user == null) {
                 if(inv != null) {
-                    user = new User(body.login, body.par, body.ico);
-                    user.setRoles(inv.getRole());
-                    user.setSelRole(datas.getFirstRoleId(inv.getRole()));
-                    if(inv.getRole().containsKey(1L)) {
-                        if(!ObjectUtils.isEmpty(inv.getRole().get(1L).getKids())) {
-                            user.setSelKid(inv.getRole().get(1L).getKids().get(0));
-                        } else if(!ObjectUtils.isEmpty(inv.getRole().get(1L).getKidsInv())) {
-                            user.setSelKid(inv.getRole().get(1L).getKidsInv().get(0));
+                    SettingUser settingUser = datas.createSettingUser(new SettingUser(body.ico));
+                    user = new User(body.login, body.par, settingUser.getId());
+                    user.setRoles(inv.getRoles());
+                    user.setSelRole(datas.getFirstRoleId(inv.getRoles()));
+                    if(inv.getRoles().containsKey(1L)) {
+                        if(!ObjectUtils.isEmpty(inv.getRoles().get(1L).getKids())) {
+                            user.setSelKid(inv.getRoles().get(1L).getKids().get(0));
+                        } else if(!ObjectUtils.isEmpty(inv.getRoles().get(1L).getKidsInv())) {
+                            user.setSelKid(inv.getRoles().get(1L).getKidsInv().get(0));
                         }
                     }
                     user.setFio(inv.getFio());
-                    Long schId = datas.getFirstRole(inv.getRole()).getYO();
-                    datas.addTopic(user, schId+"_news");
                     datas.getUserRepository().saveAndFlush(user);
+                    Long schId = datas.getFirstRole(inv.getRoles()).getYO();
                     School school = datas.schoolById(schId);
-                    school.getHteachersInv().remove(inv.getId());
-                    school.getHteachers().add(user.getId());
-                    datas.getSchoolRepository().saveAndFlush(school);
+                    if(school != null) {
+                        school.getHteachersInv().remove(inv.getId());
+                        school.getHteachers().add(user.getId());
+                        datas.getSchoolRepository().saveAndFlush(school);
+                        datas.addTopic(settingUser, schId+"News");
+                    }
+                    datas.addTopic(settingUser, "news");
+                    datas.getSettingUserRepository().saveAndFlush(settingUser);
                     datas.getInviteRepository().delete(inv);
                 }
                 if(user1 != null){
+                    SettingUser settingUser = datas.settingUserById(user1.getSettings());
                     user1.setLogin(body.login);
                     user1.setPassword(body.par);
-                    user1.setIco(body.ico);
+                    settingUser.setIco(body.ico);
                     user1.setCode(null);
                     user1.setExpDate(null);
                     datas.getUserRepository().saveAndFlush(user1);
+                    Long schId = datas.getFirstRole(user1.getRoles()).getYO();
+                    School school = datas.schoolById(schId);
+                    if(school != null) {
+                        datas.addTopic(settingUser, schId+"News");
+                    }
+                    datas.addTopic(settingUser, "news");
+                    datas.getSettingUserRepository().saveAndFlush(settingUser);
                 }
             }
             body.wrtr.name("yes").value(true);
@@ -294,7 +311,8 @@ import java.util.concurrent.ConcurrentHashMap;
         User user = datas.userByLogin(body.login);
         try {
             body.wrtr = datas.ini(body.toString());
-            if(user != null && Objects.equals(user.getSecFr(), body.secFr)) {
+            SettingUser settingUser = datas.settingUserById(user.getSettings());
+            if(user != null && Objects.equals(settingUser.getSecFr(), body.secFr)) {
                 user.setPassword(body.par);
                 datas.getUserRepository().saveAndFlush(user);
                 body.wrtr.name("yes").value(true);
@@ -364,8 +382,9 @@ import java.util.concurrent.ConcurrentHashMap;
         if(subscriber != null) {
             if (!ObjectUtils.isEmpty(body.notifToken)) {
                 User user = datas.userByLogin(subscriber.getLogin());
-                datas.remToken(user, body.notifToken);
-                datas.getUserRepository().saveAndFlush(user);
+                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                datas.remToken(settingUser, body.notifToken);
+                datas.getSettingUserRepository().saveAndFlush(settingUser);
             }
             subscriber.setLogin(null);
             subscriber.setLvlGr(null);
@@ -382,8 +401,9 @@ import java.util.concurrent.ConcurrentHashMap;
         Subscriber subscriber = getSubscriber(body.uuid);
         if(!ObjectUtils.isEmpty(body.notifToken)) {
             User user = datas.userByLogin(subscriber.getLogin());
-            datas.remToken(user, body.notifToken);
-            datas.getUserRepository().saveAndFlush(user);
+            SettingUser settingUser = datas.settingUserById(user.getSettings());
+            datas.remToken(settingUser, body.notifToken);
+            datas.getSettingUserRepository().saveAndFlush(settingUser);
         }
         try {
             body.wrtr = datas.ini(body.toString());
@@ -397,8 +417,9 @@ import java.util.concurrent.ConcurrentHashMap;
         Subscriber subscriber = getSubscriber(body.uuid);
         if(!ObjectUtils.isEmpty(body.notifToken)) {
             User user = datas.userByLogin(subscriber.getLogin());
-            datas.addToken(user, body.notifToken);
-            datas.getUserRepository().saveAndFlush(user);
+            SettingUser settingUser = datas.settingUserById(user.getSettings());
+            datas.addToken(settingUser, body.notifToken);
+            datas.getSettingUserRepository().saveAndFlush(settingUser);
         }
         try {
             body.wrtr = datas.ini(body.toString());
@@ -455,7 +476,7 @@ import java.util.concurrent.ConcurrentHashMap;
                     inv.setCode(uuid.toString());
                     inv.setExpDate(Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    ref.schId = datas.getFirstRole(inv.getRole()).getYO();
+                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO();
 
                     body.wrtr.name("id").value(inv.getId());
                 }

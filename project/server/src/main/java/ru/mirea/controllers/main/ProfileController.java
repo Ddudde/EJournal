@@ -17,14 +17,12 @@ import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.json.Role;
-import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
 import ru.mirea.services.ServerService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @RequestMapping("/profiles")
@@ -74,9 +72,10 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
-                user.setInfo(body.info);
-                datas.getUserRepository().saveAndFlush(user);
-                body.wrtr.name("more").value(user.getInfo());
+                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                settingUser.setInfo(body.info);
+                datas.getSettingUserRepository().saveAndFlush(settingUser);
+                body.wrtr.name("more").value(settingUser.getInfo());
             }
             body.wrtr.endObject();
         } catch (Exception e) { body.bol = Main.excp(e);}
@@ -120,14 +119,15 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null) {
+                SettingUser settingUser = datas.settingUserById(user.getSettings());
                 body.wrtr.name("login").value(user.getLogin())
-                    .name("ico").value(user.getIco())
+                    .name("ico").value(settingUser.getIco())
                     .name("id").value(user.getId());
                 if (!ObjectUtils.isEmpty(user.getFio())) {
                     body.wrtr.name("fio").value(user.getFio());
                 }
-                if (!ObjectUtils.isEmpty(user.getInfo())) {
-                    body.wrtr.name("more").value(user.getInfo());
+                if (!ObjectUtils.isEmpty(settingUser.getInfo())) {
+                    body.wrtr.name("more").value(settingUser.getInfo());
                 }
                 body.wrtr.name("roles").beginObject();
                 for (long i = 0; i < 5; i++) {

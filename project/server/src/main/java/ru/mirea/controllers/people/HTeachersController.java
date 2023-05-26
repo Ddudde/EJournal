@@ -130,7 +130,7 @@ import java.util.Map;
         if (user1 != null) {
             ref.sch = datas.schoolById(user1.getRoles().get(3L).getYO());
         } else if (inv != null) {
-            ref.sch = datas.schoolById(inv.getRole().get(3L).getYO());
+            ref.sch = datas.schoolById(inv.getRoles().get(3L).getYO());
         }
         try {
             body.wrtr = datas.ini(body.toString());
@@ -180,7 +180,7 @@ import java.util.Map;
         if (user1 != null) {
             ref.sch = datas.schoolById(user1.getRoles().get(3L).getYO());
         } else if (inv != null) {
-            ref.sch = datas.schoolById(inv.getRole().get(3L).getYO());
+            ref.sch = datas.schoolById(inv.getRoles().get(3L).getYO());
         }
         try {
             body.wrtr = datas.ini(body.toString());

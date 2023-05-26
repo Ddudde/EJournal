@@ -79,8 +79,7 @@ import static java.util.Arrays.asList;
 
     public int subscribe(List<String> registrationTokens, String topic) {
         try {
-            TopicManagementResponse response = FirebaseMessaging.getInstance().subscribeToTopic(
-                    registrationTokens, topic);
+            TopicManagementResponse response = FirebaseMessaging.getInstance().subscribeToTopic(registrationTokens, topic);
             System.out.println(response.getSuccessCount() + " request were subscribed successfully");
             if (response != null && response.getFailureCount() > 0) {
                 System.out.println("List of tokens that caused failures: " + response.getErrors());
@@ -94,8 +93,7 @@ import static java.util.Arrays.asList;
 
     public int unsubscribe(List<String> registrationTokens, String topic) {
         try {
-            TopicManagementResponse response = FirebaseMessaging.getInstance().unsubscribeFromTopic(
-                    registrationTokens, topic);
+            TopicManagementResponse response = FirebaseMessaging.getInstance().unsubscribeFromTopic(registrationTokens, topic);
             System.out.println(response.getSuccessCount() + " request were unsubscribed successfully");
             if (response != null && response.getFailureCount() > 0) {
                 System.out.println("List of tokens that caused failures: " + response.getErrors());

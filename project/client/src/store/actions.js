@@ -112,6 +112,7 @@ export const CHANGE_EVENT_TIMER = "CHANGE_EVENT_TIMER";
 export const CHANGE_EVENT_TIMER_DEL = "CHANGE_EVENT_TIMER_DEL";
 export const CHANGE_EVENTS_STEP = "CHANGE_EVENTS_STEP";
 export const CHANGE_EVENTS_RL = "CHANGE_EVENTS_RL";
+export const CHANGE_EVENTS_VISIBLE = "CHANGE_EVENTS_VISIBLE";
 
 export function changeCB(checkboxId, checkBoxState) {
     return {

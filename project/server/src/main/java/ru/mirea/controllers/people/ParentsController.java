@@ -125,7 +125,7 @@ import java.util.UUID;
                     inv.setCode(uuid.toString());
                     inv.setExpDate(Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    ref.schId = datas.getFirstRole(inv.getRole()).getYO();
+                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO();
 
                     body.wrtr.name("id1").value(inv.getId());
                 }
@@ -191,10 +191,10 @@ import java.util.UUID;
                         body.wrtr.name(inv.getId() + "").beginObject()
                             .name("name").value(inv.getFio());
 
-                        if (!kidI.getRole().get(0L).getParentsInv().contains(kidI.getId())) {
-                            kidI.getRole().get(0L).getParentsInv().add(kidI.getId());
+                        if (!kidI.getRoles().get(0L).getParentsInv().contains(kidI.getId())) {
+                            kidI.getRoles().get(0L).getParentsInv().add(kidI.getId());
                         }
-                        kidI.getRole().get(0L).getParentsInv().add(inv.getId());
+                        kidI.getRoles().get(0L).getParentsInv().add(inv.getId());
                         datas.getInviteRepository().saveAndFlush(kidI);
 
                         body.wrtr.endObject();
@@ -253,8 +253,8 @@ import java.util.UUID;
                                 body.wrtr.name("link").value(studI.getCode());
                             }
                             body.wrtr.name("par").beginObject();
-                            datas.usersByList(studI.getRole().get(0L).getParents(), body.wrtr, true);
-                            datas.invitesByList(studI.getRole().get(0L).getParentsInv(), body.wrtr, true);
+                            datas.usersByList(studI.getRoles().get(0L).getParents(), body.wrtr, true);
+                            datas.invitesByList(studI.getRoles().get(0L).getParentsInv(), body.wrtr, true);
                             body.wrtr.endObject().endObject();
                         }
                     }

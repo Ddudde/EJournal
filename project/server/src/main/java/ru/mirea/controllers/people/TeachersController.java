@@ -126,7 +126,7 @@ import java.util.UUID;
                     inv.setCode(uuid.toString());
                     inv.setExpDate(Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    ref.schId = datas.getFirstRole(inv.getRole()).getYO();
+                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO();
 
                     body.wrtr.name("id1").value(inv.getId());
                 }

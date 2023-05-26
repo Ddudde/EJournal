@@ -27,7 +27,12 @@ public class Test {
     private static final InputStream config = Test.class.getResourceAsStream("e-journalfcm-firebase-auth.json");
 
     public static void main(String[] args) throws Exception {
-        jsonTest6();
+        stringTest1();
+    }
+
+    private static void stringTest1() throws Exception {
+        System.out.println(Objects.equals("_news", "_news"));
+        System.out.println("234_news".contains("_news"));
     }
 
     private static void jsonTest6() throws Exception {

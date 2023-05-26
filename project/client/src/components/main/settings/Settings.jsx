@@ -3,7 +3,14 @@ import {Helmet} from "react-helmet-async";
 import settingsCSS from './settings.module.css';
 import {checkbox, states} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {CHANGE_EVENTS_CLEAR, CHANGE_STATE, changeEvents, changeState} from "../../../store/actions";
+import {
+    CHANGE_EVENTS_CLEAR,
+    CHANGE_EVENTS_VISIBLE,
+    CHANGE_STATE,
+    changeCB,
+    changeEvents,
+    changeState
+} from "../../../store/actions";
 import ran from "../../../media/random.png";
 import button from "../../button.module.css";
 import CheckBox from "../../other/checkBox/CheckBox";
@@ -12,7 +19,7 @@ import ls2 from "../../../media/ls-icon2.png";
 import ls3 from "../../../media/ls-icon3.png";
 import {addEvent, eventSource, remEvent, sendToServer, setActived} from "../Main";
 
-let dispatch, elem, cState, oldPasSt, els;
+let dispatch, elem, cState, oldPasSt, els, checkBoxInfo;
 oldPasSt = true;
 elem = {npasinp : undefined, powpasinp : undefined, zambut : undefined, zambut1 : undefined, oldinp : undefined, secinp : undefined};
 els = {oldinp: undefined, secinp: undefined, npasinp: undefined, powpasinp: undefined};
@@ -145,15 +152,45 @@ function onFinChPar(e) {
         });
 }
 
+function chNotif(id) {
+    console.log(id, checkBoxInfo[id]);
+    if(id == "checkbox_hints") {
+        dispatch(changeEvents(CHANGE_EVENTS_VISIBLE, !checkBoxInfo[id]));
+    }
+    sendToServer({
+        uuid: cState.uuid,
+        id: id,
+        val: !checkBoxInfo[id]
+    }, 'POST', "settings/chBool");
+}
+
 function chStatSb1(e) {
     let el = e.target;
     elem.zambut1.setAttribute("data-enable", +(el ? el.value.length != 0 : false));
 }
 
+export function setSettings(uuidP, dis) {
+    if(dis) dispatch = dis;
+    sendToServer({
+        uuid: uuidP ? uuidP : cState.uuid
+    }, 'POST', "settings/getSettings")
+        .then(data => {
+            if(data.error == false){
+                for(let id of Object.getOwnPropertyNames(data.body)) {
+                    dispatch(changeCB(id, !data.body[id]));
+                    if(id == "checkbox_hints") {
+                        dispatch(changeEvents(CHANGE_EVENTS_VISIBLE, data.body[id]));
+                    }
+                }
+            }
+        });
+}
+
 function onCon(e) {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "settings/setInfo");
+    }, 'POST', "settings/setInfo")
+        .then(data => setSettings());
 }
 
 export function gen_pas(e){
@@ -173,7 +210,7 @@ export function gen_pas(e){
 }
 
 export function Settings() {
-    const checkBoxInfo = useSelector(checkbox);
+    checkBoxInfo = useSelector(checkbox);
     dispatch = useDispatch();
     cState = useSelector(states);
     const isFirstUpdate = useRef(true);
@@ -203,25 +240,28 @@ export function Settings() {
             </Helmet>
             <div className={settingsCSS.blockPro}>
                 <div className={settingsCSS.pro}>
+                    <div className={settingsCSS.nav_i} id={settingsCSS.nav_i} onClick={e=>chNotif("checkbox_hints")}>
+                        <CheckBox state={+true} text={"Включить подсказки"} checkbox_id={"checkbox_hints"}/>
+                    </div>
                     <div className={settingsCSS.nav_iZag}>
-                        <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
+                        <div className={settingsCSS.nav_i} id={settingsCSS.nav_i} onClick={e=>chNotif("checkbox_notify")}>
                             <CheckBox text={"Включить уведомления"} checkbox_id={"checkbox_notify"}/>
                         </div>
                         <div className={settingsCSS.nav_iZag+" "+settingsCSS.blockNotif} data-act={(checkBoxInfo.checkbox_notify || false) ? '1' : '0'}>
-                            {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                                <CheckBox state={+true} text={"Уведомления о изменении в расписании"} checkbox_id={"checkbox_notify_sched"}/>
+                            {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i} onClick={e=>chNotif("checkbox_notify_sched")}>
+                                <CheckBox text={"Уведомления о изменении в расписании"} checkbox_id={"checkbox_notify_sched"}/>
                             </div>}
-                            {(cState.role < 2) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                                <CheckBox state={+true} text={"Уведомления о новых оценках"} checkbox_id={"checkbox_notify_marks"}/>
+                            {(cState.role < 2) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i} onClick={e=>chNotif("checkbox_notify_marks")}>
+                                <CheckBox text={"Уведомления о новых оценках"} checkbox_id={"checkbox_notify_marks"}/>
                             </div>}
-                            {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                                <CheckBox state={+true} text={"Присылать новые объявления учебного центра"} checkbox_id={"checkbox_notify_yo"}/>
+                            {(cState.role < 3) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i} onClick={e=>chNotif("checkbox_notify_yo")}>
+                                <CheckBox text={"Присылать новые объявления учебного центра"} checkbox_id={"checkbox_notify_yo"}/>
                             </div>}
-                            {(cState.role < 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                                <CheckBox state={+true} text={"Присылать новые объявления портала"} checkbox_id={"checkbox_notify_por"}/>
+                            {(cState.role < 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i} onClick={e=>chNotif("checkbox_notify_por")}>
+                                <CheckBox text={"Присылать новые объявления портала"} checkbox_id={"checkbox_notify_por"}/>
                             </div>}
-                            {(cState.role == 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i}>
-                                <CheckBox state={+true} text={"Присылать уведомления о новых заявках школ"} checkbox_id={"checkbox_notify_new_sch"}/>
+                            {(cState.role == 4) && <div className={settingsCSS.nav_i} id={settingsCSS.nav_i} onClick={e=>chNotif("checkbox_notify_new_sch")}>
+                                <CheckBox text={"Присылать уведомления о новых заявках школ"} checkbox_id={"checkbox_notify_new_sch"}/>
                             </div>}
                         </div>
                     </div>

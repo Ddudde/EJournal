@@ -31,6 +31,7 @@ import {
 import {addEvent, eventSource, remEvent, sendToServer, setActived} from "../main/Main";
 import {Link, useNavigate, useParams} from "react-router-dom"
 import ErrFound from "../other/error/ErrFound";
+import {setSettings} from "../main/settings/Settings";
 
 let dispatch, warns, timer, indicInfo, cState, navigate, checkBoxInfo, elem, els, textYesInvNR, textNoInv, blocks, licField;
 elem = {regbut: undefined, vxbut: undefined, g_id: undefined, logv: undefined, pasv: undefined, logz: undefined};
@@ -134,6 +135,7 @@ function vxo(){
             if(data.error == false && data.body.auth){
                 console.log(data);
                 dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
+                setSettings(cState.uuid, dispatch);
             } else {
                 addEvent("Неверный логин или пароль", 10);
             }

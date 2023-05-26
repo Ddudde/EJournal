@@ -21,23 +21,23 @@ import java.util.Map;
 
     @Convert(converter = MapRoleConverter.class)
     @Column(columnDefinition="CLOB")
-    private Map<Long, Role> role;
+    private Map<Long, Role> roles;
 
-    public Invite(String fio, Map<Long, Role> role, String expDate) {
+    public Invite(String fio, Map<Long, Role> roles, String expDate) {
         this.fio = fio;
         this.expDate = expDate;
-        this.role = role;
+        this.roles = roles;
     }
 
-    public Invite(String fio, Map<Long, Role> role, String expDate, String code) {
+    public Invite(String fio, Map<Long, Role> roles, String expDate, String code) {
         this.fio = fio;
         this.code = code;
         this.expDate = expDate;
-        this.role = role;
+        this.roles = roles;
     }
 
-    public Map<Long, Role> getRole() {
-        if(role == null) role = new HashMap<>();
-        return role;
+    public Map<Long, Role> getRoles() {
+        if(roles == null) roles = new HashMap<>();
+        return roles;
     }
 }

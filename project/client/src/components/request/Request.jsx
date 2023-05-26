@@ -105,10 +105,10 @@ function onFin(e) {
         if(bul) {
             par = par.parentElement;
             sendToServer({
-                login: cState.login,
+                uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 text: inp.value
-            }, 'POST', "requests", "chText")
+            }, 'POST', "requests/chText")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"text"));
@@ -118,10 +118,10 @@ function onFin(e) {
         if(par.parentElement.classList.contains(requestCSS.da)){
             par = par.parentElement;
             sendToServer({
-                login: cState.login,
+                uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 date: inp.value
-            }, 'POST', "requests", "chDate")
+            }, 'POST', "requests/chDate")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"date"));
@@ -131,10 +131,10 @@ function onFin(e) {
         if(par.parentElement.classList.contains(requestCSS.za)){
             par = par.parentElement;
             sendToServer({
-                login: cState.login,
+                uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 title: inp.value
-            }, 'POST', "requests", "chTitle")
+            }, 'POST', "requests/chTitle")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"title"));
@@ -152,9 +152,9 @@ function onDel(e) {
     if(par.classList.contains(requestCSS.upr)){
         if (par.hasAttribute("data-id")) {
             sendToServer({
-                login: cState.login,
+                uuid: cState.uuid,
                 id: par.getAttribute("data-id")
-            }, 'POST', "requests", "delReq")
+            }, 'POST', "requests/delReq")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_DEL, par.getAttribute("data-id")));
@@ -178,12 +178,8 @@ function onClose(e) {
 
 function setInfo() {
     sendToServer({
-        type: "REQUESTS",
         uuid: cState.uuid
-    }, 'POST', "auth", "infCon");
-    sendToServer({
-        login: cState.login
-    }, 'POST', "requests", "getRequests")
+    }, 'POST', "requests/getRequests")
         .then(data => {
             if(data.error == false){
                 dispatch(changeReq(CHANGE_REQUEST_GL, undefined, data.body));
@@ -243,7 +239,7 @@ export function Request() {
     useEffect(() => {
         console.log("I was triggered during componentDidMount Request.jsx");
         setActived(11);
-        setInfo();
+        if(eventSource.readyState == EventSource.OPEN) setInfo();
         eventSource.addEventListener('addReq', addReq, false);
         eventSource.addEventListener('chText', chText, false);
         eventSource.addEventListener('chDate', chDate, false);

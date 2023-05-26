@@ -16,11 +16,11 @@ import javax.persistence.*;
     private String email, date;
 
     @Column(columnDefinition="CLOB")
-    private String text;//FIO
+    private String fio;
 
-    public Request(String email, String date, String text) {
+    public Request(String email, String date, String fio) {
         this.email = email;
         this.date = date;
-        this.text = text;
+        this.fio = fio;
     }
 }
