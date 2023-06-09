@@ -5,7 +5,7 @@ import scheduleCSS from './schedule.module.css';
 import {groups, schedules, states, teachers, themes} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
 import {eventSource, sendToServer, setActived} from "../../main/Main";
-import {chStatB, ele, onClose, onEdit, setActNew} from "../AnalyticsMain";
+import {chStatB, ele, onClose, onEdit} from "../AnalyticsMain";
 import Pane from "../../other/pane/Pane";
 import yes from "../../../media/yes.png";
 import {
@@ -55,16 +55,14 @@ function onFin(e, type, info) {
             let inpm = ["sinpnpt_", "sinpnkt_"];
             if(inps.sinpnpt_ && inps.sinpnkt_ && inps.nyid)
             {
-                let obj;
-                obj = {
+                addLesson(info.id, {
                     name: inps.sinpnpt_,
                     cabinet: inps.sinpnkt_,
                     prepod: {
                         name: inps.nw.prepod,
                         id: inps.nyid
                     }
-                }
-                addLesson(info.id, info.id1, obj);
+                });
                 // dispatch(changeAnalytics(type, param, id, undefined, obj));
             } else {
                 for(let i = 0, inpf; i < inpm.length; i++) {
@@ -77,11 +75,10 @@ function onFin(e, type, info) {
     }
     if(!inp){
         if(type == CHANGE_SCHEDULE_PARAM) {
-            let obj = {
+            dispatch(changeAnalytics(type, info.id, info.id1, info.par, {
                 name: inps.nw.prepod,
                 id: inps.nyid
-            }
-            dispatch(changeAnalytics(type, info.id, info.id1, info.par, obj));
+            }));
         }
         par = par.parentElement;
         par.dataset.st = '0';
@@ -105,6 +102,126 @@ function onFin(e, type, info) {
     }
 }
 
+function getEdLessons(dLI, dai, param, preps, minLess) {
+    let lel = parseInt(dLI[dLI.length-1]);
+    let mas = Array(lel > (minLess-1) ? lel : minLess).fill('');
+    for(let numLess of dLI) {
+        mas[numLess] = numLess;
+    }
+    dLI = mas;
+    return dLI.map((param1, i1, x, les = dai ? dai.lessons[param1] : undefined) => <>
+        {param1 == '' &&<>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+        </>}
+        {param1 != '' && <>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                {parseInt(param1)+1}
+            </div>
+            <div className={analyticsCSS.edbl+" "+analyticsCSS.nav_iZag3} data-st="0">
+                <div className={analyticsCSS.fi}>
+                    <div className={analyticsCSS.nav_i+" "+analyticsCSS.nav_iZag2} id={analyticsCSS.nav_i}>
+                        {les.name}
+                    </div>
+                    <img className={analyticsCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                </div>
+                <div className={analyticsCSS.ed}>
+                    <div className={analyticsCSS.preinf}>
+                        Предмет:
+                    </div>
+                    <input className={analyticsCSS.inp} id={"sinpnpt_" + param + "_" + param1} placeholder={"Математика"} defaultValue={les.name} onChange={e=>chStatB(e, inps)} type="text"/>
+                    {ele(false, "sinpnpt_" + param + "_" + param1, inps)}
+                    <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "name", id: param, id1: param1})} title="Подтвердить" alt=""/>
+                    <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                </div>
+            </div>
+            <div className={analyticsCSS.edbl+" "+analyticsCSS.nav_iZag3} data-st="0">
+                <div className={analyticsCSS.fi}>
+                    <div className={analyticsCSS.nav_i+" "+analyticsCSS.nav_iZag2} id={analyticsCSS.nav_i}>
+                        {les.cabinet}
+                    </div>
+                    <img className={analyticsCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                </div>
+                <div className={analyticsCSS.ed}>
+                    <div className={analyticsCSS.preinf}>
+                        Кабинет:
+                    </div>
+                    <input className={analyticsCSS.inp} id={"sinpnkt_" + param + "_" + param1} placeholder={"300"} defaultValue={les.cabinet} onChange={e=>chStatB(e, inps)} type="text"/>
+                    {ele(false, "sinpnkt_" + param + "_" + param1, inps)}
+                    <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "cabinet", id: param, id1: param1})} title="Подтвердить" alt=""/>
+                    <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                </div>
+            </div>
+            <div className={analyticsCSS.edbl+" "+analyticsCSS.nav_iZag3} data-st="0">
+                <div className={analyticsCSS.fi}>
+                    <div className={analyticsCSS.nav_i+" "+analyticsCSS.nav_iZag2} id={analyticsCSS.nav_i}>
+                        {les.prepod.name}
+                    </div>
+                    <img className={analyticsCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                    <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={e=>onDel(e, {id: param, id1: param1})} title="Удалить" alt=""/>
+                </div>
+                <div className={analyticsCSS.ed}>
+                    <div className={analyticsCSS.preinf}>
+                        Педагог:
+                    </div>
+                    {preps}
+                    <img className={analyticsCSS.imginp} data-enable={inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "prepod", id: param, id1: param1})} title="Подтвердить" alt=""/>
+                    <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                </div>
+            </div>
+        </>}</>
+    )
+}
+
+function getLessons(dLI, dai, param, preps, minLess) {
+    let lel = parseInt(dLI[dLI.length-1]);
+    let mas = Array(lel > (minLess-1) ? lel : minLess).fill('');
+    for(let numLess of dLI) {
+        mas[numLess] = numLess;
+    }
+    dLI = mas;
+    return dLI.map((param1, i1, x, les = dai ? dai.lessons[param1] : undefined) => <>
+        {param1 == '' &&<>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                <br />
+            </div>
+        </>}
+        {param1 != '' && <>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                {parseInt(param1)+1}
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                {les.name}
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                {les.cabinet}
+            </div>
+            <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
+                {cState.role == 2 ? les.group : les.prepod.name}
+            </div>
+        </>}</>
+    )
+}
+
 function getSched(b) {
     let dI, preps;
     dI = [0, 1, 2, 3, 4, 5, 6];
@@ -124,64 +241,7 @@ function getSched(b) {
                 <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i} style={{gridColumn: "4"}}>
                     Преподаватель
                 </div>
-                {dLI.map((param1, i1, x, les = dai.lessons[param1]) =>
-                    <>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            {i1 + 1}
-                        </div>
-                        <div className={analyticsCSS.edbl+" "+analyticsCSS.nav_iZag3} data-st="0">
-                            <div className={analyticsCSS.fi}>
-                                <div className={analyticsCSS.nav_i+" "+analyticsCSS.nav_iZag2} id={analyticsCSS.nav_i}>
-                                    {les.name}
-                                </div>
-                                <img className={analyticsCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                            </div>
-                            <div className={analyticsCSS.ed}>
-                                <div className={analyticsCSS.preinf}>
-                                    Предмет:
-                                </div>
-                                <input className={analyticsCSS.inp} id={"sinpnpt_" + param + "_" + param1} placeholder={"Математика"} defaultValue={les.name} onChange={e=>chStatB(e, inps)} type="text"/>
-                                {ele(false, "sinpnpt_" + param + "_" + param1, inps)}
-                                <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "name", id: param, id1: param1})} title="Подтвердить" alt=""/>
-                                <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                            </div>
-                        </div>
-                        <div className={analyticsCSS.edbl+" "+analyticsCSS.nav_iZag3} data-st="0">
-                            <div className={analyticsCSS.fi}>
-                                <div className={analyticsCSS.nav_i+" "+analyticsCSS.nav_iZag2} id={analyticsCSS.nav_i}>
-                                    {les.cabinet}
-                                </div>
-                                <img className={analyticsCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                            </div>
-                            <div className={analyticsCSS.ed}>
-                                <div className={analyticsCSS.preinf}>
-                                    Кабинет:
-                                </div>
-                                <input className={analyticsCSS.inp} id={"sinpnkt_" + param + "_" + param1} placeholder={"300"} defaultValue={les.cabinet} onChange={e=>chStatB(e, inps)} type="text"/>
-                                {ele(false, "sinpnkt_" + param + "_" + param1, inps)}
-                                <img className={analyticsCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "cabinet", id: param, id1: param1})} title="Подтвердить" alt=""/>
-                                <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                            </div>
-                        </div>
-                        <div className={analyticsCSS.edbl+" "+analyticsCSS.nav_iZag3} data-st="0">
-                            <div className={analyticsCSS.fi}>
-                                <div className={analyticsCSS.nav_i+" "+analyticsCSS.nav_iZag2} id={analyticsCSS.nav_i}>
-                                    {les.prepod.name}
-                                </div>
-                                <img className={analyticsCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                                <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={e=>onDel(e, {id: param, id1: param1})} title="Удалить" alt=""/>
-                            </div>
-                            <div className={analyticsCSS.ed}>
-                                <div className={analyticsCSS.preinf}>
-                                    Педагог:
-                                </div>
-                                {preps}
-                                <img className={analyticsCSS.imginp} data-enable={inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE_PARAM, {par: "prepod", id: param, id1: param1})} title="Подтвердить" alt=""/>
-                                <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                            </div>
-                        </div>
-                    </>
-                )}
+                {getEdLessons(dLI, dai, param, preps, 4)}
                 <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
                     X
                 </div>
@@ -204,26 +264,10 @@ function getSched(b) {
                             , Педагог:
                         </div>
                         {preps}
-                        <img className={analyticsCSS.imginp} data-enable={inps.sinpnpt_ && inps.sinpnkt_ && inps && inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE, {id: i, id1: dai ? dai.dayId : undefined})} title="Подтвердить" alt=""/>
+                        <img className={analyticsCSS.imginp} data-enable={inps.sinpnpt_ && inps.sinpnkt_ && inps && inps.nw && inps.nw.prepod ? "1" : "0"} src={yes} onClick={e=>onFin(e, CHANGE_SCHEDULE, {id: i})} title="Подтвердить" alt=""/>
                         <img className={analyticsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                     </div>
                 </div>
-                {dLI.length < 4 && Array(4-dLI.length).fill('').map(param =>
-                    <>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                    </>
-                )}
             </div>
         )
     :
@@ -241,38 +285,7 @@ function getSched(b) {
                 <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i} style={{gridColumn: "4"}}>
                     {cState.role == 2 ? "Группа" : "Преподаватель"}
                 </div>
-                {dLI.map((param1, i1, x, les = dai.lessons[param1]) =>
-                    <>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            {i1 + 1}
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            {les.name}
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            {les.cabinet}
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            {cState.role == 2 ? les.group : les.prepod.name}
-                        </div>
-                    </>
-                )}
-                {dLI.length < 5 && Array(5-dLI.length).fill('').map(param =>
-                    <>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                        <div className={analyticsCSS.nav_i} id={analyticsCSS.nav_i}>
-                            <br />
-                        </div>
-                    </>
-                )}
+                {getLessons(dLI, dai, param, preps, 5)}
             </div>
         )
 }
@@ -286,32 +299,30 @@ function selecPrep(e, id, obj) {
 
 function getPrep() {
     let ltI0 = Object.getOwnPropertyNames(teachersInfo);
-    return (
-        <div className={scheduleCSS.blockList}>
-            <div className={analyticsCSS.nav_i+' '+scheduleCSS.selEl} id={analyticsCSS.nav_i}>
-                <div className={scheduleCSS.elInf}>Педагог:</div>
-                <div className={scheduleCSS.elText}>{inps && inps.nw && inps.nw.prepod ? inps.nw.prepod : "Не выбран"}</div>
-                <img className={scheduleCSS.mapImg} data-enablem={ltI0.length < 2 ? "0" : "1"} src={themeState.theme_ch ? mapd : mapl} alt=""/>
-            </div>
-            <div className={scheduleCSS.list}>
-                {ltI0.map((param1, i, x, info = teachersInfo[param1], lltI = (info && info.tea ? Object.getOwnPropertyNames(info.tea) : [])) =>
-                    <>
-                        {lltI.length > 0 &&
-                            <div className={analyticsCSS.nav_i+' '+scheduleCSS.listZag} id={analyticsCSS.nav_i}>
-                                <div className={scheduleCSS.elInf}>{param1 == "nt" ? "Нераспределённые" : info.name}:</div>
-                            </div>
-                        }
-                        {lltI.map((param2, i, x, tO = info.tea[param2]) =>
-                            <div className={analyticsCSS.nav_i+' '+scheduleCSS.listEl} key={param2} id={analyticsCSS.nav_i} onClick={e => (selecPrep(e, param2, tO))}>
-                                <div className={scheduleCSS.elInf}>Педагог:</div>
-                                <div className={scheduleCSS.elText}>{tO.name}</div>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+    return <div className={scheduleCSS.blockList}>
+        <div className={analyticsCSS.nav_i+' '+scheduleCSS.selEl} id={analyticsCSS.nav_i}>
+            <div className={scheduleCSS.elInf}>Педагог:</div>
+            <div className={scheduleCSS.elText}>{inps && inps.nw && inps.nw.prepod ? inps.nw.prepod : "Не выбран"}</div>
+            <img className={scheduleCSS.mapImg} data-enablem={ltI0.length < 2 ? "0" : "1"} src={themeState.theme_ch ? mapd : mapl} alt=""/>
         </div>
-    )
+        <div className={scheduleCSS.list}>
+            {ltI0.map((param1, i, x, info = teachersInfo[param1], lltI = (info && info.tea ? Object.getOwnPropertyNames(info.tea) : [])) =>
+                <>
+                    {lltI.length > 0 &&
+                        <div className={analyticsCSS.nav_i+' '+scheduleCSS.listZag} id={analyticsCSS.nav_i}>
+                            <div className={scheduleCSS.elInf}>{param1 == "nt" ? "Нераспределённые" : info.name}:</div>
+                        </div>
+                    }
+                    {lltI.map((param2, i, x, tO = info.tea[param2]) =>
+                        <div className={analyticsCSS.nav_i+' '+scheduleCSS.listEl} key={param2} id={analyticsCSS.nav_i} onClick={e => (selecPrep(e, param2, tO))}>
+                            <div className={scheduleCSS.elInf}>Педагог:</div>
+                            <div className={scheduleCSS.elText}>{tO.name}</div>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
+    </div>
 }
 
 function onCon(e) {
@@ -321,16 +332,15 @@ function onCon(e) {
 function addLessonC(e) {
     const msg = JSON.parse(e.data);
     console.log("dsf3", msg);
-    dispatch(changeAnalytics(CHANGE_SCHEDULE, msg.day, msg.les, msg.dayId, msg.body));
+    dispatch(changeAnalytics(CHANGE_SCHEDULE, msg.day, msg.les, undefined, msg.body));
     dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, msg.bodyT));
 }
 
-function addLesson(day, dayId, obj) {
+function addLesson(day, obj) {
     sendToServer({
         uuid: cState.uuid,
         group: groupsInfo.els.group,
         day: day,
-        dayId: dayId,
         obj: obj
     }, 'POST', "schedule/addLesson");
 }
@@ -375,18 +385,15 @@ export function Schedule() {
     groupsInfo = useSelector(groups);
     themeState = useSelector(themes);
     cState = useSelector(states);
-    if(!dispatch && cState.role != 2) {
-        setActNew(2);
-        if(eventSource.readyState == EventSource.OPEN) setInfo();
-        eventSource.addEventListener('connect', onCon, false);
-        eventSource.addEventListener('addLessonC', addLessonC, false);
-    }
-    if(!dispatch && cState.role == 2) setActived(8);
+    if(!dispatch) setActived(cState.role == 2 ? 8 : 2);
     [_, forceUpdate] = useReducer((x) => x + 1, 0);
     dispatch = useDispatch();
     const isFirstUpdate = useRef(true);
     useEffect(() => {
         console.log("I was triggered during componentDidMount Schedule.jsx");
+        if(eventSource.readyState == EventSource.OPEN) setInfo();
+        eventSource.addEventListener('connect', onCon, false);
+        eventSource.addEventListener('addLessonC', addLessonC, false);
         for(let el of document.querySelectorAll(" *[id^='sinpn']")){
             chStatB({target: el}, inps);
         }

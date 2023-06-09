@@ -19,7 +19,7 @@ public class Role implements Serializable {
     private List<Long> parents;
 
     private List<Long> parentsInv;
-    private List<Long> subjects;
+    private List<String> subjects;
 
     public Role(String email, Long YO, Long group, List<Long> parents) { // kid
         this.email = email;
@@ -34,7 +34,7 @@ public class Role implements Serializable {
         this.kids = kids;
     }
 
-    public Role(String email, List<Long> subjects, Long YO) { // tea
+    public Role(String email, List<String> subjects, Long YO) { // tea
         this.email = email;
         this.YO = YO;
         this.subjects = subjects;
@@ -49,7 +49,7 @@ public class Role implements Serializable {
         this.email = email;
     }
 
-    public List<Long> getSubjects() {
+    public List<String> getSubjects() {
         if(subjects == null) subjects = new ArrayList<>();
         return subjects;
     }

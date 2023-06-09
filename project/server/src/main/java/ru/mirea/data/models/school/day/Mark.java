@@ -10,15 +10,31 @@ import javax.persistence.*;
 @Entity public class Mark {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "usr")
-    private Long user;
-
-    private Long userInv;
+    private Long usr, userInv, period;
 
     private int mark, weight;
 
-    private String type;
+    private String type, style;
+
+    private float avg;
+
+    public Mark(Long usr, Long period, int mark, int weight, String type, String style) {
+        this.usr = usr;
+        this.period = period;
+        this.mark = mark;
+        this.weight = weight;
+        this.type = type;
+        this.style = style;
+    }
+
+    public Mark(Long usr, Long period, int weight, String type, float avg) {
+        this.usr = usr;
+        this.period = period;
+        this.weight = weight;
+        this.type = type;
+        this.avg = avg;
+    }
 }

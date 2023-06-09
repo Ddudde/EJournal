@@ -8,7 +8,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import com.google.gson.stream.JsonReader;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.school.day.Day;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,16 @@ public class Test {
     private static final InputStream config = Test.class.getResourceAsStream("e-journalfcm-firebase-auth.json");
 
     public static void main(String[] args) throws Exception {
-        stringTest1();
+        setTest1();
+    }
+
+    private static void setTest1() throws Exception {
+        Map<String, List<Long>> map = Map.of("Англ. Яз", List.of(67L), "Математика", List.of(67L, 68L));
+        Set<String> arr = new HashSet<>(map.keySet());
+        System.out.println(arr.addAll(List.of("dfgg", "fdg5", "Математика")));
+        System.out.println(arr);
+        System.out.println(map.keySet());
+        System.out.println(map);
     }
 
     private static void stringTest1() throws Exception {
@@ -195,21 +203,21 @@ public class Test {
     }
 
     private static void mapTest(){
-        Map<Integer, Day> day = new HashMap<>();
-        day.put(2, new Day("ret"));
-        day.put(0, new Day("pet"));
-        day.put(1, new Day("mek"));
-        day.remove(1);
-        System.out.println(day);
-        System.out.println(day.get(1));
-        for(Map.Entry<Integer, Day> entr : day.entrySet()){
-            System.out.println(entr.getKey()+" "+entr.getValue());
-        }
-        day.put(3, new Day("qek"));
-        System.out.println(day);
-        for(Map.Entry<Integer, Day> entr : day.entrySet()){
-            System.out.println(entr.getKey()+" "+entr.getValue());
-        }
+//        Map<Integer, DayL> day = new HashMap<>();
+//        day.put(2, new DayL("ret"));
+//        day.put(0, new DayL("pet"));
+//        day.put(1, new DayL("mek"));
+//        day.remove(1);
+//        System.out.println(day);
+//        System.out.println(day.get(1));
+//        for(Map.Entry<Integer, DayL> entr : day.entrySet()){
+//            System.out.println(entr.getKey()+" "+entr.getValue());
+//        }
+//        day.put(3, new DayL("qek"));
+//        System.out.println(day);
+//        for(Map.Entry<Integer, DayL> entr : day.entrySet()){
+//            System.out.println(entr.getKey()+" "+entr.getValue());
+//        }
     }
 
     private static void jsonTest4() throws Exception {

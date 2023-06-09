@@ -1,18 +1,9 @@
 import {CHANGE_DNEVNIK, CHANGE_DNEVNIK_DAY_DOWN, CHANGE_DNEVNIK_DAY_UP} from '../actions';
 
 const initialState = {
-    currWeek: "14.05.22",
-    min: "09.05.22",
-    max: "23.05.22",
-    schedule: {
-        0 : ["Англ. яз.", "Русский яз.", "Математика", "Окруж. мир"],
-        1 : ["Русский яз.", "Математика", "Англ. яз.", "Русский яз.", "Математика", "Окруж. мир"],
-        2 : ["Англ. яз.", "Англ. яз.", "Русский яз.", "Математика", "Окруж. мир"],
-        3 : ["Математика", "Окруж. мир"],
-        4 : ["Англ. яз.", "Русский яз."],
-        5 : [],
-        6 : []
-    },
+    min: "25.05.23",
+    max: "01.07.23",
+    reqWeek: [0],
     days: {
         "14.05.22": {
             lessons: [
@@ -113,28 +104,15 @@ const initialState = {
 };
 
 export default function dnevnikReducer(state = initialState, action) {
+    let fd = {...state};
     switch(action.type) {
         case CHANGE_DNEVNIK:
-            return {
-                    ...state,
-                    [action.payload.stateId]: action.payload.cState
-                };
+            fd[action.payload.stateId] = action.payload.cState;
+            return fd;
         case CHANGE_DNEVNIK_DAY_UP:
-            return {
-                    ...state,
-                    days: {
-                        [action.payload.stateId]: action.payload.cState,
-                        ...state.days
-                    }
-                };
+            return fd;
         case CHANGE_DNEVNIK_DAY_DOWN:
-            return {
-                ...state,
-                days: {
-                    ...state.days,
-                    [action.payload.stateId]: action.payload.cState
-                }
-            };
+            return fd;
         default:
             return state;
     }

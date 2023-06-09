@@ -9,12 +9,9 @@ import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.Request;
-import ru.mirea.data.models.school.School;
-import ru.mirea.data.models.school.dayOfWeek.DayOfWeek;
-import ru.mirea.data.models.school.dayOfWeek.Lesson;
-import ru.mirea.data.models.school.dayOfWeek.Subject;
+import ru.mirea.data.models.school.*;
+import ru.mirea.data.models.school.day.Day;
+import ru.mirea.data.models.school.day.Mark;
 
 import java.text.ParseException;
 import java.time.Duration;
@@ -36,7 +33,7 @@ public class IniDB {
             2L, new Role("ex@ya.ru", new ArrayList<>(), 5L),
             3L, new Role("ex@ya.ru", 5L),
             4L, new Role("ex@ya.ru")
-        ), 4L, 1L, 76L));
+        ), 4L, 1L, 68L));
         serv.createUser(new User("nm12", "1111",
             "Петров В.В.", Map.of(
             0L, new Role("ex@ya.ru", 6L, 17L, new ArrayList<>(asList(1L, 2L))),
@@ -44,25 +41,25 @@ public class IniDB {
             2L, new Role("ex@ya.ru", new ArrayList<>(), 6L),
             3L, new Role("ex@ya.ru", 6L),
             4L, new Role("ex@ya.ru")
-        ), 4L, 1L, 77L));
+        ), 4L, 1L, 69L));
         System.out.println(serv.getUsers());
 
         serv.createReq(new Request("ex@ya.ru","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
         System.out.println(serv.getRequests());
 
-        serv.createSchool(new School("Школа", new ArrayList<>(asList(7L, 8L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L)), new ArrayList<>(asList(64L, 65L)), new ArrayList<>(asList(66L))));
-        serv.createSchool(new School("Гимназия", new ArrayList<>(asList(1L)), new ArrayList<>(asList(9L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L)), new ArrayList<>(), new ArrayList<>()));
-        serv.createSchool(new School("Лицей", new ArrayList<>(asList(2L)), new ArrayList<>(asList(14L)), 15L, new ArrayList<>(asList(17L, 18L, 19L, 20L)), new ArrayList<>(), new ArrayList<>()));
+        serv.createSchool(new School("Школа", asList(7L, 8L), asList(14L), 15L, asList(17L, 18L, 19L, 20L), asList(64L), asList(86L, 87L, 88L)));
+        serv.createSchool(new School("Гимназия", asList(1L),asList(9L), asList(14L), 15L, asList(17L, 18L, 19L, 20L), asList(), asList()));
+        serv.createSchool(new School("Лицей", asList(2L), asList(14L), 15L, asList(17L, 18L, 19L, 20L), asList(), asList()));
         System.out.println(serv.getSchools());
 
         serv.createUser(new User("nm13", "1111",
             "Петров В.В.", Map.of(
             3L, new Role("ex@ya.ru", 4L)
-        ), 3L, 78L));
+        ), 3L, 70L));
         serv.createUser(new User("nm14", "1111",
             "Петров В.В.", Map.of(
             3L, new Role("ex@ya.ru", 4L)
-        ), 3L, 79L));
+        ), 3L, 71L));
 
         Instant after = Instant.now().plus(Duration.ofDays(30));
         Date dateAfter = Date.from(after);
@@ -96,7 +93,7 @@ public class IniDB {
         serv.createUser(new User("nm15", "1111",
             "Петров В.В.", Map.of(
             0L, new Role("ex@ya.ru", 4L, 17L, new ArrayList<>(asList(1L, 2L)))
-        ), 0L, 80L));//16L
+        ), 0L, 72L));//16L
 
         createGroups();//60L
         System.out.println(serv.getGroups());
@@ -104,62 +101,68 @@ public class IniDB {
         serv.createUser(new User("nm16", "1111",
             "Петров В.В.", Map.of(
             0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(62L, 63L)))
-        ), 0L, 81L));//61L
+        ), 0L, 73L));//61L
 
         serv.createUser(new User("nm17", "1111",
             "Петров В.В.", Map.of(
-            1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 75L)))
-        ), 1L, 61L, 81L));//62L
+            1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 67L)))
+        ), 1L, 61L, 74L));//62L
 
         serv.createUser(new User("nm18", "1111",
             "Петрова В.В.", Map.of(
-            1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 75L)))
-        ), 1L, 61L, 82L));//63L
-
-        serv.createSubject(new Subject("Англ. Яз.", 4L, new ArrayList<>(asList(67L))));
-        serv.createSubject(new Subject("Математика", 4L, new ArrayList<>(asList(68L))));
-        System.out.println(serv.getSubjects());
+            1L, new Role("ex@ya.ru", 4L, new ArrayList<>(asList(61L, 67L)))
+        ), 1L, 61L, 75L));//63L
 
         serv.createUser(new User("nm19", "1111",
             "Петрова В1.В.", Map.of(
             2L, new Role("ex@ya.ru", new ArrayList<>(), 4L)
-        ), 2L, 83L));//66L
+        ), 2L, 76L));//64L
 
         serv.createUser(new User("nm20", "1111",
             "Петрова В2.В.", Map.of(
-            2L, new Role("ex@ya.ru", new ArrayList<>(asList(64L)), 4L)
-        ), 2L, 84L));//67L
+            2L, new Role("ex@ya.ru", new ArrayList<>(asList("Англ. Яз.")), 4L)
+        ), 2L, 77L));//65L
 
         serv.createUser(new User("nm21", "1111",
             "Петрова В3.В.", Map.of(
-            2L, new Role("ex@ya.ru", new ArrayList<>(asList(65L)), 4L)
-        ), 2L, 85L));//68L
-
-        serv.createLesson(new Lesson(64L, 67L, "300"));
-        serv.createLesson(new Lesson(64L, 67L, "301"));
-        serv.createLesson(new Lesson(65L, 68L, "302"));
-        serv.createLesson(new Lesson(65L, 68L, "303"));
-        System.out.println(serv.getLessons());
-        serv.createDayOfWeek(new DayOfWeek(Map.of(0L, 69L, 1L, 70L, 2L, 71L)));
-        serv.createDayOfWeek(new DayOfWeek(Map.of(0L, 72L)));
-        System.out.println(serv.getDaysOfWeek());
+            2L, new Role("ex@ya.ru", new ArrayList<>(asList("Математика")), 4L)
+        ), 2L, 78L));//66L
 
         serv.createUser(new User("nm22", "1111",
             "Петров В.Вa.", Map.of(
             0L, new Role("ex@ya.ru", 4L, 18L, new ArrayList<>(asList(62L, 63L)))
-        ), 0L, 86L));//75L
+        ), 0L, 79L));//67L
 
+        serv.createSettingUser(new SettingUser(2));//68L
+        serv.createSettingUser(new SettingUser(1));//69L
+        serv.createSettingUser(new SettingUser(2, true, Set.of("4News", "news")));//70L
+        serv.createSettingUser(new SettingUser(2));//71L
+        serv.createSettingUser(new SettingUser(2));//72L
+        serv.createSettingUser(new SettingUser(2, true, Set.of("4News", "news")));//73L
+        serv.createSettingUser(new SettingUser(2));//74L
+        serv.createSettingUser(new SettingUser(2));//75L
         serv.createSettingUser(new SettingUser(2));//76L
-        serv.createSettingUser(new SettingUser(1));//77L
-        serv.createSettingUser(new SettingUser(2, Set.of("4News", "news")));//78L
+        serv.createSettingUser(new SettingUser(2));//77L
+        serv.createSettingUser(new SettingUser(2));//78L
         serv.createSettingUser(new SettingUser(2));//79L
-        serv.createSettingUser(new SettingUser(2));//80L
-        serv.createSettingUser(new SettingUser(2));//81L
-        serv.createSettingUser(new SettingUser(2));//82L
-        serv.createSettingUser(new SettingUser(2));//83L
-        serv.createSettingUser(new SettingUser(2));//84L
-        serv.createSettingUser(new SettingUser(2));//85L
-        serv.createSettingUser(new SettingUser(2));//86L
+
+        serv.createLesson(new Lesson(4L, 65L, 18L, 0, 0, "300", "Англ. Яз"));//80L
+        serv.createLesson(new Lesson(4L, 65L, 18L, 0, 1, "301", "Англ. Яз"));
+        serv.createLesson(new Lesson(4L, 66L, 18L, 0, 2, "302", "Математика"));
+        serv.createLesson(new Lesson(4L, 66L, 18L, 1, 0, "303", "Математика"));
+        serv.createLesson(new Lesson(4L, 66L, 18L, 1, 5, "32", "Математика"));
+        serv.createLesson(new Lesson(4L, 65L, 18L, 1, 6, "362", "Математика"));//85L
+
+        serv.createPeriod(new Period("I четверть", "01.09.22", "03.11.22"));//86L
+        serv.createPeriod(new Period("II четверть", "12.11.22", "29.12.22"));//87L
+        serv.createPeriod(new Period("IV четверть", "01.04.23", "30.05.23"));//88L
+        serv.createMark(new Mark(61L, 88L, 5, 1, "norm", "Ответ на уроке"));//89L
+        serv.createMark(new Mark(61L, 88L, 3, 5, "norm", "Контрольная работа"));//90L
+        serv.createMark(new Mark(67L, 88L, 4, 5, "norm", "Контрольная работа"));//91L
+        serv.createMark(new Mark(61L, 88L, 0, "avg", 4.0f));//92L
+        serv.createMark(new Mark(67L, 88L, 0, "avg", 4.0f));//93L
+        serv.createDay(new Day(4L, 66L, 18L, "Математика", null, "05.06.23", new ArrayList<>(asList(89L, 91L))));
+        serv.createDay(new Day(4L, 66L, 18L, "Математика", null, "06.06.23", new ArrayList<>(asList(90L))));
     }
 
     private void checkDates(){
@@ -201,7 +204,7 @@ public class IniDB {
 
     public void createGroups(){
         serv.createGroup(new Group("11A", new ArrayList<>(asList(1L, 2L, 16L))));//17L
-        serv.createGroup(new Group("11Б", new ArrayList<>(asList(61L, 75L)), Map.of(0L, 73L, 1L, 74L)));
+        serv.createGroup(new Group("11Б", new ArrayList<>(asList(61L, 67L))));
         serv.createGroup(new Group("11В"));
         serv.createGroup(new Group("11Г"));
         serv.createGroup(new Group("10А"));

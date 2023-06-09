@@ -16,6 +16,7 @@ import {
     CHANGE_ZVONKI_SMENA,
     changeAnalytics
 } from "../../store/actions";
+import {addPer} from "./periods/Periods";
 
 let gr, cState, ke, dispatch;
 
@@ -61,17 +62,10 @@ export function onFin(e, inps, forceUpdate, type, info) {
     inp = par.querySelector("input");
     if(par.classList.contains(analyticsCSS.edbl)){
         if(type == CHANGE_PERIODS_L1){
-            let inpm = ["inpnnt_", "inpnit_"];
-            if(inps.inpnnt_ && inps.inpnit_)
+            let inpm = ["inpnnt_", "inpnit_", "inpnit1_"];
+            if(inps.inpnnt_ && inps.inpnit_ && inps.inpnit1_)
             {
-                let grop, id, obj;
-                grop = Object.getOwnPropertyNames(info.prs);
-                id = grop.length == 0 ? 0 : (parseInt(grop[grop.length-1]) + 1);
-                obj = {
-                    name: inps.inpnnt_,
-                    per: inps.inpnit_
-                }
-                dispatch(changeAnalytics(type, "prs", id, undefined, obj));
+                addPer(inps.inpnnt_, inps.inpnit_, inps.inpnit1_);
             } else {
                 for(let i = 0, inpf; i < inpm.length; i++) {
                     inpf = document.querySelector("." + analyticsCSS.edbl + " *[id='" + inpm[i] + "']")
@@ -113,13 +107,12 @@ export function onFin(e, inps, forceUpdate, type, info) {
                     dispatch(changeAnalytics(type, id, "lessons", id1, inp.value));
                 }
             } else if(type == CHANGE_ZVONKI_SMENA){
-                let grop, id, obj;
+                let grop, id;
                 grop = Object.getOwnPropertyNames(info);
                 id = grop.length == 0 ? 0 : (parseInt(grop[grop.length-1]) + 1);
-                obj = {
+                dispatch(changeAnalytics(type, id, undefined, undefined, {
                     name: inp.value
-                }
-                dispatch(changeAnalytics(type, id, undefined, undefined, obj));
+                }));
             }
         }
         par.setAttribute('data-st', '0');
@@ -208,14 +201,12 @@ export function AnalyticsMain(props) {
         }
         console.log('componentDidUpdate AnalyticsMain.jsx');
     });
-    return (
-        <div className={analyticsCSS.AppHeader}>
-            <div style={{width:"inherit", height: "7vh", position: "fixed", zIndex:"1"}} ref={()=>(ke = !ke ? paneInfo.els.length : ke)}>
-                <Pane gro={gr}/>
-            </div>
-            <Outlet />
-            {props.comp && props.comp}
+    return <div className={analyticsCSS.AppHeader}>
+        <div style={{width:"inherit", height: "7vh", position: "fixed", zIndex:"1"}} ref={()=>(ke = !ke ? paneInfo.els.length : ke)}>
+            <Pane gro={gr}/>
         </div>
-    )
+        <Outlet />
+        {props.comp && props.comp}
+    </div>
 }
 export default AnalyticsMain;

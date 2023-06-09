@@ -57,9 +57,6 @@ import java.util.concurrent.ConcurrentHashMap;
                 subscriptions.remove(uuid);
                 System.out.println("subscription " + uuid + " was closed from onDispose");
             });
-            ServerSentEvent<Object> event1 = ServerSentEvent.builder()
-                .event("connect").data("").build();
-            fluxSink.next(event1);
         });
         return stream;
     }

@@ -2,7 +2,6 @@ package ru.mirea.data.models.school;
 
 import lombok.*;
 import ru.mirea.data.ListLongConverter;
-import ru.mirea.data.MapLongConverter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,10 +24,6 @@ import java.util.Map;
     @Column(columnDefinition="CLOB")
     private List<Long> kids, kidsInv;
 
-    @Convert(converter = MapLongConverter.class)
-    @Column(columnDefinition="CLOB")
-    private Map<Long, Long> daysOfWeek;
-
     public Group(String name) {
         this.name = name;
     }
@@ -36,17 +31,6 @@ import java.util.Map;
     public Group(String name, List<Long> kids) {
         this.name = name;
         this.kids = kids;
-    }
-
-    public Group(String name, List<Long> kids, Map<Long, Long> daysOfWeek) {
-        this.name = name;
-        this.kids = kids;
-        this.daysOfWeek = daysOfWeek;
-    }
-
-    public Map<Long, Long> getDaysOfWeek() {
-        if(daysOfWeek == null) daysOfWeek = new HashMap<>();
-        return daysOfWeek;
     }
 
     public List<Long> getKids() {

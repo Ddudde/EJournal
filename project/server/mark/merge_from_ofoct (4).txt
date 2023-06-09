@@ -37,7 +37,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import com.google.gson.stream.JsonReader;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.school.day.Day;
+import ru.mirea.data.models.school.day.DayL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -513,7 +513,7 @@ import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.Request;
 import ru.mirea.data.models.school.School;
 import ru.mirea.data.models.school.dayOfWeek.DayOfWeek;
-import ru.mirea.data.models.school.dayOfWeek.Lesson;
+import ru.mirea.data.models.school.Lesson;
 import ru.mirea.data.models.school.dayOfWeek.Subject;
 import ru.mirea.data.reps.ContactsRepository;
 import ru.mirea.data.reps.NewsRepository;
@@ -525,9 +525,7 @@ import ru.mirea.data.reps.school.RequestRepository;
 import ru.mirea.data.reps.school.SchoolRepository;
 import ru.mirea.data.reps.school.day.DayRepository;
 import ru.mirea.data.reps.school.day.MarkRepository;
-import ru.mirea.data.reps.school.dayOfWeek.DayOfWeekRepository;
-import ru.mirea.data.reps.school.dayOfWeek.LessonRepository;
-import ru.mirea.data.reps.school.dayOfWeek.SubjectRepository;
+import ru.mirea.data.reps.school.LessonRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -963,7 +961,7 @@ import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.Request;
 import ru.mirea.data.models.school.School;
 import ru.mirea.data.models.school.dayOfWeek.DayOfWeek;
-import ru.mirea.data.models.school.dayOfWeek.Lesson;
+import ru.mirea.data.models.school.Lesson;
 import ru.mirea.data.models.school.dayOfWeek.Subject;
 
 import java.text.ParseException;
@@ -1407,7 +1405,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 package ru.mirea.data.reps.school.dayOfWeek;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.mirea.data.models.school.dayOfWeek.Lesson;
+import ru.mirea.data.models.school.Lesson;
 
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
 }
@@ -1428,7 +1426,7 @@ public interface MarkRepository extends JpaRepository<Mark, Long> {
 package ru.mirea.data.reps.school.day;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.mirea.data.models.school.day.Day;
+import ru.mirea.data.models.school.day.DayL;
 
 public interface DayRepository extends JpaRepository<Day, Long> {
 }
@@ -4645,7 +4643,7 @@ import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
 import ru.mirea.data.models.school.dayOfWeek.DayOfWeek;
-import ru.mirea.data.models.school.dayOfWeek.Lesson;
+import ru.mirea.data.models.school.Lesson;
 import ru.mirea.data.models.school.dayOfWeek.Subject;
 import ru.mirea.services.ServerService;
 

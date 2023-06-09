@@ -7,23 +7,19 @@
 }
 
 .panel{
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 	position:fixed;
 	width: inherit;
 	height: 7vh;
-	display: grid;
-	place-items: center;
-    grid-template: auto/85% 15%;
-	justify-items: stretch;
 	z-index: 1;
-	-webkit-transition: background-color 1s ease;
-	-o-transition: background-color 1s ease;
-	transition: background-color 1s ease;
-	background-color: var(--bgcV1);
-	margin-block: -0.5px;
+	display: flex;
+}
+
+.pane{
+	width: 85%;
+	height: 100%;
+	z-index: 1;
+	margin-block: 0.5px;
 }
 
 .nav_i{
@@ -33,16 +29,17 @@
 	color: var(--cV1);
 	font-size: 1.25vw;
 	font-weight: bold;
+	text-shadow: 1px 1px 3px var(--shdV1);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	align-self: stretch;
-	-webkit-transition: color 1s 1s ease;
-	-o-transition: color 1s 1s ease;
-	transition: color 1s 1s ease;
+	transition: color 1s ease;
 	transition-property: color, text-shadow, border-color, background-color;
 	background-color: var(--bgcV1);
 	border-radius: 5px;
+	backface-visibility: hidden;
+	perspective: 1000px;
 }
 
 .nav_iJur{
@@ -61,55 +58,12 @@
 }
 
 #nav_i:active, #nav_i[data-act="1"]{
-	-webkit-transition: color 0.1s ease;
-	-o-transition: color 0.1s ease;
 	transition: color 0.1s ease;
 	color: #004d00 !important;
 }
 
-.predBlock{
-	position: relative;
-	margin-inline: -0.5px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	align-self: stretch;
-	margin-left: -1px;
-	width: 100%;
-}
-
-.panel > div{
+.daysGrid > div, .predmGrid > div{
 	grid-row: 1;
-}
-
-.predMM{
-	height: 300%;
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-
-.predMM > div{
-	height: 33.3%;
-}
-
-.predImg{
-	width: 2vw;
-	vertical-align: middle;
-	cursor: pointer;
-	margin-left: 1vw;
-}
-
-.predText{
-	align-self: baseline;
-	font-size: 0.75vw;
-}
-
-.mapImg{
-	width: 2vw;
-	vertical-align: middle;
-	cursor: pointer;
-	margin: 0 0.1vw;
-	grid-column: 2;
 }
 
 .block{
@@ -157,9 +111,10 @@
 
 .predmGrid{
 	display: grid;
-	grid-template: 5vh /20vw repeat(auto-fit, 2vw);
+	grid-template: 5vh /20vw;
 	transition: background-color 1s ease;
 	width: fit-content;
+    grid-auto-columns: 2vw;
 }
 
 .predmGrid:hover{
@@ -168,8 +123,9 @@
 
 .daysGrid{
 	display: grid;
-	grid-template: 15vh /20vw repeat(auto-fit, 2vw);
+	grid-template: 15vh /20vw;
 	width: fit-content;
+	grid-auto-columns: 2vw;
 }
 
 .nav_iText{
@@ -377,12 +333,10 @@
 }
 
 .inp {
-	-webkit-border-radius: 0.5vmax;
 	border-radius: 0.5vmax;
 	background-color: #4d4d4d;
 	user-select: none;
-	-webkit-box-shadow: 0 1px white, inset 0 2px 2px rgba(0, 0, 0, 0.1);
-	box-shadow: 0 1px white, inset 0 2px 2px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px #FFFFFFAA, inset 0 2px 2px #000000AA;
 	border: 1px solid var(--bcV2);
 	height: 7vh;
 	position:relative;
@@ -392,9 +346,19 @@
 	display: none;
 	width: 10vw;
 	font-size: 1.25vw;
-	padding: 0;
-	padding-left: 1vw;
+	padding: 0 0 0 1vw;
 	margin-left: 1vw;
+}
+
+.inp[data-mod='1']{
+	animation: but ease 1s;
+	outline: solid red;
+}
+
+@keyframes but {
+	0%{transform: rotateZ(-2deg);}
+	50%{transform: rotateZ(2deg);}
+	100%{transform: rotateZ(0deg);}
 }
 
 img.in[data-enable="0"] {
@@ -425,10 +389,6 @@ img.in[data-enable="0"] {
 	grid-template: repeat(5, auto)/20% 80%;
 }
 
-.dbut{
-
-}
-
 .AppHeader[data-st='0'] > .blockPredm, .AppHeader[data-st='1'] > .blockDom{
 	display: block;
 }
@@ -450,49 +410,76 @@ pre.field{
 	text-align: left;
 }
 
-.predInf{
-    align-self: end;
-    font-size: 1.25vw;
+.blockList{
+	position: relative;
+	margin-inline: -0.5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	align-self: stretch;
+	margin-left: -1px;
+	width: 15%;
+	background-color: var(--bgcV1);
 }
 
-.predEl, .pred{
-	display: grid;
+.selEl, .listEl{
+	display: grid !important;
 	justify-items: center;
-	z-index: 1;
 	margin-inline: 0;
+	font-weight: 500;
+	background-color: var(--bgcV1);
+	border-radius: unset;
+	margin-left: 0.5px;
 }
 
-.predEl{
-	grid-template: auto auto / auto auto;
+.selEl{
 	width: 100%;
 	margin-block: -0.5px;
 }
 
-.pred{
-	grid-template: auto / auto;
-	background-color: var(--bgcV1);
+.listEl{
 	padding: 0;
-	height: 100%;
+	height: 33%;
 	margin-bottom: -2px;
 }
 
-.predEl img, .pred img{
+.selEl img, .listEl img{
 	width: 2vw;
 	grid-row: 1/3;
 	margin-right: 0.25vw;
 }
 
-.predEl:hover + .predMenu, .predMenu:hover, .pred:hover + .predMenu{
+.selEl:hover + .list, .list:hover, .listEl:hover + .list{
 	opacity: 1;
 	top: 100%;
 }
 
-.predMenu{
+.list{
 	position: absolute;
 	width: 100%;
-	height: 100%;
+	height: 300%;
 	top: -300%;
 	transition: top 1s ease;
 	transition-property: top, opacity;
 	opacity: 0;
+	z-index: 1;
+	overflow: auto;
+}
+
+.elInf{
+	align-self: end;
+	font-size: 1.25vw;
+}
+
+.elText{
+	align-self: baseline;
+	font-size: 0.75vw;
+}
+
+.mapImg{
+	width: 2vw;
+	vertical-align: middle;
+	cursor: pointer;
+	margin: 0 0.1vw;
+	grid-column: 2;
 }

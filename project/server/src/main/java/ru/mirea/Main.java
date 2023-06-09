@@ -5,9 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import ru.mirea.services.ServerService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+
+import static java.util.Arrays.asList;
 
 @SpringBootApplication(exclude = { JacksonAutoConfiguration.class })
 @EnableScheduling

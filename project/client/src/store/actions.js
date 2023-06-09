@@ -16,6 +16,7 @@ export const CHANGE_ZVONKI_SMENA = "CHANGE_ZVONKI_SMENA";
 export const CHANGE_ZVONKI_L1 = "CHANGE_ZVONKI_L1";
 
 export const CHANGE_PERIODS = "CHANGE_PERIODS";
+export const CHANGE_PERIODS_GL = "CHANGE_PERIODS_GL";
 export const CHANGE_PERIODS_L1 = "CHANGE_PERIODS_L1";
 export const CHANGE_PERIODS_DEL = "CHANGE_PERIODS_DEL";
 
@@ -44,6 +45,7 @@ export const CHANGE_GROUPS_GR = "CHANGE_GROUPS_GR";
 export const CHANGE_GROUPS_GL = "CHANGE_GROUPS_GL";
 
 export const CHANGE_PJOURNAL_MARKS = "CHANGE_PJOURNAL_MARKS";
+export const CHANGE_PJOURNAL_GL = "CHANGE_PJOURNAL_GL";
 export const CHANGE_PJOURNAL_DEL_MARKS = "CHANGE_PJOURNAL_DEL_MARKS";
 export const CHANGE_PJOURNAL_PER_MARKS = "CHANGE_PJOURNAL_PER_MARKS";
 export const CHANGE_PJOURNAL_DEL_PER_MARKS = "CHANGE_PJOURNAL_DEL_PER_MARKS";
@@ -171,66 +173,15 @@ export function changeDZ(dz, st) {
     };
 }
 
-export function changePjournalMarks(kid, day, mark, st, per, typ, wei) {
-    if(per != undefined){
-        if(mark == "Л") {
-            return {
-                type: CHANGE_PJOURNAL_DEL_PER_MARKS,
-                payload: {
-                    kid: kid,
-                    per: per
-                }
-            };
-        }
-        return mark == 0 || mark == "Н" ? {type: "default", payload: undefined} : {
-            type: CHANGE_PJOURNAL_PER_MARKS,
-            payload: {
-                kid: kid,
-                per: per,
-                State: mark
-            }
-        };
-    }
-    if(st == undefined){
-        st = {
-            mark: mark
-        }
-        if(typ != "") st["type"] = typ;
-        if(wei) st["weight"] = mark == "Н" ? 1 : wei;
-        if(mark == "Л") mark = 0;
-    } else {
-        st = {
-            ...st,
-            mark : mark,
-            weight : mark == "Н" || typ == "" ? 1 : st.weight
-        }
-        if(typ != "") st["type"] = typ;
-        if(wei) st["weight"] = mark == "Н" ? 1 : wei;
-        if(mark == "Л") {
-            return {
-                type: CHANGE_PJOURNAL_DEL_MARKS,
-                payload: {
-                    kid: kid,
-                    day: day
-                }
-            };
-        }
-    }
-    return mark == 0 ? {type: "default", payload: undefined} : {
-        type: CHANGE_PJOURNAL_MARKS,
+export function changePjournal(type, id, state, kid, day, per) {
+    return {
+        type: type,
         payload: {
+            id: id,
+            state: state,
+            per: per,
             kid: kid,
-            day: day,
-            State: st
-        }
-    };
-}
-
-export function changePjournal(id, state) {
-    return { type: CHANGE_PJOURNAL,
-        payload: {
-            Id: id,
-            State: state
+            day: day
         }
     };
 }
@@ -331,7 +282,8 @@ export function changeAnalytics(type, l0, l1, l2, state) {
 }
 
 export function changeDnevnik(id, state, type) {
-    return { type: type,
+    return {
+        type: type,
         payload: {
             stateId: id,
             cState: state

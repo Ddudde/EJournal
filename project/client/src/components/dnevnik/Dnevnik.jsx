@@ -1,57 +1,32 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
 import dnevCSS from './dnevnik.module.css';
-import warn from '../../media/warn_big.png';
-import {dnevnik, states} from "../../store/selector";
+import {dnevnik, schedules, states} from "../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {CHANGE_DNEVNIK_DAY_DOWN, CHANGE_DNEVNIK_DAY_UP, changeDnevnik} from "../../store/actions";
+import {CHANGE_EVENTS_CLEAR, CHANGE_SCHEDULE_GL, changeAnalytics, changeEvents} from "../../store/actions";
 import knopka from "../../media/dnevnik/knopka.png";
-import {setActived} from "../main/Main";
+import {eventSource, sendToServer, setActived} from "../main/Main";
+import ErrFound from "../other/error/ErrFound";
 
-let DoW = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"], incDow = 0, shd = 0, scrolling = false, elem = {lessons: []};
-
-let ev, dnev, dispatch, timid, cState;
-
-function fun1(x, x1) {
-    console.log("dsfsfddsf12" + x);
-    console.log("dsfsfddsf123" + x1);
-    return x1;
-}
-
-function getDoW() {
-    if(incDow > 6) incDow = 0;
-    let s = incDow;
-    incDow++;
-    shd = 0;
-    return DoW[s];
-}
-
-function setDoW(inte) {
-    incDow = inte;
-    return "";
-}
+let ev, dnev, dispatch, selKid, timid, cState, schedulesInfo, errText, DoW, scrolling, days;
+DoW = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+scrolling = false;
+errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
+days = Array(7).fill('');
+let [_, forceUpdate] = [];
 
 function tim() {
     if (scrolling) {
         scrolling = false;
-        let par = Object.getOwnPropertyNames(dnev.days);
-        if(ev.deltaY < 0 && window.pageYOffset == 0)
-        {
-            let date = getDate(par[0]);
-            for(let i = 0; i < 7; i++)
-            {
-                date.setDate(date.getDate() - 1);
-                dispatch(changeDnevnik(date.toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"2-digit"}), elem, CHANGE_DNEVNIK_DAY_UP));
-            }
+        if(ev.deltaY < 0 && window.pageYOffset == 0) {
+            let i = dnev.reqWeek[0] - 1;
+            dnev.reqWeek.splice(0, 0, i);
+            forceUpdate();
         }
-        if(ev.deltaY > 0 && window.pageYOffset >= (document.body.scrollHeight-document.body.clientHeight))
-        {
-            let date = getDate(par[par.length-1]);
-            for(let i = 0; i < 7; i++)
-            {
-                date.setDate(date.getDate() + 1);
-                dispatch(changeDnevnik(date.toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"2-digit"}), elem, CHANGE_DNEVNIK_DAY_DOWN));
-            }
+        if(ev.deltaY > 0 && window.pageYOffset >= (document.body.scrollHeight-document.body.clientHeight)) {
+            let i = dnev.reqWeek[dnev.reqWeek.length-1] + 1;
+            dnev.reqWeek.push(i);
+            forceUpdate();
         }
         knop();
     }
@@ -68,16 +43,78 @@ function getDate(dat) {
     return new Date("20" + [d[2], d[1], d[0]].join("-"));
 }
 
-function getDiff(dat, dat1, bol, bol1) {
-    let diff = (((getDate(dat) - getDate(dat1)) / 8.64e7)-(bol ? 6 : 0)) / 7
-    if(!bol1 && diff > -1 && diff < 1) return undefined;
-    if(diff < 0) return diff + "";
-    if(diff > 0) return "+" + diff;
+function getDiff(dat, dat1) {
+    return (getDate(dat) - getDate(dat1)) > 0;
 }
 
-function getName(d, n, n1) {
-    let x = n1 ? n1 : n;
-    return (getDiff(dnev.min, d, false, true) > 0 || getDiff(d, dnev.max, false, true) > 0) ? "" : x;
+function getDay(dif) {
+    let day, date;
+    date = new Date();
+    day = (date.getDay() || 7) - 1;
+    if(day) date.setDate(date.getDate() - day + dif);
+    return date.toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"2-digit"});
+}
+
+function getLessons(dLI, dayDate, day, dai, minLess) {
+    let lel, mas, numLess, weekends;
+    weekends = getDiff(dnev.min, dayDate) || getDiff(dayDate, dnev.max);
+    lel = weekends ? 0 : parseInt(dLI[dLI.length-1]);
+    mas = Array(lel > (minLess-1) ? lel : minLess).fill('');
+    if(!weekends) {
+        for (numLess of dLI) {
+            mas[numLess] = numLess;
+        }
+    }
+    dLI = mas;
+    return dLI.map((param2, lesNum, x, les = dai ? dai.lessons[param2] : undefined) => <>
+        {param2 == '' && <>
+            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+                <br />
+            </div>
+            <div className={dnevCSS.nav_i+" "+dnevCSS.dayHomework} id={dnevCSS.nav_i}>
+                <br />
+            </div>
+            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+                <br />
+            </div>
+        </>}
+        {param2 != '' && <>
+            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+                {les.name}
+            </div>
+            <div className={dnevCSS.nav_i+" "+dnevCSS.dayHomework} id={dnevCSS.nav_i}>
+                <br />
+            </div>
+            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+                <br />
+            </div>
+        </>}
+    </>)
+}
+
+function setDnevnik() {
+    sendToServer({
+        uuid: cState.uuid
+    }, 'POST', "dnevnik/getDnevnik")
+        .then(data => {
+            console.log(data);
+            if(cState.role == 1 && cState.kid) selKid = cState.kid;
+            dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body));
+        });
+}
+
+function setInfo() {
+    sendToServer({
+        uuid: cState.uuid
+    }, 'POST', "dnevnik/getInfo")
+        .then(data => {
+            console.log(data);
+            if(data.error == false) setDnevnik();
+        });
+}
+
+function onCon(e) {
+    setInfo();
 }
 
 function goTo() {
@@ -88,13 +125,17 @@ function goTo() {
 }
 
 export function Dnevnik() {
+    schedulesInfo = useSelector(schedules);
     dnev = useSelector(dnevnik);
     cState = useSelector(states);
     dispatch = useDispatch();
     const isFirstUpdate = useRef(true);
+    [_, forceUpdate] = useReducer((x) => x + 1, 0);
     useEffect(() => {
         console.log("I was triggered during componentDidMount Dnevnik.jsx");
-        window.onwheel = (e) => {
+        if(eventSource.readyState == EventSource.OPEN) setInfo();
+        eventSource.addEventListener('connect', onCon, false);
+        window.onwheel = e => {
             if(!scrolling) {
                 scrolling = true;
                 ev = e;
@@ -104,7 +145,9 @@ export function Dnevnik() {
         knop();
         setActived(12);
         return function() {
+            dispatch(changeEvents(CHANGE_EVENTS_CLEAR));
             dispatch = undefined;
+            eventSource.removeEventListener('connect', onCon);
             window.onwheel = undefined;
             clearTimeout(timid);
             console.log("I was triggered during componentWillUnmount Dnevnik1.jsx");
@@ -115,93 +158,60 @@ export function Dnevnik() {
             isFirstUpdate.current = false;
             return;
         }
+        if(cState.role == 1 && cState.kid && selKid != cState.kid) {
+            selKid = cState.kid;
+            setDnevnik();
+        }
         console.log('componentDidUpdate Dnevnik.jsx');
     });
-    return (
-        <>
-            <Helmet>
-                <title>Дневник</title>
-            </Helmet>
-            <div className={dnevCSS.AppHeader}>
-                {Object.getOwnPropertyNames(dnev.days).length == 0 ?
-                    <div className={dnevCSS.block}>
-                        <img alt="banner" src={warn}/>
-                        <div className={dnevCSS.block_text}>
-                            К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.
-                        </div>
-                    </div> :
-                    <div className={dnevCSS.blockDay}>
-                        {setDoW(0)}
-                        {Object.getOwnPropertyNames(dnev.days).map(param =>
-                            <>
-                                {(incDow == 0 || incDow == 7) && <div className={dnevCSS.blockL+" "+dnevCSS.blockLU}>
-                                    <div className={dnevCSS.blockLine} id={dnev.currWeek == param ? "CW" : ""}/>
-                                    <div className={dnevCSS.blockLText}>
-                                        {getDiff(param, dnev.currWeek) ? "Неделя " + getDiff(param, dnev.currWeek) : "Текущая неделя"}
-                                    </div>
-                                </div>}
-                                <div className={dnevCSS.day}>
-                                    <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                                        {getDoW()} / {param}
-                                    </div>
-                                    <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                                        Домашнее задание
-                                    </div>
-                                    <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                                        Оценка
-                                    </div>
-                                    {dnev.days[param].lessons.map(param1 =>
-                                        <>
-                                            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                                                {getName(param, dnev.schedule[incDow-1][shd++], param1.name)}
-                                            </div>
-                                            <div className={dnevCSS.nav_i+" "+dnevCSS.dayHomework} id={dnevCSS.nav_i}>
-                                                {param1.homework}
-                                            </div>
-                                            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                                                {param1.mark}
-                                                {param1.weight > 1 && (<div className={dnevCSS.nav_i+" "+dnevCSS.nav_iWeight} id={dnevCSS.nav_i}>
-                                                    {param1.weight}
-                                                </div>)}
-                                                {param1.type && (<div className={dnevCSS.nav_i+" "+dnevCSS.nav_iType} id={dnevCSS.nav_i}>
-                                                    {param1.type}
-                                                </div>)}
-                                            </div>
-                                        </>
-                                    )}
-                                    {dnev.days[param].lessons.length < 5 && Array(5-dnev.days[param].lessons.length).fill('').map(param1 =>
-                                        <>
-                                            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                                                {getName(param, dnev.schedule[incDow-1][shd++])}
-                                            </div>
-                                            <div className={dnevCSS.nav_i+" "+dnevCSS.dayHomework} id={dnevCSS.nav_i}>
-                                                <br />
-                                            </div>
-                                            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                                                <br />
-                                            </div>
-                                        </>
-                                    )}
+    return <div className={dnevCSS.AppHeader}>
+        <Helmet>
+            <title>Дневник</title>
+        </Helmet>
+        {Object.getOwnPropertyNames(dnev.days).length == 0 ?
+                <ErrFound text={errText}/>
+            :
+                <div className={dnevCSS.blockDay}>
+                    {dnev.reqWeek.map(week => <>
+                        {console.log("sdfsfd", week)}
+                        {<div className={dnevCSS.blockL+" "+dnevCSS.blockLU}>
+                            <div className={dnevCSS.blockLine} id={week ? "" : "CW"}/>
+                            <div className={dnevCSS.blockLText}>
+                                {week ? "Неделя " + (week > 0 ? "+" : "") + week : "Текущая неделя"}
+                            </div>
+                        </div>}
+                        {days.map((param1, day, x, dayDate = getDay(day + 7*week), dai = schedulesInfo[day], dLI = (dai && dai.lessons ? Object.getOwnPropertyNames(dai.lessons):[])) => <>
+                            {console.log("sdfsfd1", param1, day)}
+                            <div className={dnevCSS.day}>
+                                <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+                                    {DoW[day]} / {dayDate}
                                 </div>
-                                {incDow == 7 && <div className={dnevCSS.blockL+" "+dnevCSS.blockLD}>
-                                    <div className={dnevCSS.blockLText+" "+dnevCSS.blockLTextD}>
-                                        {getDiff(param, dnev.currWeek, true) ? "Неделя " + getDiff(param, dnev.currWeek, true) : "Текущая неделя"}
-                                    </div>
-                                    <div className={dnevCSS.blockLine} id={!getDiff(param, dnev.currWeek, true) ? "CW1" : ""}/>
-                                </div>}
-                            </>)}
-                        <div className={dnevCSS.GotCW} id={"CWSEL"}>
-                            <div>
-                                <img src={knopka} alt="" onClick={() => {goTo()}}/>
-                                <div className={dnevCSS.GotCWText}>
-                                    Перейти к текущей неделе
+                                <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+                                    Домашнее задание
                                 </div>
+                                <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+                                    Оценка
+                                </div>
+                                {getLessons(dLI, dayDate, day, dai, 5)}
+                            </div>
+                        </>)}
+                        {<div className={dnevCSS.blockL+" "+dnevCSS.blockLD}>
+                            <div className={dnevCSS.blockLText+" "+dnevCSS.blockLTextD}>
+                                {week ? "Неделя " + (week > 0 ? "+" : "") + week : "Текущая неделя"}
+                            </div>
+                            <div className={dnevCSS.blockLine} id={week ? "" : "CW1"}/>
+                        </div>}
+                    </>)}
+                    <div className={dnevCSS.GotCW} id={"CWSEL"}>
+                        <div>
+                            <img src={knopka} alt="" onClick={goTo}/>
+                            <div className={dnevCSS.GotCWText}>
+                                Перейти к текущей неделе
                             </div>
                         </div>
                     </div>
-                }
-            </div>
-        </>
-    )
+                </div>
+        }
+    </div>
 }
 export default Dnevnik;

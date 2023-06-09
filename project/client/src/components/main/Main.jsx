@@ -49,47 +49,19 @@ function getPan(name, namecl, link, dopClass, fun) {
 }
 
 function getLogin() {
-    return (
-        <div className={mainCSS.logBlock}>
-            <div className={mainCSS.nav_i+' '+mainCSS.log} style={{width:"100%"}} id={mainCSS.nav_i}>
-                <img alt="ico" src={prefSite + '/static/media/ls-icon'+ cState.ico +'.png'}/>
-                <div className={mainCSS.logLog}>{cState.login}</div>
-                <div className={mainCSS.logText}>Я - {cState.roleDesc}</div>
-            </div>
-            <div className={mainCSS.logMenu}>
-                {getPan("Профиль", "Pro", "profiles", mainCSS.logMenuBlock)}
-                {cState.roles && getPan("Сменить роль", "Rol", "", mainCSS.logMenuBlock,chRoles)}
-                {getPan("Настройки", "Set", "settings", mainCSS.logMenuBlock)}
-                {getPan("Выход", "Exi", "", mainCSS.logMenuBlock,onExit)}
-            </div>
+    return <div className={mainCSS.logBlock}>
+        <div className={mainCSS.nav_i+' '+mainCSS.log} style={{width:"100%"}} id={mainCSS.nav_i}>
+            <img alt="ico" src={prefSite + '/static/media/ls-icon'+ cState.ico +'.png'}/>
+            <div className={mainCSS.logLog}>{cState.login}</div>
+            <div className={mainCSS.logText}>Я - {cState.roleDesc}</div>
         </div>
-    )
-}
-
-function getKids() {
-    return cState.kids &&
-        <div className={mainCSS.logBlock}>
-            <div className={mainCSS.nav_i+' '+mainCSS.kidEl} id={mainCSS.nav_i}>
-                <img className={mainCSS.kidImg} src={themeInfo.theme_ch ? profd : profl} title="Перейти в профиль" alt=""/>
-                <div className={mainCSS.kidInf}>Информация о:</div>
-                <div className={mainCSS.kidText}>{cState.kids[cState.kid]}</div>
-                <img className={mainCSS.mapImg} src={themeInfo.theme_ch ? mapd : mapl} title="Перейти в профиль" alt=""/>
-            </div>
-            <div className={mainCSS.logMenu}>
-                {Object.getOwnPropertyNames(cState.kids).map(param1 =>
-                    <div className={mainCSS.nav_i+' '+mainCSS.log+' '+mainCSS.kidBlock} id={mainCSS.nav_i} onClick={e => selKid(param1)}>
-                        <img className={mainCSS.kidImg} src={themeInfo.theme_ch ? profd : profl} title="Перейти в профиль" alt=""/>
-                        <div className={mainCSS.kidInf}>Информация о:</div>
-                        <div className={mainCSS.kidText}>{cState.kids[param1]}</div>
-                    </div>
-                )}
-            </div>
+        <div className={mainCSS.logMenu}>
+            {getPan("Профиль", "Pro", "profiles", mainCSS.logMenuBlock)}
+            {cState.roles && getPan("Сменить роль", "Rol", "", mainCSS.logMenuBlock,chRoles)}
+            {getPan("Настройки", "Set", "settings", mainCSS.logMenuBlock)}
+            {getPan("Выход", "Exi", "", mainCSS.logMenuBlock,onExit)}
         </div>
-}
-
-export function sendToServer(bod, typeC, url, type) {
-    // eslint-disable-next-line no-undef
-    return sendToServerApp(bod, typeC, url, type);
+    </div>
 }
 
 function selKid(kid) {
@@ -103,6 +75,31 @@ function selKid(kid) {
                 dispatch(changeState(CHANGE_STATE, "kid", data.kid));
             }
         });
+}
+
+function getKids() {
+    return cState.kids && <div className={mainCSS.logBlock}>
+        <div className={mainCSS.nav_i+' '+mainCSS.kidEl} id={mainCSS.nav_i}>
+            <img className={mainCSS.kidImg} src={themeInfo.theme_ch ? profd : profl} title="Перейти в профиль" alt=""/>
+            <div className={mainCSS.kidInf}>Информация о:</div>
+            <div className={mainCSS.kidText}>{cState.kids[cState.kid]}</div>
+            <img className={mainCSS.mapImg} src={themeInfo.theme_ch ? mapd : mapl} title="Перейти в профиль" alt=""/>
+        </div>
+        <div className={mainCSS.logMenu}>
+            {Object.getOwnPropertyNames(cState.kids).map(param1 =>
+                <div className={mainCSS.nav_i+' '+mainCSS.log+' '+mainCSS.kidBlock} id={mainCSS.nav_i} onClick={e => selKid(param1)}>
+                    <img className={mainCSS.kidImg} src={themeInfo.theme_ch ? profd : profl} title="Перейти в профиль" alt=""/>
+                    <div className={mainCSS.kidInf}>Информация о:</div>
+                    <div className={mainCSS.kidText}>{cState.kids[param1]}</div>
+                </div>
+            )}
+        </div>
+    </div>
+}
+
+export function sendToServer(bod, typeC, url, type) {
+    // eslint-disable-next-line no-undef
+    return sendToServerApp(bod, typeC, url, type);
 }
 
 function chRoles() {
@@ -210,6 +207,7 @@ function iniNet() {
                         // eslint-disable-next-line no-undef
                         appApp.dispatchEvent(new Event("op"));
                         setSettings(msg, dispatch);
+                        eventSource.dispatchEvent(new Event("connect"));
                     }
                 });
         }

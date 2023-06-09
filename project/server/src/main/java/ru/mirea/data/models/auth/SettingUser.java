@@ -35,8 +35,9 @@ import java.util.Set;
         this.ico = ico;
     }
 
-    public SettingUser(Integer ico, Set<String> topics) {
+    public SettingUser(Integer ico, Boolean notif, Set<String> topics) {
         this.ico = ico;
+        this.notif = notif;
         this.topics = topics;
     }
 

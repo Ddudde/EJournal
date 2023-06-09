@@ -2,20 +2,18 @@
 	position: fixed;
 	height: 50vh;
 	overflow: auto;
+	z-index: 1;
+	padding-inline: 1vw;
 }
 
 .warne{
 	width: 18vw;
 	position: relative;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 	margin-top: 1vh;
-	-webkit-box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.5);
 	box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.5);
 	background-color: var(--bgcV1);
-	-webkit-border-radius: 4px;
+	text-shadow: 1px 1px 3px var(--shdV1);
 	border-radius: 4px;
 	padding: 9px;
 	font-size: 2vw;
@@ -23,6 +21,8 @@
 	font-weight: bolder;
 	transition: background-color ease 1s;
 	transition-property: background-color, color;
+	backface-visibility: hidden;
+	perspective: 1000px;
 }
 
 .warnimg{

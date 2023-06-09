@@ -151,8 +151,8 @@ import java.util.Objects;
                     }
                     if (!ObjectUtils.isEmpty(role.getSubjects())) {
                         body.wrtr.name("lessons").beginArray();
-                        for (Long i1 : role.getSubjects()) {
-                            body.wrtr.value(datas.subjectById(i1).getName());
+                        for (String name : role.getSubjects()) {
+                            body.wrtr.value(name);
                         }
                         body.wrtr.endArray();
                     }

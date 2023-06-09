@@ -20,8 +20,8 @@ import java.util.List;
 
     @Convert(converter = ListLongConverter.class)
     @Column(columnDefinition="CLOB")
-    private List<Long> hteachers, hteachersInv, news, groups, teachers,
-        teachersInv, subjects;
+    private List<Long> hteachers, hteachersInv, news, groups,
+            teachers, teachersInv, periods;
 
     private Long contacts;
 
@@ -40,25 +40,25 @@ import java.util.List;
         this.hteachersInv = hteachersInv;
     }
 
-    public School(String name, List<Long> hteachers, List<Long> news, Long contacts, List<Long> groups, List<Long> subjects, List<Long> teachers) {
+    public School(String name, List<Long> hteachers, List<Long> news, Long contacts, List<Long> groups, List<Long> teachers, List<Long> periods) {
         this.name = name;
-        this.hteachers = hteachers;
-        this.news = news;
+        this.hteachers = new ArrayList<>(hteachers);
+        this.news = new ArrayList<>(news);
         this.contacts = contacts;
-        this.groups = groups;
-        this.subjects = subjects;
-        this.teachers = teachers;
+        this.groups = new ArrayList<>(groups);
+        this.teachers = new ArrayList<>(teachers);
+        this.periods = new ArrayList<>(periods);
     }
 
-    public School(String name, List<Long> hteachers, List<Long> hteachersInv, List<Long> news, Long contacts, List<Long> groups, List<Long> subjects, List<Long> teachers) {
+    public School(String name, List<Long> hteachers, List<Long> hteachersInv, List<Long> news, Long contacts, List<Long> groups, List<Long> teachers, List<Long> periods) {
         this.name = name;
-        this.hteachers = hteachers;
-        this.hteachersInv = hteachersInv;
-        this.news = news;
+        this.hteachers = new ArrayList<>(hteachers);
+        this.hteachersInv = new ArrayList<>(hteachersInv);
+        this.news = new ArrayList<>(news);
         this.contacts = contacts;
-        this.groups = groups;
-        this.subjects = subjects;
-        this.teachers = teachers;
+        this.groups = new ArrayList<>(groups);
+        this.teachers = new ArrayList<>(teachers);
+        this.periods = new ArrayList<>(periods);
     }
 
     public List<Long> getHteachers() {
@@ -91,8 +91,8 @@ import java.util.List;
         return teachersInv;
     }
 
-    public List<Long> getSubjects() {
-        if(subjects == null) subjects = new ArrayList<>();
-        return subjects;
+    public List<Long> getPeriods() {
+        if(periods == null) periods = new ArrayList<>();
+        return periods;
     }
 }

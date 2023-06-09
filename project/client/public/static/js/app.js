@@ -108,20 +108,14 @@ function addNotifToken(token) {
     localStorage.setItem("notifToken", token);
 }
 
-function sendToServerApp(bod, typeC, url, type) {
+function sendToServerApp(bod, typeC, url) {
     let sed = {method: typeC};
     if (bod) {
         sed.headers = {'Content-Type': 'application/json'};
-        if (!type) {
-            sed.body = JSON.stringify(bod);
-        } else {
-            sed.body = JSON.stringify({
-                type: type,
-                body: bod
-            });
-        }
+        sed.body = JSON.stringify(bod);
     }
-    return fetch(servLink + "/" + (url ? url : ""), sed)
+    if(!url) url = "";
+    return fetch(servLink + "/" + url, sed)
         .then(res => {
             if (!res.ok) {
                 throw new Error(`This is an HTTP error: The status is ${res.status}`);

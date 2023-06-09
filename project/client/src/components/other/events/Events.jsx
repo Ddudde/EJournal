@@ -3,14 +3,10 @@ import eventsCSS from './events.module.css';
 import {useDispatch, useSelector} from "react-redux";
 import {events} from "../../../store/selector";
 import warn from '../../../media/warning.png';
-import {CHANGE_EVENT_DEL, CHANGE_EVENT_TIMER, CHANGE_EVENTS_RL, changeEvents} from "../../../store/actions";
+import {CHANGE_EVENT_DEL, CHANGE_EVENT_TIMER, changeEvents} from "../../../store/actions";
 import no from "../../../media/no.png";
 
-let dispatch, eventsInfo, evHeader;
-
-function f(e) {
-    dispatch(changeEvents(CHANGE_EVENTS_RL, !eventsInfo.right));
-}
+let dispatch, eventsInfo;
 
 function onDel(e) {
     let par, id;
@@ -27,14 +23,13 @@ function delT(id) {
 
 export function Events() {
     eventsInfo = useSelector(events);
-    // if(!dispatch) setActNew(0);
     dispatch = useDispatch();
     const isFirstUpdate = useRef(true);
     useEffect(() => {
         console.log("I was triggered during componentDidMount Events.jsx");
-        for(let id of Object.getOwnPropertyNames(eventsInfo.time)){
+        for(let id in eventsInfo.time){
             if(eventsInfo.time[id].init) continue;
-            setTimeout(()=>(delT(id)),eventsInfo.time[id].long*1000);
+            setTimeout(()=>delT(id),eventsInfo.time[id].long*1000);
             dispatch(changeEvents(CHANGE_EVENT_TIMER, true, id));
         }
         return function() {
@@ -47,15 +42,15 @@ export function Events() {
             isFirstUpdate.current = false;
             return;
         }
-        for(let id of Object.getOwnPropertyNames(eventsInfo.time)){
+        for(let id in eventsInfo.time){
             if(eventsInfo.time[id].init) continue;
-            setTimeout(()=>(delT(id)),eventsInfo.time[id].long*1000);
+            setTimeout(()=>delT(id),eventsInfo.time[id].long*1000);
             dispatch(changeEvents(CHANGE_EVENT_TIMER, true, id));
         }
         console.log('componentDidUpdate Events.jsx');
     });
     return (
-        <div className={eventsCSS.evHeader} style={{top: (7*eventsInfo.steps) + "vh", left: eventsInfo.right ? "" : "1vw", right: eventsInfo.right ? "1vw" : "", display: eventsInfo.visible ? "block" : "none"}} ref={el=>evHeader = el}>
+        <div className={eventsCSS.evHeader} style={{top: (7*eventsInfo.steps) + "vh", left: eventsInfo.right ? "" : "0", right: eventsInfo.right ? "0" : "", display: eventsInfo.visible ? "block" : "none"}}>
             {Object.getOwnPropertyNames(eventsInfo.evs).reverse().map(param =>
                 <div className={eventsCSS.warne} key={param}>
                     <img src={warn} className={eventsCSS.warnimg} alt=""/>
