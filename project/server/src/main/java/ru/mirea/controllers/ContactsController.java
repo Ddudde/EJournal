@@ -41,14 +41,11 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
                 if(user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")){
-                    contacts = datas.contactsById(syst.getContacts());
+                    contacts = syst.getContacts();
                 }
                 if(user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo")){
-                    Long schId = user.getRoles().get(user.getSelRole()).getYO();
-                    School school = datas.schoolById(schId);
-                    if(school != null) {
-                        contacts = datas.contactsById(school.getContacts());
-                    }
+                    School school = user.getRoles().get(user.getSelRole()).getYO();
+                    if(school != null) contacts = school.getContacts();
                 }
             }
             if(contacts != null) {
@@ -86,12 +83,12 @@ import java.util.Objects;
                 User user = datas.userByLogin(subscriber.getLogin());
                 Syst syst = datas.getSyst();
                 if (Objects.equals(body.type, "Yo") && user != null) {
-                    ref.schId = user.getRoles().get(user.getSelRole()).getYO();
-                    School school = datas.schoolById(ref.schId);
-                    if(school != null) ref.conId = school.getContacts();
+                    School school = user.getRoles().get(user.getSelRole()).getYO();
+                    ref.schId = school.getId();
+                    if(school != null) ref.conId = school.getContacts().getId();
                 }
                 if (Objects.equals(body.type, "Por") && syst != null) {
-                    ref.conId = syst.getContacts();
+                    ref.conId = syst.getContacts().getId();
                     ref.schId = null;
                 }
                 if(ref.conId != null) {

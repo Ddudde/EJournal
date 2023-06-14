@@ -1,11 +1,10 @@
 package ru.mirea.data.models.school;
 
 import lombok.*;
+import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.User;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -16,15 +15,24 @@ import javax.persistence.Id;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    private Long teacher, teacherInv, grp, school;
+    @OneToOne
+    private User teacher;
+
+    @OneToOne
+    private Invite teacherInv;
+
+    @OneToOne
+    private School school;
+
+    @OneToOne
+    private Group grp;
 
     private int dayWeek, numLesson;
 
     private String kab, nameSubject;
 
-    public Lesson(Long school, Long teacher, Long grp, int dayWeek, int numLesson, String kab, String nameSubject) {
+    public Lesson(School school, Group grp, int dayWeek, int numLesson, String kab, String nameSubject) {
         this.school = school;
-        this.teacher = teacher;
         this.grp = grp;
         this.dayWeek = dayWeek;
         this.numLesson = numLesson;

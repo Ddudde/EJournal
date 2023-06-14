@@ -5,12 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import ru.mirea.data.models.auth.User;
+import ru.mirea.data.models.school.School;
 import ru.mirea.services.ServerService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
-import static java.util.Arrays.asList;
 
 @SpringBootApplication(exclude = { JacksonAutoConfiguration.class })
 @EnableScheduling
@@ -25,6 +25,11 @@ public class Main {
     public static void main(String[] args) {
         ctx = SpringApplication.run(Main.class, args);
         System.out.println("Hello world!");
+        ServerService serverService = (ServerService) ctx.getBean("serverService");
+        User user = serverService.userByLogin("nm13");
+        System.out.println(user);
+        School school = serverService.schoolById(26L);
+        System.out.println(school);
     }
 
     public static boolean excp(Exception e) {

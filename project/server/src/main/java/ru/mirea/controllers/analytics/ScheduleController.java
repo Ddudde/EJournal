@@ -18,11 +18,12 @@ import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.School;
 import ru.mirea.data.models.school.Lesson;
+import ru.mirea.data.models.school.School;
 import ru.mirea.services.ServerService;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 @RequestMapping("/schedule")
 @NoArgsConstructor
@@ -57,7 +58,7 @@ import java.util.*;
                     ref.teaU = datas.userById(teaId);
                     Invite teaI = datas.inviteById(teaId);
                     if(ref.teaU != null) {
-                        ref.lesson.setTeacher(teaId);
+                        ref.lesson.setTeacher(ref.teaU);
                         if(!ObjectUtils.isEmpty(school.getTeachers())
                             && school.getTeachers().contains(teaId)){
                             school.getTeachers().remove(teaId);
@@ -67,7 +68,7 @@ import java.util.*;
                             datas.getUserRepository().saveAndFlush(ref.teaU);
                         }
                     } else if(teaI != null){
-                        ref.lesson.setTeacherInv(teaId);
+                        ref.lesson.setTeacherInv(teaI);
                         if(!ObjectUtils.isEmpty(school.getTeachersInv())
                             && school.getTeachersInv().contains(teaId)){
                             school.getTeachersInv().remove(teaId);
@@ -77,8 +78,8 @@ import java.util.*;
                             datas.getInviteRepository().saveAndFlush(teaI);
                         }
                     }
-                    ref.lesson.setGrp(ref.group.getId());
-                    ref.lesson.setSchool(school.getId());
+                    ref.lesson.setGrp(datas.groupById(ref.group.getId()));
+                    ref.lesson.setSchool(school);
                     ref.lesson.setDayWeek(body.day);
                     List<Lesson> lessons = datas.getLessonRepository().findBySchoolAndGrpAndDayWeek(school.getId(), ref.group.getId(), body.day);
                     lessons.sort(Comparator.comparing(Lesson::getDayWeek).thenComparing(Lesson::getNumLesson));
@@ -118,14 +119,14 @@ import java.util.*;
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
                 if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
-                    ref.group = datas.groupById(user.getRoles().get(0L).getGroup());
+                    ref.group = user.getRoles().get(0L).getGrp();
                 } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
                     User kidU = datas.userById(user.getSelKid());
                     Invite kidI = datas.inviteById(user.getSelKid());
                     if(kidU != null) {
-                        ref.group = datas.groupById(kidU.getRoles().get(0L).getGroup());
+                        ref.group = kidU.getRoles().get(0L).getGrp();
                     } else if(kidI != null) {
-                        ref.group = datas.groupById(kidI.getRoles().get(0L).getGroup());
+                        ref.group = kidI.getRoles().get(0L).getGrp();
                     }
                 } else if(user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
                     ref.group = datas.groupById(body.group);
@@ -149,7 +150,7 @@ import java.util.*;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
+                ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
                 if(user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L)) {
                     body.wrtr.name("bodyG").beginObject();
                     ref.firstG = datas.groupsByUser(user, body.wrtr);

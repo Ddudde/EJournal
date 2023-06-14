@@ -15,8 +15,8 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.json.Role;
 import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RequestMapping("/teachers")
@@ -119,14 +120,14 @@ import java.util.UUID;
                     user1.setCode(uuid.toString());
                     user1.setExpDate(Main.df.format(dateAfter));
                     datas.getUserRepository().saveAndFlush(user1);
-                    ref.schId = datas.getFirstRole(user1.getRoles()).getYO();
+                    ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
 
                     body.wrtr.name("id1").value(user1.getId());
                 } else if(inv != null){
                     inv.setCode(uuid.toString());
                     inv.setExpDate(Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO();
+                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO().getId();
 
                     body.wrtr.name("id1").value(inv.getId());
                 }
@@ -151,11 +152,13 @@ import java.util.UUID;
                 if(school != null) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
+                    Role role = new Role(null, Set.of(), school);
+                    datas.getRoleRepository().saveAndFlush(role);
                     Invite inv = new Invite(body.name, Map.of(
-                        2L, new Role(null, null, Long.parseLong(subscriber.getLvlSch()))
+                        2L, role
                     ), Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    school.getTeachersInv().add(inv.getId());
+                    school.getTeachersInv().add(inv);
                     datas.getSchoolRepository().saveAndFlush(school);
 
                     body.wrtr.name("id").value(inv.getId());
@@ -178,8 +181,8 @@ import java.util.UUID;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
-                School school = datas.schoolById(ref.schId);
+                School school = datas.getFirstRole(user.getRoles()).getYO();
+                ref.schId = school.getId();
                 if(school != null) {
                     body.wrtr.name("body").beginObject();
                     datas.teachersBySchool(school, body.wrtr);

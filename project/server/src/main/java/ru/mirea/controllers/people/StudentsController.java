@@ -15,8 +15,8 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.json.Role;
 import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
@@ -109,11 +109,13 @@ import java.util.Map;
                 if (group != null) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
+                    Role role = new Role(null, datas.schoolById(Long.parseLong(subscriber.getLvlSch())), group);
+                    datas.getRoleRepository().saveAndFlush(role);
                     Invite inv = new Invite(body.name, Map.of(
-                        0L, new Role(null, Long.parseLong(subscriber.getLvlSch()), group.getId(), null)
+                        0L, role
                     ), Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    group.getKidsInv().add(inv.getId());
+                    group.getKidsInv().add(inv);
                     datas.getGroupRepository().saveAndFlush(group);
 
                     body.wrtr.name("id").value(inv.getId())
@@ -137,16 +139,16 @@ import java.util.Map;
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
-                School school = datas.schoolById(ref.schId);
+                School school = datas.getFirstRole(user.getRoles()).getYO();
+                ref.schId = school.getId();
                 if (!user.getRoles().containsKey(3L)) {
-                    ref.grId = datas.getFirstRole(user.getRoles()).getGroup();
+                    ref.grId = datas.getFirstRole(user.getRoles()).getGrp().getId();
                 }
                 Group group = datas.groupById(ref.grId);
                 if (group != null && school != null && school.getGroups().contains(group.getId())) {
                     body.wrtr.name("body").beginObject();
-                    datas.usersByList(group.getKids(), body.wrtr, true);
-                    datas.invitesByList(group.getKidsInv(), body.wrtr, true);
+                    datas.usersByList(group.getKids(), true, body.wrtr);
+                    datas.invitesByList(group.getKidsInv(), true, body.wrtr);
                     body.wrtr.endObject();
                 }
             }

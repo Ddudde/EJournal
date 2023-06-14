@@ -1,6 +1,9 @@
 package ru.mirea.data.models.school.day;
 
 import lombok.*;
+import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.User;
+import ru.mirea.data.models.school.Period;
 
 import javax.persistence.*;
 
@@ -13,15 +16,22 @@ import javax.persistence.*;
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long usr, userInv, period;
+    @OneToOne
+    private User usr;
+
+    @OneToOne
+    private Invite userInv;
+
+    @OneToOne
+    private Period period;
 
     private int mark, weight;
 
     private String type, style;
 
-    private float avg;
+    private Float avg;
 
-    public Mark(Long usr, Long period, int mark, int weight, String type, String style) {
+    public Mark(User usr, Period period, int mark, int weight, String type, String style) {
         this.usr = usr;
         this.period = period;
         this.mark = mark;
@@ -30,7 +40,7 @@ import javax.persistence.*;
         this.style = style;
     }
 
-    public Mark(Long usr, Long period, int weight, String type, float avg) {
+    public Mark(User usr, Period period, int weight, String type, Float avg) {
         this.usr = usr;
         this.period = period;
         this.weight = weight;

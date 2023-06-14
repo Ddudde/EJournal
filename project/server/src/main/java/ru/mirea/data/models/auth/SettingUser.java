@@ -1,8 +1,9 @@
 package ru.mirea.data.models.auth;
 
 import lombok.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import ru.mirea.Main;
-import ru.mirea.data.SetStringConverter;
 import ru.mirea.services.PushService;
 
 import javax.persistence.*;
@@ -27,8 +28,8 @@ import java.util.Set;
             nNewMarks = false, nNewNewsYO = false,
             nNewNewsPor = false, nNewReqSch = false, hints = true;
 
-    @Convert(converter = SetStringConverter.class)
-    @Column(columnDefinition="CLOB")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ElementCollection
     private Set<String> tokens, topics;
 
     public SettingUser(Integer ico) {

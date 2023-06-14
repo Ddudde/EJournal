@@ -6,24 +6,24 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.json.Role;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.services.ServerService;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @RequestMapping("/admins")
 @NoArgsConstructor
@@ -109,7 +109,7 @@ import java.util.Objects;
                     4L, new Role(null)
                 ), Main.df.format(dateAfter));
                 datas.getInviteRepository().saveAndFlush(inv);
-                syst.getAdminsInv().add(inv.getId());
+                syst.getAdminsInv().add(inv);
                 datas.getSystRepository().saveAndFlush(syst);
 
                 body.wrtr.name("id").value(inv.getId())
@@ -132,8 +132,8 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && syst != null) {
-                datas.usersByList(syst.getAdmins(), body.wrtr, true);
-                datas.invitesByList(syst.getAdminsInv(), body.wrtr, true);
+                datas.usersByList(syst.getAdmins(), true, body.wrtr);
+                datas.invitesByList(syst.getAdminsInv(), true, body.wrtr);
             }
             body.wrtr.endObject();
         } catch (Exception e) {body.bol = Main.excp(e);}

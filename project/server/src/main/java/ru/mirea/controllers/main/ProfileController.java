@@ -16,7 +16,7 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.json.Role;
+import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
@@ -72,7 +72,7 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
-                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                SettingUser settingUser = user.getSettings();
                 settingUser.setInfo(body.info);
                 datas.getSettingUserRepository().saveAndFlush(settingUser);
                 body.wrtr.name("more").value(settingUser.getInfo());
@@ -119,7 +119,7 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null) {
-                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                SettingUser settingUser = user.getSettings();
                 body.wrtr.name("login").value(user.getLogin())
                     .name("ico").value(settingUser.getIco())
                     .name("id").value(user.getId());
@@ -138,13 +138,13 @@ import java.util.Objects;
                         body.wrtr.name("email").value(role.getEmail());
                     }
                     if (!ObjectUtils.isEmpty(role.getYO())) {
-                        School school = datas.schoolById(role.getYO());
+                        School school = role.getYO();
                         if (school != null) {
                             body.wrtr.name("yo").value(school.getName());
                         }
                     }
-                    if (!ObjectUtils.isEmpty(role.getGroup())) {
-                        Group group = datas.groupById(role.getGroup());
+                    if (!ObjectUtils.isEmpty(role.getGrp())) {
+                        Group group = role.getGrp();
                         if (group != null) {
                             body.wrtr.name("group").value(group.getName());
                         }
@@ -158,12 +158,12 @@ import java.util.Objects;
                     }
                     if(!ObjectUtils.isEmpty(role.getKids())) {
                         body.wrtr.name("kids").beginObject();
-                        datas.usersByList(role.getKids(), body.wrtr, false);
+                        datas.usersByList(role.getKids(), false, body.wrtr);
                         body.wrtr.endObject();
                     }
                     if(!ObjectUtils.isEmpty(role.getParents())) {
                         body.wrtr.name("parents").beginObject();
-                        datas.usersByList(role.getParents(), body.wrtr, false);
+                        datas.usersByList(role.getParents(), false, body.wrtr);
                         body.wrtr.endObject();
                     }
                     body.wrtr.endObject();

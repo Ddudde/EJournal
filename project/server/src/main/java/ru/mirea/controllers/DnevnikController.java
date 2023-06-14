@@ -45,18 +45,18 @@ import java.util.List;
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
                 if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
-                    ref.group = datas.groupById(user.getRoles().get(0L).getGroup());
+                    ref.group = user.getRoles().get(0L).getGrp();
                 } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
                     User kidU = datas.userById(user.getSelKid());
                     Invite kidI = datas.inviteById(user.getSelKid());
                     if(kidU != null) {
-                        ref.group = datas.groupById(kidU.getRoles().get(0L).getGroup());
+                        ref.group = kidU.getRoles().get(0L).getGrp();
                     } else if(kidI != null) {
-                        ref.group = datas.groupById(kidI.getRoles().get(0L).getGroup());
+                        ref.group = kidI.getRoles().get(0L).getGrp();
                     }
                 }
                 if (ref.group != null || user.getSelRole() == 2L) {
-                    ref.schId = datas.getFirstRole(user.getRoles()).getYO();
+                    ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
                     List<Lesson> lessons;
                     if(user.getSelRole() == 2L && user.getRoles().containsKey(2L)) {
                         lessons = datas.getLessonRepository().findBySchoolAndTeacher(ref.schId, user.getId());
@@ -79,11 +79,11 @@ import java.util.List;
                         }
                         body.wrtr.name("cabinet").value(les.getKab());
                         if(user.getSelRole() == 2L) {
-                            Group grp = datas.groupById(les.getGrp());
+                            Group grp = les.getGrp();
                             body.wrtr.name("group").value(grp.getName());
                         } else {
-                            User teaU = datas.userById(les.getTeacher());
-                            Invite teaI = datas.inviteById(les.getTeacherInv());
+                            User teaU = les.getTeacher();
+                            Invite teaI = les.getTeacherInv();
                             body.wrtr.name("prepod").beginObject();
                             if (teaU != null) {
                                 body.wrtr.name("name").value(teaU.getFio())
@@ -117,7 +117,7 @@ import java.util.List;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
+                ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
                 if(user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L)) {
                     body.wrtr.name("yes").value(true);
                 }

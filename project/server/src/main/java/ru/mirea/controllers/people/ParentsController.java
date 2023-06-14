@@ -15,8 +15,8 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.json.Role;
 import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
@@ -118,14 +118,14 @@ import java.util.UUID;
                     user1.setCode(uuid.toString());
                     user1.setExpDate(Main.df.format(dateAfter));
                     datas.getUserRepository().saveAndFlush(user1);
-                    ref.schId = datas.getFirstRole(user1.getRoles()).getYO();
+                    ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
 
                     body.wrtr.name("id1").value(user1.getId());
                 } else if (inv != null) {
                     inv.setCode(uuid.toString());
                     inv.setExpDate(Main.df.format(dateAfter));
                     datas.getInviteRepository().saveAndFlush(inv);
-                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO();
+                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO().getId();
 
                     body.wrtr.name("id1").value(inv.getId());
                 }
@@ -159,18 +159,20 @@ import java.util.UUID;
                         .name("login").value(kidU.getLogin())
                         .name("par").beginObject();
                     for (String id : par.keySet()) {
+                        Role role = new Role(null, datas.schoolById(Long.parseLong(subscriber.getLvlSch())));
+                        datas.getRoleRepository().saveAndFlush(role);
                         Invite inv = new Invite(par.getAsJsonObject(id).get("name").getAsString(), Map.of(
-                            1L, new Role(null, Long.parseLong(subscriber.getLvlSch()), null)
+                            1L, role
                         ), Main.df.format(dateAfter));
                         datas.getInviteRepository().saveAndFlush(inv);
 
                         body.wrtr.name(inv.getId() + "").beginObject()
                             .name("name").value(inv.getFio());
 
-                        if (!kidU.getRoles().get(0L).getParentsInv().contains(kidU.getId())) {
-                            kidU.getRoles().get(0L).getParentsInv().add(kidU.getId());
+                        if (!inv.getRoles().get(1L).getKids().contains(kidU)) {
+                            inv.getRoles().get(1L).getKids().add(kidU);
                         }
-                        kidU.getRoles().get(0L).getParentsInv().add(inv.getId());
+                        kidU.getRoles().get(0L).getParentsInv().add(inv);
                         datas.getUserRepository().saveAndFlush(kidU);
 
                         body.wrtr.endObject();
@@ -183,18 +185,19 @@ import java.util.UUID;
                         .name("name").value(kidI.getFio())
                         .name("par").beginObject();
                     for (String id : par.keySet()) {
+                        Role role = new Role(null, datas.schoolById(Long.parseLong(subscriber.getLvlSch())));
                         Invite inv = new Invite(par.getAsJsonObject(id).get("name").getAsString(), Map.of(
-                            1L, new Role(null, Long.parseLong(subscriber.getLvlSch()), null)
+                            1L, role
                         ), Main.df.format(dateAfter));
                         datas.getInviteRepository().saveAndFlush(inv);
 
                         body.wrtr.name(inv.getId() + "").beginObject()
                             .name("name").value(inv.getFio());
 
-                        if (!kidI.getRoles().get(0L).getParentsInv().contains(kidI.getId())) {
-                            kidI.getRoles().get(0L).getParentsInv().add(kidI.getId());
+                        if (!inv.getRoles().get(1L).getKidsInv().contains(kidI)) {
+                            inv.getRoles().get(1L).getKidsInv().add(kidI);
                         }
-                        kidI.getRoles().get(0L).getParentsInv().add(inv.getId());
+                        kidI.getRoles().get(0L).getParentsInv().add(inv);
                         datas.getInviteRepository().saveAndFlush(kidI);
 
                         body.wrtr.endObject();
@@ -219,48 +222,46 @@ import java.util.UUID;
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
-                School school = datas.schoolById(ref.schId);
+                School school = datas.getFirstRole(user.getRoles()).getYO();
+                ref.schId = school.getId();
                 if (!user.getRoles().containsKey(3L)) {
-                    ref.grId = datas.getFirstRole(user.getRoles()).getGroup();
+                    ref.grId = datas.getFirstRole(user.getRoles()).getGrp().getId();
                 }
                 Group group = datas.groupById(ref.grId);
                 if (group != null && school != null && school.getGroups().contains(group.getId())) {
                     body.wrtr.name("bodyP").beginObject();
                     if (!ObjectUtils.isEmpty(group.getKids())) {
-                        for (Long i1 : group.getKids()) {
-                            User studU = datas.userById(i1);
+                        for (User studU : group.getKids()) {
                             if (studU == null) continue;
-                            body.wrtr.name(i1 + "").beginObject()
+                            body.wrtr.name(studU.getId() + "").beginObject()
                                 .name("name").value(studU.getFio())
                                 .name("login").value(studU.getLogin());
                             if (!ObjectUtils.isEmpty(studU.getCode())) {
                                 body.wrtr.name("link").value(studU.getCode());
                             }
                             body.wrtr.name("par").beginObject();
-                            datas.usersByList(studU.getRoles().get(0L).getParents(), body.wrtr, true);
-                            datas.invitesByList(studU.getRoles().get(0L).getParentsInv(), body.wrtr, true);
+                            datas.usersByList(studU.getRoles().get(0L).getParents(), true, body.wrtr);
+                            datas.invitesByList(studU.getRoles().get(0L).getParentsInv(), true, body.wrtr);
                             body.wrtr.endObject().endObject();
                         }
                     }
                     if (!ObjectUtils.isEmpty(group.getKidsInv())) {
-                        for (Long i1 : group.getKidsInv()) {
-                            Invite studI = datas.inviteById(i1);
+                        for (Invite studI : group.getKidsInv()) {
                             if (studI == null) continue;
-                            body.wrtr.name(i1 + "").beginObject()
+                            body.wrtr.name(studI.getId() + "").beginObject()
                                 .name("name").value(studI.getFio());
                             if (!ObjectUtils.isEmpty(studI.getCode())) {
                                 body.wrtr.name("link").value(studI.getCode());
                             }
                             body.wrtr.name("par").beginObject();
-                            datas.usersByList(studI.getRoles().get(0L).getParents(), body.wrtr, true);
-                            datas.invitesByList(studI.getRoles().get(0L).getParentsInv(), body.wrtr, true);
+                            datas.usersByList(studI.getRoles().get(0L).getParents(), true, body.wrtr);
+                            datas.invitesByList(studI.getRoles().get(0L).getParentsInv(), true, body.wrtr);
                             body.wrtr.endObject().endObject();
                         }
                     }
                     body.wrtr.endObject().name("bodyC").beginObject();
-                    datas.usersByList(group.getKids(), body.wrtr, true);
-                    datas.invitesByList(group.getKidsInv(), body.wrtr, true);
+                    datas.usersByList(group.getKids(), true, body.wrtr);
+                    datas.invitesByList(group.getKidsInv(), true, body.wrtr);
                     body.wrtr.endObject();
                 }
             }

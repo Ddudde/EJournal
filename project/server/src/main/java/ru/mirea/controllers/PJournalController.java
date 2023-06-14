@@ -17,7 +17,7 @@ import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.Lesson;
+import ru.mirea.data.models.school.School;
 import ru.mirea.data.models.school.day.Day;
 import ru.mirea.data.models.school.day.Mark;
 import ru.mirea.services.ServerService;
@@ -50,7 +50,8 @@ import java.util.stream.Collectors;
                 ref.group = datas.groupById(body.group);
                 User objU = datas.userById(body.kid);
                 if (ref.group != null && user.getSelRole() == 2L && objU != null) {
-                    ref.schId = user.getRoles().get(2L).getYO();
+                    School school = user.getRoles().get(2L).getYO();
+                    ref.schId = school.getId();
                     List<Object[]> marks = datas.getDayRepository().uniqDatAndMarksByParams(ref.schId, user.getId(), ref.group.getId(), subscriber.getLvlMore2());
                     List<Day> days = datas.getDayRepository().findBySchoolAndTeacherAndGrpAndNameSubject(ref.schId, user.getId(), ref.group.getId(), subscriber.getLvlMore2());
                     Mark mark = null;
@@ -82,21 +83,21 @@ import java.util.stream.Collectors;
                     if(day == null) {
                         day = new Day();
                         day.setDat(lesDay[0]);
-                        day.setGrp(ref.group.getId());
-                        day.setTeacher(user.getId());
-                        day.setSchool(ref.schId);
+                        day.setGrp(ref.group);
+                        day.setTeacher(user);
+                        day.setSchool(school);
                         day.setNameSubject(subscriber.getLvlMore2());
                         datas.getDayRepository().saveAndFlush(day);
                     }
                     if(mark == null) mark = new Mark();
                     mark.setMark(body.mark);
-                    mark.setUsr(objU.getId());
+                    mark.setUsr(objU);
                     mark.setType("norm");
                     mark.setWeight(body.weight);
                     mark.setStyle(body.style);
                     datas.getMarkRepository().saveAndFlush(mark);
                     if(!oldMark) {
-                        day.getMarks().add(mark.getId());
+                        day.getMarks().add(mark);
                         datas.getDayRepository().saveAndFlush(day);
                     }
                     body.wrtr.name("kid").value(objU.getId())
@@ -121,7 +122,7 @@ import java.util.stream.Collectors;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(2L)) {
-                Long schId = datas.getFirstRole(user.getRoles()).getYO();
+                Long schId = datas.getFirstRole(user.getRoles()).getYO().getId();
                 Group group = datas.groupById(body.group);
                 if (group != null) {
                     List<Object[]> marks = datas.getDayRepository().uniqDatAndMarksByParams(schId, user.getId(), group.getId(), subscriber.getLvlMore2());
@@ -135,10 +136,9 @@ import java.util.stream.Collectors;
                     System.out.println(mapM);
                     body.wrtr.name("bodyK").beginObject();
                     if (!ObjectUtils.isEmpty(group.getKids())) {
-                        for (Long i : group.getKids()) {
-                            User objU = datas.userById(i);
+                        for (User objU : group.getKids()) {
                             if (objU == null) continue;
-                            body.wrtr.name(i + "").beginObject()
+                            body.wrtr.name(objU.getId() + "").beginObject()
                                 .name("name").value(objU.getFio())
                                 .name("days").beginObject();
                             for (String dat : mapM.keySet()) {
@@ -169,10 +169,9 @@ import java.util.stream.Collectors;
                         }
                     }
                     if (!ObjectUtils.isEmpty(group.getKidsInv())) {
-                        for (Long i : group.getKidsInv()) {
-                            Invite objI = datas.inviteById(i);
+                        for (Invite objI : group.getKidsInv()) {
                             if (objI == null) continue;
-                            body.wrtr.name(i + "").beginObject()
+                            body.wrtr.name(objI.getId() + "").beginObject()
                                 .name("name").value(objI.getFio())
                                 .name("days").beginObject();
                             for (String dat : mapM.keySet()) {
@@ -216,7 +215,7 @@ import java.util.stream.Collectors;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(2L)) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
+                ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
                 List<Long> groupsL = datas.getLessonRepository().uniqGroupsBySchoolAndSubName(ref.schId, body.predm);
                 if (!ObjectUtils.isEmpty(groupsL)){
                     System.out.println(groupsL);
@@ -245,7 +244,7 @@ import java.util.stream.Collectors;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(2L)) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO();
+                ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
                 List<String> subjs = datas.getLessonRepository().uniqSubNameBySchool(ref.schId);
                 if (!ObjectUtils.isEmpty(subjs)){
                     System.out.println(subjs);

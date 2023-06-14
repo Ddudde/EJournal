@@ -15,15 +15,10 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.Lesson;
 import ru.mirea.data.models.school.Period;
 import ru.mirea.data.models.school.School;
 import ru.mirea.services.ServerService;
-
-import java.util.*;
 
 @RequestMapping("/periods")
 @NoArgsConstructor
@@ -45,14 +40,14 @@ import java.util.*;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(3L)) {
-                ref.schId = user.getRoles().get(3L).getYO();
-                School school = datas.schoolById(ref.schId);
+                School school = user.getRoles().get(3L).getYO();
+                ref.schId = school.getId();
                 Period period = new Period();
                 period.setName(body.name);
                 period.setDateN(body.perN);
                 period.setDateK(body.perK);
                 datas.getPeriodRepository().saveAndFlush(period);
-                school.getPeriods().add(period.getId());
+                school.getPeriods().add(period);
                 datas.getSchoolRepository().saveAndFlush(school);
                 body.wrtr.name("id").value(period.getId())
                     .name("body").beginObject()
@@ -77,14 +72,13 @@ import java.util.*;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(3L)) {
-                ref.schId = user.getRoles().get(3L).getYO();
-                School school = datas.schoolById(ref.schId);
+                School school = user.getRoles().get(3L).getYO();
+                ref.schId = school.getId();
                 if (!ObjectUtils.isEmpty(school.getPeriods())){
                     System.out.println(school.getPeriods());
                     body.wrtr.name("bodyP").beginObject();
                     int i = 0;
-                    for (Long id : school.getPeriods()) {
-                        Period period = datas.periodById(id);
+                    for (Period period : school.getPeriods()) {
                         if(period == null) continue;
                         body.wrtr.name(i+"").beginObject()
                             .name("name").value(period.getName())

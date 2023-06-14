@@ -95,7 +95,7 @@ import java.util.Objects;
                 body.wrtr.name("body").beginObject();
                 User user = datas.userByLogin(subscriber.getLogin());
                 Syst syst = datas.getSyst();
-                School school = datas.schoolById(user.getRoles().get(user.getSelRole()).getYO());
+                School school = user.getRoles().get(user.getSelRole()).getYO();
                 ref.b = Objects.equals(subscriber.getLvlMore2(), "Por") && user.getRoles().containsKey(4L) && syst != null;
                 ref.b1 = Objects.equals(subscriber.getLvlMore2(), "Yo") && user.getRoles().containsKey(3L) && school != null;
                 if (user != null && (ref.b || ref.b1)) {
@@ -114,10 +114,10 @@ import java.util.Objects;
                     }
                     datas.getNewsRepository().saveAndFlush(news);
                     if (ref.b) {
-                        syst.getNews().add(news.getId());
+                        syst.getNews().add(news);
                         datas.getSystRepository().saveAndFlush(syst);
                     } else if (ref.b1) {
-                        school.getNews().add(news.getId());
+                        school.getNews().add(news);
                         datas.getSchoolRepository().saveAndFlush(school);
                     }
                     body.wrtr.name("title").value(news.getTitle())
@@ -146,7 +146,7 @@ import java.util.Objects;
         };
         try {
             body.wrtr = datas.ini(body.toString());
-            List<Long> list = null;
+            List<News> list = null;
             body.wrtr.name("body").beginObject();
             Syst syst = null;
             School school = null;
@@ -154,8 +154,8 @@ import java.util.Objects;
                 User user = datas.userByLogin(subscriber.getLogin());
                 syst = datas.getSyst();
                 if (user != null) {
-                    ref.schId = user.getRoles().get(user.getSelRole()).getYO();
-                    school = datas.schoolById(ref.schId);
+                    school = user.getRoles().get(user.getSelRole()).getYO();
+                    ref.schId = school.getId();
                     if (Objects.equals(body.type, "Yo") && school != null && !ObjectUtils.isEmpty(school.getNews())) {
                         list = school.getNews();
                     }
@@ -166,17 +166,16 @@ import java.util.Objects;
                 }
             }
             if (!ObjectUtils.isEmpty(list)) {
-                for (Long i1 : list) {
-                    News newsU = datas.newsById(i1);
+                for (News newsU : list) {
                     if (newsU == null) {
                         if (ref.schId == null) {
-                            syst.getNews().remove(i1);
+                            syst.getNews().remove(newsU);
                         } else {
-                            school.getNews().remove(i1);
+                            school.getNews().remove(newsU);
                         }
                         continue;
                     }
-                    body.wrtr.name(i1 + "").beginObject()
+                    body.wrtr.name(newsU.getId() + "").beginObject()
                         .name("title").value(newsU.getTitle())
                         .name("date").value(newsU.getDate())
                         .name("img_url").value(newsU.getImg_url())

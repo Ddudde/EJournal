@@ -1,8 +1,8 @@
 package ru.mirea.data.models.auth;
 
 import lombok.*;
-import ru.mirea.data.MapRoleConverter;
-import ru.mirea.data.json.Role;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.HashMap;
@@ -19,8 +19,10 @@ import java.util.Map;
 
     private String fio, code, expDate;
 
-    @Convert(converter = MapRoleConverter.class)
-    @Column(columnDefinition="CLOB")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "invite_id")
+    @MapKeyColumn(name = "role")
     private Map<Long, Role> roles;
 
     public Invite(String fio, Map<Long, Role> roles, String expDate) {

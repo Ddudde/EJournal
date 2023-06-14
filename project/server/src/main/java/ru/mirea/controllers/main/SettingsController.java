@@ -37,7 +37,7 @@ import java.util.Objects;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                SettingUser settingUser = user.getSettings();
                 switch (body.id) {
                     case "checkbox_hints" -> settingUser.setHints(body.val);
                     case "checkbox_notify" -> settingUser.setNotif(body.val);
@@ -62,7 +62,7 @@ import java.util.Objects;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                SettingUser settingUser = user.getSettings();
                 if(!Objects.equals(settingUser.getSecFr(), body.secFR)){
                     body.wrtr.name("error").value(3);
                 } else if(!Objects.equals(user.getPassword(), body.oPar)){
@@ -83,7 +83,7 @@ import java.util.Objects;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                SettingUser settingUser = user.getSettings();
                 settingUser.setSecFr(body.secFR);
                 datas.getSettingUserRepository().saveAndFlush(settingUser);
                 body.wrtr.name("yes").value(true);
@@ -99,7 +99,7 @@ import java.util.Objects;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                SettingUser settingUser = user.getSettings();
                 settingUser.setIco(body.ico);
                 datas.getSettingUserRepository().saveAndFlush(settingUser);
                 body.wrtr.name("yes").value(true);
@@ -115,7 +115,7 @@ import java.util.Objects;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                SettingUser settingUser = datas.settingUserById(user.getSettings());
+                SettingUser settingUser = user.getSettings();
                 body.wrtr.name("body").beginObject()
                     .name("checkbox_hints").value(settingUser.getHints())
                     .name("checkbox_notify").value(settingUser.getNotif())

@@ -1,13 +1,14 @@
 package ru.mirea.data.models.school;
 
 import lombok.*;
-import ru.mirea.data.ListLongConverter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -20,25 +21,26 @@ import java.util.Map;
 
     private String name;
 
-    @Convert(converter = ListLongConverter.class)
-    @Column(columnDefinition="CLOB")
-    private List<Long> kids, kidsInv;
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany
+    @JoinColumn(name = "grp_kid_id")
+    private List<User> kids;
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany
+    @JoinColumn(name = "grp_kid_id")
+    private List<Invite> kidsInv;
 
     public Group(String name) {
         this.name = name;
     }
 
-    public Group(String name, List<Long> kids) {
-        this.name = name;
-        this.kids = kids;
-    }
-
-    public List<Long> getKids() {
+    public List<User> getKids() {
         if(kids == null) kids = new ArrayList<>();
         return kids;
     }
 
-    public List<Long> getKidsInv() {
+    public List<Invite> getKidsInv() {
         if(kidsInv == null) kidsInv = new ArrayList<>();
         return kidsInv;
     }

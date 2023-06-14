@@ -1,7 +1,10 @@
 package ru.mirea.data.models;
 
 import lombok.*;
-import ru.mirea.data.ListLongConverter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import ru.mirea.data.models.auth.Invite;
+import ru.mirea.data.models.auth.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,33 +19,44 @@ import java.util.List;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Convert(converter = ListLongConverter.class)
-    @Column(columnDefinition="CLOB")
-    private List<Long> admins, adminsInv, news;
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany
+    @JoinColumn(name = "syst_adm_id")
+    private List<User> admins;
 
-    private Long contacts;
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany
+    @JoinColumn(name = "syst_adm_id")
+    private List<Invite> adminsInv;
 
-    public Syst(List<Long> admins) {
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "system_id")
+    private List<News> news;
+
+    @OneToOne(orphanRemoval = true)
+    private Contacts contacts;
+
+    public Syst(List<User> admins) {
         this.admins = admins;
     }
 
-    public Syst(List<Long> admins, List<Long> news, Long contacts) {
-        this.admins = admins;
-        this.news = news;
+    public Syst(List<News> news, Contacts contacts) {
+        this.news = new ArrayList<>(news);
         this.contacts = contacts;
     }
 
-    public List<Long> getAdmins() {
-        if(admins == null) new ArrayList<>();
+    public List<User> getAdmins() {
+        if(admins == null) admins = new ArrayList<>();
         return admins;
     }
 
-    public List<Long> getAdminsInv() {
+    public List<Invite> getAdminsInv() {
         if(adminsInv == null) adminsInv = new ArrayList<>();
         return adminsInv;
     }
 
-    public List<Long> getNews() {
+    public List<News> getNews() {
         if(news == null) news = new ArrayList<>();
         return news;
     }
