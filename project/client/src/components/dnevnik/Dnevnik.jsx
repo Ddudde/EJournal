@@ -143,7 +143,7 @@ export function Dnevnik() {
             }
         };
         knop();
-        setActived(12);
+        setActived(13);
         return function() {
             dispatch(changeEvents(CHANGE_EVENTS_CLEAR));
             dispatch = undefined;

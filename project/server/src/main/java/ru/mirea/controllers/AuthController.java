@@ -15,7 +15,6 @@ import reactor.core.publisher.Flux;
 import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
@@ -164,11 +163,6 @@ import java.util.concurrent.ConcurrentHashMap;
                             body.wrtr.name(kid.getId() + "").value(kid.getFio());
                         }
                     }
-                    if (!ObjectUtils.isEmpty(role.getKidsInv())) {
-                        for (Invite kid : role.getKidsInv()) {
-                            body.wrtr.name(kid.getId() + "").value(kid.getFio());
-                        }
-                    }
                     body.wrtr.endObject();
                 }
                 body.wrtr.endObject();
@@ -223,11 +217,6 @@ import java.util.concurrent.ConcurrentHashMap;
                             body.wrtr.name(kid.getId() + "").value(kid.getFio());
                         }
                     }
-                    if (!ObjectUtils.isEmpty(role.getKidsInv())) {
-                        for (Invite kid : role.getKidsInv()) {
-                            body.wrtr.name(kid.getId() + "").value(kid.getFio());
-                        }
-                    }
                     body.wrtr.endObject();
                 }
                 infCon(body.uuid, body.login, null, null, null, null, null);
@@ -239,55 +228,36 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @PostMapping(value = "/reg")
     public JsonObject reg(@RequestBody DataAuth body) {
-        User user = datas.userByLogin(body.login), user1 = null;
-        Invite inv = null;
-        if(Objects.equals(body.mod, "inv")){
-            inv = datas.inviteByCode(body.code);
-        }
-        if(Objects.equals(body.mod, "rea")){
+        User user = datas.userByLogin(body.login),
             user1 = datas.userByCode(body.code);
-        }
         try {
             body.wrtr = datas.ini(body.toString());
-            if(inv == null && user1 == null){
+            if(user1 == null){
                 body.wrtr.name("error").value(2);
             } else if(user == null) {
-                if(inv != null) {
-                    SettingUser settingUser = datas.createSettingUser(new SettingUser(body.ico));
-                    user = new User(body.login, body.par, settingUser);
-                    user.setRoles(inv.getRoles());
-                    user.setSelRole(datas.getFirstRoleId(inv.getRoles()));
-                    if(inv.getRoles().containsKey(1L)) {
-                        if(!ObjectUtils.isEmpty(inv.getRoles().get(1L).getKids())) {
-                            user.setSelKid(inv.getRoles().get(1L).getKids().get(0).getId());
-                        } else if(!ObjectUtils.isEmpty(inv.getRoles().get(1L).getKidsInv())) {
-                            user.setSelKid(inv.getRoles().get(1L).getKidsInv().get(0).getId());
+                SettingUser settingUser = null;
+                if(Objects.equals(body.mod, "inv")) {
+                    settingUser = datas.createSettingUser(new SettingUser(body.ico));
+                    user1.setSelRole(datas.getFirstRoleId(user1.getRoles()));
+                    user1.setSettings(settingUser);
+                    if(user1.getRoles().containsKey(1L)) {
+                        if(!ObjectUtils.isEmpty(user1.getRoles().get(1L).getKids())) {
+                            user1.setSelKid(user1.getRoles().get(1L).getKids().get(0).getId());
                         }
                     }
-                    user.setFio(inv.getFio());
-                    datas.getUserRepository().saveAndFlush(user);
-                    School school = datas.getFirstRole(inv.getRoles()).getYO();
-                    if(school != null) {
-                        school.getHteachersInv().remove(inv);
-                        school.getHteachers().add(user);
-                        datas.getSchoolRepository().saveAndFlush(school);
-                        datas.addTopic(settingUser, school.getId()+"News");
-                    }
-                    datas.addTopic(settingUser, "news");
-                    datas.getSettingUserRepository().saveAndFlush(settingUser);
-                    datas.getInviteRepository().delete(inv);
-                }
-                if(user1 != null){
-                    SettingUser settingUser = user1.getSettings();
+                } else if(Objects.equals(body.mod, "rea")){
+                    settingUser = user1.getSettings();
                     user1.setLogin(body.login);
                     user1.setPassword(body.par);
                     settingUser.setIco(body.ico);
                     user1.setCode(null);
                     user1.setExpDate(null);
-                    datas.getUserRepository().saveAndFlush(user1);
+                }
+                datas.getUserRepository().saveAndFlush(user1);
+                if(settingUser != null) {
                     School school = datas.getFirstRole(user1.getRoles()).getYO();
-                    if(school != null) {
-                        datas.addTopic(settingUser, school.getId()+"News");
+                    if (school != null) {
+                        datas.addTopic(settingUser, school.getId() + "News");
                     }
                     datas.addTopic(settingUser, "news");
                     datas.getSettingUserRepository().saveAndFlush(settingUser);
@@ -348,11 +318,6 @@ import java.util.concurrent.ConcurrentHashMap;
                             .name("kids").beginObject();
                         if (!ObjectUtils.isEmpty(role.getKids())) {
                             for (User kid : role.getKids()) {
-                                body.wrtr.name(kid.getId() + "").value(kid.getFio());
-                            }
-                        }
-                        if (!ObjectUtils.isEmpty(role.getKidsInv())) {
-                            for (Invite kid : role.getKidsInv()) {
                                 body.wrtr.name(kid.getId() + "").value(kid.getFio());
                             }
                         }
@@ -420,7 +385,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @PostMapping(value = "/checkInvCode")
     public JsonObject checkInvCode(@RequestBody DataAuth body) {
-        Invite inv = datas.inviteByCode(body.code);
+        User inv = datas.userByCode(body.code);
         try {
             body.wrtr = datas.ini(body.toString());
             if(inv != null) body.wrtr.name("yes").value(true);
@@ -443,33 +408,23 @@ import java.util.concurrent.ConcurrentHashMap;
         Subscriber subscriber = getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
         User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
         final var ref = new Object() {
             Long schId = null;
         };
         try {
             body.wrtr = datas.ini(body.toString());
-            if(user != null && (user1 != null || inv != null)
+            if(user != null && user1 != null
                     && (user.getSelRole() == 3L && user.getRoles().containsKey(3L)
                     || user.getSelRole() == 4L && user.getRoles().containsKey(4L))) {
                 UUID uuid = UUID.randomUUID();
                 Instant after = Instant.now().plus(Duration.ofDays(30));
                 Date dateAfter = Date.from(after);
-                if(user1 != null){
-                    user1.setCode(uuid.toString());
-                    user1.setExpDate(Main.df.format(dateAfter));
-                    datas.getUserRepository().saveAndFlush(user1);
-                    ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
+                user1.setCode(uuid.toString());
+                user1.setExpDate(Main.df.format(dateAfter));
+                datas.getUserRepository().saveAndFlush(user1);
+                ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
 
-                    body.wrtr.name("id").value(user1.getId());
-                } else if(inv != null){
-                    inv.setCode(uuid.toString());
-                    inv.setExpDate(Main.df.format(dateAfter));
-                    datas.getInviteRepository().saveAndFlush(inv);
-                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO().getId();
-
-                    body.wrtr.name("id").value(inv.getId());
-                }
+                body.wrtr.name("id").value(user1.getId());
                 System.out.println("setCode " + uuid);
 
                 body.wrtr.name("code").value(uuid.toString())

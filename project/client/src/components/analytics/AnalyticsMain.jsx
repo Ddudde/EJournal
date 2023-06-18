@@ -188,7 +188,7 @@ export function AnalyticsMain(props) {
     const isFirstUpdate = useRef(true);
     useEffect(() => {
         console.log("I was triggered during componentDidMount AnalyticsMain.jsx");
-        setActived(cState.role == 3 ? 10 : 13);
+        setActived(cState.role == 3 ? 10 : 14);
         return function() {
             dispatch = undefined;
             console.log("I was triggered during componentWillUnmount AnalyticsMain.jsx");

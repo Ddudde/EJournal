@@ -1,7 +1,6 @@
 package ru.mirea.data.models.school.day;
 
 import lombok.*;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Period;
 
@@ -18,9 +17,6 @@ import javax.persistence.*;
 
     @OneToOne
     private User usr;
-
-    @OneToOne
-    private Invite userInv;
 
     @OneToOne
     private Period period;

@@ -41,16 +41,6 @@ import java.util.Set;
     private List<User> parents;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany
-    @JoinColumn(name = "role_kid_id")
-    private List<Invite> kidsInv;
-
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany
-    @JoinColumn(name = "role_par_id")
-    private List<Invite> parentsInv;
-
-    @LazyCollection(LazyCollectionOption.FALSE)
     @ElementCollection
     private Set<String> subjects;
 
@@ -91,19 +81,9 @@ import java.util.Set;
         return kids;
     }
 
-    public List<Invite> getKidsInv() {
-        if(kidsInv == null) kidsInv = new ArrayList<>();
-        return kidsInv;
-    }
-
     public List<User> getParents() {
         if(parents == null) parents = new ArrayList<>();
         return parents;
-    }
-
-    public List<Invite> getParentsInv() {
-        if(parentsInv == null) parentsInv = new ArrayList<>();
-        return parentsInv;
     }
 
     public String getToStringU(List<User> users) {
@@ -120,32 +100,17 @@ import java.util.Set;
         return rez + "]";
     }
 
-    public String getToStringI(List<Invite> invites) {
-        String rez = null;
-        if(invites == null) return "[]";
-        for(Invite invite : invites) {
-            if(rez == null) {
-                rez = "[";
-            } else {
-                rez += ", ";
-            }
-            rez += "Invite{id=" + invite.getId() + "}";
-        }
-        return rez + "]";
-    }
-
     @Override
     public String toString() {
+        String yo = YO == null ? "null" : YO.getId()+"";
         String gr = grp == null ? "null" : grp.getId()+"";
         return "Role{" +
                 "id=" + id +
                 ", email='" + email + '\'' +
-                ", YO=" + YO.getId() +
+                ", YO=" + yo +
                 ", grp=" + gr +
                 ", kids=" + getToStringU(kids) +
                 ", parents=" + getToStringU(parents) +
-                ", kidsInv=" + getToStringI(kidsInv) +
-                ", parentsInv=" + getToStringI(parentsInv) +
                 ", subjects=" + subjects +
                 '}';
     }

@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
@@ -25,9 +24,6 @@ import java.util.List;
 
     @OneToOne
     private User teacher;
-
-    @OneToOne
-    private Invite teacherInv;
 
     @OneToOne
     private School school;
@@ -66,7 +62,6 @@ import java.util.List;
         return "Day{" +
                 "id=" + id +
                 ", teacher=" + teacher +
-                ", teacherInv=" + teacherInv +
                 ", school=" + school.getId() +
                 ", grp=" + gr +
                 ", homework='" + homework + '\'' +

@@ -56,8 +56,7 @@ function refreshLink(e) {
         // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
         sendToServer({
             uuid: cState.uuid,
-            id: id[0],
-            id1: id[1]
+            id: id[0]
         }, 'POST', "auth/setCodePep")
             .then(data => {
                 console.log(data);
@@ -76,7 +75,7 @@ function onDel(e, type) {
         if (inp.hasAttribute("data-id")) {
             id = inp.getAttribute("data-id").split("_");
             // dispatch(changePeople(type, 0, id[0], id[1]));
-            remInv(type, id[0], id[1]);
+            remInv(type, id[1]);
         }
     }
 }
@@ -111,7 +110,7 @@ function onFin(e, type) {
             if(type){
                 if(inp.hasAttribute("data-id")){
                     let id = inp.getAttribute("data-id").split("_");
-                    changeInv(type, id[0], id[1], inp.value, par);
+                    changeInv(type, id[1], inp.value, par);
                     // dispatch(changePeople(type, 2, id, undefined, inp.value));
                 }
             } else {
@@ -169,21 +168,19 @@ function addPepC(e) {
     dispatch(changePeople(tps.el_gl, 0, msg.id, undefined, msg.body));
 }
 
-function remInv (type, id, id1) {
+function remInv (type, id) {
     console.log("remInv");
     sendToServer({
         uuid: cState.uuid,
-        id: id,
-        id1: id1
+        id: id
     }, 'POST', "admins/remPep")
 }
 
-function changeInv (type, id, id1, inp, par) {
+function changeInv (type, id, inp, par) {
     console.log("changeInv");
     sendToServer({
         uuid: cState.uuid,
         id: id,
-        id1: id1,
         name: inp
     }, 'POST', "admins/chPep")
         .then(data => {

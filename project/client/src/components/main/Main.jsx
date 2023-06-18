@@ -316,11 +316,15 @@ export function Main() {
             nam: "Заявки",
             linke: "/"
         } : undefined,
-        12: cState.auth && cState.role < 2 ? {
+        12: cState.auth && cState.role == 4 ? {
+            nam: "Тестирование",
+            linke: "test"
+        } : undefined,
+        13: cState.auth && cState.role < 2 ? {
             nam: "Дневник",
             linke: "/"
         } : undefined,
-        13: cState.auth && cState.role < 2 ? {
+        14: cState.auth && cState.role < 2 ? {
             nam: "Аналитика",
             linke: "analytics"
         } : undefined
@@ -347,36 +351,34 @@ export function Main() {
         }
         console.log('componentDidUpdate Main.jsx');
     });
-    return (
-        <>
-            <div className={mainCSS.fon}>
-                <div/>
-                <div/>
+    return <>
+        <div className={mainCSS.fon}>
+            <div/>
+            <div/>
+        </div>
+        <nav className={mainCSS.panel} id="her">
+            <div className={mainCSS.pane} ref={()=>ke = ke == undefined ? paneInfo.els.length : ke}>
+                <Pane gro={gr} main={true}/>
             </div>
-            <nav className={mainCSS.panel} id="her">
-                <div className={mainCSS.pane} ref={()=>ke = ke == undefined ? paneInfo.els.length : ke}>
-                    <Pane gro={gr} main={true}/>
-                </div>
-                {cState.auth && getLogin()}
-                {(cState.auth && cState.role == 1) && getKids()}
-            </nav>
-            <Outlet/>
-            <Dialog/>
-            <Events/>
-            <div className={mainCSS.switcher}>
-                <label className={mainCSS.switch}>
-                    <input className={mainCSS.inp_sw} type="checkbox" checked={themeInfo.theme_ch ? "checked" : ""} onChange={() => {dispatch(changeTheme(themeInfo.theme_ch, themeInfo.thP))}}/>
-                    <span className={mainCSS.slider}/>
-                </label>
-                <div className={mainCSS.lab_sw}>
-                    Тема: {themeInfo.theme}
-                </div>
+            {cState.auth && getLogin()}
+            {(cState.auth && cState.role == 1) && getKids()}
+        </nav>
+        <Outlet/>
+        <Dialog/>
+        <Events/>
+        <div className={mainCSS.switcher}>
+            <label className={mainCSS.switch}>
+                <input className={mainCSS.inp_sw} type="checkbox" checked={themeInfo.theme_ch ? "checked" : ""} onChange={() => {dispatch(changeTheme(themeInfo.theme_ch, themeInfo.thP))}}/>
+                <span className={mainCSS.slider}/>
+            </label>
+            <div className={mainCSS.lab_sw}>
+                Тема: {themeInfo.theme}
             </div>
-            <div className={mainCSS.d}>
-                © 2023 ООО "Рога и Копыта" Все права защищены. Project on <a href="https://github.com/Ddudde/DipvLom" style={{color: "var(--cV2)"}}>github</a>.
-            </div>
-            <img className={mainCSS.d1} src={up} title="Вверх" alt="" onClick={onTop} ref={el=>d1 = el}/>
-        </>
-    )
+        </div>
+        <div className={mainCSS.d}>
+            © 2023 ООО "Рога и Копыта" Все права защищены. Project on <a href="https://github.com/Ddudde/DipvLom" style={{color: "var(--cV2)"}}>github</a>.
+        </div>
+        <img className={mainCSS.d1} src={up} title="Вверх" alt="" onClick={onTop} ref={el=>d1 = el}/>
+    </>
 }
 export default Main;

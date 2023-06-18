@@ -61,12 +61,8 @@
 	margin-bottom: 0.5vw;
 }
 
-.block{
+.block, .blockOtv{
     margin-inline: 2vw;
-}
-
-.blockOtv{
-	margin-inline: 2vw;
 }
 
 .blockOtv[data-act="0"]{

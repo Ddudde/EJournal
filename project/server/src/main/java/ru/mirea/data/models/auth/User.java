@@ -30,6 +30,19 @@ import java.util.Map;
     @MapKeyColumn(name = "role")
     private Map<Long, Role> roles;
 
+    public User(String fio, Map<Long, Role> roles, String expDate) {//inv
+        this.fio = fio;
+        this.expDate = expDate;
+        this.roles = new HashMap<>(roles);
+    }
+
+    public User(String fio, Map<Long, Role> roles, String expDate, String code) {//inv
+        this.fio = fio;
+        this.code = code;
+        this.expDate = expDate;
+        this.roles = new HashMap<>(roles);
+    }
+
     public User(String login, String password, SettingUser settings) {
         this.login = login;
         this.password = password;
@@ -41,7 +54,7 @@ import java.util.Map;
         this.password = password;
         this.fio = fio;
         this.selRole = selRole;
-        this.roles = roles;
+        this.roles = new HashMap<>(roles);
         this.settings = settings;
     }
 
@@ -51,8 +64,13 @@ import java.util.Map;
         this.fio = fio;
         this.selRole = selRole;
         this.selKid = selKid;
-        this.roles = roles;
+        this.roles = new HashMap<>(roles);
         this.settings = settings;
+    }
+
+//    @PreRemove
+    public void rem() {
+        getRoles().clear();
     }
 
     public Map<Long, Role> getRoles() {

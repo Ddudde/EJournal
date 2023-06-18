@@ -15,7 +15,6 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
@@ -43,27 +42,18 @@ import java.util.UUID;
     public JsonObject remPep(@RequestBody DataTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
-            if(user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
+            if(user != null && user.getRoles().containsKey(3L) && user1 != null) {
                 Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
                 if(group != null) {
-                    if (user1 != null) {
-                        user1.getRoles().remove(3L);
-                        datas.getUserRepository().saveAndFlush(user1);
-                        if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
-                        datas.getGroupRepository().saveAndFlush(group);
+                    user1.getRoles().remove(3L);
+                    datas.getUserRepository().saveAndFlush(user1);
+                    if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
+                    datas.getGroupRepository().saveAndFlush(group);
 
-                        body.wrtr.name("id").value(user1.getId());
-                    } else if (inv != null) {
-                        datas.getInviteRepository().delete(inv);
-                        if (!ObjectUtils.isEmpty(group.getKidsInv())) group.getKidsInv().remove(inv.getId());
-                        datas.getGroupRepository().saveAndFlush(group);
-
-                        body.wrtr.name("id").value(inv.getId());
-                    }
+                    body.wrtr.name("id").value(user1.getId());
                 }
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -76,23 +66,15 @@ import java.util.UUID;
     public JsonObject chPep(@RequestBody DataTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
-            if(user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
-                if(user1 != null){
-                    user1.setFio(body.name);
-                    datas.getUserRepository().saveAndFlush(user1);
+            if(user != null && user.getRoles().containsKey(3L) && user1 != null) {
+                user1.setFio(body.name);
+                datas.getUserRepository().saveAndFlush(user1);
 
-                    body.wrtr.name("id").value(user1.getId());
-                } else if(inv != null){
-                    inv.setFio(body.name);
-                    datas.getInviteRepository().saveAndFlush(inv);
-
-                    body.wrtr.name("id").value(inv.getId());
-                }
-                body.wrtr.name("name").value(body.name);
+                body.wrtr.name("id").value(user1.getId())
+                    .name("name").value(body.name);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
@@ -104,36 +86,26 @@ import java.util.UUID;
     public JsonObject setCodePep(@RequestBody DataTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id1);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         final var ref = new Object() {
             Long schId = null;
         };
         try {
             body.wrtr = datas.ini(body.toString());
-            if(user != null && (user1 != null || inv != null)
+            if(user != null && user1 != null
                 && user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
                 UUID uuid = UUID.randomUUID();
                 Instant after = Instant.now().plus(Duration.ofDays(30));
                 Date dateAfter = Date.from(after);
-                if(user1 != null){
-                    user1.setCode(uuid.toString());
-                    user1.setExpDate(Main.df.format(dateAfter));
-                    datas.getUserRepository().saveAndFlush(user1);
-                    ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
+                user1.setCode(uuid.toString());
+                user1.setExpDate(Main.df.format(dateAfter));
+                datas.getUserRepository().saveAndFlush(user1);
+                ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
 
-                    body.wrtr.name("id1").value(user1.getId());
-                } else if(inv != null){
-                    inv.setCode(uuid.toString());
-                    inv.setExpDate(Main.df.format(dateAfter));
-                    datas.getInviteRepository().saveAndFlush(inv);
-                    ref.schId = datas.getFirstRole(inv.getRoles()).getYO().getId();
-
-                    body.wrtr.name("id1").value(inv.getId());
-                }
                 System.out.println("setCode " + uuid);
-                body.wrtr.name("code").value(uuid.toString());
-                body.wrtr.name("id").value(body.id);
+                body.wrtr.name("id1").value(user1.getId())
+                    .name("code").value(uuid.toString())
+                    .name("id").value(body.id);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
@@ -152,13 +124,12 @@ import java.util.UUID;
                 if(school != null) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
-                    Role role = new Role(null, Set.of(), school);
-                    datas.getRoleRepository().saveAndFlush(role);
-                    Invite inv = new Invite(body.name, Map.of(
+                    Role role = datas.getRoleRepository().saveAndFlush(new Role(null, Set.of(), school));
+                    User inv = new User(body.name, Map.of(
                         2L, role
                     ), Main.df.format(dateAfter));
-                    datas.getInviteRepository().saveAndFlush(inv);
-                    school.getTeachersInv().add(inv);
+                    datas.getUserRepository().saveAndFlush(inv);
+                    school.getTeachers().add(inv);
                     datas.getSchoolRepository().saveAndFlush(school);
 
                     body.wrtr.name("id").value(inv.getId());
@@ -198,8 +169,8 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor @AllArgsConstructor
 class DataTeachers {
-    public String uuid, name, id;
-    public Long id1;
+    public String uuid, name;
+    public Long id;
     public transient boolean bol = true;
     public transient JsonTreeWriter wrtr;
 }

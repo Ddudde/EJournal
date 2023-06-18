@@ -53,13 +53,10 @@ export function refreshLink(e, sit, type) {
     if (inp.hasAttribute("data-id")) {
         id = inp.getAttribute("data-id").split("_");
         if(type == CHANGE_PARENTS){
-            codPar(id[0], id[1], title, text);
-            // dispatch(changePeople(type, id[0], "par", id[1], sit + "/invite/" + gen_cod(), "link"));
+            codPar(id[1], title, text);
         } else {
-            codTea(id[0], id[1], title, text);
-            // dispatch(changePeople(type, id[0], id[1], undefined, sit + "/invite/" + gen_cod(), "link"));
+            codTea(id[1], title, text);
         }
-        // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
     } else if (inp.hasAttribute("data-id1")) {
         id = inp.getAttribute("data-id1");
         dispatch(changePeople(type, 2, id, undefined, sit + "/invite/" + gen_cod(), "link"));
@@ -118,9 +115,6 @@ export function onFin(e, inps, forceUpdate, type, info) {
     if (par.classList.contains(parentsCSS.upr)) {
         par = par.parentElement;
         addKid({...info.nw}, inps.nyid, par);
-        // dispatch(changePeople(CHANGE_PARENTS_L1, undefined, inps.nyid, undefined, {...info.nw}));
-        // inps.nyid = undefined;
-        // dispatch(changePeople(CHANGE_PARENTS_DEL_L1, "nw", "par"));
         par.setAttribute('data-st', '0');
         return;
     }
@@ -144,7 +138,6 @@ export function onFin(e, inps, forceUpdate, type, info) {
         } else if(type == CHANGE_TEACHERS) {
             par = par.parentElement;
             addTea(inps.inpnpt, par);
-            // dispatch(changePeople(type, "nt", "id8", undefined, inps.inpnpt));
         } else {
             par = par.parentElement;
             dispatch(changePeople(type, 2, "id8", undefined, inps.inpnpt));

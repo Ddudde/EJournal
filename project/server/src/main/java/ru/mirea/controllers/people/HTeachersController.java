@@ -14,7 +14,6 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
@@ -122,34 +121,24 @@ import java.util.Map;
     public JsonObject chPep(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         final var ref = new Object() {
             School sch = null;
         };
         if (user1 != null) {
             ref.sch = user1.getRoles().get(3L).getYO();
-        } else if (inv != null) {
-            ref.sch = inv.getRoles().get(3L).getYO();
         }
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && ref.sch != null) {
                 if ((user.getSelRole() == 4L && user.getRoles().containsKey(4L)
                     || user.getSelRole() == 3L && user.getRoles().containsKey(3L))
-                    && (user1 != null || inv != null)) {
-                    if (user1 != null) {
-                        user1.setFio(body.name);
-                        datas.getUserRepository().saveAndFlush(user1);
+                    && user1 != null) {
+                    user1.setFio(body.name);
+                    datas.getUserRepository().saveAndFlush(user1);
 
-                        body.wrtr.name("id").value(user1.getId());
-                    } else if (inv != null) {
-                        inv.setFio(body.name);
-                        datas.getInviteRepository().saveAndFlush(inv);
-
-                        body.wrtr.name("id").value(inv.getId());
-                    }
-                    body.wrtr.name("id1").value(ref.sch.getId())
+                    body.wrtr.name("id").value(user1.getId())
+                        .name("id1").value(ref.sch.getId())
                         .name("name").value(body.name);
                 }
             }
@@ -172,37 +161,26 @@ import java.util.Map;
     public JsonObject remPep(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         final var ref = new Object() {
             School sch = null;
         };
         if (user1 != null) {
             ref.sch = user1.getRoles().get(3L).getYO();
-        } else if (inv != null) {
-            ref.sch = inv.getRoles().get(3L).getYO();
         }
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && ref.sch != null) {
                 if ((user.getSelRole() == 4L && user.getRoles().containsKey(4L)
                     || user.getSelRole() == 3L && user.getRoles().containsKey(3L))
-                    && (user1 != null || inv != null)) {
-                    if (user1 != null) {
-                        user1.getRoles().remove(3L);
-                        datas.getUserRepository().saveAndFlush(user1);
-                        ref.sch.getHteachers().remove(user1.getId());
-                        datas.getSchoolRepository().saveAndFlush(ref.sch);
+                    && user1 != null) {
+                    user1.getRoles().remove(3L);
+                    datas.getUserRepository().saveAndFlush(user1);
+                    ref.sch.getHteachers().remove(user1);
+                    datas.getSchoolRepository().saveAndFlush(ref.sch);
 
-                        body.wrtr.name("id").value(user1.getId());
-                    } else if (inv != null) {
-                        datas.getInviteRepository().delete(inv);
-                        ref.sch.getHteachersInv().remove(inv.getId());
-                        datas.getSchoolRepository().saveAndFlush(ref.sch);
-
-                        body.wrtr.name("id").value(inv.getId());
-                    }
-                    body.wrtr.name("id1").value(ref.sch.getId());
+                    body.wrtr.name("id").value(user1.getId())
+                        .name("id1").value(ref.sch.getId());
                 }
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -231,7 +209,7 @@ import java.util.Map;
             ref.schId = user.getRoles().get(3L).getYO().getId();
         }
         School sch = datas.schoolById(ref.schId);
-        Invite inv = null;
+        User inv = null;
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && sch != null) {
@@ -239,11 +217,12 @@ import java.util.Map;
                     || user.getSelRole() == 4L && user.getRoles().containsKey(4L)) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
-                    inv = new Invite(body.name, Map.of(
-                        3L, new Role(null, sch)
+                    Role role = datas.getRoleRepository().saveAndFlush(new Role(null, sch));
+                    inv = new User(body.name, Map.of(
+                        3L, role
                     ), Main.df.format(dateAfter));
-                    datas.getInviteRepository().saveAndFlush(inv);
-                    sch.getHteachersInv().add(inv);
+                    datas.getUserRepository().saveAndFlush(inv);
+                    sch.getHteachers().add(inv);
                     datas.getSchoolRepository().saveAndFlush(sch);
 
                     body.wrtr.name("id1").value(sch.getId())
@@ -344,7 +323,6 @@ import java.util.Map;
                             .name("name").value(el.getName())
                             .name("pep").beginObject();
                         datas.usersByList(el.getHteachers(), true, body.wrtr);
-                        datas.invitesByList(el.getHteachersInv(), true, body.wrtr);
                         body.wrtr.endObject().endObject();
                     }
                 } else {
@@ -353,7 +331,6 @@ import java.util.Map;
                     ref.schId = school.getId();
                     if (school != null) {
                         datas.usersByList(school.getHteachers(), true, body.wrtr);
-                        datas.invitesByList(school.getHteachersInv(), true, body.wrtr);
                     }
                 }
             }
@@ -368,8 +345,8 @@ import java.util.Map;
 @ToString
 @NoArgsConstructor @AllArgsConstructor
 class DataHTeachers {
-    public String login, uuid, name, id;
-    public Long schId, yo, id1, grId;
+    public String login, uuid, name;
+    public Long schId, yo, id, grId;
     public transient boolean bol = true;
     public transient JsonTreeWriter wrtr;
 }

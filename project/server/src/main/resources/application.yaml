@@ -10,4 +10,4 @@ spring:
       path: /console_db/
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    hibernate.ddl-auto: create-drop
+    hibernate.ddl-auto: create

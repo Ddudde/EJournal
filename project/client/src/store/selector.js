@@ -23,3 +23,4 @@ export const events = state => state.events || {};
 export const zvonki = state => state.zvonki || {};
 export const news = state => state.news || {};
 export const contacts = state => state.contacts || {};
+export const testRed = state => state.testRed || {};

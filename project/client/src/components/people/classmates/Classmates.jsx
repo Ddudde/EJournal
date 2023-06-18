@@ -54,12 +54,9 @@ function refreshLink(e) {
     inp = e.target.parentElement.querySelector("input");
     if (inp.hasAttribute("data-id")) {
         id = inp.getAttribute("data-id").split("_");
-        // dispatch(changePeople(type, 0, id[0], id[1], sit + "/invite/" + gen_cod(), "link"));
-        // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
         sendToServer({
             uuid: cState.uuid,
-            id: id[0],
-            id1: id[1]
+            id: id[1]
         }, 'POST', "auth/setCodePep")
             .then(data => {
                 console.log(data);
@@ -77,8 +74,7 @@ function onDel(e, type) {
         inp = par.querySelector("input:not([readOnly])");
         if (inp.hasAttribute("data-id")) {
             id = inp.getAttribute("data-id").split("_");
-            // dispatch(changePeople(type, 0, id[0], id[1]));
-            remInv(type, id[0], id[1]);
+            remInv(type, id[1]);
         }
     }
 }
@@ -101,8 +97,6 @@ function onFin(e, type) {
     if (par.classList.contains(peopleCSS.fi)){
         par = par.parentElement.parentElement;
         addInv(type, inps.inpnpt, par);
-        // dispatch(changePeople(type, 2, "id8", undefined, inps.inpnpt));
-        // par.setAttribute('data-st', '0');
         return;
     }
     inp = par.querySelector("input");
@@ -113,8 +107,7 @@ function onFin(e, type) {
             if(type){
                 if(inp.hasAttribute("data-id")){
                     let id = inp.getAttribute("data-id").split("_");
-                    changeInv(type, id[0], id[1], inp.value, par);
-                    // dispatch(changePeople(type, 2, id, undefined, inp.value));
+                    changeInv(type, id[1], inp.value, par);
                 }
             } else {
                 inps.inpnpt = inp.value;
@@ -122,7 +115,6 @@ function onFin(e, type) {
                 par.setAttribute('data-st', '0');
             }
         }
-        // par.setAttribute('data-st', '0');
     } else {
         inp.setAttribute("data-mod", '1');
     }
@@ -171,21 +163,19 @@ function addPepC(e) {
     dispatch(changePeople(tps.el_gl, 0, msg.id, undefined, msg.body));
 }
 
-function remInv (type, id, id1) {
+function remInv (type, id) {
     console.log("remInv");
     sendToServer({
         uuid: cState.uuid,
-        id: id,
-        id1: id1
+        id: id
     }, 'POST', "students/remPep")
 }
 
-function changeInv (type, id, id1, inp, par) {
+function changeInv (type, id, inp, par) {
     console.log("changeInv");
     sendToServer({
         uuid: cState.uuid,
         id: id,
-        id1: id1,
         name: inp
     }, 'POST', "students/chPep")
         .then(data => {

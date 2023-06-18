@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.Lesson;
@@ -48,11 +47,8 @@ import java.util.List;
                     ref.group = user.getRoles().get(0L).getGrp();
                 } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
                     User kidU = datas.userById(user.getSelKid());
-                    Invite kidI = datas.inviteById(user.getSelKid());
                     if(kidU != null) {
                         ref.group = kidU.getRoles().get(0L).getGrp();
-                    } else if(kidI != null) {
-                        ref.group = kidI.getRoles().get(0L).getGrp();
                     }
                 }
                 if (ref.group != null || user.getSelRole() == 2L) {
@@ -83,14 +79,10 @@ import java.util.List;
                             body.wrtr.name("group").value(grp.getName());
                         } else {
                             User teaU = les.getTeacher();
-                            Invite teaI = les.getTeacherInv();
                             body.wrtr.name("prepod").beginObject();
                             if (teaU != null) {
                                 body.wrtr.name("name").value(teaU.getFio())
                                     .name("id").value(teaU.getId());
-                            } else if (teaI != null) {
-                                body.wrtr.name("name").value(teaI.getFio())
-                                    .name("id").value(teaI.getId());
                             }
                             body.wrtr.endObject();
                         }

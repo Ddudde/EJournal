@@ -3,7 +3,6 @@ package ru.mirea.data.models.school;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 
 import javax.persistence.*;
@@ -26,22 +25,18 @@ import java.util.List;
     @JoinColumn(name = "grp_kid_id")
     private List<User> kids;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany
-    @JoinColumn(name = "grp_kid_id")
-    private List<Invite> kidsInv;
-
     public Group(String name) {
         this.name = name;
     }
 
+//    @PreRemove
+//    private void rem() {
+//        System.out.println(name);
+//        getKids().clear();
+//    }
+
     public List<User> getKids() {
         if(kids == null) kids = new ArrayList<>();
         return kids;
-    }
-
-    public List<Invite> getKidsInv() {
-        if(kidsInv == null) kidsInv = new ArrayList<>();
-        return kidsInv;
     }
 }

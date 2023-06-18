@@ -176,7 +176,7 @@ export function setSettings(uuidP, dis) {
     }, 'POST', "settings/getSettings")
         .then(data => {
             if(data.error == false){
-                for(let id of Object.getOwnPropertyNames(data.body)) {
+                for(let id in data.body) {
                     dispatch(changeCB(id, !data.body[id]));
                     if(id == "checkbox_hints") {
                         dispatch(changeEvents(CHANGE_EVENTS_VISIBLE, data.body[id]));

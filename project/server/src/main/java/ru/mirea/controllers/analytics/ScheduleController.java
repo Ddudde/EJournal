@@ -15,7 +15,6 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.Lesson;
@@ -56,26 +55,15 @@ import java.util.List;
                     ref.lesson.setNameSubject(body.obj.get("name").getAsString());
                     ref.lesson.setKab(body.obj.get("cabinet").getAsString());
                     ref.teaU = datas.userById(teaId);
-                    Invite teaI = datas.inviteById(teaId);
                     if(ref.teaU != null) {
                         ref.lesson.setTeacher(ref.teaU);
                         if(!ObjectUtils.isEmpty(school.getTeachers())
-                            && school.getTeachers().contains(teaId)){
-                            school.getTeachers().remove(teaId);
+                            && school.getTeachers().contains(ref.teaU)){
+                            school.getTeachers().remove(ref.teaU);
                         }
                         if(ref.teaU.getRoles().get(2L).getSubjects().contains(ref.lesson.getNameSubject())) {
                             ref.teaU.getRoles().get(2L).getSubjects().add(ref.lesson.getNameSubject());
                             datas.getUserRepository().saveAndFlush(ref.teaU);
-                        }
-                    } else if(teaI != null){
-                        ref.lesson.setTeacherInv(teaI);
-                        if(!ObjectUtils.isEmpty(school.getTeachersInv())
-                            && school.getTeachersInv().contains(teaId)){
-                            school.getTeachersInv().remove(teaId);
-                        }
-                        if(teaI.getRoles().get(2L).getSubjects().contains(ref.lesson.getNameSubject())) {
-                            teaI.getRoles().get(2L).getSubjects().add(ref.lesson.getNameSubject());
-                            datas.getInviteRepository().saveAndFlush(teaI);
                         }
                     }
                     ref.lesson.setGrp(datas.groupById(ref.group.getId()));
@@ -122,11 +110,8 @@ import java.util.List;
                     ref.group = user.getRoles().get(0L).getGrp();
                 } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
                     User kidU = datas.userById(user.getSelKid());
-                    Invite kidI = datas.inviteById(user.getSelKid());
                     if(kidU != null) {
                         ref.group = kidU.getRoles().get(0L).getGrp();
-                    } else if(kidI != null) {
-                        ref.group = kidI.getRoles().get(0L).getGrp();
                     }
                 } else if(user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
                     ref.group = datas.groupById(body.group);

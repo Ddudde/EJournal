@@ -23,6 +23,7 @@ import eventsReducer from "./reducers/other/eventsReducer";
 import groupReducer from "./reducers/people/groupReducer";
 import requestReducer from "./reducers/requestReducer";
 import dialogReducer from "./reducers/other/dialogReducer";
+import testReducer from "./reducers/testReducer";
 
 export default combineReducers({
     checkbox: checkBoxReducer,
@@ -48,5 +49,6 @@ export default combineReducers({
     events: eventsReducer,
     groups: groupReducer,
     requests: requestReducer,
-    dialog: dialogReducer
+    dialog: dialogReducer,
+    testRed: testReducer
 });

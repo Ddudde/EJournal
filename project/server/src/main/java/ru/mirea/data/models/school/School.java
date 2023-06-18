@@ -5,7 +5,6 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.News;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 
 import javax.persistence.*;
@@ -30,18 +29,8 @@ import java.util.List;
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany
-    @JoinColumn(name = "sch_htea_id")
-    private List<Invite> hteachersInv;
-
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany
     @JoinColumn(name = "sch_tea_id")
     private List<User> teachers;
-
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany
-    @JoinColumn(name = "sch_tea_id")
-    private List<Invite> teachersInv;
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(orphanRemoval = true)
@@ -70,10 +59,9 @@ import java.util.List;
         this.hteachers = hteachers;
     }
 
-    public School(List<User> hteachers, String name, List<Invite> hteachersInv) {
+    public School(List<User> hteachers, String name) {
         this.name = name;
         this.hteachers = hteachers;
-        this.hteachersInv = hteachersInv;
     }
 
     public School(String name, List<News> news, Contacts contacts, List<Group> groups, List<Period> periods) {
@@ -89,11 +77,6 @@ import java.util.List;
         return hteachers;
     }
 
-    public List<Invite> getHteachersInv() {
-        if(hteachersInv == null) hteachersInv = new ArrayList<>();
-        return hteachersInv;
-    }
-
     public List<News> getNews() {
         if(news == null) news = new ArrayList<>();
         return news;
@@ -107,11 +90,6 @@ import java.util.List;
     public List<User> getTeachers() {
         if(teachers == null) teachers = new ArrayList<>();
         return teachers;
-    }
-
-    public List<Invite> getTeachersInv() {
-        if(teachersInv == null) teachersInv = new ArrayList<>();
-        return teachersInv;
     }
 
     public List<Period> getPeriods() {

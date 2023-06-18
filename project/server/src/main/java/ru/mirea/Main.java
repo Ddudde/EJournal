@@ -18,7 +18,9 @@ public class Main {
 
     public static ConfigurableApplicationContext ctx;
 
-    private final static boolean debug = true;
+    public static boolean debug = true;
+
+    public static boolean test = false;
 
     public final static DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 

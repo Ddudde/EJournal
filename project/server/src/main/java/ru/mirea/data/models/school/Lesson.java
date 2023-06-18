@@ -1,7 +1,6 @@
 package ru.mirea.data.models.school;
 
 import lombok.*;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 
 import javax.persistence.*;
@@ -17,9 +16,6 @@ import javax.persistence.*;
 
     @OneToOne
     private User teacher;
-
-    @OneToOne
-    private Invite teacherInv;
 
     @OneToOne
     private School school;

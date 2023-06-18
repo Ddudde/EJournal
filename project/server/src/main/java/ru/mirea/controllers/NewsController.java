@@ -155,8 +155,8 @@ import java.util.Objects;
                 syst = datas.getSyst();
                 if (user != null) {
                     school = user.getRoles().get(user.getSelRole()).getYO();
-                    ref.schId = school.getId();
                     if (Objects.equals(body.type, "Yo") && school != null && !ObjectUtils.isEmpty(school.getNews())) {
+                        ref.schId = school.getId();
                         list = school.getNews();
                     }
                 }

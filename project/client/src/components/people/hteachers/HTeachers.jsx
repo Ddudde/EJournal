@@ -66,29 +66,19 @@ function refreshLink(e) {
     inp = e.target.parentElement.parentElement.querySelector("input:not([readOnly])");
     if (inp.hasAttribute("data-id")) {
         id = inp.getAttribute("data-id").split("_");
-        sendToServer({
-            uuid: cState.uuid,
-            id: id[0],
-            id1: id[1]
-        }, 'POST', "auth/setCodePep")
-            .then(data => {
-                console.log(data);
-                if(data.error == false){
-                    dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
-                }
-            });
+        id = id[1];
     } else if (inp.hasAttribute("data-id1")) {
         id = inp.getAttribute("data-id1").split("_");
-        // dispatch(changePeople(type, 2, id, undefined, sit + (id[0] ? "/reauth/" : "/invite/") + gen_cod(), "link"));
-        // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
+        id = id[0];
+    }
+    if(id) {
         sendToServer({
             uuid: cState.uuid,
-            id: id[1],
-            id1: id[0]
+            id: id
         }, 'POST', "auth/setCodePep")
             .then(data => {
                 console.log(data);
-                if(data.error == false){
+                if (data.error == false) {
                     dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
                 }
             });
@@ -102,15 +92,13 @@ function onDel(e) {
         inp = par.querySelector("input:not([readOnly])");
         if (inp.hasAttribute("data-id")) {
             id = inp.getAttribute("data-id").split("_");
-            // dispatch(changePeople(type, 0, id[0], id[1]));
-            remPep(id[0], id[1]);
+            remPep(id[1]);
         } else if(inp.hasAttribute("data-id1")){
             let id = inp.getAttribute("data-id1").split("_");
-            // dispatch(changePeople(type, 2, id));
             if(cState.role == 4) {
                 remSch(id[0]);
             } else if(cState.role == 3) {
-                remPep(id[1], id[0]);
+                remPep(id[0]);
             }
         }
     }
@@ -138,7 +126,6 @@ function onFin(e, type) {
             if(e.target.hasAttribute("data-id1")){
                 let id = e.target.getAttribute("data-id1");
                 addPep(par, id, inps.inpnpt);
-                // dispatch(changePeople(type, 2, id, "id8", inps.inpnpt));
             }
         } else {
             par = par.parentElement;
@@ -148,7 +135,6 @@ function onFin(e, type) {
                 addPep(par, undefined, inps.inpnpt);
             }
         }
-        // par.setAttribute('data-st', '0');
         return;
     }
     inp = par.querySelector("input");
@@ -159,14 +145,13 @@ function onFin(e, type) {
             if(type){
                 if(inp.hasAttribute("data-id")){
                     let id = inp.getAttribute("data-id").split("_");
-                    chPep(par, id[0], id[1], inp.value);
-                    // dispatch(changePeople(type, 0, id[0], id[1], inp.value));
+                    chPep(par, id[1], inp.value);
                 } else if(inp.hasAttribute("data-id1")){
                     let id = inp.getAttribute("data-id1").split("_");
                     if(cState.role == 4) {
                         chSch(par, id[0], inp.value);
                     } else if(cState.role == 3) {
-                        chPep(par, id[1], id[0], inp.value);
+                        chPep(par, id[0], inp.value);
                     }
                 }
             } else {
@@ -175,7 +160,6 @@ function onFin(e, type) {
                 par.setAttribute('data-st', '0');
             }
         }
-        // par.setAttribute('data-st', '0');
     } else {
         inp.setAttribute("data-mod", '1');
     }
@@ -288,21 +272,19 @@ function chSch (par, id, inp) {
         });
 }
 
-function remPep (id, id1) {
+function remPep (id) {
     console.log("remInv");
     sendToServer({
         uuid: cState.uuid,
-        id: id,
-        id1: id1
+        id: id
     }, 'POST', "hteachers/remPep")
 }
 
-function chPep (par, id, id1, inp) {
+function chPep (par, id, inp) {
     console.log("changeInv");
     sendToServer({
         uuid: cState.uuid,
         id: id,
-        id1: id1,
         name: inp
     }, 'POST', "hteachers/chPep")
         .then(data => {

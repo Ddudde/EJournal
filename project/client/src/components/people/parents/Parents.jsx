@@ -231,12 +231,11 @@ function codPepL1C(e) {
     dispatch(changePeople(CHANGE_PARENTS, msg.id, "par", msg.id1, msg.code, "link"));
 }
 
-export function codPar (id, id1, title, text) {
+export function codPar (id, title, text) {
     console.log("codPar");
     sendToServer({
         uuid: cState.uuid,
-        id: id,
-        id1: id1
+        id: id
     }, 'POST', "parents/setCodePep")
         .then(data => {
             console.log(data);

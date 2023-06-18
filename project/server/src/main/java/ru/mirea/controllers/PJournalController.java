@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
@@ -161,36 +160,6 @@ import java.util.stream.Collectors;
                             List<Mark> marksU = datas.getMarkRepository().findByUsrAndWeight(objU.getId(), 0);
                             System.out.println("perU " + marksU);
                             for (Mark marksM : marksU) {
-                                if(Objects.equals(marksM.getType(), "avg")) {
-                                    body.wrtr.name("mark").value(marksM.getAvg());
-                                }
-                            }
-                            body.wrtr.endObject().endObject();
-                        }
-                    }
-                    if (!ObjectUtils.isEmpty(group.getKidsInv())) {
-                        for (Invite objI : group.getKidsInv()) {
-                            if (objI == null) continue;
-                            body.wrtr.name(objI.getId() + "").beginObject()
-                                .name("name").value(objI.getFio())
-                                .name("days").beginObject();
-                            for (String dat : mapM.keySet()) {
-                                List<Mark> marksI = datas.getMarkRepository().findByIdInAndUserInv(mapM.get(dat), objI.getId());
-                                int i1 = -1;
-                                for (Mark marksM : marksI) {
-                                    body.wrtr.name(i1 == -1 ? dat : (dat + "," + i1)).beginObject()
-                                        .name("mark").value(marksM.getMark())
-                                        .name("weight").value(marksM.getWeight())
-                                        .name("type").value(marksM.getStyle())
-                                        .endObject();
-                                    i1++;
-                                }
-                            }
-                            body.wrtr.endObject()
-                                .name("avg").beginObject();
-                            List<Mark> marksI = datas.getMarkRepository().findByUserInvAndWeight(objI.getId(), 0);
-                            System.out.println("perI " + marksI);
-                            for (Mark marksM : marksI) {
                                 if(Objects.equals(marksM.getType(), "avg")) {
                                     body.wrtr.name("mark").value(marksM.getAvg());
                                 }

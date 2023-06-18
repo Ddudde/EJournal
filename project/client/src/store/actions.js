@@ -31,6 +31,8 @@ export const CHANGE_SCHEDULE_DEL = "CHANGE_SCHEDULE_DEL";
 
 export const CHANGE_JOURNAL = "CHANGE_JOURNAL";
 
+export const CHANGE_TEST_GL = "CHANGE_TEST_GL";
+
 export const CHANGE_PJOURNAL = "CHANGE_PJOURNAL";
 
 export const CHANGE_PANE = "CHANGE_PANE";
@@ -122,6 +124,15 @@ export function changeCB(checkboxId, checkBoxState) {
         payload: {
             checkBoxId: checkboxId,
             checkBoxState: !checkBoxState
+        }
+    };
+}
+
+export function changeTest(type, state) {
+    return {
+        type: type,
+        payload: {
+            state: state
         }
     };
 }

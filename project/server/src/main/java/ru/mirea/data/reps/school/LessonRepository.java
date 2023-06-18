@@ -15,9 +15,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     @Query("SELECT DISTINCT l.nameSubject, l.teacher FROM Lesson l WHERE l.school = :school")
     List<Object[]> uniqTeachersBySchool(@Param("school") Long school);
 
-    @Query("SELECT DISTINCT l.nameSubject, l.teacherInv FROM Lesson l WHERE l.school = :school")
-    List<Object[]> uniqTeachersInvBySchool(@Param("school") Long school);
-
     List<Lesson> findBySchoolAndGrp(Long school, Long grp);
 
     List<Lesson> findBySchoolAndTeacher(Long school, Long teacher);

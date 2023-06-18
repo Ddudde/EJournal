@@ -42,8 +42,6 @@
 	align-items: center;
 	justify-content: center;
 	align-self: stretch;
-	-webkit-transition: color 1s ease;
-	-o-transition: color 1s ease;
 	transition: color 1s ease;
 	transition-property: color, text-shadow, border-color;
 	margin: -0.5px;

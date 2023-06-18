@@ -15,7 +15,6 @@ import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
@@ -41,27 +40,20 @@ import java.util.Map;
     public JsonObject remPep(@RequestBody DataStudents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
-            if (user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
+            if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
                 Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
                 if (group != null) {
-                    if (user1 != null) {
-                        user1.getRoles().remove(3L);
-                        datas.getUserRepository().saveAndFlush(user1);
-                        if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
-                        datas.getGroupRepository().saveAndFlush(group);
-
-                        body.wrtr.name("id").value(user1.getId());
-                    } else if (inv != null) {
-                        datas.getInviteRepository().delete(inv);
-                        if (!ObjectUtils.isEmpty(group.getKidsInv())) group.getKidsInv().remove(inv.getId());
-                        datas.getGroupRepository().saveAndFlush(group);
-
-                        body.wrtr.name("id").value(inv.getId());
+                    user1.getRoles().remove(3L);
+                    datas.getUserRepository().saveAndFlush(user1);
+                    if (!ObjectUtils.isEmpty(group.getKids())) {
+                        group.getKids().remove(user1);
                     }
+                    datas.getGroupRepository().saveAndFlush(group);
+
+                    body.wrtr.name("id").value(user1.getId());
                 }
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -74,23 +66,15 @@ import java.util.Map;
     public JsonObject chPep(@RequestBody DataStudents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
-            if (user != null && user.getRoles().containsKey(3L) && (user1 != null || inv != null)) {
-                if (user1 != null) {
-                    user1.setFio(body.name);
-                    datas.getUserRepository().saveAndFlush(user1);
+            if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
+                user1.setFio(body.name);
+                datas.getUserRepository().saveAndFlush(user1);
 
-                    body.wrtr.name("id").value(user1.getId());
-                } else if (inv != null) {
-                    inv.setFio(body.name);
-                    datas.getInviteRepository().saveAndFlush(inv);
-
-                    body.wrtr.name("id").value(inv.getId());
-                }
-                body.wrtr.name("name").value(body.name);
+                body.wrtr.name("id").value(user1.getId())
+                    .name("name").value(body.name);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
@@ -109,13 +93,12 @@ import java.util.Map;
                 if (group != null) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
-                    Role role = new Role(null, datas.schoolById(Long.parseLong(subscriber.getLvlSch())), group);
-                    datas.getRoleRepository().saveAndFlush(role);
-                    Invite inv = new Invite(body.name, Map.of(
+                    Role role = datas.getRoleRepository().saveAndFlush(new Role(null, datas.schoolById(Long.parseLong(subscriber.getLvlSch())), group));
+                    User inv = new User(body.name, Map.of(
                         0L, role
                     ), Main.df.format(dateAfter));
-                    datas.getInviteRepository().saveAndFlush(inv);
-                    group.getKidsInv().add(inv);
+                    datas.getUserRepository().saveAndFlush(inv);
+                    group.getKids().add(inv);
                     datas.getGroupRepository().saveAndFlush(group);
 
                     body.wrtr.name("id").value(inv.getId())
@@ -148,7 +131,6 @@ import java.util.Map;
                 if (group != null && school != null && school.getGroups().contains(group.getId())) {
                     body.wrtr.name("body").beginObject();
                     datas.usersByList(group.getKids(), true, body.wrtr);
-                    datas.invitesByList(group.getKidsInv(), true, body.wrtr);
                     body.wrtr.endObject();
                 }
             }
@@ -183,8 +165,8 @@ import java.util.Map;
 @ToString
 @NoArgsConstructor @AllArgsConstructor
 class DataStudents {
-    public String uuid, name, id;
-    public Long group, id1;
+    public String uuid, name;
+    public Long group, id;
     public transient boolean bol = true;
     public transient JsonTreeWriter wrtr;
 }

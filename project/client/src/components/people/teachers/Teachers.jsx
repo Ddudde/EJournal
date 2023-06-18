@@ -157,12 +157,11 @@ function codPepL1C(e) {
     dispatch(changePeople(CHANGE_TEACHERS, msg.id, msg.id1, undefined, msg.code, "link"));
 }
 
-export function codTea (id, id1, title, text) {
+export function codTea (id, title, text) {
     console.log("codPar");
     sendToServer({
         uuid: cState.uuid,
-        id: id,
-        id1: id1
+        id: id
     }, 'POST', "teachers/setCodePep")
         .then(data => {
             console.log(data);

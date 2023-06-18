@@ -15,7 +15,6 @@ import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.Syst;
-import ru.mirea.data.models.auth.Invite;
 import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.services.ServerService;
@@ -39,26 +38,17 @@ import java.util.Map;
     public JsonObject remPep(@RequestBody DataAdmins body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         Syst syst = datas.getSyst();
         try {
             body.wrtr = datas.ini(body.toString());
-            if (user != null && user.getRoles().containsKey(4L) && syst != null) {
-                if (user1 != null) {
-                    user1.getRoles().remove(4L);
-                    datas.getUserRepository().saveAndFlush(user1);
-                    syst.getAdmins().remove(user1.getId());
-                    datas.getSystRepository().saveAndFlush(syst);
+            if (user != null && user.getRoles().containsKey(4L) && syst != null && user1 != null) {
+                user1.getRoles().remove(4L);
+                datas.getUserRepository().saveAndFlush(user1);
+                syst.getAdmins().remove(user1);
+                datas.getSystRepository().saveAndFlush(syst);
 
-                    body.wrtr.name("id").value(user1.getId());
-                } else if (inv != null) {
-                    datas.getInviteRepository().delete(inv);
-                    syst.getAdminsInv().remove(inv.getId());
-                    datas.getSystRepository().saveAndFlush(syst);
-
-                    body.wrtr.name("id").value(inv.getId());
-                }
+                body.wrtr.name("id").value(user1.getId());
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
@@ -70,24 +60,15 @@ import java.util.Map;
     public JsonObject chPep(@RequestBody DataAdmins body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
-        Invite inv = datas.inviteById(body.id1);
+        User user1 = datas.userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
-            if (user != null && user.getRoles().containsKey(4L) && (user1 != null || inv != null)) {
-                if (user1 != null) {
-                    user1.setFio(body.name);
-                    datas.getUserRepository().saveAndFlush(user1);
+            if (user != null && user.getRoles().containsKey(4L) && user1 != null) {
+                user1.setFio(body.name);
+                datas.getUserRepository().saveAndFlush(user1);
 
-                    body.wrtr.name("id").value(user1.getId());
-                } else if (inv != null) {
-                    inv.setFio(body.name);
-                    datas.getInviteRepository().saveAndFlush(inv);
-
-                    body.wrtr.name("id").value(inv.getId());
-                }
-
-                body.wrtr.name("name").value(body.name);
+                body.wrtr.name("id").value(user1.getId())
+                    .name("name").value(body.name);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
@@ -105,11 +86,12 @@ import java.util.Map;
             if (user != null && user.getRoles().containsKey(4L) && syst != null) {
                 Instant after = Instant.now().plus(Duration.ofDays(30));
                 Date dateAfter = Date.from(after);
-                Invite inv = new Invite(body.name, Map.of(
-                    4L, new Role(null)
+                Role role = datas.getRoleRepository().saveAndFlush(new Role(null));
+                User inv = new User(body.name, Map.of(
+                    4L, role
                 ), Main.df.format(dateAfter));
-                datas.getInviteRepository().saveAndFlush(inv);
-                syst.getAdminsInv().add(inv);
+                datas.getUserRepository().saveAndFlush(inv);
+                syst.getAdmins().add(inv);
                 datas.getSystRepository().saveAndFlush(syst);
 
                 body.wrtr.name("id").value(inv.getId())
@@ -133,7 +115,6 @@ import java.util.Map;
             body.wrtr.name("body").beginObject();
             if (user != null && syst != null) {
                 datas.usersByList(syst.getAdmins(), true, body.wrtr);
-                datas.invitesByList(syst.getAdminsInv(), true, body.wrtr);
             }
             body.wrtr.endObject();
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -146,8 +127,8 @@ import java.util.Map;
 @ToString
 @NoArgsConstructor @AllArgsConstructor
 class DataAdmins {
-    public String login, uuid, name, id;
-    public Long id1;
+    public String login, uuid, name;
+    public Long id;
     public transient boolean bol = true;
     public transient JsonTreeWriter wrtr;
 }
