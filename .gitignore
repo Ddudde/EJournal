@@ -3,7 +3,7 @@
 /project/client/build/
 /project/client/mark/
 /project/server/build/
-/project/server/exe/
+/project/server/exe
 /project/server/mark/
 /project/server/.idea/
 /project/server/.gradle/
