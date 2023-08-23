@@ -37,16 +37,16 @@ import java.util.Map;
     @PostMapping(value = "/remPep")
     public JsonObject remPep(@RequestBody DataAdmins body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id);
-        Syst syst = datas.getSyst();
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userById(body.id);
+        Syst syst = datas.getDbService().getSyst();
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && syst != null && user1 != null) {
                 user1.getRoles().remove(4L);
-                datas.getUserRepository().saveAndFlush(user1);
+                datas.getDbService().getUserRepository().saveAndFlush(user1);
                 syst.getAdmins().remove(user1);
-                datas.getSystRepository().saveAndFlush(syst);
+                datas.getDbService().getSystRepository().saveAndFlush(syst);
 
                 body.wrtr.name("id").value(user1.getId());
             }
@@ -59,13 +59,13 @@ import java.util.Map;
     @PostMapping(value = "/chPep")
     public JsonObject chPep(@RequestBody DataAdmins body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && user1 != null) {
                 user1.setFio(body.name);
-                datas.getUserRepository().saveAndFlush(user1);
+                datas.getDbService().getUserRepository().saveAndFlush(user1);
 
                 body.wrtr.name("id").value(user1.getId())
                     .name("name").value(body.name);
@@ -79,20 +79,20 @@ import java.util.Map;
     @PostMapping(value = "/addPep")
     public JsonObject addPep(@RequestBody DataAdmins body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        Syst syst = datas.getSyst();
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        Syst syst = datas.getDbService().getSyst();
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && syst != null) {
                 Instant after = Instant.now().plus(Duration.ofDays(30));
                 Date dateAfter = Date.from(after);
-                Role role = datas.getRoleRepository().saveAndFlush(new Role(null));
+                Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null));
                 User inv = new User(body.name, Map.of(
                     4L, role
                 ), Main.df.format(dateAfter));
-                datas.getUserRepository().saveAndFlush(inv);
+                datas.getDbService().getUserRepository().saveAndFlush(inv);
                 syst.getAdmins().add(inv);
-                datas.getSystRepository().saveAndFlush(syst);
+                datas.getDbService().getSystRepository().saveAndFlush(syst);
 
                 body.wrtr.name("id").value(inv.getId())
                     .name("body").beginObject()
@@ -108,8 +108,8 @@ import java.util.Map;
     @PostMapping(value = "/getAdmins")
     public JsonObject getAdmins(@RequestBody DataAdmins body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        Syst syst = datas.getSyst();
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        Syst syst = datas.getDbService().getSyst();
         try {
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();

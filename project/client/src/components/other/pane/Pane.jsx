@@ -36,27 +36,27 @@ export function Pane(props) {
     const getPan = (name, namecl, link, fun) => {
         let cla = [paneCSS.nav_i, paneCSS.nav_iJur, namecl].join(" ");
         return link ?
-            <Link className={cla} id={paneCSS.nav_i} to={link} onClick={fun} data-id={namecl} key={namecl} ref={el=>panJs.gr[namecl]=el}>
-                {name.nam}
-            </Link>
+                <Link className={cla} id={paneCSS.nav_i} to={link} onClick={fun} data-id={namecl} key={namecl} ref={el=>panJs.gr[namecl]=el}>
+                    {name.nam}
+                </Link>
             :
-            <div className={cla} id={paneCSS.nav_i} onClick={fun} data-id={namecl} key={namecl} data-st="0" ref={el=>panJs.gr[namecl]=el}>
-                {props.cla && cState.role == 3 ?
-                    <>
-                        <div className={paneCSS.field+" "+paneCSS.fi}>
-                            {name}
-                        </div>
-                        <img className={paneCSS.imgfield+" "+paneCSS.fi} src={ed} onClick={onEdGr} title="Редактировать" alt=""/>
-                        <img className={paneCSS.imginp+" "+paneCSS.fi} src={no} onClick={onDel} title="Удалить группу" alt=""/>
-                    </> : name
-                }
-            </div>
+                <div className={cla} id={paneCSS.nav_i} onClick={fun} data-id={namecl} key={namecl} data-st="0" ref={el=>panJs.gr[namecl]=el}>
+                    {props.cla && cState.role == 3 ?
+                        <>
+                            <div className={paneCSS.field+" "+paneCSS.fi}>
+                                {name}
+                            </div>
+                            <img className={paneCSS.imgfield+" "+paneCSS.fi} src={ed} onClick={onEdGr} title="Редактировать" alt=""/>
+                            <img className={paneCSS.imginp+" "+paneCSS.fi} src={no} onClick={onDel} title="Удалить группу" alt=""/>
+                        </> : name
+                    }
+                </div>
     };
     const overpan = () => {
         let wid, el, lst;
         panJs.eles = [];
         for(el of panJs.lGroupY) {
-            if(panJs.gr[el].style.display) {
+            if(panJs.gr[el] && panJs.gr[el].style.display) {
                 panJs.gr[el].style.display = "";
             }
         }

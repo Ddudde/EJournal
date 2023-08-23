@@ -13,7 +13,7 @@ import javax.persistence.*;
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(columnDefinition="CLOB")
+    @Column(columnDefinition="text")
     private String contact, text;
 
     private String imgUrl;

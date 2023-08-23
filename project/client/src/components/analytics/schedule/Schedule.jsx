@@ -419,20 +419,18 @@ export function Schedule() {
         }
         console.log('componentDidUpdate Schedule.jsx');
     });
-    return (
-        <div className={analyticsCSS.header}>
-            <Helmet>
-                <title>Расписание</title>
-            </Helmet>
-            {(cState.auth && cState.role == 3) &&
-                <div className={scheduleCSS.pane}>
-                    <Pane cla={true}/>
-                </div>
-            }
-            <div className={analyticsCSS.block} style={{marginTop: (cState.auth && cState.role == 3) ? "7vh" : undefined}}>
-                {getSched(cState.role == 3)}
+    return <div className={analyticsCSS.header}>
+        <Helmet>
+            <title>Расписание</title>
+        </Helmet>
+        {(cState.auth && cState.role == 3) &&
+            <div className={scheduleCSS.pane}>
+                <Pane cla={true}/>
             </div>
+        }
+        <div className={analyticsCSS.block} style={{marginTop: (cState.auth && cState.role == 3) ? "7vh" : undefined}}>
+            {getSched(cState.role == 3)}
         </div>
-    )
+    </div>
 }
 export default Schedule;

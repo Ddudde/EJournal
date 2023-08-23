@@ -11,6 +11,7 @@ import ru.mirea.data.models.school.School;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +60,7 @@ import java.util.Set;
     public Role(String email, Set<String> subjects, School YO) { // tea
         this.email = email;
         this.YO = YO;
-        this.subjects = subjects;
+        this.subjects = new HashSet<>(subjects);
     }
 
     public Role(String email, School YO) { //zav, par
@@ -72,7 +73,7 @@ import java.util.Set;
     }
 
     public Set<String> getSubjects() {
-        if(subjects == null) subjects = Set.of();
+        if(subjects == null) subjects = new HashSet<>();
         return subjects;
     }
 

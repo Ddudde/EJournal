@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
 import org.springframework.stereotype.Service;
+import ru.mirea.data.models.auth.SettingUser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,5 +104,35 @@ import static java.util.Arrays.asList;
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public void addToken(SettingUser settingUser, String token) {
+        settingUser.getTokens().add(token);
+        settingUser.getTopics().forEach((topic) -> {
+            if (settingUser.getNotif()
+                    && ((topic.contains("News") && settingUser.getNNewNewsYO())
+                    || (topic.contains("news") && settingUser.getNNewNewsPor()))) {
+                if (subscribe(asList(token), topic) > 0) {
+                    settingUser.getTokens().remove(token);
+                }
+            }
+        });
+    }
+
+    public void remToken(SettingUser settingUser, String token) {
+        settingUser.getTokens().remove(token);
+        settingUser.getTopics().forEach((topic) -> {
+            unsubscribe(asList(token), topic);
+        });
+    }
+
+    public void addTopic(SettingUser settingUser, String topic) {
+        settingUser.getTopics().add(topic);
+//        pushService.subscribe(new ArrayList<>(settingUser.getTokens()), topic);
+    }
+
+    public void remTopic(SettingUser settingUser, String topic) {
+        settingUser.getTopics().remove(topic);
+//        pushService.unsubscribe(new ArrayList<>(settingUser.getTokens()), topic);
     }
 }

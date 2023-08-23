@@ -3,13 +3,22 @@ import {Helmet} from "react-helmet-async";
 import dnevCSS from './dnevnik.module.css';
 import {dnevnik, schedules, states} from "../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {CHANGE_EVENTS_CLEAR, CHANGE_SCHEDULE_GL, changeAnalytics, changeEvents} from "../../store/actions";
+import {
+    CHANGE_DNEVNIK,
+    CHANGE_EVENTS_CLEAR,
+    CHANGE_EVENTS_RL,
+    CHANGE_SCHEDULE_GL,
+    changeAnalytics,
+    changeDnevnik,
+    changeEvents
+} from "../../store/actions";
 import knopka from "../../media/dnevnik/knopka.png";
 import {eventSource, sendToServer, setActived} from "../main/Main";
 import ErrFound from "../other/error/ErrFound";
 
-let ev, dnev, dispatch, selKid, timid, cState, schedulesInfo, errText, DoW, scrolling, days;
+let ev, dnev, dispatch, selKid, timid, cState, schedulesInfo, errText, DoW, scrolling, days, elem;
 DoW = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+elem = {CW: undefined, CW1: undefined};
 scrolling = false;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 days = Array(7).fill('');
@@ -33,8 +42,10 @@ function tim() {
 }
 
 function knop() {
-    let x = document.querySelector("#CW1").getBoundingClientRect().top + Math.round(window.innerHeight / 100) * 7 - window.innerHeight;
-    let x1 = document.querySelector("#CW").getBoundingClientRect().top + Math.round(window.innerHeight / 100) * 7 - window.innerHeight;
+    let x, x1;
+    if(!elem.CW1 || !elem.CW) return;
+    x = elem.CW1.getBoundingClientRect().top + Math.round(window.innerHeight / 100) * 7 - window.innerHeight;
+    x1 = elem.CW.getBoundingClientRect().top + Math.round(window.innerHeight / 100) * 7 - window.innerHeight;
     document.querySelector("#CWSEL").style.display = x > 0 && x1 < 0 ? "none" : "flex";
 }
 
@@ -51,11 +62,12 @@ function getDay(dif) {
     let day, date;
     date = new Date();
     day = (date.getDay() || 7) - 1;
-    if(day) date.setDate(date.getDate() - day + dif);
+    if(day != undefined) date.setDate(date.getDate() - day + dif);
     return date.toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"2-digit"});
 }
 
 function getLessons(dLI, dayDate, day, dai, minLess) {
+    if(!dnev.min || !dnev.max) return;
     let lel, mas, numLess, weekends;
     weekends = getDiff(dnev.min, dayDate) || getDiff(dayDate, dnev.max);
     lel = weekends ? 0 : parseInt(dLI[dLI.length-1]);
@@ -66,29 +78,22 @@ function getLessons(dLI, dayDate, day, dai, minLess) {
         }
     }
     dLI = mas;
-    return dLI.map((param2, lesNum, x, les = dai ? dai.lessons[param2] : undefined) => <>
-        {param2 == '' && <>
-            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                <br />
-            </div>
-            <div className={dnevCSS.nav_i+" "+dnevCSS.dayHomework} id={dnevCSS.nav_i}>
-                <br />
-            </div>
-            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                <br />
-            </div>
-        </>}
-        {param2 != '' && <>
-            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                {les.name}
-            </div>
-            <div className={dnevCSS.nav_i+" "+dnevCSS.dayHomework} id={dnevCSS.nav_i}>
-                <br />
-            </div>
-            <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
-                <br />
-            </div>
-        </>}
+    return dLI.map((param2, lesNum, x, les = dai.lessons[param2] || {}, lesDM = (dnev.jur[les.name] || {})[dayDate] || {}, lesD = lesDM[lesDM.i++] || {}) => <>
+        <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+            {les.name || <br/>}
+        </div>
+        <div className={dnevCSS.nav_i+" "+dnevCSS.dayHomework} id={dnevCSS.nav_i}>
+            {lesD.homework || <br/>}
+        </div>
+        <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
+            {lesD.mark || <br/>}
+            {lesD.weight > 1 && <div className={dnevCSS.nav_i+" "+dnevCSS.nav_iWeight} id={dnevCSS.nav_i}>
+                {lesD.weight}
+            </div>}
+            {lesD.type && <div className={dnevCSS.nav_i+" "+dnevCSS.nav_iType} id={dnevCSS.nav_i}>
+                {lesD.type}
+            </div>}
+        </div>
     </>)
 }
 
@@ -100,6 +105,9 @@ function setDnevnik() {
             console.log(data);
             if(cState.role == 1 && cState.kid) selKid = cState.kid;
             dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body));
+            dispatch(changeDnevnik(CHANGE_DNEVNIK, "jur", data.bodyD || {}));
+            dispatch(changeDnevnik(CHANGE_DNEVNIK, "min", data.min));
+            dispatch(changeDnevnik(CHANGE_DNEVNIK, "max", data.max));
         });
 }
 
@@ -118,7 +126,7 @@ function onCon(e) {
 }
 
 function goTo() {
-    document.querySelector("#CW").scrollIntoView(true);
+    if(elem.CW) elem.CW.scrollIntoView(true);
     let sinc = window.scrollY - Math.round(window.innerHeight / 100) * 7;
     window.scrollTo(0, sinc);
     knop();
@@ -144,8 +152,10 @@ export function Dnevnik() {
         };
         knop();
         setActived(13);
+        dispatch(changeEvents(CHANGE_EVENTS_RL, false));
         return function() {
             dispatch(changeEvents(CHANGE_EVENTS_CLEAR));
+            dispatch(changeEvents(CHANGE_EVENTS_RL, true));
             dispatch = undefined;
             eventSource.removeEventListener('connect', onCon);
             window.onwheel = undefined;
@@ -168,20 +178,18 @@ export function Dnevnik() {
         <Helmet>
             <title>Дневник</title>
         </Helmet>
-        {Object.getOwnPropertyNames(dnev.days).length == 0 ?
+        {!Object.getOwnPropertyNames(dnev.jur) ?
                 <ErrFound text={errText}/>
             :
                 <div className={dnevCSS.blockDay}>
                     {dnev.reqWeek.map(week => <>
-                        {console.log("sdfsfd", week)}
                         {<div className={dnevCSS.blockL+" "+dnevCSS.blockLU}>
-                            <div className={dnevCSS.blockLine} id={week ? "" : "CW"}/>
+                            <div className={dnevCSS.blockLine} ref={el=>(week ? el : elem.CW=el)}/>
                             <div className={dnevCSS.blockLText}>
                                 {week ? "Неделя " + (week > 0 ? "+" : "") + week : "Текущая неделя"}
                             </div>
                         </div>}
-                        {days.map((param1, day, x, dayDate = getDay(day + 7*week), dai = schedulesInfo[day], dLI = (dai && dai.lessons ? Object.getOwnPropertyNames(dai.lessons):[])) => <>
-                            {console.log("sdfsfd1", param1, day)}
+                        {days.map((param1, day, x, dayDate = getDay(day + 7*week), dai = schedulesInfo[day] || {lessons:{}}, dLI = Object.getOwnPropertyNames(dai.lessons)) => <>
                             <div className={dnevCSS.day}>
                                 <div className={dnevCSS.nav_i} id={dnevCSS.nav_i}>
                                     {DoW[day]} / {dayDate}
@@ -199,7 +207,7 @@ export function Dnevnik() {
                             <div className={dnevCSS.blockLText+" "+dnevCSS.blockLTextD}>
                                 {week ? "Неделя " + (week > 0 ? "+" : "") + week : "Текущая неделя"}
                             </div>
-                            <div className={dnevCSS.blockLine} id={week ? "" : "CW1"}/>
+                            <div className={dnevCSS.blockLine} ref={el=>(week ? el : elem.CW1=el)}/>
                         </div>}
                     </>)}
                     <div className={dnevCSS.GotCW} id={"CWSEL"}>

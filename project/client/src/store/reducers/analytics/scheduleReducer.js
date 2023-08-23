@@ -20,6 +20,15 @@ const initialState = {
     //                 id: "id1"
     //             },
     //             group: "10A"
+    //         },
+    //         4: {
+    //             name: "Англ. яз.",
+    //             cabinet: "300",
+    //             prepod: {
+    //                 name: "Петренко А.А.",
+    //                 id: "id1"
+    //             },
+    //             group: "10A"
     //         }
     //     }
     // },
@@ -72,6 +81,15 @@ const initialState = {
     //         },
     //         5 : {
     //             name: "Окруж. мир",
+    //             cabinet: "300",
+    //             prepod: {
+    //                 name: "Петренко А.А.",
+    //                 id: "id1"
+    //             },
+    //             group: "10A"
+    //         },
+    //         6 : {
+    //             name: "Математика",
     //             cabinet: "300",
     //             prepod: {
     //                 name: "Петренко А.А.",

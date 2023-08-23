@@ -21,8 +21,11 @@ import {
 } from "../../../store/actions";
 import {addEvent, eventSource, prefSite, sendToServer, setActived} from "../Main";
 import ErrFound from "../../other/error/ErrFound";
+import ls1 from "../../../media/ls-icon1.png";
+import ls2 from "../../../media/ls-icon2.png";
+import ls3 from "../../../media/ls-icon3.png";
 
-let profilesInfo, dispatch, moore, errText, cState, navigate;
+let profilesInfo, dispatch, moore, errText, cState, navigate, icons;
 errText = "К сожалению, информация не найдена...";
 
 moore = `/*
@@ -34,6 +37,12 @@ moore = `/*
 	e-mail1: fsdfdsfd@ya.ru
 	e-mail2: fsdfdsfd2@ya.ru
 */`;
+
+icons = {
+    1: ls1,
+    2: ls2,
+    3: ls3
+}
 
 function inpchr(event){
     var el = event.target;
@@ -178,117 +187,115 @@ export function Profile() {
         }
         console.log('componentDidUpdate Profile.jsx');
     });
-    return (
-        <div className={profileCSS.AppHeader}>
-            <Helmet>
-                <title>Профиль</title>
-            </Helmet>
-            {Object.getOwnPropertyNames(profilesInfo).length == 0 ?
-                    <ErrFound text={errText}/>
-                :
-                    <div className={profileCSS.blockPro}>
-                        <div className={profileCSS.pro}>
-                            <img alt="ico" src={prefSite + '/static/media/ls-icon'+ profilesInfo.ico +'.png'}/>
-                            <div className={profileCSS.nav_i} id={profileCSS.nav_i} data-mod='0'>
-                                <div className={profileCSS.preinf}>
-                                    Логин:
-                                </div>
-                                <div className={profileCSS.field}>
-                                    {profilesInfo.login}
-                                </div>
-                                {(!log || log == cState.login) && <>
-                                    <input className={profileCSS.inp} id="loginp" placeholder="nickname" onInput={inpchr} defaultValue={profilesInfo.login} type="text" pattern="^[a-zA-Z0-9]+$"/>
-                                    <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
-                                    <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                                    <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                                </>}
+    return <div className={profileCSS.AppHeader}>
+        <Helmet>
+            <title>Профиль</title>
+        </Helmet>
+        {!Object.getOwnPropertyNames(profilesInfo).length ?
+                <ErrFound text={errText}/>
+            :
+                <div className={profileCSS.blockPro}>
+                    <div className={profileCSS.pro}>
+                        <img alt="ico" src={icons[profilesInfo.ico]}/>
+                        <div className={profileCSS.nav_i} id={profileCSS.nav_i} data-mod='0'>
+                            <div className={profileCSS.preinf}>
+                                Логин:
                             </div>
-                            <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
-                                ФИО: {profilesInfo.fio}
+                            <div className={profileCSS.field}>
+                                {profilesInfo.login}
                             </div>
-                            <div className={profileCSS.nav_i} id={profileCSS.nav_i} data-mod='0'>
-                                <div className={profileCSS.preinf}>
-                                    Дополнительная информация:
-                                </div>
-                                <pre className={profileCSS.field}>
-                                    {profilesInfo.more}
-                                </pre>
-                                {(!log || log == cState.login) && <>
-                                    <textarea className={profileCSS.inp+" "+profileCSS.inparea} placeholder="Информация о вас" onInput={inpchr} defaultValue={profilesInfo.more ? profilesInfo.more : moore}/>
-                                    <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
-                                    <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                                    <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                                </>}
-                            </div>
-                            {profilesInfo.roles && Object.getOwnPropertyNames(profilesInfo.roles).map((param, i, x, role = profilesInfo.roles[param]) =>
-                                <div className={profileCSS.nav_iZag} key={param}>
-                                    <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
-                                        Роль: {cState.rolesDescrs[param]}
-                                    </div>
-                                    {role.yo && <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
-                                        Учебная организация: {role.yo}
-                                    </div>}
-                                    <div className={profileCSS.nav_i} id={profileCSS.nav_i} data-mod='0'>
-                                        <div className={profileCSS.preinf}>
-                                            Почта:
-                                        </div>
-                                        <div className={profileCSS.field}>
-                                            {role.email}
-                                        </div>
-                                        {(!log || log == cState.login) && <>
-                                            <input className={profileCSS.inp} onInput={inpchr} placeholder="ex@gmail.com" defaultValue={role.email} type="email"/>
-                                            <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
-                                            <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                                            <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                                        </>}
-                                    </div>
-                                    {role.group && <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
-                                        Класс: {role.group}
-                                    </div>}
-                                    {role.parents && <>
-                                        <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
-                                            Родители:
-                                        </div>
-                                        <div className={profileCSS.nav_iZag}>
-                                            {Object.getOwnPropertyNames(role.parents).map(param1 => <div key={param1}>
-                                                <div className={profileCSS.nav_i+" "+profileCSS.preinf} id={profileCSS.nav_i}>
-                                                    {role.parents[param1].name}
-                                                </div>
-                                                <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(role.parents[param1].login)} title="Перейти в профиль" alt=""/>
-                                            </div>)}
-                                        </div>
-                                    </>}
-                                    {role.kids && <>
-                                        <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
-                                            Дети:
-                                        </div>
-                                        <div className={profileCSS.nav_iZag}>
-                                            {Object.getOwnPropertyNames(role.kids).map(param1 => <div key={param1}>
-                                                <div className={profileCSS.nav_i+" "+profileCSS.preinf} id={profileCSS.nav_i}>
-                                                    {role.kids[param1].name}
-                                                </div>
-                                                <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(role.kids[param1].login)} title="Перейти в профиль" alt=""/>
-                                            </div>)}
-                                        </div>
-                                    </>}
-                                    {role.lessons && <>
-                                        <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
-                                            Дисциплины:
-                                        </div>
-                                        <div className={profileCSS.nav_iZag}>
-                                            {role.lessons.map(param1 =>
-                                                <div className={profileCSS.nav_i} id={profileCSS.nav_i} key={param1}>
-                                                    {param1}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>}
-                                </div>
-                            )}
+                            {(!log || log == cState.login) && <>
+                                <input className={profileCSS.inp} id="loginp" placeholder="nickname" onInput={inpchr} defaultValue={profilesInfo.login} type="text" pattern="^[a-zA-Z0-9]+$"/>
+                                <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
+                                <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                                <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                            </>}
                         </div>
+                        <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
+                            ФИО: {profilesInfo.fio}
+                        </div>
+                        <div className={profileCSS.nav_i} id={profileCSS.nav_i} data-mod='0'>
+                            <div className={profileCSS.preinf}>
+                                Дополнительная информация:
+                            </div>
+                            <pre className={profileCSS.field}>
+                                {profilesInfo.more}
+                            </pre>
+                            {(!log || log == cState.login) && <>
+                                <textarea className={profileCSS.inp+" "+profileCSS.inparea} placeholder="Информация о вас" onInput={inpchr} defaultValue={profilesInfo.more ? profilesInfo.more : moore}/>
+                                <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
+                                <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                                <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                            </>}
+                        </div>
+                        {profilesInfo.roles && Object.getOwnPropertyNames(profilesInfo.roles).map((param, i, x, role = profilesInfo.roles[param]) =>
+                            <div className={profileCSS.nav_iZag} key={param}>
+                                <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
+                                    Роль: {cState.rolesDescrs[param]}
+                                </div>
+                                {role.yo && <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
+                                    Учебная организация: {role.yo}
+                                </div>}
+                                <div className={profileCSS.nav_i} id={profileCSS.nav_i} data-mod='0'>
+                                    <div className={profileCSS.preinf}>
+                                        Почта:
+                                    </div>
+                                    <div className={profileCSS.field}>
+                                        {role.email}
+                                    </div>
+                                    {(!log || log == cState.login) && <>
+                                        <input className={profileCSS.inp} onInput={inpchr} placeholder="ex@gmail.com" defaultValue={role.email} type="email"/>
+                                        <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
+                                        <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                                        <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                                    </>}
+                                </div>
+                                {role.group && <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
+                                    Класс: {role.group}
+                                </div>}
+                                {role.parents && <>
+                                    <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
+                                        Родители:
+                                    </div>
+                                    <div className={profileCSS.nav_iZag}>
+                                        {Object.getOwnPropertyNames(role.parents).map(param1 => <div key={param1}>
+                                            <div className={profileCSS.nav_i+" "+profileCSS.preinf} id={profileCSS.nav_i}>
+                                                {role.parents[param1].name}
+                                            </div>
+                                            <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(role.parents[param1].login)} title="Перейти в профиль" alt=""/>
+                                        </div>)}
+                                    </div>
+                                </>}
+                                {role.kids && <>
+                                    <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
+                                        Дети:
+                                    </div>
+                                    <div className={profileCSS.nav_iZag}>
+                                        {Object.getOwnPropertyNames(role.kids).map(param1 => <div key={param1}>
+                                            <div className={profileCSS.nav_i+" "+profileCSS.preinf} id={profileCSS.nav_i}>
+                                                {role.kids[param1].name}
+                                            </div>
+                                            <img className={profileCSS.proImg} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(role.kids[param1].login)} title="Перейти в профиль" alt=""/>
+                                        </div>)}
+                                    </div>
+                                </>}
+                                {role.lessons && <>
+                                    <div className={profileCSS.nav_i} id={profileCSS.nav_i}>
+                                        Дисциплины:
+                                    </div>
+                                    <div className={profileCSS.nav_iZag}>
+                                        {role.lessons.map(param1 =>
+                                            <div className={profileCSS.nav_i} id={profileCSS.nav_i} key={param1}>
+                                                {param1}
+                                            </div>
+                                        )}
+                                    </div>
+                                </>}
+                            </div>
+                        )}
                     </div>
-            }
-        </div>
-    )
+                </div>
+        }
+    </div>
 }
 export default Profile;

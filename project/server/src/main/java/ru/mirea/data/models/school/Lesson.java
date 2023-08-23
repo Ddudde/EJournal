@@ -27,12 +27,13 @@ import javax.persistence.*;
 
     private String kab, nameSubject;
 
-    public Lesson(School school, Group grp, int dayWeek, int numLesson, String kab, String nameSubject) {
+    public Lesson(School school, Group grp, int dayWeek, int numLesson, String kab, String nameSubject, User teacher) {
         this.school = school;
         this.grp = grp;
         this.dayWeek = dayWeek;
         this.numLesson = numLesson;
         this.kab = kab;
         this.nameSubject = nameSubject;
+        this.teacher = teacher;
     }
 }

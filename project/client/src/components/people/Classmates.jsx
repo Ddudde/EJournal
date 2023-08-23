@@ -1,39 +1,44 @@
 import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
-import peopleCSS from '../peopleMain.module.css';
-import {admins, states, themes} from "../../../store/selector";
+import {classmates, groups, states, themes} from "../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {ele, goToProf, setActNew, sit} from "../PeopleMain";
-import profl from "../../../media/profl.png";
-import profd from "../../../media/profd.png";
-import ErrFound from "../../other/error/ErrFound";
+import {ele, goToProf, setActNew, setEvGr, sit} from "./PeopleMain";
+import profl from "../../media/profl.png";
+import profd from "../../media/profd.png";
+import Pane from "../other/pane/Pane";
+import ErrFound from "../other/error/ErrFound";
+import peopleCSS from "./peopleMain.module.css";
 import {
-    CHANGE_ADMINS,
-    CHANGE_ADMINS_DEL,
-    CHANGE_ADMINS_EL_GL,
-    CHANGE_ADMINS_GL,
+    CHANGE_CLASSMATES,
+    CHANGE_CLASSMATES_DEL,
+    CHANGE_CLASSMATES_EL_GL,
+    CHANGE_CLASSMATES_GL,
     CHANGE_EVENT,
     CHANGE_EVENTS_CLEAR,
+    CHANGE_GROUPS_GL,
+    CHANGE_GROUPS_GR,
     changeEvents,
+    changeGroups,
     changePeople
-} from "../../../store/actions";
-import ed from "../../../media/edit.png";
-import no from "../../../media/no.png";
-import refreshCd from "../../../media/refreshCd.png";
-import refreshCl from "../../../media/refreshCl.png";
-import copyd from "../../../media/copyd.png";
-import copyl from "../../../media/copyl.png";
-import yes from "../../../media/yes.png";
-import {eventSource, sendToServer} from "../../main/Main";
+} from "../../store/actions";
+import ed from "../../media/edit.png";
+import no from "../../media/no.png";
+import refreshCd from "../../media/refreshCd.png";
+import refreshCl from "../../media/refreshCl.png";
+import copyd from "../../media/copyd.png";
+import copyl from "../../media/copyl.png";
+import yes from "../../media/yes.png";
+import {eventSource, sendToServer} from "../main/Main";
 
-let dispatch, errText, inps, adminsInfo, themeState, cState, tps;
-errText = "К сожалению, информация не найдена...";
+let dispatch, classmatesInfo, groupsInfo, selGr, errText, inps, themeState, cState, tps;
+errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 inps = {inpnpt : "Фамилия И.О."};
+selGr = 0;
 tps = {
-    del : CHANGE_ADMINS_DEL,
-    ch: CHANGE_ADMINS,
-    el_gl: CHANGE_ADMINS_EL_GL,
-    gl: CHANGE_ADMINS_GL
+    del : CHANGE_CLASSMATES_DEL,
+    ch: CHANGE_CLASSMATES,
+    el_gl: CHANGE_CLASSMATES_EL_GL,
+    gl: CHANGE_CLASSMATES_GL
 };
 let [_, forceUpdate] = [];
 
@@ -52,11 +57,9 @@ function refreshLink(e) {
     inp = e.target.parentElement.querySelector("input");
     if (inp.hasAttribute("data-id")) {
         id = inp.getAttribute("data-id").split("_");
-        // dispatch(changePeople(type, 0, id[0], id[1], sit + "/invite/" + gen_cod(), "link"));
-        // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
         sendToServer({
             uuid: cState.uuid,
-            id: id[0]
+            id: id[1]
         }, 'POST', "auth/setCodePep")
             .then(data => {
                 console.log(data);
@@ -74,7 +77,6 @@ function onDel(e, type) {
         inp = par.querySelector("input:not([readOnly])");
         if (inp.hasAttribute("data-id")) {
             id = inp.getAttribute("data-id").split("_");
-            // dispatch(changePeople(type, 0, id[0], id[1]));
             remInv(type, id[1]);
         }
     }
@@ -98,8 +100,6 @@ function onFin(e, type) {
     if (par.classList.contains(peopleCSS.fi)){
         par = par.parentElement.parentElement;
         addInv(type, inps.inpnpt, par);
-        // dispatch(changePeople(type, 2, "id8", undefined, inps.inpnpt));
-        // par.setAttribute('data-st', '0');
         return;
     }
     inp = par.querySelector("input");
@@ -111,7 +111,6 @@ function onFin(e, type) {
                 if(inp.hasAttribute("data-id")){
                     let id = inp.getAttribute("data-id").split("_");
                     changeInv(type, id[1], inp.value, par);
-                    // dispatch(changePeople(type, 2, id, undefined, inp.value));
                 }
             } else {
                 inps.inpnpt = inp.value;
@@ -119,7 +118,6 @@ function onFin(e, type) {
                 par.setAttribute('data-st', '0');
             }
         }
-        // par.setAttribute('data-st', '0');
     } else {
         inp.setAttribute("data-mod", '1');
     }
@@ -173,7 +171,7 @@ function remInv (type, id) {
     sendToServer({
         uuid: cState.uuid,
         id: id
-    }, 'POST', "admins/remPep")
+    }, 'POST', "students/remPep")
 }
 
 function changeInv (type, id, inp, par) {
@@ -182,7 +180,7 @@ function changeInv (type, id, inp, par) {
         uuid: cState.uuid,
         id: id,
         name: inp
-    }, 'POST', "admins/chPep")
+    }, 'POST', "students/chPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -196,7 +194,7 @@ function addInv (type, inp, par) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "admins/addPep")
+    }, 'POST', "students/addPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -209,14 +207,18 @@ function onCon(e) {
     setInfo();
 }
 
-function setInfo() {
+function setStud(firstG, bodyG) {
+    selGr = firstG != undefined ? firstG : groupsInfo.els.group;
     sendToServer({
-        uuid: cState.uuid
-    }, 'POST', "admins/getAdmins")
+        uuid: cState.uuid,
+        group: selGr
+    }, 'POST', "students/getStud")
         .then(data => {
             console.log(data);
-            if(data.error == false){
-                dispatch(changePeople(tps.gl, undefined, undefined, undefined, data.body));
+            dispatch(changePeople(tps.gl, undefined, undefined, undefined, data.body));
+            if(firstG != undefined) {
+                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, bodyG));
+                dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, firstG));
             }
             for(let el of document.querySelectorAll("." + peopleCSS.ed + " > *[id^='inpn']")){
                 chStatB({target: el});
@@ -224,9 +226,26 @@ function setInfo() {
         });
 }
 
+function setInfo() {
+    sendToServer({
+        uuid: cState.uuid
+    }, 'POST', "students/getInfo")
+        .then(data => {
+            console.log(data);
+            if(data.error == false){
+                if(cState.role == 3) {
+                    setEvGr(cState, dispatch);
+                    setStud(parseInt(data.firstG), data.bodyG);
+                } else {
+                    setStud();
+                }
+            }
+        });
+}
+
 function getBlock(x, b) {
     let edFi, info, codeLink;
-    info = adminsInfo[x];
+    info = classmatesInfo[x];
     if(info && info.link) {
         codeLink = sit + (info.login ? "/reauth/" : "/invite/") + info.link;
     }
@@ -267,30 +286,34 @@ function getBlock(x, b) {
     return b ? edFi :
         <div className={peopleCSS.add+" "+peopleCSS.nav_iZag} data-st="0">
             <div className={peopleCSS.nav_i+" "+peopleCSS.link} id={peopleCSS.nav_i} onClick={onEdit}>
-                Добавить администратора
+                Добавить ученика
             </div>
             {edFi}
         </div>
 }
 
-export function Admins() {
-    adminsInfo = useSelector(admins);
-    themeState = useSelector(themes);
+export function Classmates() {
+    classmatesInfo = useSelector(classmates);
     cState = useSelector(states);
+    themeState = useSelector(themes);
+    groupsInfo = useSelector(groups);
     if(!dispatch) {
-        setActNew(4);
+        setActNew(2);
         if(eventSource.readyState == EventSource.OPEN) setInfo();
         eventSource.addEventListener('connect', onCon, false);
         eventSource.addEventListener('addPepC', addPepC, false);
         eventSource.addEventListener('chPepC', chPepC, false);
         eventSource.addEventListener('remPepC', remPepC, false);
-        eventSource.addEventListener('codPepL2C', codPepC, false);
+        eventSource.addEventListener('codPepL1C', codPepC, false);
     }
     [_, forceUpdate] = useReducer((x) => x + 1, 0);
     dispatch = useDispatch();
     const isFirstUpdate = useRef(true);
     useEffect(() => {
-        console.log("I was triggered during componentDidMount Admins.jsx");
+        console.log("I was triggered during componentDidMount Classmates.jsx");
+        for(let el of document.querySelectorAll("." + peopleCSS.ed + " > *[id^='inpn']")){
+            chStatB({target: el}, inps);
+        }
         return function() {
             dispatch(changeEvents(CHANGE_EVENTS_CLEAR));
             dispatch = undefined;
@@ -298,8 +321,8 @@ export function Admins() {
             eventSource.removeEventListener('addPepC', addPepC);
             eventSource.removeEventListener('chPepC', chPepC);
             eventSource.removeEventListener('remPepC', remPepC);
-            eventSource.removeEventListener('codPepL2C', codPepC);
-            console.log("I was triggered during componentWillUnmount Admins.jsx");
+            eventSource.removeEventListener('codPepL1C', codPepC);
+            console.log("I was triggered during componentWillUnmount Classmates.jsx");
         }
     }, []);
     useEffect(() => {
@@ -307,43 +330,52 @@ export function Admins() {
             isFirstUpdate.current = false;
             return;
         }
-        console.log(adminsInfo);
-        console.log('componentDidUpdate Admins.jsx');
+        if(groupsInfo.els.group && selGr != groupsInfo.els.group && eventSource.readyState == EventSource.OPEN){
+            setStud();
+        }
+        console.log('componentDidUpdate Classmates.jsx');
     });
     return (
         <div className={peopleCSS.header}>
             <Helmet>
-                <title>Администраторы портала</title>
+                <title>{cState.role == 3 ? "Обучающиеся" : "Одноклассники"}</title>
             </Helmet>
-            {Object.getOwnPropertyNames(adminsInfo).length == 0 && !(cState.auth && cState.role == 4) ?
+            {Object.getOwnPropertyNames(classmatesInfo).length == 0 && !(cState.auth && cState.role == 3) ?
                     <ErrFound text={errText}/>
                 :
-                    <div className={peopleCSS.blockPep}>
-                        <div className={peopleCSS.pep}>
-                            <div className={peopleCSS.nav_iZag}>
-                                <div className={peopleCSS.nav_i} id={peopleCSS.nav_i}>
-                                    Администраторы портала
-                                </div>
-                                {cState.auth && cState.role == 4 ? <>
-                                        {getBlock()}
-                                        {Object.getOwnPropertyNames(adminsInfo).map(param =>
-                                            getBlock(param, true)
-                                        )}
-                                    </> :
-                                    Object.getOwnPropertyNames(adminsInfo).map(param =>
-                                        <div key={param}>
-                                            <div className={peopleCSS.nav_i+" "+peopleCSS.nav_iZag2} id={peopleCSS.nav_i}>
-                                                {adminsInfo[param].name}
+                    <>
+                        {(cState.auth && cState.role == 3) &&
+                            <div style={{width:"inherit", height: "7vh", position: "fixed", zIndex:"1"}}>
+                                <Pane cla={true}/>
+                            </div>
+                        }
+                        <div className={peopleCSS.blockPep}>
+                            <div className={peopleCSS.pep}>
+                                <div className={peopleCSS.nav_iZag}>
+                                    <div className={peopleCSS.nav_i} id={peopleCSS.nav_i}>
+                                        {cState.role == 3 ? "Обучающиеся" : "Одноклассники"}
+                                    </div>
+                                    {cState.auth && cState.role == 3 ? <>
+                                            {getBlock()}
+                                            {Object.getOwnPropertyNames(classmatesInfo).map(param =>
+                                                getBlock(param, true)
+                                            )}
+                                        </> :
+                                        Object.getOwnPropertyNames(classmatesInfo).map(param =>
+                                            <div key={param}>
+                                                <div className={peopleCSS.nav_i+" "+peopleCSS.nav_iZag2} id={peopleCSS.nav_i}>
+                                                    {classmatesInfo[param].name}
+                                                </div>
+                                                {classmatesInfo[param].login && <img className={peopleCSS.profIm} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(classmatesInfo[param].login)} title="Перейти в профиль" alt=""/>}
                                             </div>
-                                            {adminsInfo[param].login && <img className={peopleCSS.profIm} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(adminsInfo[param].login)} title="Перейти в профиль" alt=""/>}
-                                        </div>
-                                    )
-                                }
+                                        )
+                                    }
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </>
             }
         </div>
     )
 }
-export default Admins;
+export default Classmates;

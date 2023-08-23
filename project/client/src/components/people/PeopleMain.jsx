@@ -19,7 +19,7 @@ import {
 } from "../../store/actions";
 import parentsCSS from "./parents/parents.module.css";
 import {addKid, codPar} from "./parents/Parents";
-import {addTea, codTea} from "./teachers/Teachers";
+import {addTea, codTea} from "./Teachers";
 
 let gr, cState, dispatch, groupsInfo, evsIni, navigate;
 gr = {

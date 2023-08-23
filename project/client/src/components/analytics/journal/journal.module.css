@@ -25,13 +25,15 @@
 .days{
 	overflow-x: auto;
 	overflow-y: hidden;
+	padding: 0.5px;
 }
 
 .predmGrid{
 	display: grid;
-	grid-template: 5vh /20vw repeat(auto-fit, 2vw);
+	grid-template: 5vh /20vw;
 	transition: background-color 1s ease;
 	width: fit-content;
+	grid-auto-columns: 2vw;
 }
 
 .predmGrid:hover{
@@ -40,8 +42,13 @@
 
 .daysGrid{
 	display: grid;
-	grid-template: 15vh /20vw repeat(auto-fit, 2vw);
+	grid-template: 15vh /20vw;
 	width: fit-content;
+	grid-auto-columns: 2vw;
+}
+
+.daysGrid > div, .predmGrid > div{
+	grid-row: 1;
 }
 
 .nav_i{
@@ -51,13 +58,12 @@
 	color: var(--cV1);
 	font-size: 1.25vw;
 	font-weight: 500;
+	text-shadow: 1px 1px 3px var(--shdV1);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	align-self: stretch;
-	-webkit-transition: color 1s 2s ease;
-	-o-transition: color 1s 2s ease;
-	transition: color 1s 2s ease;
+	transition: color 1s ease;
 	transition-property: color, text-shadow, border-color;
 	margin: -0.5px;
 	padding: 5px;
@@ -69,6 +75,11 @@
 	text-shadow: 0 0 2vw #66ff66;
 }
 
+#nav_i:active, #nav_i[data-act="1"]{
+	transition: color 0.1s ease;
+	color: #004d00 !important;
+}
+
 .nav_iText{
 	transform: rotateZ(270deg);
 	color: #990000;
@@ -78,13 +89,17 @@
 	border: none;
 }
 
-.nam{
+.nam, .namd{
 	position: absolute;
-	width: 22vw;
+	width: 20vw;
 	height: 5vh;
 	padding: 0;
 	background-color: var(--bgcV1);
 	z-index: 1;
+}
+
+.namd{
+	height: 15vh;
 }
 
 .nav_iTextM{
@@ -93,17 +108,6 @@
 
 .nav_iTextD{
 	font-size: 0.75vw;
-}
-
-.descr{
-	padding: 1vw;
-}
-
-.nav_iTextDescr{
-	font-size: 1vw;
-	width: fit-content;
-	border: none;
-	padding: 0;
 }
 
 .nav_iWeight{
@@ -115,4 +119,20 @@
 	top: 0.75vw;
 	position: relative;
 	margin-block: 0.75vw;
+}
+
+.nav_i:hover .nav_iType {
+	opacity: 1;
+}
+
+.blockMark[data-tooltip]:hover::before {
+	content: attr(data-tooltip);
+	position: absolute;
+	right: 75%;
+	bottom: 75%;
+	padding: 5px 10px;
+	background-color: var(--bgcV2);
+	border-radius: 5px;
+	border: 1px solid var(--bcV1);
+	z-index: 2;
 }

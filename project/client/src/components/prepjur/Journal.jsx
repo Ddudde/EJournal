@@ -33,10 +33,11 @@ import yes from "../../media/yes.png";
 import Pane from "../other/pane/Pane";
 import ErrFound from "../other/error/ErrFound";
 
-let jourInfo, errText, groupsInfo, cState, schedulesInfo, dispatch, theme, pari, parb, inps, days, lastD, lastDI;
+let jourInfo, errText, groupsInfo, cState, schedulesInfo, dispatch, theme, pari, parb, inps, days, lastD, lastDI, selGr;
 pari = {lMonth: 0};
 parb = {upddel: false};
 inps = {};
+selGr = 0;
 days = [];
 lastDI = 0;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -106,10 +107,9 @@ function onFin(e) {
 function onFinM(e) {
     let par, inp;
     par = e.target.parentElement;
-    inp = par.querySelector("." + journalCSS.inp);
+    inp = par.querySelector("textarea");
     if (inp.value.length != 0) {
-        dispatch(changeDZ(inp.id.split("_")[1], inp.value));
-        par.setAttribute('data-st', '0');
+        addHomework(inp.id.split("_")[1], inp.value, par);
     }
 }
 
@@ -157,6 +157,9 @@ function chM(kid, day, per) {
             type = CHANGE_PJOURNAL_DEL_PER_MARKS;
         } else {
             type = CHANGE_PJOURNAL_PER_MARKS;
+            if (st == undefined) {
+                st = {mark : jourInfo.mar};
+            }
         }
     } else if (st == undefined) {
         type = CHANGE_PJOURNAL_MARKS;
@@ -164,21 +167,22 @@ function chM(kid, day, per) {
         if(jourInfo.typs[jourInfo.typ]) {
             st.weight = jourInfo.mar == "Н" ? 1 : jourInfo.typs[jourInfo.typ];
         }
-        if(jourInfo.mar == "Л") return;
+        if(jourInfo.mar == "Л" || !st.weight) return;
     } else {
         if(jourInfo.typs[jourInfo.typ]) {
             st.weight = jourInfo.mar == "Н" ? 1 : jourInfo.typs[jourInfo.typ];
         } else if(jourInfo.mar == "Н" || jourInfo.typ == "") {
             st.weight = 1;
         }
+        if(!st.weight) return;
         if(jourInfo.mar == "Л") {
             type = CHANGE_PJOURNAL_DEL_MARKS;
         } else {
             type = CHANGE_PJOURNAL_MARKS;
         }
     }
-    if (type == CHANGE_PJOURNAL_MARKS) {
-        addMark(st.weight, kid, day);
+    if (type == CHANGE_PJOURNAL_MARKS || type == CHANGE_PJOURNAL_PER_MARKS) {
+        addMark(st.weight, kid, day, per);
     } else {
         dispatch(changePjournal(type, undefined, st, kid, day, per));
     }
@@ -226,14 +230,16 @@ function getDateS(date) {
 }
 
 function getDays() {
-    if(!jourInfo.predms || !schedulesInfo) return;
-    let schOfSubj, monOfMin, week, d, les, datD, min, max, maxB;
+    if(!jourInfo.predms || !schedulesInfo || !jourInfo.min || !jourInfo.max || !groupsInfo.els.groups) return;
+    let schOfSubj, monOfMin, week, d, les, datD, min, max, maxB, rez;
     week = 0;
+    console.log("sheeeed", schedulesInfo);
     days = [];
     schOfSubj = {};
     for(d in schedulesInfo) {
         for(les in schedulesInfo[d].lessons) {
-            if(schedulesInfo[d].lessons[les].name != jourInfo.predms[jourInfo.predm]) continue;
+            // if(schedulesInfo[d].lessons[les].name != jourInfo.predms[jourInfo.predm]) continue;
+            if(schedulesInfo[d].lessons[les].name != jourInfo.predms[jourInfo.predm] || (cState.role == 2 && schedulesInfo[d].lessons[les].group != groupsInfo.els.groups[groupsInfo.els.group])) continue;
             if(!schOfSubj[d]) schOfSubj[d] = [];
             if(!schOfSubj[d].indexOf(les) > -1) {
                 schOfSubj[d].push(les);
@@ -259,12 +265,16 @@ function getDays() {
             week++;
         }
     }
-
-    return days.map(param =>
+    rez = days.map(param =>
         <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.nav_iTextD} id={journalCSS.nav_i}>
             {getDayofMonth(param)}
         </div>
     )
+    for(let i = 0; i < days.length; i++) {
+        days[i] = getDateS(days[i]);
+    }
+    console.log("test1", days);
+    return rez;
 }
 
 function selTyp(p) {
@@ -277,105 +287,103 @@ function selMar(p) {
 }
 
 function getBlockInstr(p3) {
-    return (
-        <div className={journalCSS.blockInstrum+" "+journalCSS.ju}>
-            <div className={journalCSS.blockMarks}>
-                <div className={journalCSS.marks} data-tr>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "1" ? "1" : "0"} onClick={() => selMar(1)}>
-                        1
-                    </div>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "2" ? "1" : "0"} onClick={() => selMar(2)}>
-                        2
-                    </div>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "3" ? "1" : "0"} onClick={() => selMar(3)}>
-                        3
-                    </div>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "4" ? "1" : "0"} onClick={() => selMar(4)}>
-                        4
-                    </div>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "5" ? "1" : "0"} onClick={() => selMar(5)}>
-                        5
-                    </div>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "Н" ? "1" : "0"} onClick={() => selMar("Н")}>
-                        Н
-                    </div>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "Л" ? "1" : "0"} onClick={() => selMar("Л")}>
-                        <img className={journalCSS.imger} src={(jourInfo.mar == "Л" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
-                    </div>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == 0 ? "1" : "0"} onClick={() => selMar(0)}>
-                        <br/>
-                    </div>
+    return <div className={journalCSS.blockInstrum+" "+journalCSS.ju}>
+        <div className={journalCSS.blockMarks}>
+            <div className={journalCSS.marks} data-tr>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "1" ? "1" : "0"} onClick={() => selMar(1)}>
+                    1
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i}>
-                    Выбрать оценку
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "2" ? "1" : "0"} onClick={() => selMar(2)}>
+                    2
+                </div>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "3" ? "1" : "0"} onClick={() => selMar(3)}>
+                    3
+                </div>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "4" ? "1" : "0"} onClick={() => selMar(4)}>
+                    4
+                </div>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "5" ? "1" : "0"} onClick={() => selMar(5)}>
+                    5
+                </div>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "Н" ? "1" : "0"} onClick={() => selMar("Н")}>
+                    Н
+                </div>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "Л" ? "1" : "0"} onClick={() => selMar("Л")}>
+                    <img className={journalCSS.imger} src={(jourInfo.mar == "Л" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
+                </div>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == 0 ? "1" : "0"} onClick={() => selMar(0)}>
+                    <br/>
                 </div>
             </div>
-            <div className={journalCSS.blockTypes}>
-                <div className={journalCSS.types+" "+journalCSS.types1}>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-st="0" data-ac="0">
+            <div className={journalCSS.nav_i} id={journalCSS.nav_i}>
+                Выбрать оценку
+            </div>
+        </div>
+        <div className={journalCSS.blockTypes}>
+            <div className={journalCSS.types+" "+journalCSS.types1}>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-st="0" data-ac="0">
+                    <div className={journalCSS.field+" "+journalCSS.fi}>
+                        {Object.getOwnPropertyNames(jourInfo.typs).map(param => {
+                            if(param.length > p3.length) p3 = param;
+                        }) && p3 + ", вес: " + jourInfo.typs[p3]}
+                    </div>
+                    <img className={journalCSS.imgfield+" "+journalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                    <img className={journalCSS.imginp+" "+journalCSS.fi} src={no} onClick={onDel} title="Удалить тип" alt=""/>
+                </div>
+            </div>
+            <div className={journalCSS.types} data-tr data-real>
+                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.typ == "" ? "1" : "0"} onClick={() => selTyp("")}>
+                    <img className={journalCSS.imger} src={(jourInfo.typ == "" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
+                </div>
+                {Object.getOwnPropertyNames(jourInfo.typs).map(param =>
+                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-st="0" data-ac={jourInfo.typ == param ? "1" : "0"} onClick={() => selTyp(param)}>
                         <div className={journalCSS.field+" "+journalCSS.fi}>
-                            {Object.getOwnPropertyNames(jourInfo.typs).map(param => {
-                                if(param.length > p3.length) p3 = param;
-                            }) && p3 + ", вес: " + jourInfo.typs[p3]}
+                            {param}, вес: {jourInfo.typs[param]}
                         </div>
+                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                            Тип:
+                        </div>
+                        <input className={journalCSS.inp+" "+journalCSS.in} id={"inpt_" + param} onChange={chStatB} defaultValue={param} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
+                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                            , вес:
+                        </div>
+                        <input className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.mass} id={"inpv_" + param} onChange={chStatB} defaultValue={jourInfo.typs[param]} type="text" pattern="^[0-9]+$"/>
+                        {ele(false, "inpt_" + param, true)}
+                        {ele(false, "inpv_" + param, true)}
+                        <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
+                        <img className={journalCSS.imginp+" "+journalCSS.in} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                         <img className={journalCSS.imgfield+" "+journalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
                         <img className={journalCSS.imginp+" "+journalCSS.fi} src={no} onClick={onDel} title="Удалить тип" alt=""/>
                     </div>
-                </div>
-                <div className={journalCSS.types} data-tr data-real>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.typ == "" ? "1" : "0"} onClick={() => selTyp("")}>
-                        <img className={journalCSS.imger} src={(jourInfo.typ == "" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
+                )}
+                <div className={journalCSS.nav_iZag} data-st="0">
+                    <div className={journalCSS.nav_i+" "+journalCSS.chPass} id={journalCSS.nav_i} data-ac='1' onClick={onEdit}>
+                        Добавить новый тип
                     </div>
-                    {Object.getOwnPropertyNames(jourInfo.typs).map(param =>
-                        <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-st="0" data-ac={jourInfo.typ == param ? "1" : "0"} onClick={() => selTyp(param)}>
-                            <div className={journalCSS.field+" "+journalCSS.fi}>
-                                {param}, вес: {jourInfo.typs[param]}
-                            </div>
-                            <div className={journalCSS.preinf+" "+journalCSS.in}>
-                                Тип:
-                            </div>
-                            <input className={journalCSS.inp+" "+journalCSS.in} id={"inpt_" + param} onChange={chStatB} defaultValue={param} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
-                            <div className={journalCSS.preinf+" "+journalCSS.in}>
-                                , вес:
-                            </div>
-                            <input className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.mass} id={"inpv_" + param} onChange={chStatB} defaultValue={jourInfo.typs[param]} type="text" pattern="^[0-9]+$"/>
-                            {ele(false, "inpt_" + param, true)}
-                            {ele(false, "inpv_" + param, true)}
-                            <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
-                            <img className={journalCSS.imginp+" "+journalCSS.in} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                            <img className={journalCSS.imgfield+" "+journalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                            <img className={journalCSS.imginp+" "+journalCSS.fi} src={no} onClick={onDel} title="Удалить тип" alt=""/>
+                    <div className={journalCSS.nav_i+" "+journalCSS.blNew} id={journalCSS.nav_i} data-ac="0">
+                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                            Тип:
                         </div>
-                    )}
-                    <div className={journalCSS.nav_iZag} data-st="0">
-                        <div className={journalCSS.nav_i+" "+journalCSS.chPass} id={journalCSS.nav_i} data-ac='1' onClick={onEdit}>
-                            Добавить новый тип
+                        <input className={journalCSS.inp+" "+journalCSS.in} id={"inpnt_"} onChange={chStatB} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
+                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                            , вес:
                         </div>
-                        <div className={journalCSS.nav_i+" "+journalCSS.blNew} id={journalCSS.nav_i} data-ac="0">
-                            <div className={journalCSS.preinf+" "+journalCSS.in}>
-                                Тип:
-                            </div>
-                            <input className={journalCSS.inp+" "+journalCSS.in} id={"inpnt_"} onChange={chStatB} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
-                            <div className={journalCSS.preinf+" "+journalCSS.in}>
-                                , вес:
-                            </div>
-                            <input className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.mass} id={"inpnv_"} onChange={chStatB} type="text" pattern="^[0-9]+$"/>
-                            {ele(false, "inpnt_", true)}
-                            {ele(false, "inpnv_", true)}
-                            <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFin} title="Подтвердить" alt=""/>
-                            <img className={journalCSS.imginp+" "+journalCSS.in} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                        </div>
+                        <input className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.mass} id={"inpnv_"} onChange={chStatB} type="text" pattern="^[0-9]+$"/>
+                        {ele(false, "inpnt_", true)}
+                        {ele(false, "inpnv_", true)}
+                        <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFin} title="Подтвердить" alt=""/>
+                        <img className={journalCSS.imginp+" "+journalCSS.in} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                     </div>
-                </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i}>
-                    Выбрать тип оценки
                 </div>
             </div>
-            <div className={journalCSS.nav_i} id={journalCSS.nav_i} onClick={e=>onEdit(e, true)}>
-                Задать домашнее задание
+            <div className={journalCSS.nav_i} id={journalCSS.nav_i}>
+                Выбрать тип оценки
             </div>
         </div>
-    );
+        <div className={journalCSS.nav_i} id={journalCSS.nav_i} onClick={e=>onEdit(e, true)}>
+            Задать домашнее задание
+        </div>
+    </div>;
 }
 
 function onCon(e) {
@@ -389,14 +397,17 @@ function setInfoP1() {
     }, 'POST', "pjournal/getInfoP1")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.error == false) {
+                dispatch(changePjournal(CHANGE_PJOURNAL, "pers", data.bodyPers));
                 dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.bodyS));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "predms", data.bodyP));
-                if (!data.bodyP[jourInfo.predm]) {
+                dispatch(changePjournal(CHANGE_PJOURNAL, "predms", data.bodyPred));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "min", data.min));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "max", data.max));
+                if (!data.bodyPred[jourInfo.predm]) {
                     dispatch(changePjournal(CHANGE_PJOURNAL, "predm", 0));
-                    setInfoP2(data.bodyP[0]);
+                    setInfoP2(data.bodyPred[0]);
                 } else {
-                    setInfoP2(data.bodyP[jourInfo.predm]);
+                    setInfoP2(data.bodyPred[jourInfo.predm]);
                 }
                 scr = document.querySelector("." + journalCSS.days);
                 if(!scr) return;
@@ -430,10 +441,11 @@ function setInfoP2(predm) {
             if(data.error == false){
                 dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
                 if (!data.bodyG[groupsInfo.els.group]) {
-                    // selGr = data.firstG;
+                    selGr = data.firstG;
                     dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
                     setInfoP3(data.firstG);
                 } else {
+                    selGr = groupsInfo.els.group;
                     setInfoP3(groupsInfo.els.group);
                 }
             }
@@ -449,7 +461,24 @@ function setInfoP3(group) {
         .then(data => {
             console.log(data);
             if(data.error == false){
+                let weight, sum, mar, wei;
+                for(let kid in data.bodyK) {
+                    weight = 0;
+                    sum = 0;
+                    for(let day in data.bodyK[kid].days) {
+                        mar = parseInt(data.bodyK[kid].days[day].mark);
+                        if(!mar || isNaN(mar)) continue;
+                        wei = parseInt(data.bodyK[kid].days[day].weight);
+                        if(!wei) wei = 1;
+                        sum += mar*wei;
+                        weight += wei;
+                    }
+                    if (sum && weight) {
+                        data.bodyK[kid].avg.mark = (sum/weight).toFixed(2);
+                    }
+                }
                 dispatch(changePjournal(CHANGE_PJOURNAL_GL, 0, data.bodyK));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "dz", data.bodyD));
             }
         });
 }
@@ -457,10 +486,34 @@ function setInfoP3(group) {
 function addMarkC(e) {
     const msg = JSON.parse(e.data);
     console.log("sdf", msg);
-    dispatch(changePjournal(CHANGE_PJOURNAL_MARKS, undefined, msg.body, msg.kid, msg.day));
+    if (msg.body.per) {
+        dispatch(changePjournal(CHANGE_PJOURNAL_PER_MARKS, undefined, msg.body, msg.kid, undefined, msg.body.per));
+    } else {
+        let weight, sum, mar, wei;
+        sum = parseInt(msg.body.mark);
+        if (sum && !isNaN(sum)) {
+            weight = parseInt(msg.body.weight);
+            if (!weight) weight = 1;
+            sum *= weight;
+            for (let day in jourInfo.jur[msg.kid].days) {
+                mar = parseInt(jourInfo.jur[msg.kid].days[day].mark);
+                if (!mar || isNaN(mar)) continue;
+                wei = parseInt(jourInfo.jur[msg.kid].days[day].weight);
+                if (!wei) wei = 1;
+                sum += mar * wei;
+                weight += wei;
+            }
+            if (sum && weight) {
+                // data.bodyK[kid].avg.mark = (sum/weight).toFixed(2);
+                mar = {mark: (sum / weight).toFixed(2)};
+                dispatch(changePjournal(CHANGE_PJOURNAL_PER_MARKS, undefined, mar, msg.kid, undefined, "mark"));
+            }
+        }
+        dispatch(changePjournal(CHANGE_PJOURNAL_MARKS, undefined, msg.body, msg.kid, msg.day));
+    }
 }
 
-function addMark (weight, kid, day) {
+function addMark (weight, kid, day, per) {
     console.log("addMark");
     sendToServer({
         uuid: cState.uuid,
@@ -469,8 +522,29 @@ function addMark (weight, kid, day) {
         day: day,
         mark: jourInfo.mar,
         style: jourInfo.typ,
-        group: groupsInfo.els.group
+        group: groupsInfo.els.group,
+        per: per
     }, 'POST', "pjournal/addMark")
+}
+
+function addHomework (day, homework, par) {
+    console.log("addHomework");
+    sendToServer({
+        uuid: cState.uuid,
+        day: day,
+        group: groupsInfo.els.group,
+        homework: homework
+    }, 'POST', "pjournal/addHomework")
+        .then(data => {
+            if(data.error == false) {
+                par.setAttribute('data-st', '0');
+            }
+        });
+}
+
+function addHomeworkC(e) {
+    const msg = JSON.parse(e.data);
+    dispatch(changeDZ(msg.day, msg.homework));
 }
 
 export function Journal() {
@@ -486,6 +560,7 @@ export function Journal() {
         if(eventSource.readyState == EventSource.OPEN) setInfoP1();
         eventSource.addEventListener('connect', onCon, false);
         eventSource.addEventListener('addMarkC', addMarkC, false);
+        eventSource.addEventListener('addHomeworkC', addHomeworkC, false);
         setActived(9);
         dispatch(changeEvents(CHANGE_EVENTS_RL, false));
         return function() {
@@ -494,6 +569,7 @@ export function Journal() {
             dispatch = undefined;
             eventSource.removeEventListener('connect', onCon);
             eventSource.removeEventListener('addMarkC', addMarkC);
+            eventSource.removeEventListener('addHomeworkC', addHomeworkC);
             console.log("I was triggered during componentWillUnmount Journal.jsx");
         }
     }, []);
@@ -510,12 +586,17 @@ export function Journal() {
                 if(idi[1] != "") el.value = idi[0] == "inpt" ? idi[1] : jourInfo.typs[idi[1]];
             }
         }
+        if(groupsInfo.els.group && selGr != groupsInfo.els.group && eventSource.readyState == EventSource.OPEN) {
+            setInfoP2(jourInfo.predms[jourInfo.predm]);
+        }
         console.log('componentDidUpdate Journal.jsx');
     });
-    let p3, kidsK, predmsK;
+    let p3, kidsK, predmsK, pers;
     p3 = "";
-    if(jourInfo.jur.kids) kidsK = Object.getOwnPropertyNames(jourInfo.jur.kids);
+    if(jourInfo.jur) kidsK = Object.getOwnPropertyNames(jourInfo.jur);
     if(jourInfo.predms) predmsK = Object.getOwnPropertyNames(jourInfo.predms);
+    if(jourInfo.pers) pers = Object.getOwnPropertyNames(jourInfo.pers);
+    console.log("test", kidsK, predmsK);
     return <div className={journalCSS.AppHeader} data-st='0'>
         <Helmet>
             <title>Журнал</title>
@@ -547,15 +628,15 @@ export function Journal() {
                                             Средняя
                                         </div>
                                     </div>
-                                    {jourInfo.pers.map(param =>
+                                    {jourInfo.pers && pers.map((param, i, x, per = jourInfo.pers[param]) =>
                                         <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur}>
-                                            <div className={journalCSS.nav_iTextPer} data-s={param.length > 2 ? 1 : 0}>
-                                                {param}
+                                            <div className={journalCSS.nav_iTextPer} data-s={per.length > 2 ? 1 : 0}>
+                                                {per}
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                {kidsK && kidsK.map((param, i, x, kid = jourInfo.jur.kids[param]) => <>
+                                {kidsK && kidsK.map((param, i, x, kid = jourInfo.jur[param]) => <>
                                     <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" nam " + journalCSS.nam} id={journalCSS.nav_i}>
                                         {kid.name}
                                     </div>
@@ -563,11 +644,11 @@ export function Journal() {
                                         <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.nav_iBr} id={journalCSS.nav_i}>
                                             <br/>
                                         </div>
-                                        {days.map((param1, i1, x1, p1S = getDateS(param1), marL = kid.days ? kid.days[p1S] : undefined) => <>
-                                            {!marL && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur} id={journalCSS.nav_i} onClick={e=>chM(param, p1S)}>
+                                        {days.map((param1, i1, x1, marL = kid.days ? kid.days[param1] : undefined) => <>
+                                            {!marL && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur} id={journalCSS.nav_i} onClick={e=>chM(param, param1)}>
                                                 <br/>
                                             </div>}
-                                            {marL && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur} id={journalCSS.nav_i} onClick={e=>chM(param, p1S)}>
+                                            {marL && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur} id={journalCSS.nav_i} onClick={e=>chM(param, param1)}>
                                                 {marL.mark}
                                                 {marL.weight > 1 && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.nav_iWeight} id={journalCSS.nav_i}>
                                                     {marL.weight}
@@ -577,7 +658,7 @@ export function Journal() {
                                         <div className={journalCSS.nav_i + ' ' + journalCSS.nav_iJur + " " + journalCSS.nav_iTextM} style={{fontSize: "0.85vw"}}>
                                             {kid.avg ? kid.avg.mark : <br/>}
                                         </div>
-                                        {jourInfo.pers.map(param1 =>
+                                        {jourInfo.pers && pers.map(param1 =>
                                             <div className={journalCSS.nav_i + ' ' + journalCSS.nav_iJur + " " + journalCSS.nav_iTextM} onClick={() => chM(param, undefined, param1)}>
                                                 {kid.avg && kid.avg[param1] ? kid.avg[param1] : <br/>}
                                             </div>
@@ -596,13 +677,13 @@ export function Journal() {
                             <div className={journalCSS.nav_i+" "+journalCSS.nav_iJur} id={journalCSS.nav_i}>
                                 Домашнее задание
                             </div>
-                            {Object.getOwnPropertyNames(jourInfo.jur.day).reverse().map(param => <>
+                            {days && days.reverse().map((param, i, x, dM = param.split(",")[0]) => <>
                                 <div className={journalCSS.nav_i+" "+journalCSS.nav_iJur} id={journalCSS.nav_i}>
-                                    {jourInfo.jur.day[param]}
+                                    {dM}
                                 </div>
                                 <div className={journalCSS.nav_i+" "+journalCSS.nav_iJur} id={journalCSS.nav_i} data-st="0">
                                     <pre className={journalCSS.field+" "+journalCSS.fi}>
-                                        {jourInfo.dz[param] ? jourInfo.dz[param] : <br/>}
+                                        {jourInfo.dz[param] || <br/>}
                                     </pre>
                                     <textarea className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.inparea} id={"inpd_" + param} defaultValue={jourInfo.dz[param]} onChange={chStatM}/>
                                     <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFinM} title="Подтвердить изменения" alt=""/>

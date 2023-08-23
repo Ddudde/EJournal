@@ -137,22 +137,17 @@
 	border: none;
 }
 
-.namd{
-	position: absolute;
-	width: 20vw;
-	height: 15vh;
-	padding: 0;
-	background-color: var(--bgcV1);
-	z-index: 1;
-}
-
-.nam{
+.nam, .namd{
 	position: absolute;
 	width: 20vw;
 	height: 5vh;
 	padding: 0;
 	background-color: var(--bgcV1);
 	z-index: 1;
+}
+
+.namd{
+	height: 15vh;
 }
 
 .nav_iTextM{
@@ -275,6 +270,7 @@
 .nav_iTextPer[data-s="1"]{
     transform: rotateZ(270deg);
 	font-family: unset;
+	white-space: nowrap;
 }
 
 .imger{

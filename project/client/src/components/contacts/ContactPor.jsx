@@ -1,31 +1,31 @@
 import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
-import contactCSS from '../contactMain.module.css';
-import {contacts, states} from "../../../store/selector";
+import contactCSS from './contactMain.module.css';
+import {contacts, states} from "../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {chStatB, errorLoad, getEdCon, setActNew, setTyp} from "../ContactMain";
-import ErrFound from "../../other/error/ErrFound";
-import {CHANGE_EVENTS_CLEAR, changeEvents} from "../../../store/actions";
-import {prefSite} from "../../main/Main";
+import {chStatB, errorLoad, getEdCon, setActNew, setTyp} from "./ContactMain";
+import ErrFound from "../other/error/ErrFound";
+import {CHANGE_EVENTS_CLEAR, changeEvents} from "../../store/actions";
+import {prefSite} from "../main/Main";
 
-let dispatch, contactsInfo, type, cState, inps, errText;
-type = "Yo";
+let dispatch, contactsInfo, type, errText, cState, inps;
+type = "Por";
 inps = {};
-errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
+errText = "К сожалению, информация не найдена... Ждите новой информации.";
 let [_, forceUpdate] = [];
 
-export function ContactYo() {
+export function ContactPor() {
     contactsInfo = useSelector(contacts);
     cState = useSelector(states);
     if(!dispatch) {
-        setActNew(1);
+        setActNew(0);
         setTyp(type);
     }
     [_, forceUpdate] = useReducer((x) => x + 1, 0);
     dispatch = useDispatch();
     const isFirstUpdate = useRef(true);
     useEffect(() => {
-        console.log("I was triggered during componentDidMount ContactYo.jsx");
+        console.log("I was triggered during componentDidMount ContactPor.jsx");
         setTyp(type);
         for(let el of document.querySelectorAll("." + contactCSS.ed + " > *[id^='inpn']")){
             chStatB({target: el}, inps);
@@ -33,7 +33,7 @@ export function ContactYo() {
         return function() {
             dispatch(changeEvents(CHANGE_EVENTS_CLEAR));
             dispatch = undefined;
-            console.log("I was triggered during componentWillUnmount ContactYo.jsx");
+            console.log("I was triggered during componentWillUnmount ContactPor.jsx");
         }
     }, []);
     useEffect(() => {
@@ -41,18 +41,18 @@ export function ContactYo() {
             isFirstUpdate.current = false;
             return;
         }
-        console.log('componentDidUpdate ContactYo.jsx');
+        console.log('componentDidUpdate ContactPor.jsx');
     });
     return (
         <div className={contactCSS.header}>
             <Helmet>
-                <title>Контакты учебного центра</title>
+                <title>Контакты портала</title>
             </Helmet>
-            {(!contactsInfo[type].contact && !contactsInfo[type].mapPr && !(cState.auth && cState.role == 3)) ?
+            {(!contactsInfo[type].contact && !contactsInfo[type].mapPr && !(cState.auth && cState.role == 4)) ?
                     <ErrFound text={errText}/>
                 :
                     <div className={contactCSS.block}>
-                        {(cState.auth && cState.role == 3) ?
+                        {(cState.auth && cState.role == 4) ?
                                 getEdCon(contactsInfo, inps, forceUpdate)
                             :
                                 <section className={contactCSS.center_colum}>
@@ -78,4 +78,4 @@ export function ContactYo() {
         </div>
     )
 }
-export default ContactYo;
+export default ContactPor;

@@ -2,9 +2,7 @@ import React, {useEffect, useRef} from "react";
 import dialogCSS from './dialog.module.css';
 import {dialog, states} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import start from "../../start/start.module.css";
 import button from "../../button.module.css";
-import {CHANGE_DIALOG_DEL, changeDialog} from "../../../store/actions";
 
 export function Dialog() {
     const cState = useSelector(states);
@@ -24,16 +22,17 @@ export function Dialog() {
         }
         console.log('componentDidUpdate ErrNotFound.jsx');
     });
-    return dialogInfo.obj &&
-        <div className={dialogCSS.over}>
-            <div className={dialogCSS.block}>
-                {dialogInfo.obj}
-                {dialogInfo.buts && Object.getOwnPropertyNames(dialogInfo.buts).map(param =>
-                    <div className={button.button+" "+start.button+" "+start.butz} onClick={() => dispatch(changeDialog(CHANGE_DIALOG_DEL))}>
-                        {dialogInfo.buts[param].text}
+    return dialogInfo.obj && <div className={dialogCSS.over}>
+        <div className={dialogCSS.block}>
+            {dialogInfo.obj}
+            <div className={dialogCSS.blockBut}>
+                {dialogInfo.buts && Object.getOwnPropertyNames(dialogInfo.buts).map((param, i, x, but = dialogInfo.buts[param]) =>
+                    <div className={button.button+" "+dialogCSS.but} onClick={but.fun} data-enable={+but.enab} key={i}>
+                        {but.text}
                     </div>
                 )}
             </div>
         </div>
+    </div>
 }
 export default Dialog;

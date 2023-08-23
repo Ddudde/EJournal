@@ -37,7 +37,7 @@ import java.util.List;
     @PostMapping(value = "/addLesson")
     public JsonObject addLesson(@RequestBody DataSchedule body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             User teaU = null;
             Group group = null;
@@ -46,38 +46,38 @@ import java.util.List;
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(3L)) {
-                ref.group = datas.groupById(body.group);
+                ref.group = datas.getDbService().groupById(body.group);
                 if(ref.group != null) {
                     ref.lesson = new Lesson();
                     Long schId = Long.parseLong(subscriber.getLvlSch()),
                         teaId = body.obj.getAsJsonObject("prepod").get("id").getAsLong();
-                    School school = datas.schoolById(schId);
+                    School school = datas.getDbService().schoolById(schId);
                     ref.lesson.setNameSubject(body.obj.get("name").getAsString());
                     ref.lesson.setKab(body.obj.get("cabinet").getAsString());
-                    ref.teaU = datas.userById(teaId);
+                    ref.teaU = datas.getDbService().userById(teaId);
                     if(ref.teaU != null) {
                         ref.lesson.setTeacher(ref.teaU);
                         if(!ObjectUtils.isEmpty(school.getTeachers())
                             && school.getTeachers().contains(ref.teaU)){
                             school.getTeachers().remove(ref.teaU);
                         }
-                        if(ref.teaU.getRoles().get(2L).getSubjects().contains(ref.lesson.getNameSubject())) {
+                        if(!ref.teaU.getRoles().get(2L).getSubjects().contains(ref.lesson.getNameSubject())) {
                             ref.teaU.getRoles().get(2L).getSubjects().add(ref.lesson.getNameSubject());
-                            datas.getUserRepository().saveAndFlush(ref.teaU);
+                            datas.getDbService().getUserRepository().saveAndFlush(ref.teaU);
                         }
                     }
-                    ref.lesson.setGrp(datas.groupById(ref.group.getId()));
+                    ref.lesson.setGrp(datas.getDbService().groupById(ref.group.getId()));
                     ref.lesson.setSchool(school);
                     ref.lesson.setDayWeek(body.day);
-                    List<Lesson> lessons = datas.getLessonRepository().findBySchoolAndGrpAndDayWeek(school.getId(), ref.group.getId(), body.day);
+                    List<Lesson> lessons = datas.getDbService().getLessonRepository().findBySchoolIdAndGrpIdAndDayWeek(school.getId(), ref.group.getId(), body.day);
                     lessons.sort(Comparator.comparing(Lesson::getDayWeek).thenComparing(Lesson::getNumLesson));
                     if(lessons.isEmpty()) {
                         ref.lesson.setNumLesson(0);
                     } else {
                         ref.lesson.setNumLesson(lessons.get(lessons.size()-1).getNumLesson()+1);
                     }
-                    datas.getLessonRepository().saveAndFlush(ref.lesson);
-                    datas.getSchoolRepository().saveAndFlush(school);
+                    datas.getDbService().getLessonRepository().saveAndFlush(ref.lesson);
+                    datas.getDbService().getSchoolRepository().saveAndFlush(school);
                     body.wrtr.name("bodyT").beginObject();
                     datas.teachersBySchool(school, body.wrtr);
                     body.obj.addProperty("group", ref.group.getName());
@@ -99,7 +99,7 @@ import java.util.List;
     @PostMapping(value = "/getSchedule")
     public JsonObject getSchedule(@RequestBody DataSchedule body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Group group = null;
         };
@@ -109,12 +109,12 @@ import java.util.List;
                 if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
                     ref.group = user.getRoles().get(0L).getGrp();
                 } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
-                    User kidU = datas.userById(user.getSelKid());
+                    User kidU = datas.getDbService().userById(user.getSelKid());
                     if(kidU != null) {
                         ref.group = kidU.getRoles().get(0L).getGrp();
                     }
                 } else if(user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
-                    ref.group = datas.groupById(body.group);
+                    ref.group = datas.getDbService().groupById(body.group);
                 }
                 datas.getShedule("body", user, body.wrtr, ref.group != null ? ref.group.getId() : null);
             }
@@ -128,18 +128,18 @@ import java.util.List;
     @PostMapping(value = "/getInfo")
     public JsonObject getInfo(@RequestBody DataSchedule body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null, firstG;
         };
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
+                ref.schId = datas.getDbService().getFirstRole(user.getRoles()).getYO().getId();
                 if(user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L)) {
                     body.wrtr.name("bodyG").beginObject();
                     ref.firstG = datas.groupsByUser(user, body.wrtr);
-                    School school = datas.schoolById(ref.schId);
+                    School school = datas.getDbService().schoolById(ref.schId);
                     body.wrtr.name("firstG").value(ref.firstG)
                         .name("bodyT").beginObject();
                     datas.teachersBySchool(school, body.wrtr);

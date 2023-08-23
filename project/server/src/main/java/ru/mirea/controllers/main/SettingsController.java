@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,11 @@ import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.services.ServerService;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @RequestMapping("/settings")
 @NoArgsConstructor
@@ -33,7 +38,7 @@ import java.util.Objects;
     @PostMapping(value = "/chBool")
     public JsonObject chBool(@RequestBody DataSettings body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
@@ -48,7 +53,25 @@ import java.util.Objects;
                     case "checkbox_notify_new_sch" -> settingUser.setNNewReqSch(body.val);
                     default -> {}
                 }
-                datas.getSettingUserRepository().saveAndFlush(settingUser);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+                body.wrtr.name("yes").value(true);
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {}, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/checkPasCodeEmail")
+    public JsonObject checkPasCodeEmail(@RequestBody DataSettings body) {
+        try {
+            body.wrtr = datas.ini(body.toString());
+            Subscriber subscriber = authController.getSubscriber(body.uuid);
+            User user = datas.getDbService().userByLogin(subscriber.getLogin());
+            if(user != null && Objects.equals(user.getSettings().getEmailCode(), body.emailCode)) {
+                user.getSettings().setEmailCode(null);
+                user.getSettings().setExpDateEC(null);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
+                user.setPassword(body.nPar);
+                datas.getDbService().getUserRepository().saveAndFlush(user);
                 body.wrtr.name("yes").value(true);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -58,18 +81,29 @@ import java.util.Objects;
     @PostMapping(value = "/chPass")
     public JsonObject chPass(@RequestBody DataSettings body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
                 SettingUser settingUser = user.getSettings();
-                if(!Objects.equals(settingUser.getSecFr(), body.secFR)){
+                body.wrtr.name("yes").value(true);
+                if(!body.emailSt && !Objects.equals(settingUser.getSecFr(), body.secFR)){
                     body.wrtr.name("error").value(3);
-                } else if(!Objects.equals(user.getPassword(), body.oPar)){
+                } else if(body.emailSt && !Objects.equals(user.getSettings().getEmail(), body.email)){
                     body.wrtr.name("error").value(2);
                 } else {
-                    user.setPassword(body.nPar);
-                    datas.getUserRepository().saveAndFlush(user);
+                    if(body.emailSt) {
+                        String code = UUID.randomUUID().toString();
+                        datas.getEmailService().sendRecCode(body.email, code, "Изменение пароля в EJournal");
+                        user.getSettings().setEmailCode(code);
+                        Instant after = Instant.now().plus(Duration.ofDays(1));
+                        Date dateAfter = Date.from(after);
+                        user.getSettings().setExpDateEC(Main.df.format(dateAfter));
+                        datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
+                    } else {
+                        user.setPassword(body.nPar);
+                        datas.getDbService().getUserRepository().saveAndFlush(user);
+                    }
                 }
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -79,13 +113,13 @@ import java.util.Objects;
     @PostMapping(value = "/chSecFR")
     public JsonObject chSecFR(@RequestBody DataSettings body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
                 SettingUser settingUser = user.getSettings();
                 settingUser.setSecFr(body.secFR);
-                datas.getSettingUserRepository().saveAndFlush(settingUser);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                 body.wrtr.name("yes").value(true);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -95,13 +129,13 @@ import java.util.Objects;
     @PostMapping(value = "/chIco")
     public JsonObject chIco(@RequestBody DataSettings body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
                 SettingUser settingUser = user.getSettings();
                 settingUser.setIco(body.ico);
-                datas.getSettingUserRepository().saveAndFlush(settingUser);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                 body.wrtr.name("yes").value(true);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -111,7 +145,7 @@ import java.util.Objects;
     @PostMapping(value = "/getSettings")
     public JsonObject getSettings(@RequestBody DataSettings body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
@@ -144,9 +178,9 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor @AllArgsConstructor
 class DataSettings {
-    public String uuid, secFR, oPar, nPar, id;
+    public String uuid, secFR, oPar, nPar, id, email, emailCode;
     public int ico;
-    public boolean val;
+    public boolean val, emailSt;
     public transient boolean bol = true;
     public transient JsonTreeWriter wrtr;
 }

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useReducer, useRef} from "react";
 import warn from '../../media/warning.png';
 import ls1 from '../../media/ls-icon1.png';
 import ls2 from '../../media/ls-icon2.png';
@@ -18,6 +18,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {checkbox, indicators, states} from "../../store/selector";
 import {
     CHANGE_DIALOG,
+    CHANGE_DIALOG_BUT,
+    CHANGE_DIALOG_DEL,
     CHANGE_EVENTS_CLEAR,
     CHANGE_STATE,
     CHANGE_STATE_GL,
@@ -33,12 +35,14 @@ import {Link, useNavigate, useParams} from "react-router-dom"
 import ErrFound from "../other/error/ErrFound";
 import {setSettings} from "../main/settings/Settings";
 
-let dispatch, warns, timer, indicInfo, cState, navigate, checkBoxInfo, elem, els, textYesInvNR, textNoInv, blocks, licField;
-elem = {regbut: undefined, vxbut: undefined, g_id: undefined, logv: undefined, pasv: undefined, logz: undefined};
+let dispatch, warns, timer, indicInfo, cState, navigate, checkBoxInfo, elem, els, textYesInvNR, textNoInv, blocks, licField, selEmailR, emailCode, code, prop, selEmailZ, emailCodePas;
+elem = {regbut: undefined, vxbut: undefined, g_id: undefined, logv: undefined, pasv: undefined, logz: undefined, blockRecR: undefined, emalR:undefined, codEm:undefined, logoR:undefined, blockRecZ:undefined, emalZ:undefined, vxodBlock:undefined};
 textNoInv = "Приглашение неверно или недействительно.";
 textYesInvNR = "К действующему аккаунту была добавлена новая роль.";
-els = {logz: 0, secz: 0, pasnz: 0, paspz: 0, logv: 0, pasv: 0, logr: 0, pasr: 0, ppasr: 0};
+els = {logz: 0, pasnz: 0, paspz: 0, logv: 0, pasv: 0, logr: 0, pasr: 0, ppasr: 0, emalR: 0, secFrR: 0, secFrZ: 0, emalZ: 0};
 warns = {pat: undefined, empt: undefined, pow: undefined};
+selEmailR = true;
+selEmailZ = true;
 blocks = [
     {
         name: "Завучам",
@@ -71,10 +75,43 @@ licField = {
     </div>,
     buts: {
         0 : {
-            text: "Прочитал"
+            text: "Прочитал",
+            fun: () => dispatch(changeDialog(CHANGE_DIALOG_DEL)),
+            enab: true
         }
     }
-}
+};
+emailCode = {
+    obj: getEmail("Подтвердите E-Mail"),
+    buts: {
+        0 : {
+            text: "ГОТОВО!",
+            fun: () => checkCodeEmail(),
+            enab: false
+        },
+        1 : {
+            text: "ОТМЕНА",
+            fun: () => dispatch(changeDialog(CHANGE_DIALOG_DEL)),
+            enab: true
+        }
+    }
+};
+emailCodePas = {
+    obj: getEmail("Восстановление пароля"),
+    buts: {
+        0 : {
+            text: "ГОТОВО!",
+            fun: () => checkPasCodeEmail(),
+            enab: false
+        },
+        1 : {
+            text: "ОТМЕНА",
+            fun: () => dispatch(changeDialog(CHANGE_DIALOG_DEL)),
+            enab: true
+        }
+    }
+};
+let [_, forceUpdate] = [];
 
 function gen_pas(e){
     let par, password, symbols;
@@ -84,7 +121,7 @@ function gen_pas(e){
     for (var i = 0; i < 15; i++){
         password += symbols.charAt(Math.floor(Math.random() * symbols.length));
     }
-    for(let el of par.querySelectorAll("." + start.pass+"[pattern]")){
+    for(let el of par.querySelectorAll("." + start.inps+"[type='password']")){
         el.value = password;
         inpchr({target:el});
         par.classList.contains(start.reg) ? chStatRb({target:el}) : chStatZb({target:el});
@@ -93,22 +130,75 @@ function gen_pas(e){
     addEvent(`Сгенерирован пароль: ${password}. Он скопирован в буфер обмена`, 10);
 }
 
-function rego(e, props, code){
-    let par, ch;
-    par = e.target.parentElement.parentElement;
-    ch = par.querySelector("input[checked]");
-    console.log(props);
+function checkPasCodeEmail() {
+    sendToServer({
+        login: els.logz,
+        emailCode: elem.codEm.value,
+        par : els.pasnz
+    }, 'POST', "auth/checkPasCodeEmail")
+        .then(data => {
+            if(data.error == false){
+                dispatch(changeDialog(CHANGE_DIALOG_DEL));
+                addEvent("Код верный, пароль изменён успешно!", 10);
+                elem.vxodBlock.dataset.mod = '0';
+            } else {
+                addEvent("Код подтверждения, неверный", 10);
+            }
+        });
+}
+
+function checkCodeEmail() {
+    sendToServer({
+        invCod: code,
+        emailCode: elem.codEm.value,
+        email: elem.emalR.value
+    }, 'POST', "auth/checkCodeEmail")
+        .then(data => {
+            if(data.error == false){
+                dispatch(changeDialog(CHANGE_DIALOG_DEL));
+                addEvent("Почта подтверждена успешно!", 10);
+                rego();
+            } else {
+                addEvent("Код подтверждения к почте, неверный", 10);
+            }
+        });
+}
+
+function startEmail() {
+    sendToServer({
+        invCod: code,
+        email: elem.emalR.value
+    }, 'POST', "auth/startEmail")
+        .then(data => {
+            if(data.error == false){
+                dispatch(changeDialog(CHANGE_DIALOG, emailCode));
+            }
+        });
+}
+
+function preRego(){
+    if(selEmailR) {
+        startEmail();
+    } else {
+        rego();
+    }
+}
+
+function rego(){
+    let ch = elem.logoR.querySelector("input[checked]");
+    console.log(prop);
     if(els.pasr && els.logr){
         sendToServer({
             login: els.logr,
             par: els.pasr,
             ico: ch.value,
-            mod: props.mod,
+            mod: prop.mod,
+            secFr: selEmailR ? undefined : els.secFrR,
             code: code
         }, 'POST', "auth/reg")
             .then(data => {
                 if(data.error == false){
-                    onvxod({target: e.target.parentElement});
+                    onvxod({target: elem.logoR.firstElementChild});
                     navigate("/");
                     if(warns.logR != undefined) {
                         remEvent(warns.logR);
@@ -116,7 +206,7 @@ function rego(e, props, code){
                     }
                 } else if(data.error == 2){
                     addEvent(textNoInv, 10);
-                } else if(warns.logR == undefined && props.mod == undefined){
+                } else if(warns.logR == undefined && prop.mod == undefined){
                     warns.logR = addEvent("Логин занят, попробуйте изменить");
                 }
             });
@@ -156,7 +246,7 @@ function inpchr(e){
                 }
             }
         } else if(warns.pat == undefined) {
-            warns.pat = addEvent("Допустимы только латиница или цифры");
+            warns.pat = addEvent("Допустимы только латиница, цифры или нижнее подчёркивание");
             if(warns.empt != undefined) {
                 remEvent(warns.empt);
                 warns.empt = undefined;
@@ -177,7 +267,7 @@ function inpchr(e){
 function checkCaps(event) {
     var caps = event.getModifierState && event.getModifierState('CapsLock');
     for(let el of document.getElementsByClassName(start.warn)){
-        el.style.opacity = caps ? "1" : "0";
+        el.style.opacity = +caps;
     }
 }
 
@@ -204,10 +294,24 @@ function reset_timer() {
     timer = setInterval(function() { dispatch(changeIndNext(indicInfo.actived)); }, 5000);
 }
 
+function changeSelEmailR() {
+    selEmailR = !selEmailR;
+    elem.blockRecR.dataset.selemail = +selEmailR;
+    chStatRb();
+}
+
+function changeSelEmailZ() {
+    selEmailZ = !selEmailZ;
+    elem.blockRecZ.dataset.selemail = +selEmailZ;
+    chStatZb();
+}
+
 function chStatRb(e) {
-    let el = e.target;
-    els[el.id] = el.validity.patternMismatch ? false : el.value;
-    els.regb = (checkBoxInfo.checkbox_lic && els.logr && els.pasr && els.ppasr && (els.pasr == els.ppasr)) || false;
+    if(e) {
+        let el = e.target;
+        els[el.id] = (el.validity.patternMismatch || el.validity.typeMismatch) ? false : el.value;
+    }
+    els.regb = (checkBoxInfo.checkbox_lic && els.logr && els.pasr && els.ppasr && (els.pasr == els.ppasr) && (selEmailR ? els.emalR : els.secFrR)) || false;
     elem.regbut.setAttribute("data-enable", +els.regb);
     if(els.pasr == els.ppasr) {
         if(warns.pow != undefined) {
@@ -232,18 +336,26 @@ function chStatAv(e) {
 function onRec(e) {
     sendToServer({
         login: els.logz,
-        secFr: els.secz,
+        emailSt: selEmailZ,
+        email: selEmailZ ? els.emalZ : undefined,
+        secFr: selEmailZ ? undefined : els.secFrZ,
         par : els.pasnz
     }, 'POST', "auth/chPass")
         .then(data => {
             if(data.error == false){
-                onSmvz(e);
+                if(selEmailZ) {
+                    dispatch(changeDialog(CHANGE_DIALOG, emailCodePas));
+                } else {
+                    e.target = e.target.parentElement;
+                    onSmvz(e);
+                }
                 if(warns.chPass != undefined) {
                     remEvent(warns.chPass);
                     warns.chPass = undefined;
                 }
             } else if(warns.chPass == undefined){
-                warns.chPass = addEvent("Неверен логин или секретная фраза");
+                let text = "Неверен логин или " + (selEmailZ ? "электронная почта" : "секретная фраза");
+                warns.chPass = addEvent(text);
             }
         });
 }
@@ -251,8 +363,8 @@ function onRec(e) {
 function onSmvz(e) {
     let par, mod;
     par = e.target.parentElement.parentElement.parentElement;
-    mod = par.getAttribute('data-mod') == '1';
-    par.setAttribute("data-mod", mod ? "0" : "1");
+    mod = par.getAttribute('data-mod') == '0';
+    par.setAttribute("data-mod", +mod);
     if(mod && warns.pow != undefined) {
         remEvent(warns.pow);
         warns.pow = undefined;
@@ -260,9 +372,11 @@ function onSmvz(e) {
 }
 
 function chStatZb(e) {
-    let el = e.target;
-    els[el.id] = el.validity.patternMismatch ? false : el.value;
-    document.querySelector("#butL").setAttribute("data-enable", +((els.logz && els.secz && els.pasnz && els.paspz && (els.pasnz == els.paspz)) || false));
+    if(e) {
+        let el = e.target;
+        els[el.id] = (el.validity.patternMismatch || el.validity.typeMismatch) ? false : el.value;
+    }
+    document.querySelector("#butL").setAttribute("data-enable", +((els.logz && (selEmailZ ? els.emalZ : els.secFrZ) && els.pasnz && els.paspz && (els.pasnz == els.paspz)) || false));
     if(els.pasnz == els.paspz) {
         if(warns.pow != undefined) {
             remEvent(warns.pow);
@@ -285,6 +399,31 @@ function onsetText(e) {
     }
 }
 
+function getEmail(title) {
+    return <div className={start.code}>
+        <div className={start.zag}>
+            {title}
+        </div>
+        <div className={start.raz}>
+            В течение нескольких минут вам
+            придёт письмо с кодом, который
+            необходимо ввести в форму ниже.
+        </div>
+        <div className={start.raz}>
+            Код подтверждения:
+            <span style={{color: "#F00"}}> *</span>
+        </div>
+        <input className={start.inps} type="text" placeholder="Код подтверждения" onChange={chGotovo} id="codeR"
+               ref={el => elem.codEm = el} required pattern="^[a-zA-Z0-9_]+$"/>
+    </div>
+}
+
+function chGotovo(e) {
+    let el = e.target;
+    els[el.id] = el.value;
+    dispatch(changeDialog(CHANGE_DIALOG_BUT, els[el.id], 0));
+}
+
 function onCon(e) {
     sendToServer({
         type: "AUTH",
@@ -294,10 +433,12 @@ function onCon(e) {
 
 export function Start(props) {
     checkBoxInfo = useSelector(checkbox);
-    const { code } = useParams();
+    code = useParams().code;
+    prop = props;
     navigate = useNavigate();
     cState = useSelector(states);
     indicInfo = useSelector(indicators);
+    [_, forceUpdate] = useReducer((x) => x + 1, 0);
     const isFirstUpdate = useRef(true);
     els.regb = (checkBoxInfo.checkbox_lic && els.logr && els.pasr && els.ppasr && (els.pasr == els.ppasr)) || false;
     dispatch = useDispatch();
@@ -321,7 +462,7 @@ export function Start(props) {
                     }
                 });
         }
-        if(props.mod == "rea" && code){
+        if(props.mod == "rea" && code) {
             sendToServer({
                 code: code
             }, 'POST', "auth/checkReaCode")
@@ -344,6 +485,9 @@ export function Start(props) {
             el.addEventListener('input', inpchr);
         }
         eventSource.addEventListener('connect', onCon, false);
+        // dispatch(changeDialog(CHANGE_DIALOG, emailCode));
+        // addEvent("Почта подтверждена успешно!", 10);
+        // addEvent("Код подтверждения к почте, неверный", 10);
         return function() {
             clearInterval(timer);
             console.log("I was triggered during componentWillUnmount Start.jsx");
@@ -361,165 +505,239 @@ export function Start(props) {
         reset_timer();
         console.log('componentDidUpdate Start.jsx');
     });
-    return (
-        <div className={start.AppHeader}>
-            <Helmet>
-                <title>Главная</title>
-            </Helmet>
+    return <div className={start.AppHeader}>
+        <Helmet>
+            <title>Главная</title>
+        </Helmet>
+        <div className={start.block}>
+            {cState.invErr &&
+                <ErrFound text={textNoInv}/>
+            }
+            {cState.reaYes &&
+                <ErrFound text={textYesInvNR}/>
+            }
+            {(cState.invErr || cState.reaYes) ? undefined : <>
+                <div className={start.g}>
+                    <div className={start.gH} ref={el=>elem.g_id=el}>
+                        {blocks.map((param, i) =>
+                            <Link className={start.g_block} to={param.link} key={i} data-act={indicInfo.actived == i ? "1" : "0"}>
+                                <img src={param.img} className={start.pic_g} alt=""/>
+                                <div className={start.g_block_text} data-text={param.name} data-textm={param.text}>
+                                    {param.name}
+                                </div>
+                            </Link>
+                        )}
+                        <div className={start.g_block_shad}/>
+                        <img src={left} className={start.pic_l} alt="" onClick={() => {dispatch(changeIndPrev(indicInfo.actived, reset_timer))}}/>
+                        <img src={left} className={start.pic_r} alt="" onClick={() => {dispatch(changeIndNext(indicInfo.actived, reset_timer))}}/>
+                        <div className={start.indic}>
+                            <div className={start.indic_bl} id="ind_0" data-act={!indicInfo.actived ? "1" : "0"} onClick={() => {dispatch(changeInd(0, reset_timer))}}/>
+                            <div className={start.indic_bl} id="ind_1" data-act={indicInfo.actived == 1 ? "1" : "0"} onClick={() => {dispatch(changeInd(1, reset_timer))}}/>
+                            <div className={start.indic_bl} id="ind_2" data-act={indicInfo.actived == 2 ? "1" : "0"} onClick={() => {dispatch(changeInd(2, reset_timer))}}/>
+                            <div className={start.indic_bl} id="ind_3" data-act={indicInfo.actived == 3 ? "1" : "0"} onClick={() => {dispatch(changeInd(3, reset_timer))}}/>
+                        </div>
+                    </div>
+                </div>
+                <div className={start.startimg}>
+                    <div className={start.startimgText}>
+                        Для авторизации проскролльте или нажмите на стрелки
+                    </div>
+                    <img src={sta} alt="" onClick={() => {window.scrollTo(0, window.innerHeight)}}/>
+                </div>
+            </>}
+        </div>
+        {(cState.invErr || cState.reaYes) ? undefined :
             <div className={start.block}>
-                {cState.invErr &&
-                    <ErrFound text={textNoInv}/>
-                }
-                {cState.reaYes &&
-                    <ErrFound text={textYesInvNR}/>
-                }
-                {(cState.invErr || cState.reaYes) ? undefined : <>
-                    <div className={start.g}>
-                        <div className={start.gH} ref={el=>elem.g_id=el}>
-                            {blocks.map((param, i) =>
-                                <Link className={start.g_block} to={param.link} key={i} data-act={indicInfo.actived == i ? "1" : "0"}>
-                                    <img src={param.img} className={start.pic_g} alt=""/>
-                                    <div className={start.g_block_text} data-text={param.name} data-textm={param.text}>
-                                        {param.name}
-                                    </div>
-                                </Link>
-                            )}
-                            <div className={start.g_block_shad}/>
-                            <img src={left} className={start.pic_l} alt="" onClick={() => {dispatch(changeIndPrev(indicInfo.actived, reset_timer))}}/>
-                            <img src={left} className={start.pic_r} alt="" onClick={() => {dispatch(changeIndNext(indicInfo.actived, reset_timer))}}/>
-                            <div className={start.indic}>
-                                <div className={start.indic_bl} id="ind_0" data-act={!indicInfo.actived ? "1" : "0"} onClick={() => {dispatch(changeInd(0, reset_timer))}}/>
-                                <div className={start.indic_bl} id="ind_1" data-act={indicInfo.actived == 1 ? "1" : "0"} onClick={() => {dispatch(changeInd(1, reset_timer))}}/>
-                                <div className={start.indic_bl} id="ind_2" data-act={indicInfo.actived == 2 ? "1" : "0"} onClick={() => {dispatch(changeInd(2, reset_timer))}}/>
-                                <div className={start.indic_bl} id="ind_3" data-act={indicInfo.actived == 3 ? "1" : "0"} onClick={() => {dispatch(changeInd(3, reset_timer))}}/>
-                            </div>
+                <div className={start.posit} data-mod="0">
+                    <div className={start.help} data-enable={code ? '1' : '0'} data-mod="0">
+                        <div className={start.r}>
+                            Нет аккаунта? <span className={start.helpa} onClick={onreg}>Регистрация!</span>
+                        </div>
+                        <div className={start.v}>
+                            Есть аккаунт? <span className={start.helpa} onClick={onvxod}>Вход!</span>
                         </div>
                     </div>
-                    <div className={start.startimg}>
-                        <div className={start.startimgText}>
-                            Для авторизации проскролльте или нажмите на стрелки
-                        </div>
-                        <img src={sta} alt="" onClick={() => {window.scrollTo(0, window.innerHeight)}}/>
-                    </div>
-                </>}
-            </div>
-            {(cState.invErr || cState.reaYes) ? undefined :
-                <div className={start.block}>
-                    <div className={start.posit} data-mod="0">
-                        <div className={start.help} data-enable={code ? '1' : '0'} data-mod="0">
-                            <div className={start.r}>
-                                Нет аккаунта? <span className={start.helpa} onClick={onreg}>Регистрация!</span>
+                    <form className={start.vxod} data-mod="0" ref={el=>elem.vxodBlock = el}>
+                        <div className={start.vxo}>
+                            <input className={start.inps} type="login" onChange={chStatVb}
+                                   ref={el => elem.logv = el} placeholder="Логин" id="logv" autoComplete="username"
+                                   required pattern="^[a-zA-Z0-9_]+$"/>
+                            <div className={start.dinp}>
+                                <input className={start.inps} type="password" onChange={chStatVb}
+                                       ref={el => elem.pasv = el} placeholder="Пароль" id="pasv"
+                                       autoComplete="current-password" required pattern="^[a-zA-Z0-9_]+$"/>
+                                <div className={start.nav_i + " " + start.zabpar} id={start.nav_i} onClick={onSmvz}>
+                                    Забыли пароль?
+                                </div>
                             </div>
-                            <div className={start.v}>
-                                Есть аккаунт? <span className={start.helpa} onClick={onvxod}>Вход!</span>
-                            </div>
-                        </div>
-                        <form className={start.vxod} data-mod="0">
-                            <div className={start.vxo}>
-                                <input className={start.login} type="login" onChange={chStatVb}
-                                       ref={el => elem.logv = el} placeholder="Логин" id="logv" autoComplete="username"
-                                       required pattern="^[a-zA-Z0-9]+$"/>
-                                <div className={start.grid_cont_l}>
-                                    <input className={start.pass} type="password" onChange={chStatVb}
-                                           ref={el => elem.pasv = el} placeholder="Пароль" id="pasv"
-                                           autoComplete="current-password" required pattern="^[a-zA-Z0-9]+$"/>
-                                    <div className={start.nav_i + " " + start.zabpar} id={start.nav_i} onClick={onSmvz}>
-                                        Забыли пароль?
-                                    </div>
+                            <div className={start.dinp}>
+                                <div className={start.dinpo}>
                                     <div className={start.warn + ' ' + start.warnc} id="warnc">
                                         <img src={warn} className={start.warnimg} alt=""/>
                                         Включён Caps Lock!
                                     </div>
-                                    <div className={button.button + ' ' + start.marg} ref={el => elem.vxbut = el}
-                                         onClick={vxo}>
-                                        ВОЙТИ!
+                                </div>
+                                <div className={button.button + ' ' + start.marg} ref={el => elem.vxbut = el}
+                                     onClick={vxo}>
+                                    ВОЙТИ!
+                                </div>
+                            </div>
+                        </div>
+                        <div className={start.zab}>
+                            <input className={start.inps} ref={el => elem.logz = el} type="text"
+                                   onChange={chStatZb} placeholder="Логин" id="logz" autoComplete="username"
+                                   required pattern="^[a-zA-Z0-9_]+$"/>
+                            <div className={start.blockRec} data-selemail={+selEmailZ} ref={el=>elem.blockRecZ=el}>
+                                <div className={start.email}>
+                                    <div className={start.dinp}>
+                                        <input className={start.inps} ref={el => elem.emalZ = el} type="email" placeholder="E-Mail" onChange={chStatZb} id="emalZ" required/>
+                                        <span className={button.button + ' ' + start.marg} data-mod='2' onClick={changeSelEmailZ}>
+                                            Заменить на секретную фразу
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className={start.secFR}>
+                                    <div className={start.dinp}>
+                                        <input className={start.inps} type="text" placeholder="Секретная фраза" onChange={chStatZb} id="secFrZ"
+                                               required pattern="^[a-zA-Z0-9_]+$"/>
+                                        <span className={button.button + ' ' + start.marg} data-mod='2' onClick={changeSelEmailZ}>
+                                            Заменить на e-mail
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                            <div className={start.zab}>
-                                <input className={start.login + ' ' + start.inpz} ref={el => elem.logz = el} type="text"
-                                       onChange={chStatZb} placeholder="Логин" id="logz" autoComplete="username"
-                                       required pattern="^[a-zA-Z0-9]+$"/>
-                                <input className={start.pass + ' ' + start.inpz} type="password" onChange={chStatZb}
-                                       placeholder="Секретная фраза" id="secz"/>
-                                <div className={start.blockPas}>
-                                    <input className={start.pass + ' ' + start.inpz} type="password" onChange={chStatZb}
-                                           placeholder="Новый пароль" id="pasnz" autoComplete="new-password" required
-                                           pattern="^[a-zA-Z0-9]+$"/>
-                                    <div className={button.button + ' ' + start.marg} data-mod='2' onClick={gen_pas}>
-                                        <img src={ran} className={start.randimg} alt=""/>
-                                        Случайный пароль
-                                    </div>
-                                </div>
-                                <div className={start.grid_cont_l}>
-                                    <input className={start.pass + ' ' + start.inpz} type="password" onChange={chStatZb}
-                                           placeholder="Подтвердите пароль" id="paspz" autoComplete="new-password"
-                                           required pattern="^[a-zA-Z0-9]+$"/>
-                                    <span className={start.warn + ' ' + start.marg} id="warncz">
-                                        <img src={warn} className={start.warnimg} alt=""/>
-                                        Включён Caps Lock!
-                                    </span>
-                                    <div className={button.button + ' ' + start.butZab} id="butL" data-mod="1"
-                                         onClick={onRec}>
-                                        Подтвердить
-                                    </div>
-                                    <div className={button.button + ' ' + start.butZab + ' ' + start.marg} id="butR"
-                                         data-mod="1" onClick={onSmvz}>
-                                        Вспомнил пароль
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        <form className={start.reg} id="reg">
-                            <div className={start.logo}>
-                                <p style={{marginBlock: "0.5vw"}}>Выберите аватар для профиля:</p>
-                                <div className={start.blockAva} onClick={chStatAv}>
-                                    <input id="ch1" name="ico" type="radio" value="1" defaultChecked/>
-                                    <img className={start.logoi} src={ls1} alt=""/>
-                                </div>
-                                <div className={start.blockAva} onClick={chStatAv}>
-                                    <input id="ch2" name="ico" type="radio" value="2"/>
-                                    <img className={start.logoi} src={ls2} alt=""/>
-                                </div>
-                                <div className={start.blockAva} onClick={chStatAv}>
-                                    <input id="ch3" name="ico" type="radio" value="3"/>
-                                    <img className={start.logoi} src={ls3} alt=""/>
-                                </div>
-                            </div>
-                            <input className={start.login} type="text" placeholder="Логин" onChange={chStatRb} id="logr"
-                                   autoComplete="username" required pattern="^[a-zA-Z0-9]+$"/>
-                            <input className={start.pass} type="password" placeholder="Пароль" onChange={chStatRb}
-                                   id="pasr" autoComplete="new-password" required pattern="^[a-zA-Z0-9]+$"/>
-                            <div className={start.grid_cont_r}>
-                                <input className={start.pass} type="password" placeholder="Повторите пароль"
-                                       onChange={chStatRb} id="ppasr" autoComplete="new-password" required
-                                       pattern="^[a-zA-Z0-9]+$"/>
+                            <div className={start.dinp}>
+                                <input className={start.inps} type="password" onChange={chStatZb}
+                                       placeholder="Новый пароль" id="pasnz" autoComplete="new-password" required
+                                       pattern="^[a-zA-Z0-9_]+$"/>
                                 <div className={button.button + ' ' + start.marg} data-mod='2' onClick={gen_pas}>
                                     <img src={ran} className={start.randimg} alt=""/>
                                     Случайный пароль
                                 </div>
+                            </div>
+                            <div className={start.dinp}>
+                                <input className={start.inps} type="password" onChange={chStatZb}
+                                       placeholder="Подтвердите пароль" id="paspz" autoComplete="new-password"
+                                       required pattern="^[a-zA-Z0-9_]+$"/>
+                                <span className={start.warn + ' ' + start.marg} id="warncz">
+                                    <img src={warn} className={start.warnimg} alt=""/>
+                                    Включён Caps Lock!
+                                </span>
+                            </div>
+                            <div className={start.dinp}>
+                                <div className={start.dinpo}>
+                                    <div className={button.button + ' ' + start.butZab} id="butL" data-mod="1"
+                                         onClick={onRec}>
+                                        Подтвердить
+                                    </div>
+                                </div>
+                                <div className={button.button + ' ' + start.butZab + ' ' + start.marg} id="butR"
+                                     data-mod="1" onClick={onSmvz}>
+                                    Вспомнил пароль
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form className={start.reg} id="reg">
+                        <div className={start.logo} ref={el => elem.logoR = el}>
+                            <p style={{marginBlock: "0.5vw"}}>
+                                Выберите аватар для профиля:
+                                <span style={{color: "#F00"}}> *</span>
+                            </p>
+                            <div className={start.blockAva} onClick={chStatAv}>
+                                <input id="ch1" name="ico" type="radio" value="1" defaultChecked/>
+                                <img className={start.logoi} src={ls1} alt=""/>
+                            </div>
+                            <div className={start.blockAva} onClick={chStatAv}>
+                                <input id="ch2" name="ico" type="radio" value="2"/>
+                                <img className={start.logoi} src={ls2} alt=""/>
+                            </div>
+                            <div className={start.blockAva} onClick={chStatAv}>
+                                <input id="ch3" name="ico" type="radio" value="3"/>
+                                <img className={start.logoi} src={ls3} alt=""/>
+                            </div>
+                        </div>
+                        <div className={start.raz}>
+                            Логин:
+                            <span style={{color: "#F00"}}> *</span>
+                        </div>
+                        <input className={start.inps} type="text" placeholder="Логин" onChange={chStatRb} id="logr"
+                               autoComplete="username" required pattern="^[a-zA-Z0-9_]+$"/>
+                        <div className={start.raz}>
+                            Пароль:
+                            <span style={{color: "#F00"}}> *</span>
+                        </div>
+                        <input className={start.inps} type="password" placeholder="Пароль" onChange={chStatRb}
+                               id="pasr" autoComplete="new-password" required pattern="^[a-zA-Z0-9_]+$"/>
+                        <div className={start.raz}>
+                            Повторите пароль:
+                            <span style={{color: "#F00"}}> *</span>
+                        </div>
+                        <div className={start.dinp}>
+                            <input className={start.inps} type="password" placeholder="Повторите пароль"
+                                   onChange={chStatRb} id="ppasr" autoComplete="new-password" required
+                                   pattern="^[a-zA-Z0-9_]+$"/>
+                            <span className={button.button + ' ' + start.marg} data-mod='2' onClick={gen_pas}>
+                                <img src={ran} className={start.randimg} alt=""/>
+                                Случайный пароль
+                            </span>
+                        </div>
+                        <div className={start.blockRec} data-selemail={+selEmailR} ref={el=>elem.blockRecR=el}>
+                            <div className={start.email}>
+                                <div className={start.raz}>
+                                    E-Mail:
+                                    <span style={{color: "#F00"}}> *</span>
+                                </div>
+                                <div className={start.dinp}>
+                                    <input className={start.inps} ref={el => elem.emalR = el} type="email" placeholder="E-Mail" onChange={chStatRb} id="emalR" required/>
+                                    <span className={button.button + ' ' + start.marg} data-mod='2' onClick={changeSelEmailR}>
+                                        Заменить на секретную фразу
+                                    </span>
+                                </div>
+                            </div>
+                            <div className={start.secFR}>
+                                <div className={start.raz}>
+                                    Секретная фраза:
+                                    <span style={{color: "#F00"}}> *</span>
+                                </div>
+                                <div className={start.dinp}>
+                                    <input className={start.inps} type="text" placeholder="Секретная фраза" onChange={chStatRb} id="secFrR"
+                                           required pattern="^[a-zA-Z0-9_]+$"/>
+                                    <span className={button.button + ' ' + start.marg} data-mod='2' onClick={changeSelEmailR}>
+                                        Заменить на e-mail
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={start.dinp}>
+                            <div className={start.dinpo}>
                                 <div className={start.lic}>
                                     <CheckBox text={"Принимаю условия "} checkbox_id={"checkbox_lic"}/>
                                     <span className={start.url}
                                           onClick={() => dispatch(changeDialog(CHANGE_DIALOG, licField))}>
                                         соглашения
                                     </span>
-                                    <div className={start.warn} id="warncr">
-                                        <img src={warn} className={start.warnimg} alt=""/>
-                                        Включён Caps Lock!
+                                    <span style={{color: "#F00"}}> *</span>
+                                    <div>
+                                        <span style={{color: "#F00"}}>*</span>
+                                         — поля, обязательные для заполнения
                                     </div>
                                 </div>
-                                <div data-enable={+els.regb} className={button.button + ' ' + start.marg}
-                                     ref={el => elem.regbut = el} onClick={e=>rego(e, props, code)}>
-                                    ЗАРЕГИСТРИРОВАТЬСЯ!
+                                <div className={start.warn} id="warncr">
+                                    <img src={warn} className={start.warnimg} alt=""/>
+                                    Включён Caps Lock!
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                            <span data-enable={+els.regb} className={button.button + ' ' + start.marg}
+                                 ref={el => elem.regbut = el} onClick={preRego}>
+                                ЗАРЕГИСТРИРОВАТЬСЯ!
+                            </span>
+                        </div>
+                    </form>
                 </div>
-            }
-        </div>
-    )
+            </div>
+        }
+    </div>
 }
 export default Start;
 

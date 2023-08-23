@@ -1,15 +1,15 @@
 import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
-import peopleCSS from '../peopleMain.module.css';
-import {hteachers, states, themes} from "../../../store/selector";
+import peopleCSS from './peopleMain.module.css';
+import {hteachers, states, themes} from "../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
-import {ele, goToProf, setActNew, sit} from "../PeopleMain";
-import profl from "../../../media/profl.png";
-import profd from "../../../media/profd.png";
-import ErrFound from "../../other/error/ErrFound";
-import ed from "../../../media/edit.png";
-import yes from "../../../media/yes.png";
-import no from "../../../media/no.png";
+import {ele, goToProf, setActNew, sit} from "./PeopleMain";
+import profl from "../../media/profl.png";
+import profd from "../../media/profd.png";
+import ErrFound from "../other/error/ErrFound";
+import ed from "../../media/edit.png";
+import yes from "../../media/yes.png";
+import no from "../../media/no.png";
 import {
     CHANGE_EVENT,
     CHANGE_EVENTS_CLEAR,
@@ -22,12 +22,12 @@ import {
     CHANGE_HTEACHERS_L2_GL,
     changeEvents,
     changePeople
-} from "../../../store/actions";
-import refreshCd from "../../../media/refreshCd.png";
-import refreshCl from "../../../media/refreshCl.png";
-import copyd from "../../../media/copyd.png";
-import copyl from "../../../media/copyl.png";
-import {eventSource, sendToServer} from "../../main/Main";
+} from "../../store/actions";
+import refreshCd from "../../media/refreshCd.png";
+import refreshCl from "../../media/refreshCl.png";
+import copyd from "../../media/copyd.png";
+import copyl from "../../media/copyl.png";
+import {eventSource, sendToServer} from "../main/Main";
 
 let dispatch, errText, cState, inps, selKid, hteachersInfo, themeState, tps;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";

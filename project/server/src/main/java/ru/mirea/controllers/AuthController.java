@@ -137,19 +137,19 @@ import java.util.concurrent.ConcurrentHashMap;
             Subscriber subscriber = getSubscriber(body.uuid);
             User user = null;
             if(subscriber != null) {
-                user = datas.userByLogin(subscriber.getLogin());
+                user = datas.getDbService().userByLogin(subscriber.getLogin());
             }
             if(user != null) {
                 System.out.println(user);
                 if (!ObjectUtils.isEmpty(body.notifToken)) {
                     SettingUser settingUser = user.getSettings();
                     if(body.permis && !settingUser.getTokens().contains(body.notifToken)) {
-                        datas.addToken(settingUser, body.notifToken);
-                        datas.getSettingUserRepository().saveAndFlush(settingUser);
+                        datas.getPushService().addToken(settingUser, body.notifToken);
+                        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                     }
                     if(!body.permis && settingUser.getTokens().contains(body.notifToken)){
-                        datas.remToken(settingUser, body.notifToken);
-                        datas.getSettingUserRepository().saveAndFlush(settingUser);
+                        datas.getPushService().remToken(settingUser, body.notifToken);
+                        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                     }
                 }
                 body.wrtr.name("body").beginObject()
@@ -184,9 +184,60 @@ import java.util.concurrent.ConcurrentHashMap;
         return datas.getObj(ans -> {}, body.wrtr, body.bol);
     }
 
+    @PostMapping(value = "/checkCodeEmail")
+    public JsonObject checkCodeEmail(@RequestBody DataAuth body) {
+        try {
+            body.wrtr = datas.ini(body.toString());
+            User user = null;
+            if(!ObjectUtils.isEmpty(body.invCod)) {
+                user = datas.getDbService().userByCode(body.invCod);
+            } else if(user == null && !ObjectUtils.isEmpty(body.uuid)) {
+                Subscriber subscriber = getSubscriber(body.uuid);
+                user = datas.getDbService().userByLogin(subscriber.getLogin());
+            }
+            if(user == null && !ObjectUtils.isEmpty(body.uuid)) {
+                Subscriber subscriber = getSubscriber(body.uuid);
+                user = datas.getDbService().userByLogin(subscriber.getLogin());
+            }
+            if(user != null && Objects.equals(user.getSettings().getEmailCode(), body.emailCode)) {
+                user.getSettings().setEmail(body.email);
+                user.getSettings().setEmailCode(null);
+                user.getSettings().setExpDateEC(null);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
+                body.wrtr.name("yes").value(true);
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {}, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/startEmail")
+    public JsonObject startEmail(@RequestBody DataAuth body) {
+        try {
+            body.wrtr = datas.ini(body.toString());
+            User user = null;
+            if(!ObjectUtils.isEmpty(body.invCod)) {
+                user = datas.getDbService().userByCode(body.invCod);
+            } else if(user == null && !ObjectUtils.isEmpty(body.uuid)) {
+                Subscriber subscriber = getSubscriber(body.uuid);
+                user = datas.getDbService().userByLogin(subscriber.getLogin());
+            }
+            if(user != null) {
+                String code = UUID.randomUUID().toString();
+                datas.getEmailService().sendRegCode(body.email, code);
+                user.getSettings().setEmailCode(code);
+                Instant after = Instant.now().plus(Duration.ofDays(1));
+                Date dateAfter = Date.from(after);
+                user.getSettings().setExpDateEC(Main.df.format(dateAfter));
+                datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
+                body.wrtr.name("yes").value(true);
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {}, body.wrtr, body.bol);
+    }
+
     @PostMapping(value = "/auth")
     public JsonObject auth(@RequestBody DataAuth body) {
-        User user = datas.userByLogin(body.login);
+        User user = datas.getDbService().userByLogin(body.login);
         try {
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
@@ -194,20 +245,20 @@ import java.util.concurrent.ConcurrentHashMap;
                 if(!ObjectUtils.isEmpty(body.notifToken)) {
                     SettingUser settingUser = user.getSettings();
                     if(body.permis) {
-                        datas.addToken(settingUser, body.notifToken);
+                        datas.getPushService().addToken(settingUser, body.notifToken);
                     } else {
-                        datas.remToken(settingUser, body.notifToken);
+                        datas.getPushService().remToken(settingUser, body.notifToken);
                     }
-                    datas.getSettingUserRepository().saveAndFlush(settingUser);
+                    datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                 }
-                SettingUser settingUser = user.getSettings();
                 body.wrtr.name("auth").value(true)
                     .name("login").value(user.getLogin())
 //                        bodyAns.addProperty("role", ObjectUtils.isEmpty(user.getRoles()) ? 0 : ((Long) user.getRoles().keySet().toArray()[4]));
                     .name("role").value(user.getSelRole())
-                    .name("ico").value(settingUser.getIco())
+                    .name("ico").value(user.getSettings().getIco())
                     .name("roles").value(!ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1)
-                    .name("secFr").value(!ObjectUtils.isEmpty(settingUser.getSecFr()));
+                    .name("secFr").value(!ObjectUtils.isEmpty(user.getSettings().getSecFr()))
+                    .name("email").value(!ObjectUtils.isEmpty(user.getSettings().getEmail()));
                 if(user.getSelRole() == 1L) {
                     Role role = user.getRoles().get(1L);
                     body.wrtr.name("kid").value(user.getSelKid())
@@ -228,39 +279,41 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @PostMapping(value = "/reg")
     public JsonObject reg(@RequestBody DataAuth body) {
-        User user = datas.userByLogin(body.login),
-            user1 = datas.userByCode(body.code);
+        User user = datas.getDbService().userByLogin(body.login),
+            user1 = datas.getDbService().userByCode(body.code);
         try {
             body.wrtr = datas.ini(body.toString());
             if(user1 == null){
                 body.wrtr.name("error").value(2);
             } else if(user == null) {
-                SettingUser settingUser = null;
                 if(Objects.equals(body.mod, "inv")) {
-                    settingUser = datas.createSettingUser(new SettingUser(body.ico));
-                    user1.setSelRole(datas.getFirstRoleId(user1.getRoles()));
-                    user1.setSettings(settingUser);
+                    if(user1.getSettings() == null) {
+                        user1.setSettings(datas.getDbService().createSettingUser(new SettingUser(body.ico)));
+                    }
+                    user1.setSelRole(datas.getDbService().getFirstRoleId(user1.getRoles()));
                     if(user1.getRoles().containsKey(1L)) {
                         if(!ObjectUtils.isEmpty(user1.getRoles().get(1L).getKids())) {
                             user1.setSelKid(user1.getRoles().get(1L).getKids().get(0).getId());
                         }
                     }
                 } else if(Objects.equals(body.mod, "rea")){
-                    settingUser = user1.getSettings();
-                    user1.setLogin(body.login);
-                    user1.setPassword(body.par);
-                    settingUser.setIco(body.ico);
                     user1.setCode(null);
                     user1.setExpDate(null);
                 }
-                datas.getUserRepository().saveAndFlush(user1);
-                if(settingUser != null) {
-                    School school = datas.getFirstRole(user1.getRoles()).getYO();
+                user1.setLogin(body.login);
+                user1.setPassword(body.par);
+                user1.getSettings().setIco(body.ico);
+                datas.getDbService().getUserRepository().saveAndFlush(user1);
+                if(user1.getSettings() != null) {
+                    School school = datas.getDbService().getFirstRole(user1.getRoles()).getYO();
                     if (school != null) {
-                        datas.addTopic(settingUser, school.getId() + "News");
+                        datas.getPushService().addTopic(user1.getSettings(), school.getId() + "News");
                     }
-                    datas.addTopic(settingUser, "news");
-                    datas.getSettingUserRepository().saveAndFlush(settingUser);
+                    datas.getPushService().addTopic(user1.getSettings(), "news");
+                    datas.getDbService().getSettingUserRepository().saveAndFlush(user1.getSettings());
+                    if(!ObjectUtils.isEmpty(body.secFr)) {
+                        user1.getSettings().setSecFr(body.secFr);
+                    }
                 }
             }
             body.wrtr.name("yes").value(true);
@@ -268,15 +321,45 @@ import java.util.concurrent.ConcurrentHashMap;
         return datas.getObj(ans -> {}, body.wrtr, body.bol);
     }
 
-    @PostMapping(value = "/chPass")
-    public JsonObject chPass(@RequestBody DataAuth body) {
-        User user = datas.userByLogin(body.login);
+    @PostMapping(value = "/checkPasCodeEmail")
+    public JsonObject checkPasCodeEmail(@RequestBody DataAuth body) {
+        User user = datas.getDbService().userByLogin(body.login);
         try {
             body.wrtr = datas.ini(body.toString());
             SettingUser settingUser = user.getSettings();
-            if(user != null && Objects.equals(settingUser.getSecFr(), body.secFr)) {
+            if(user != null && Objects.equals(user.getSettings().getEmailCode(), body.emailCode)) {
+                user.getSettings().setEmailCode(null);
+                user.getSettings().setExpDateEC(null);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
                 user.setPassword(body.par);
-                datas.getUserRepository().saveAndFlush(user);
+                datas.getDbService().getUserRepository().saveAndFlush(user);
+                body.wrtr.name("yes").value(true);
+            }
+        } catch (Exception e) {body.bol = Main.excp(e);}
+        return datas.getObj(ans -> {}, body.wrtr, body.bol);
+    }
+
+    @PostMapping(value = "/chPass")
+    public JsonObject chPass(@RequestBody DataAuth body) {
+        User user = datas.getDbService().userByLogin(body.login);
+        try {
+            body.wrtr = datas.ini(body.toString());
+            SettingUser settingUser = user.getSettings();
+            if(user != null
+            && ((!body.emailSt && Objects.equals(settingUser.getSecFr(), body.secFr))
+            || (body.emailSt && Objects.equals(user.getSettings().getEmail(), body.email)))) {
+                if(body.emailSt) {
+                    String code = UUID.randomUUID().toString();
+                    datas.getEmailService().sendRecCode(body.email, code, "Восстановление пароля в EJournal");
+                    user.getSettings().setEmailCode(code);
+                    Instant after = Instant.now().plus(Duration.ofDays(1));
+                    Date dateAfter = Date.from(after);
+                    user.getSettings().setExpDateEC(Main.df.format(dateAfter));
+                    datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
+                } else {
+                    user.setPassword(body.par);
+                    datas.getDbService().getUserRepository().saveAndFlush(user);
+                }
                 body.wrtr.name("yes").value(true);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -286,13 +369,13 @@ import java.util.concurrent.ConcurrentHashMap;
     @PostMapping(value = "/chKid")
     public JsonObject chKid(@RequestBody DataAuth body) {
         Subscriber subscriber = getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getSelRole() == 1L && body.idL != null) {
                 user.setSelKid(body.idL);
                 body.wrtr.name("kid").value(user.getSelKid());
-                datas.getUserRepository().saveAndFlush(user);
+                datas.getDbService().getUserRepository().saveAndFlush(user);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {}, body.wrtr, body.bol);
@@ -301,7 +384,7 @@ import java.util.concurrent.ConcurrentHashMap;
     @PostMapping(value = "/chRole")
     public JsonObject chRole(@RequestBody DataAuth body) {
         Subscriber subscriber = getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         long curRol = user.getSelRole();
         try {
             body.wrtr = datas.ini(body.toString());
@@ -311,7 +394,7 @@ import java.util.concurrent.ConcurrentHashMap;
                     if(!user.getRoles().containsKey(i)) continue;
                     body.wrtr.name("role").value(i);
                     user.setSelRole(i);
-                    datas.getUserRepository().saveAndFlush(user);
+                    datas.getDbService().getUserRepository().saveAndFlush(user);
                     Role role = user.getRoles().get(i);
                     if(i == 1L) {
                         body.wrtr.name("kid").value(user.getSelKid())
@@ -336,10 +419,12 @@ import java.util.concurrent.ConcurrentHashMap;
         Subscriber subscriber = getSubscriber(body.uuid);
         if(subscriber != null) {
             if (!ObjectUtils.isEmpty(body.notifToken)) {
-                User user = datas.userByLogin(subscriber.getLogin());
-                SettingUser settingUser = user.getSettings();
-                datas.remToken(settingUser, body.notifToken);
-                datas.getSettingUserRepository().saveAndFlush(settingUser);
+                User user = datas.getDbService().userByLogin(subscriber.getLogin());
+                if(user != null) {
+                    SettingUser settingUser = user.getSettings();
+                    datas.getPushService().remToken(settingUser, body.notifToken);
+                    datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+                }
             }
             subscriber.setLogin(null);
             subscriber.setLvlGr(null);
@@ -355,10 +440,10 @@ import java.util.concurrent.ConcurrentHashMap;
     public JsonObject remNotifToken(@RequestBody DataAuth body) {
         Subscriber subscriber = getSubscriber(body.uuid);
         if(!ObjectUtils.isEmpty(body.notifToken)) {
-            User user = datas.userByLogin(subscriber.getLogin());
+            User user = datas.getDbService().userByLogin(subscriber.getLogin());
             SettingUser settingUser = user.getSettings();
-            datas.remToken(settingUser, body.notifToken);
-            datas.getSettingUserRepository().saveAndFlush(settingUser);
+            datas.getPushService().remToken(settingUser, body.notifToken);
+            datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
         }
         try {
             body.wrtr = datas.ini(body.toString());
@@ -371,10 +456,10 @@ import java.util.concurrent.ConcurrentHashMap;
     public JsonObject addNotifToken(@RequestBody DataAuth body) {
         Subscriber subscriber = getSubscriber(body.uuid);
         if(!ObjectUtils.isEmpty(body.notifToken)) {
-            User user = datas.userByLogin(subscriber.getLogin());
+            User user = datas.getDbService().userByLogin(subscriber.getLogin());
             SettingUser settingUser = user.getSettings();
-            datas.addToken(settingUser, body.notifToken);
-            datas.getSettingUserRepository().saveAndFlush(settingUser);
+            datas.getPushService().addToken(settingUser, body.notifToken);
+            datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
         }
         try {
             body.wrtr = datas.ini(body.toString());
@@ -385,7 +470,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @PostMapping(value = "/checkInvCode")
     public JsonObject checkInvCode(@RequestBody DataAuth body) {
-        User inv = datas.userByCode(body.code);
+        User inv = datas.getDbService().userByCode(body.code);
         try {
             body.wrtr = datas.ini(body.toString());
             if(inv != null) body.wrtr.name("yes").value(true);
@@ -395,7 +480,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @PostMapping(value = "/checkReaCode")
     public JsonObject checkReaCode(@RequestBody DataAuth body) {
-        User user = datas.userByCode(body.code);
+        User user = datas.getDbService().userByCode(body.code);
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) body.wrtr.name("yes").value(true);
@@ -406,8 +491,8 @@ import java.util.concurrent.ConcurrentHashMap;
     @PostMapping(value = "/setCodePep")
     public JsonObject setCodePep(@RequestBody DataAuth body) {
         Subscriber subscriber = getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userByLogin(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userByLogin(body.id);
         final var ref = new Object() {
             Long schId = null;
         };
@@ -421,8 +506,8 @@ import java.util.concurrent.ConcurrentHashMap;
                 Date dateAfter = Date.from(after);
                 user1.setCode(uuid.toString());
                 user1.setExpDate(Main.df.format(dateAfter));
-                datas.getUserRepository().saveAndFlush(user1);
-                ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
+                datas.getDbService().getUserRepository().saveAndFlush(user1);
+                ref.schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
 
                 body.wrtr.name("id").value(user1.getId());
                 System.out.println("setCode " + uuid);
@@ -442,10 +527,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor @AllArgsConstructor
 class DataAuth {
     public String uuid, code, notifToken, login, secFr, par, mod,
-        password, type, id;
+        password, type, id, email, invCod, emailCode;
     public Long id1, idL;
     public int ico;
-    public boolean permis;
+    public boolean permis, emailSt;
     public transient boolean bol = true;
     public transient JsonTreeWriter wrtr;
 }

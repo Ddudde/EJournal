@@ -1,60 +1,56 @@
 import {CHANGE_MARKS} from '../../actions';
 
 const initialState = {
-        namePers: [
-            "I", "II", "III", "IV"
-        ],
-        pers: {
-            "Англ. яз.": {
-                per: {
-                    "I": 5,
-                    "II": 4,
-                    "III": 2,
-                    "IV": 5
-                },
-                year: 5,
-                itog: 5
-            },
-            "Русский яз.": {
-                per: {
-                    "I": 5,
-                    "II": 4,
-                    "III": 3,
-                    "IV": 5
-                },
-                year: 5,
-                itog: 5
-            },
-            "Математика": {
-                per: {
-                    "I": 5,
-                    "II": 4,
-                    "III": 2,
-                    "IV": 5
-                },
-                year: 3,
-                itog: 5
-            },
-            "Окруж. мир": {
-                per: {
-                    "I": 5,
-                    "II": 4,
-                    "III": 2,
-                    "IV": 5
-                },
-                year: 5,
-                itog: 4
-            }
-        }
+    namePers: {
+        // 0: "I четверть",
+        // 1: "II четверть",
+        // 2: "III четверть",
+        // 3: "IV четверть",
+        // 4: "Годовая",
+        // 5: "Итоговая"
+    },
+    jur: {
+        // "Англ. яз.": {},
+        // "Англ. яз.1": {},
+        // "Англ. яз.2": {}
+        // "Англ. яз.": {
+        //     2: 2,
+        //     3: 5,
+        //     4: 5,
+        //     5: 5
+        // },
+        // "Русский яз.": {
+        //     0: 5,
+        //     1: 4,
+        //     2: 3,
+        //     5: 5
+        // }
+    //     "Математика": {
+    //         0: 5,
+    //         1: 4,
+    //         3: 2,
+    //         4: 5,
+    //         5: 3,
+    //         6: 5
+    //     },
+    //     "Окруж. мир": {
+    //         0: 5,
+    //         1: 4,
+    //         3: 2,
+    //         4: 5,
+    //         5: 5,
+    //         6: 4
+    //     }
+    }
 };
 
 export default function marksReducer(state = initialState, action) {
+    let fd = {...state};
     switch(action.type) {
         case CHANGE_MARKS:
-            return {
-                    ...state,
-                    [action.payload.markId]: action.payload.markState
-                };
+            fd[action.payload.id] = action.payload.state;
+
+            return fd;
         default:
             return state;
     }

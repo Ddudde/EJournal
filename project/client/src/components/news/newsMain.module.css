@@ -183,11 +183,13 @@ div.banner > div{
 
 .imginp, .imgfield{
 	width: 1vw;
+	height: 1vw;
 	vertical-align: middle;
 	cursor: pointer;
 	margin-left: 1vw;
 	display: inline-block;
 	margin-block: auto;
+	align-self: center;
 }
 
 .inp {

@@ -1,16 +1,17 @@
 import {CHANGE_STATE, CHANGE_STATE_GL, CHANGE_STATE_RESET} from '../actions';
 
 const initialState = {
-        auth: true,
+        auth: false,
         // invErr: false,
         // reaYes: false,
-        login: "nm12",
-        ico: 2,
-        role: 4,
+        // login: "ut_molestiae1",
+        // ico: 2,
+        // role: 0,
         // uuid: "sdfds",
         // roles: true,
-        // secFr: false,
-        // roleDesc: "администратор портала",
+        // secFr: true,
+        // email: true,
+        roleDesc: "администратор портала",
         rolesDescrs: ["обучающийся", "родитель", "педагог", "завуч", "администратор портала"],
         // kid: "id1",
         // kids:{

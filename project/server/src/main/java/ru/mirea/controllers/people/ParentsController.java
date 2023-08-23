@@ -40,16 +40,16 @@ import java.util.UUID;
     @PostMapping(value = "/remPep")
     public JsonObject remPep(@RequestBody DataParents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
-            Group group = datas.groupById(Long.parseLong(subscriber.getLvlGr()));
+            Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
             if (user != null && user.getRoles().containsKey(3L) && group != null && user1 != null) {
                 user1.getRoles().remove(3L);
-                datas.getUserRepository().saveAndFlush(user1);
+                datas.getDbService().getUserRepository().saveAndFlush(user1);
                 if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
-                datas.getGroupRepository().saveAndFlush(group);
+                datas.getDbService().getGroupRepository().saveAndFlush(group);
 
                 body.wrtr.name("id").value(user1.getId());
             }
@@ -62,13 +62,13 @@ import java.util.UUID;
     @PostMapping(value = "/chPep")
     public JsonObject chPep(@RequestBody DataParents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
                 user1.setFio(body.name);
-                datas.getUserRepository().saveAndFlush(user1);
+                datas.getDbService().getUserRepository().saveAndFlush(user1);
 
                 body.wrtr.name("id").value(user1.getId())
                     .name("name").value(body.name);
@@ -82,8 +82,8 @@ import java.util.UUID;
     @PostMapping(value = "/setCodePep")
     public JsonObject setCodePep(@RequestBody DataParents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userById(body.id);
         final var ref = new Object() {
             Long schId = null;
         };
@@ -96,8 +96,8 @@ import java.util.UUID;
                 Date dateAfter = Date.from(after);
                 user1.setCode(uuid.toString());
                 user1.setExpDate(Main.df.format(dateAfter));
-                datas.getUserRepository().saveAndFlush(user1);
-                ref.schId = datas.getFirstRole(user1.getRoles()).getYO().getId();
+                datas.getDbService().getUserRepository().saveAndFlush(user1);
+                ref.schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
 
                 body.wrtr.name("id1").value(user1.getId());
                 System.out.println("setCode " + uuid);
@@ -114,11 +114,11 @@ import java.util.UUID;
     @PostMapping(value = "/addKid")
     public JsonObject addKid(@RequestBody DataParents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(3L)) {
-                User kidU = datas.userById(body.id);
+                User kidU = datas.getDbService().userById(body.id);
                 JsonObject par = body.bod.getAsJsonObject("par");
                 Instant after = Instant.now().plus(Duration.ofDays(30));
                 Date dateAfter = Date.from(after);
@@ -129,11 +129,11 @@ import java.util.UUID;
                         .name("login").value(kidU.getLogin())
                         .name("par").beginObject();
                     for (String id : par.keySet()) {
-                        Role role = datas.getRoleRepository().saveAndFlush(new Role(null, datas.schoolById(Long.parseLong(subscriber.getLvlSch()))));
+                        Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, datas.getDbService().schoolById(Long.parseLong(subscriber.getLvlSch()))));
                         User inv = new User(par.getAsJsonObject(id).get("name").getAsString(), Map.of(
                             1L, role
                         ), Main.df.format(dateAfter));
-                        datas.getUserRepository().saveAndFlush(inv);
+                        datas.getDbService().getUserRepository().saveAndFlush(inv);
 
                         body.wrtr.name(inv.getId() + "").beginObject()
                             .name("name").value(inv.getFio());
@@ -142,7 +142,7 @@ import java.util.UUID;
                             inv.getRoles().get(1L).getKids().add(kidU);
                         }
                         kidU.getRoles().get(0L).getParents().add(inv);
-                        datas.getUserRepository().saveAndFlush(kidU);
+                        datas.getDbService().getUserRepository().saveAndFlush(kidU);
 
                         body.wrtr.endObject();
                     }
@@ -159,19 +159,19 @@ import java.util.UUID;
     @PostMapping(value = "/getParents")
     public JsonObject getParents(@RequestBody DataParents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null, grId = body.group;
         };
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null) {
-                School school = datas.getFirstRole(user.getRoles()).getYO();
+                School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 ref.schId = school.getId();
                 if (!user.getRoles().containsKey(3L)) {
-                    ref.grId = datas.getFirstRole(user.getRoles()).getGrp().getId();
+                    ref.grId = datas.getDbService().getFirstRole(user.getRoles()).getGrp().getId();
                 }
-                Group group = datas.groupById(ref.grId);
+                Group group = datas.getDbService().groupById(ref.grId);
                 if (group != null && school != null && school.getGroups().contains(group.getId())) {
                     body.wrtr.name("bodyP").beginObject();
                     if (!ObjectUtils.isEmpty(group.getKids())) {
@@ -204,7 +204,7 @@ import java.util.UUID;
     @PostMapping(value = "/getInfo")
     public JsonObject getInfo(@RequestBody DataParents body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null) {

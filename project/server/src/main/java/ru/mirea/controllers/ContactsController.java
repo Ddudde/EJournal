@@ -34,8 +34,8 @@ import java.util.Objects;
     @PostMapping(value = "/chContact")
     public JsonObject chContact(@RequestBody DataContacts body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        Syst syst = datas.getSyst();
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        Syst syst = datas.getDbService().getSyst();
         Contacts contacts = null;
         try {
             body.wrtr = datas.ini(body.toString());
@@ -60,7 +60,7 @@ import java.util.Objects;
                         contacts.setImgUrl(body.val);
                     }
                 }
-                datas.getContactsRepository().saveAndFlush(contacts);
+                datas.getDbService().getContactsRepository().saveAndFlush(contacts);
                 body.wrtr.name("val").value(body.val)
                     .name("p").value(body.p)
                     .name("p1").value(body.p1);
@@ -80,8 +80,8 @@ import java.util.Objects;
         try {
             body.wrtr = datas.ini(body.toString());
             if(subscriber != null) {
-                User user = datas.userByLogin(subscriber.getLogin());
-                Syst syst = datas.getSyst();
+                User user = datas.getDbService().userByLogin(subscriber.getLogin());
+                Syst syst = datas.getDbService().getSyst();
                 if (Objects.equals(body.type, "Yo") && user != null) {
                     School school = user.getRoles().get(user.getSelRole()).getYO();
                     ref.schId = school.getId();
@@ -92,7 +92,7 @@ import java.util.Objects;
                     ref.schId = null;
                 }
                 if(ref.conId != null) {
-                    Contacts conM = datas.contactsById(ref.conId);
+                    Contacts conM = datas.getDbService().contactsById(ref.conId);
                     body.wrtr.name("body").beginObject()
                         .name("contact").value(conM.getContact())
                         .name("mapPr").beginObject()

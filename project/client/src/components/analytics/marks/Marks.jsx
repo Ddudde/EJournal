@@ -1,30 +1,59 @@
 import React, {useEffect, useRef} from "react";
 import {Helmet} from "react-helmet-async";
 import marksCSS from './marks.module.css';
-import {marks} from "../../../store/selector";
+import {marks, states} from "../../../store/selector";
 import {useDispatch, useSelector} from "react-redux";
 import {setActNew} from "../AnalyticsMain";
 import ErrFound from "../../other/error/ErrFound";
+import {eventSource, sendToServer} from "../../main/Main";
+import {CHANGE_EVENTS_CLEAR, changeEvents, changeMarks} from "../../../store/actions";
 
-let dispatch, marksInfo, maxEl, errText;
+let dispatch, marksInfo, maxEl, errText, cState, selKid;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 maxEl = 0;
 
+function onCon(e) {
+    setInfo();
+}
+
+function setInfo() {
+    sendToServer({
+        uuid: cState.uuid
+    }, 'POST', "journal/getInfoPers")
+        .then(data => {
+            console.log(data);
+            if (data.error == false) {
+                if(cState.role == 1 && cState.kid) selKid = cState.kid;
+                dispatch(changeMarks("namePers", data.bodyPers));
+                dispatch(changeMarks("jur", data.bodyM));
+            }
+        });
+}
+
 export function Marks() {
     marksInfo = useSelector(marks);
-    for(let el of Object.getOwnPropertyNames(marksInfo.pers)){
-        let len = Object.getOwnPropertyNames(marksInfo.pers[el].per).length;
-        if(len > maxEl )maxEl = len;
+    cState = useSelector(states);
+    let jur, pers;
+    if(marksInfo.namePers) {
+        pers = Object.getOwnPropertyNames(marksInfo.namePers);
     }
+    if(marksInfo.jur) {
+        jur = Object.getOwnPropertyNames(marksInfo.jur);
+    }
+    maxEl = pers.length;
     if(!dispatch) setActNew(4);
     dispatch = useDispatch();
     const isFirstUpdate = useRef(true);
     useEffect(() => {
         console.log("I was triggered during componentDidMount Marks.jsx");
+        if(eventSource.readyState == EventSource.OPEN) setInfo();
+        eventSource.addEventListener('connect', onCon, false);
         let scr = document.querySelector("." + marksCSS.predm);
-        scr.scrollTo(scr.scrollWidth, 0);
+        if(scr) scr.scrollTo(scr.scrollWidth, 0);
         return function() {
+            dispatch(changeEvents(CHANGE_EVENTS_CLEAR));
             dispatch = undefined;
+            eventSource.removeEventListener('connect', onCon);
             console.log("I was triggered during componentWillUnmount Marks.jsx");
         }
     }, []);
@@ -33,70 +62,51 @@ export function Marks() {
             isFirstUpdate.current = false;
             return;
         }
+        if(cState.role == 1 && cState.kid && selKid != cState.kid) {
+            selKid = cState.kid;
+            setInfo();
+        }
         console.log('componentDidUpdate Marks.jsx');
     });
-    return (
-        <div className={marksCSS.AppHeader}>
-            <Helmet>
-                <title>Итоговые оценки</title>
-            </Helmet>
-            {Object.getOwnPropertyNames(marksInfo.pers).length == 0 ?
-                    <ErrFound text={errText}/>
-                :
-                    <div className={marksCSS.blockPredm}>
-                        <div className={marksCSS.predm}>
-                            <div className={marksCSS.persGrid} style={{gridTemplate: "15vh /22vw repeat(" + (maxEl + 2) + ", 2vw)"}}>
-                                <div className={marksCSS.nav_i} id={marksCSS.nav_i}>
-                                    <br/>
-                                </div>
-                                {marksInfo.namePers.map(param =>
-                                    <div className={marksCSS.nav_i+" "+marksCSS.nav_iTextD} id={marksCSS.nav_i}>
-                                        {param}
-                                    </div>
-                                )}
-                                <div className={marksCSS.nav_i}>
-                                    <div className={marksCSS.nav_iText}>
-                                        Годовая
-                                    </div>
-                                </div>
-                                <div className={marksCSS.nav_i}>
-                                    <div className={marksCSS.nav_iText}>
-                                        Итоговая
-                                    </div>
-                                </div>
+    return <div className={marksCSS.AppHeader}>
+        <Helmet>
+            <title>Итоговые оценки</title>
+        </Helmet>
+        {!marksInfo.namePers || !maxEl ?
+                <ErrFound text={errText}/>
+            :
+                <div className={marksCSS.blockPredm}>
+                    <div className={marksCSS.predm}>
+                        <div className={marksCSS.persGrid}>
+                            <div className={marksCSS.nav_i} id={marksCSS.nav_i}>
+                                <br/>
                             </div>
-                            {Object.getOwnPropertyNames(marksInfo.pers).map(param => <div className={marksCSS.predmGrid} style={{gridTemplate: "5vh /20vw repeat(" + (maxEl + 3) + ", 2vw)"}} id={param}>
-                                    <div className={marksCSS.nav_i+" nam " + marksCSS.nam} id={marksCSS.nav_i}>
-                                        {param}
-                                    </div>
-                                    <div className={marksCSS.nav_i+" "+marksCSS.nav_iBr} id={marksCSS.nav_i}>
-                                        <br/>
-                                    </div>
-                                    <div className={marksCSS.nav_i+" "+marksCSS.nav_iBr} id={marksCSS.nav_i}>
-                                        <br/>
-                                    </div>
-                                    {Object.getOwnPropertyNames(marksInfo.pers[param].per).map(param1 =>
-                                        <div className={marksCSS.nav_i} id={marksCSS.nav_i}>
-                                            {marksInfo.pers[param].per[param1]}
-                                        </div>
-                                    )}
-                                    {Object.getOwnPropertyNames(marksInfo.pers[param].per).length < maxEl && Array(maxEl-Object.getOwnPropertyNames(marksInfo.pers[param].per).length).fill('').map(param =>
-                                        <div className={marksCSS.nav_i} id={marksCSS.nav_i}>
-                                            <br/>
-                                        </div>
-                                    )}
-                                    <div className={marksCSS.nav_i + " " + marksCSS.nav_iTextM}>
-                                        {marksInfo.pers[param].year}
-                                    </div>
-                                    <div className={marksCSS.nav_i + " " + marksCSS.nav_iTextM}>
-                                        {marksInfo.pers[param].itog}
+                            {marksInfo.namePers && pers.map(param =>
+                                <div className={marksCSS.nav_i}>
+                                    <div className={marksCSS.nav_iTextPer} data-s={pers.length > 2 ? 1 : 0}>
+                                        {marksInfo.namePers[param]}
                                     </div>
                                 </div>
                             )}
                         </div>
+                        {jur && jur.map(param =>
+                            <div className={marksCSS.predmGrid} id={param}>
+                                <div className={marksCSS.nav_i+" nam " + marksCSS.nam} id={marksCSS.nav_i}>
+                                    {param}
+                                </div>
+                                <div className={marksCSS.nav_i+" "+marksCSS.nav_iBr} id={marksCSS.nav_i}>
+                                    <br/>
+                                </div>
+                                {marksInfo.namePers && pers.map(param1 =>
+                                    <div className={marksCSS.nav_i} id={marksCSS.nav_i}>
+                                        {marksInfo.jur ? marksInfo.jur[param][param1] : <br/>}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
-            }
-        </div>
-    )
+                </div>
+        }
+    </div>
 }
 export default Marks;

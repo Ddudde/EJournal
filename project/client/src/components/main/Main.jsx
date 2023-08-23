@@ -4,12 +4,15 @@ import {Link, Outlet} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {pane, states, themes} from "../../store/selector";
 import {
+    CHANGE_DIALOG,
+    CHANGE_DIALOG_DEL,
     CHANGE_EVENT,
     CHANGE_EVENT_DEL,
     CHANGE_PANE_GR,
     CHANGE_STATE,
     CHANGE_STATE_GL,
     CHANGE_STATE_RESET,
+    changeDialog,
     changeEvents,
     changeGroups,
     changeState,
@@ -24,6 +27,9 @@ import Events from "../other/events/Events";
 import Dialog from "../other/dialog/Dialog";
 import Pane from "../other/pane/Pane";
 import {setSettings} from "./settings/Settings";
+import ls1 from "../../media/ls-icon1.png";
+import ls2 from "../../media/ls-icon2.png";
+import ls3 from "../../media/ls-icon3.png";
 
 let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling, timid, timidP, d1, warnErrNet, server;
 scrolling = false;
@@ -33,7 +39,6 @@ export let prefSite = "/DipvLom";
 gr = {
     group: 4
 };
-
 export let eventSource;
 
 function getPan(name, namecl, link, dopClass, fun) {
@@ -49,9 +54,14 @@ function getPan(name, namecl, link, dopClass, fun) {
 }
 
 function getLogin() {
+    let icons = {
+        1: ls1,
+        2: ls2,
+        3: ls3
+    };
     return <div className={mainCSS.logBlock}>
         <div className={mainCSS.nav_i+' '+mainCSS.log} style={{width:"100%"}} id={mainCSS.nav_i}>
-            <img alt="ico" src={prefSite + '/static/media/ls-icon'+ cState.ico +'.png'}/>
+            <img alt="ico" src={icons[cState.ico]}/>
             <div className={mainCSS.logLog}>{cState.login}</div>
             <div className={mainCSS.logText}>Я - {cState.roleDesc}</div>
         </div>
@@ -114,11 +124,31 @@ function chRoles() {
 }
 
 function onExit() {
-    dispatch(changeState(CHANGE_STATE_RESET));
-    sendToServer({
-        uuid: cState.uuid,
-        notifToken: localStorage.getItem("notifToken")
-    }, 'POST', "auth/exit");
+    let exitField = {
+        obj: <div>
+            Вы желаете выйти?
+        </div>,
+        buts: {
+            0 : {
+                text: "Да",
+                fun: () => {
+                    dispatch(changeState(CHANGE_STATE_RESET));
+                    sendToServer({
+                        uuid: cState.uuid,
+                        notifToken: localStorage.getItem("notifToken")
+                    }, 'POST', "auth/exit");
+                    dispatch(changeDialog(CHANGE_DIALOG_DEL))
+                },
+                enab: true
+            },
+            1 : {
+                text: "Нет",
+                fun:() => dispatch(changeDialog(CHANGE_DIALOG_DEL)),
+                enab: true
+            }
+        }
+    };
+    dispatch(changeDialog(CHANGE_DIALOG, exitField))
 }
 
 export function setActived(name) {
@@ -357,7 +387,7 @@ export function Main() {
             <div/>
         </div>
         <nav className={mainCSS.panel} id="her">
-            <div className={mainCSS.pane} ref={()=>ke = ke == undefined ? paneInfo.els.length : ke}>
+            <div className={mainCSS.pane} ref={()=>ke = ke || paneInfo.els.length}>
                 <Pane gro={gr} main={true}/>
             </div>
             {cState.auth && getLogin()}

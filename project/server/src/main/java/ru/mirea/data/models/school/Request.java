@@ -15,7 +15,7 @@ import javax.persistence.*;
 
     private String email, date;
 
-    @Column(columnDefinition="CLOB")
+    @Column(columnDefinition="text")
     private String fio;
 
     public Request(String email, String date, String fio) {

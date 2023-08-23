@@ -38,7 +38,7 @@ import java.util.Map;
     @PostMapping(value = "/remGroup")
     public JsonObject remGroup(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null;
         };
@@ -48,10 +48,10 @@ import java.util.Map;
                 School school = user.getRoles().get(3L).getYO();
                 ref.schId = school.getId();
                 if (school != null) {
-                    Group group = datas.groupById(body.grId);
-                    datas.getGroupRepository().delete(group);
+                    Group group = datas.getDbService().groupById(body.grId);
+                    datas.getDbService().getGroupRepository().delete(group);
                     school.getGroups().remove(group.getId());
-                    datas.getSchoolRepository().saveAndFlush(school);
+                    datas.getDbService().getSchoolRepository().saveAndFlush(school);
 
                     body.wrtr.name("id").value(group.getId());
                 }
@@ -65,7 +65,7 @@ import java.util.Map;
     @PostMapping(value = "/addGroup")
     public JsonObject addGroup(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null;
         };
@@ -76,9 +76,9 @@ import java.util.Map;
                 ref.schId = school.getId();
                 if (school != null) {
                     Group group = new Group(body.name);
-                    datas.getGroupRepository().saveAndFlush(group);
+                    datas.getDbService().getGroupRepository().saveAndFlush(group);
                     school.getGroups().add(group);
-                    datas.getSchoolRepository().saveAndFlush(school);
+                    datas.getDbService().getSchoolRepository().saveAndFlush(school);
 
                     body.wrtr.name("id").value(group.getId())
                         .name("name").value(body.name);
@@ -93,7 +93,7 @@ import java.util.Map;
     @PostMapping(value = "/chGroup")
     public JsonObject chGroup(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null;
         };
@@ -103,9 +103,9 @@ import java.util.Map;
                 School school = user.getRoles().get(3L).getYO();
                 ref.schId = school.getId();
                 if (school != null) {
-                    Group group = datas.groupById(body.grId);
+                    Group group = datas.getDbService().groupById(body.grId);
                     group.setName(body.name);
-                    datas.getGroupRepository().saveAndFlush(group);
+                    datas.getDbService().getGroupRepository().saveAndFlush(group);
 
                     body.wrtr.name("id").value(group.getId())
                         .name("name").value(body.name);
@@ -120,8 +120,8 @@ import java.util.Map;
     @PostMapping(value = "/chPep")
     public JsonObject chPep(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userById(body.id);
         final var ref = new Object() {
             School sch = null;
         };
@@ -135,7 +135,7 @@ import java.util.Map;
                     || user.getSelRole() == 3L && user.getRoles().containsKey(3L))
                     && user1 != null) {
                     user1.setFio(body.name);
-                    datas.getUserRepository().saveAndFlush(user1);
+                    datas.getDbService().getUserRepository().saveAndFlush(user1);
 
                     body.wrtr.name("id").value(user1.getId())
                         .name("id1").value(ref.sch.getId())
@@ -160,8 +160,8 @@ import java.util.Map;
     @PostMapping(value = "/remPep")
     public JsonObject remPep(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        User user1 = datas.userById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        User user1 = datas.getDbService().userById(body.id);
         final var ref = new Object() {
             School sch = null;
         };
@@ -175,9 +175,9 @@ import java.util.Map;
                     || user.getSelRole() == 3L && user.getRoles().containsKey(3L))
                     && user1 != null) {
                     user1.getRoles().remove(3L);
-                    datas.getUserRepository().saveAndFlush(user1);
+                    datas.getDbService().getUserRepository().saveAndFlush(user1);
                     ref.sch.getHteachers().remove(user1);
-                    datas.getSchoolRepository().saveAndFlush(ref.sch);
+                    datas.getDbService().getSchoolRepository().saveAndFlush(ref.sch);
 
                     body.wrtr.name("id").value(user1.getId())
                         .name("id1").value(ref.sch.getId());
@@ -201,14 +201,14 @@ import java.util.Map;
     @PostMapping(value = "/addPep")
     public JsonObject addPep(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = body.yo;
         };
         if (user.getSelRole() != 4L) {
             ref.schId = user.getRoles().get(3L).getYO().getId();
         }
-        School sch = datas.schoolById(ref.schId);
+        School sch = datas.getDbService().schoolById(ref.schId);
         User inv = null;
         try {
             body.wrtr = datas.ini(body.toString());
@@ -217,13 +217,13 @@ import java.util.Map;
                     || user.getSelRole() == 4L && user.getRoles().containsKey(4L)) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
-                    Role role = datas.getRoleRepository().saveAndFlush(new Role(null, sch));
+                    Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, sch));
                     inv = new User(body.name, Map.of(
                         3L, role
                     ), Main.df.format(dateAfter));
-                    datas.getUserRepository().saveAndFlush(inv);
+                    datas.getDbService().getUserRepository().saveAndFlush(inv);
                     sch.getHteachers().add(inv);
-                    datas.getSchoolRepository().saveAndFlush(sch);
+                    datas.getDbService().getSchoolRepository().saveAndFlush(sch);
 
                     body.wrtr.name("id1").value(sch.getId())
                         .name("id").value(inv.getId())
@@ -249,13 +249,13 @@ import java.util.Map;
     @PostMapping(value = "/chSch")
     public JsonObject chSch(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        School school = datas.schoolById(body.schId);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        School school = datas.getDbService().schoolById(body.schId);
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && school != null) {
                 school.setName(body.name);
-                datas.getSchoolRepository().saveAndFlush(school);
+                datas.getDbService().getSchoolRepository().saveAndFlush(school);
 
                 body.wrtr.name("id").value(body.schId)
                     .name("name").value(body.name);
@@ -269,12 +269,12 @@ import java.util.Map;
     @PostMapping(value = "/addSch")
     public JsonObject addSch(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(4L)) {
                 School school = new School(body.name);
-                datas.getSchoolRepository().saveAndFlush(school);
+                datas.getDbService().getSchoolRepository().saveAndFlush(school);
                 body.wrtr.name("id").value(school.getId())
                     .name("body").beginObject()
                     .name("name").value(body.name)
@@ -289,12 +289,12 @@ import java.util.Map;
     @PostMapping(value = "/remSch")
     public JsonObject remSch(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        School school = datas.schoolById(body.schId);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        School school = datas.getDbService().schoolById(body.schId);
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && school != null) {
-                datas.getSchoolRepository().delete(school);
+                datas.getDbService().getSchoolRepository().delete(school);
 
                 body.wrtr.name("id").value(body.schId);
             }
@@ -307,7 +307,7 @@ import java.util.Map;
     @PostMapping(value = "/getInfo")
     public JsonObject getInfo(@RequestBody DataHTeachers body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null;
             String l2 = "user";
@@ -318,7 +318,7 @@ import java.util.Map;
             if (user != null) {
                 if (user.getSelRole() == 4L && user.getRoles().containsKey(4L)) {
                     ref.l2 = "adm";
-                    for (School el : datas.getSchools()) {
+                    for (School el : datas.getDbService().getSchools()) {
                         body.wrtr.name(el.getId() + "").beginObject()
                             .name("name").value(el.getName())
                             .name("pep").beginObject();

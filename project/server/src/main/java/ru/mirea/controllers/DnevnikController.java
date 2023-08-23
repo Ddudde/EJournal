@@ -15,12 +15,15 @@ import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.Lesson;
+import ru.mirea.data.models.school.*;
 import ru.mirea.services.ServerService;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RequestMapping("/dnevnik")
 @NoArgsConstructor
@@ -35,10 +38,10 @@ import java.util.List;
     @PostMapping(value = "/getDnevnik")
     public JsonObject getDnevnik(@RequestBody DataDnevnik body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Group group = null;
-            Long schId = null;
+            School school = null;
         };
         try {
             body.wrtr = datas.ini(body.toString());
@@ -46,18 +49,18 @@ import java.util.List;
                 if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
                     ref.group = user.getRoles().get(0L).getGrp();
                 } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
-                    User kidU = datas.userById(user.getSelKid());
+                    User kidU = datas.getDbService().userById(user.getSelKid());
                     if(kidU != null) {
                         ref.group = kidU.getRoles().get(0L).getGrp();
                     }
                 }
                 if (ref.group != null || user.getSelRole() == 2L) {
-                    ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
+                    ref.school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                     List<Lesson> lessons;
                     if(user.getSelRole() == 2L && user.getRoles().containsKey(2L)) {
-                        lessons = datas.getLessonRepository().findBySchoolAndTeacher(ref.schId, user.getId());
+                        lessons = datas.getDbService().getLessonRepository().findBySchoolIdAndTeacherId(ref.school.getId(), user.getId());
                     } else {
-                        lessons = datas.getLessonRepository().findBySchoolAndGrp(ref.schId, ref.group.getId());
+                        lessons = datas.getDbService().getLessonRepository().findBySchoolIdAndGrpId(ref.school.getId(), ref.group.getId());
                     }
                     body.wrtr.name("body").beginObject();
                     lessons.sort(Comparator.comparing(Lesson::getDayWeek).thenComparing(Lesson::getNumLesson));
@@ -90,6 +93,70 @@ import java.util.List;
                     }
                     if(k1 != -1) body.wrtr.endObject().endObject();
                     body.wrtr.endObject();
+
+                    Period actPeriod = datas.getActualPeriodBySchool(ref.school);
+                    List<Object[]> marks = datas.getDbService().getDayRepository().uniqNameSubjectAndDatAndMarksByParams(ref.school.getId(), ref.group.getId(), actPeriod.getId());
+                    Map<String, Map<String, List<Mark>>> mapD = marks.stream().collect(Collectors.groupingBy(
+                        obj -> (String) obj[0],
+                        Collectors.groupingBy(
+                            obj1 -> (String) obj1[1],
+                            Collector.of(
+                                ArrayList<Mark>::new,
+                                (list, item) -> list.add((Mark) item[2]),
+                                (left, right) -> right
+                            ))));
+                    System.out.println("mapD " + mapD);
+                    body.wrtr.name("min").value(actPeriod.getDateN());
+                    body.wrtr.name("max").value(actPeriod.getDateK());
+                    List<Object[]> homeworks = datas.getDbService().getDayRepository().uniqNameSubAndDatAndHomeworkByParams(ref.school.getId(), ref.group.getId());
+                    Map<String, Map<String, String>> mapH = homeworks.stream().collect(Collectors.groupingBy(
+                        obj -> (String) obj[0],
+                        Collectors.toMap(obj -> (String) obj[1], obj -> (String) obj[2])
+                    ));
+                    body.wrtr.name("bodyD").beginObject();
+                    if(!ObjectUtils.isEmpty(mapD)) {
+                        for (String nameSub : mapD.keySet()) {
+                            Map<String, List<Mark>> mapM = mapD.get(nameSub);
+                            body.wrtr.name(nameSub).beginObject();
+                            if (!ObjectUtils.isEmpty(mapM)) {
+                                for (String dat : mapM.keySet()) {
+                                    body.wrtr.name(dat).beginObject();
+                                    int i1 = 0;
+                                    for (Mark marksM : mapM.get(dat)) {
+                                        body.wrtr.name(i1++ + "").beginObject()
+                                            .name("mark").value(marksM.getMark())
+                                            .name("weight").value(marksM.getWeight())
+                                            .name("type").value(marksM.getStyle());
+                                        if (i1 == 1 && !ObjectUtils.isEmpty(mapH) && mapH.containsKey(nameSub) && mapH.get(nameSub).containsKey(dat)) {
+                                            body.wrtr.name("homework").value(mapH.get(nameSub).get(dat));
+                                        }
+                                        body.wrtr.endObject();
+                                    }
+                                    body.wrtr.name("i").value(0)
+                                        .endObject();
+                                }
+                            }
+                            body.wrtr.endObject();
+                        }
+                    } else if(!ObjectUtils.isEmpty(mapH)) {
+                        for (String nameSub : mapH.keySet()) {
+                            body.wrtr.name(nameSub).beginObject();
+                            if (!ObjectUtils.isEmpty(mapH.get(nameSub))) {
+                                for (String dat : mapH.get(nameSub).keySet()) {
+                                    body.wrtr.name(dat).beginObject()
+                                        .name("0").beginObject();
+                                    if (mapH.get(nameSub).containsKey(dat)) {
+                                        body.wrtr.name("homework").value(mapH.get(nameSub).get(dat));
+                                    }
+                                    body.wrtr.endObject()
+                                        .name("i").value(0)
+                                        .endObject();
+                                }
+                            }
+                            body.wrtr.endObject();
+                        }
+                    }
+                    body.wrtr.endObject();
                 }
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -102,14 +169,14 @@ import java.util.List;
     @PostMapping(value = "/getInfo")
     public JsonObject getInfo(@RequestBody DataDnevnik body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null;
         };
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null) {
-                ref.schId = datas.getFirstRole(user.getRoles()).getYO().getId();
+                ref.schId = datas.getDbService().getFirstRole(user.getRoles()).getYO().getId();
                 if(user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L)) {
                     body.wrtr.name("yes").value(true);
                 }

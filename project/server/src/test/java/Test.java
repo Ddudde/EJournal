@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -18,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 
@@ -26,7 +29,36 @@ public class Test {
     private static final InputStream config = Test.class.getResourceAsStream("e-journalfcm-firebase-auth.json");
 
     public static void main(String[] args) throws Exception {
-        setTest1();
+        setTest2();
+    }
+
+    private static void testFaker() {
+        Faker fakerRu = new Faker(new Locale("ru"));
+        Faker fakerEn = new Faker();
+
+        String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
+        System.out.println(fio);
+        System.out.println(fakerEn.internet().slug());
+        System.out.println(fakerEn.bool().bool());
+        System.out.println(fakerEn.internet().emailAddress());
+        System.out.println(fakerEn.internet().password());
+    }
+
+    private static void setTest2() throws Exception {
+        List<Object[]> arr = List.of(new Object[]{"Англ. Яз", "10.06.22", 1L}, new Object[]{"Математика", "10.06.22", 2L}, new Object[]{"Химия", "10.06.22", 4L}, new Object[]{"Математика", "10.06.22", 5L}, new Object[]{"Математика", "11.06.22", 5L}, new Object[]{"Англ. Яз", "12.06.22", 6L});
+        System.out.println(arr);
+        Map<String, Map<String, List<Long>>> mapM = arr.stream().collect(Collectors.groupingBy(
+            obj -> (String) obj[0],
+            Collectors.groupingBy(
+                obj1 -> (String) obj1[1],
+                Collector.of(
+                    ArrayList<Long>::new,
+                    (list, item) -> list.add((Long) item[2]),
+                    (left, right) -> right
+                ))));
+        mapM.put("Англ. Яз", null);
+        mapM.put("Англ. Яз1", null);
+        System.out.println(mapM);
     }
 
     private static void setTest1() throws Exception {
@@ -36,6 +68,11 @@ public class Test {
         System.out.println(arr);
         System.out.println(map.keySet());
         System.out.println(map);
+    }
+
+    private static void randTest() {
+        int max = (int) Math.round(Math.random() * 3) + 2;
+        System.out.println(max);
     }
 
     private static void stringTest1() throws Exception {

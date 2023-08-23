@@ -34,7 +34,7 @@ import ru.mirea.services.ServerService;
             body.wrtr = datas.ini(body.toString());
             if(!ObjectUtils.isEmpty(body.email) && !ObjectUtils.isEmpty(body.date) && !ObjectUtils.isEmpty(body.fio)) {
                 Request request = new Request(body.email, body.date, body.fio);
-                datas.getRequestRepository().saveAndFlush(request);
+                datas.getDbService().getRequestRepository().saveAndFlush(request);
 
                 body.wrtr.name("id").value(request.getId())
                     .name("body").beginObject()
@@ -52,12 +52,12 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/delReq")
     public JsonObject delReq(@RequestBody DataRequest body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        Request request = datas.requestById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        Request request = datas.getDbService().requestById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
-                datas.getRequestRepository().delete(request);
+                datas.getDbService().getRequestRepository().delete(request);
 
                 body.wrtr.name("id").value(request.getId());
             }
@@ -70,13 +70,13 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/chTitle")
     public JsonObject chTitle(@RequestBody DataRequest body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        Request request = datas.requestById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        Request request = datas.getDbService().requestById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
                 request.setEmail(body.title);
-                datas.getRequestRepository().saveAndFlush(request);
+                datas.getDbService().getRequestRepository().saveAndFlush(request);
 
                 body.wrtr.name("id").value(request.getId())
                     .name("title").value(request.getEmail());
@@ -90,13 +90,13 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/chDate")
     public JsonObject chDate(@RequestBody DataRequest body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        Request request = datas.requestById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        Request request = datas.getDbService().requestById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
                 request.setDate(body.date);
-                datas.getRequestRepository().saveAndFlush(request);
+                datas.getDbService().getRequestRepository().saveAndFlush(request);
 
                 body.wrtr.name("id").value(request.getId())
                     .name("date").value(request.getDate());
@@ -110,13 +110,13 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/chText")
     public JsonObject chText(@RequestBody DataRequest body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        Request request = datas.requestById(body.id);
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        Request request = datas.getDbService().requestById(body.id);
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
                 request.setFio(body.text);
-                datas.getRequestRepository().saveAndFlush(request);
+                datas.getDbService().getRequestRepository().saveAndFlush(request);
 
                 body.wrtr.name("id").value(request.getId())
                     .name("text").value(request.getFio());
@@ -130,12 +130,12 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/getRequests")
     public JsonObject getRequests(@RequestBody DataRequest body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(4L)) {
                 body.wrtr.name("body").beginObject();
-                for(Request reqR : datas.getRequests()){
+                for(Request reqR : datas.getDbService().getRequests()){
                     body.wrtr.name(reqR.getId()+"").beginObject()
                         .name("title").value(reqR.getEmail())
                         .name("date").value(reqR.getDate())

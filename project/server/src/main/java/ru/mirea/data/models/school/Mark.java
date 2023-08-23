@@ -1,4 +1,4 @@
-package ru.mirea.data.models.school.day;
+package ru.mirea.data.models.school;
 
 import lombok.*;
 import ru.mirea.data.models.auth.User;
@@ -21,26 +21,16 @@ import javax.persistence.*;
     @OneToOne
     private Period period;
 
-    private int mark, weight;
+    private int weight;
 
-    private String type, style;
+    private String type, style, mark;
 
-    private Float avg;
-
-    public Mark(User usr, Period period, int mark, int weight, String type, String style) {
+    public Mark(User usr, Period period, String mark, int weight, String type, String style) {
         this.usr = usr;
         this.period = period;
         this.mark = mark;
         this.weight = weight;
         this.type = type;
         this.style = style;
-    }
-
-    public Mark(User usr, Period period, int weight, String type, Float avg) {
-        this.usr = usr;
-        this.period = period;
-        this.weight = weight;
-        this.type = type;
-        this.avg = avg;
     }
 }

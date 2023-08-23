@@ -59,9 +59,11 @@ import java.util.List;
         this.hteachers = hteachers;
     }
 
-    public School(List<User> hteachers, String name) {
+    public School(String name, List<News> news, Contacts contacts, List<Period> periods) {
         this.name = name;
-        this.hteachers = hteachers;
+        this.news = new ArrayList<>(news);
+        this.contacts = contacts;
+        this.periods = new ArrayList<>(periods);
     }
 
     public School(String name, List<News> news, Contacts contacts, List<Group> groups, List<Period> periods) {

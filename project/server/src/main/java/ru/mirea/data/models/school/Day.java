@@ -1,4 +1,4 @@
-package ru.mirea.data.models.school.day;
+package ru.mirea.data.models.school;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.School;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ import java.util.List;
     @OneToOne
     private Group grp;
 
-    @Column(columnDefinition="CLOB")
+    @Column(columnDefinition="text")
     private String homework;
 
     private String nameSubject, dat;

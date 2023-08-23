@@ -29,7 +29,7 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/chBool")
     public JsonObject chBool(@RequestBody DataTest body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(4L)) {
@@ -38,9 +38,9 @@ import ru.mirea.services.ServerService;
                     case "checkbox_test" -> {
                         Main.test = body.val;
                         if(Main.test) {
-                            datas.testOn();
+                            datas.getIniDBService().testOn();
                         } else {
-                            datas.testOff();
+                            datas.getIniDBService().testOff();
                         }
                         datas.getTestInfo(body.wrtr);
                     }
@@ -55,7 +55,7 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/getInfo")
     public JsonObject getInfo(@RequestBody DataTest body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.ini(body.toString());
             if(user != null && user.getRoles().containsKey(4L)) {

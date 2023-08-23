@@ -20,18 +20,22 @@ public class Main {
 
     public static boolean debug = true;
 
-    public static boolean test = false;
+    public static boolean test = true;
 
-    public final static DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+    public final static DateFormat df = new SimpleDateFormat("dd.MM.yy");
 
     public static void main(String[] args) {
         ctx = SpringApplication.run(Main.class, args);
         System.out.println("Hello world!");
         ServerService serverService = (ServerService) ctx.getBean("serverService");
-        User user = serverService.userByLogin("nm13");
+        User user = serverService.getDbService().userByLogin("nm12");
         System.out.println(user);
-        School school = serverService.schoolById(26L);
+        School school = serverService.getDbService().schoolById(26L);
         System.out.println(school);
+//        serverService.getDbService().getDayRepository().uniqDatAndMarksByParams();
+//        serverService.getEmailService().sendRegCode("myratoff25@gmail.com");
+//        serverService.sendSimpleMessage("myratoff25@gmail.com", "TestG2", "test");
+//        serverService.sendSimpleMessage("nat.muradov@yandex.com", "TestY2", "test");
     }
 
     public static boolean excp(Exception e) {

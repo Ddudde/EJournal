@@ -2,60 +2,51 @@ import React, {useEffect, useReducer, useRef} from "react";
 import {Helmet} from "react-helmet-async";
 import testCSS from './test.module.css';
 import {useDispatch, useSelector} from "react-redux";
-import yes from "../../media/yes.png";
-import no from "../../media/no.png";
-import ed from "../../media/edit.png";
 import ErrFound from "../other/error/ErrFound";
-import {checkbox, requests, states, testRed} from "../../store/selector";
-import {
-    CHANGE_EVENTS_CLEAR, CHANGE_EVENTS_VISIBLE,
-    CHANGE_REQUEST,
-    CHANGE_REQUEST_DEL,
-    CHANGE_REQUEST_GL,
-    CHANGE_REQUEST_PARAM, CHANGE_TEST_GL, changeCB,
-    changeEvents,
-    changeReq, changeTest
-} from "../../store/actions";
+import {checkbox, states, testRed} from "../../store/selector";
+import {CHANGE_EVENTS_CLEAR, CHANGE_TEST_GL, changeCB, changeEvents, changeTest} from "../../store/actions";
 import {eventSource, sendToServer, setActived} from "../main/Main";
-import settingsCSS from "../main/settings/settings.module.css";
 import CheckBox from "../other/checkBox/CheckBox";
-import tutorCSS from "../tutor/tutor.module.css";
-import zvonkiCSS from "../analytics/zvonki/zvonki.module.css";
-import analyticsCSS from "../analytics/analyticsMain.module.css";
 
 let dispatch, testInfo, inps, cState, errText, checkBoxInfo;
 inps = {inpntt : "Текст", inpnzt : "Заголовок", inpndt: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})};
-errText = "Заявок нет...";
+errText = "Данные для тестирования не сформированы...";
 
 let [_, forceUpdate] = [];
 
 function getPep(x) {
     return <div className={testCSS.infGrid}>
-        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i}>
+        <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
             №
         </div>
-        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i} style={{gridColumn: "2"}}>
+        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} style={{gridColumn: "2"}}>
             ФИО
         </div>
-        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i} style={{gridColumn: "3"}}>
+        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} style={{gridColumn: "3"}}>
             Логин
         </div>
-        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i} style={{gridColumn: "4"}}>
+        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} style={{gridColumn: "4"}}>
             Пароль
+        </div>
+        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} style={{gridColumn: "5"}}>
+            Код-приглашение
         </div>
         {Object.getOwnPropertyNames(x).map((param, i) =>
             <>
-                <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i}>
+                <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
                     {i + 1}
                 </div>
-                <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i}>
+                <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
                     {x[param].fio}
                 </div>
-                <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i}>
+                <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
                     {x[param].login}
                 </div>
-                <div className={testCSS.nav_i+" "+testCSS.nav_iTable} id={testCSS.nav_i}>
+                <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
                     {x[param].pass}
+                </div>
+                <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
+                    {x[param].code}
                 </div>
             </>
         )}

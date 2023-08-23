@@ -20,9 +20,9 @@ import java.util.Set;
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    private String secFr, info;
+    private String secFr, info, email, emailCode, expDateEC;
 
-    private Integer ico;
+    private Integer ico;//1,2,3
 
     private Boolean notif = false, nChangeShedule = false,
             nNewMarks = false, nNewNewsYO = false,

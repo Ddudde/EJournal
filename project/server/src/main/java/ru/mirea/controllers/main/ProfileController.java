@@ -44,13 +44,13 @@ import java.util.Objects;
         if(ObjectUtils.isEmpty(body.login)) {
             body.login = subscriber.getLogin();
         }
-        User user = datas.userByLogin(body.login);
+        User user = datas.getDbService().userByLogin(body.login);
         try {
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
                 user.getRoles().get(user.getSelRole()).setEmail(body.email);
-                datas.getUserRepository().saveAndFlush(user);
+                datas.getDbService().getUserRepository().saveAndFlush(user);
                 body.wrtr.name("email").value(body.email)
                     .name("role").value(user.getSelRole());
             }
@@ -67,14 +67,14 @@ import java.util.Objects;
         if(ObjectUtils.isEmpty(body.login)) {
             body.login = subscriber.getLogin();
         }
-        User user = datas.userByLogin(body.login);
+        User user = datas.getDbService().userByLogin(body.login);
         try {
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
                 SettingUser settingUser = user.getSettings();
                 settingUser.setInfo(body.info);
-                datas.getSettingUserRepository().saveAndFlush(settingUser);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                 body.wrtr.name("more").value(settingUser.getInfo());
             }
             body.wrtr.endObject();
@@ -90,15 +90,15 @@ import java.util.Objects;
         if(ObjectUtils.isEmpty(body.oLogin)) {
             body.oLogin = subscriber.getLogin();
         }
-        User user = datas.userByLogin(body.oLogin);
-        User userN = datas.userByLogin(body.nLogin);
+        User user = datas.getDbService().userByLogin(body.oLogin);
+        User userN = datas.getDbService().userByLogin(body.nLogin);
         try {
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && userN == null && Objects.equals(body.oLogin, subscriber.getLogin())) {
                 user.setLogin(body.nLogin);
                 subscriber.setLogin(body.nLogin);
-                datas.getUserRepository().saveAndFlush(user);
+                datas.getDbService().getUserRepository().saveAndFlush(user);
                 body.wrtr.name("login").value(user.getLogin());
             }
             body.wrtr.endObject();
@@ -114,7 +114,7 @@ import java.util.Objects;
         if(ObjectUtils.isEmpty(body.login)) {
             body.login = subscriber.getLogin();
         }
-        User user = datas.userByLogin(body.login);
+        User user = datas.getDbService().userByLogin(body.login);
         try {
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();

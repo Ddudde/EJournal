@@ -36,17 +36,17 @@ import java.util.Objects;
     @PostMapping(value = "/delNews")
     public JsonObject delNews(@RequestBody DataNews body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
-        News news = datas.newsById(body.id);
-        Syst syst = datas.getSyst();
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+        News news = datas.getDbService().newsById(body.id);
+        Syst syst = datas.getDbService().getSyst();
         try {
             body.wrtr = datas.ini(body.toString());
             if (user != null && news != null && syst != null
                 && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
                 || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
-                datas.getNewsRepository().delete(news);
+                datas.getDbService().getNewsRepository().delete(news);
                 if (!ObjectUtils.isEmpty(syst.getNews())) syst.getNews().remove(news.getId());
-                datas.getSystRepository().saveAndFlush(syst);
+                datas.getDbService().getSystRepository().saveAndFlush(syst);
                 body.wrtr.name("id").value(body.id);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
@@ -60,8 +60,8 @@ import java.util.Objects;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         try {
             body.wrtr = datas.ini(body.toString());
-            User user = datas.userByLogin(subscriber.getLogin());
-            News news = datas.newsById(body.id);
+            User user = datas.getDbService().userByLogin(subscriber.getLogin());
+            News news = datas.getDbService().newsById(body.id);
             if (user != null && news != null
                 && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
                 || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
@@ -72,7 +72,7 @@ import java.util.Objects;
                     case "text" -> news.setText(body.val);
                     default -> {}
                 }
-                datas.getNewsRepository().saveAndFlush(news);
+                datas.getDbService().getNewsRepository().saveAndFlush(news);
                 body.wrtr.name("id").value(body.id)
                     .name("type").value(body.type)
                     .name("val").value(body.val);
@@ -93,8 +93,8 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             if (subscriber != null) {
                 body.wrtr.name("body").beginObject();
-                User user = datas.userByLogin(subscriber.getLogin());
-                Syst syst = datas.getSyst();
+                User user = datas.getDbService().userByLogin(subscriber.getLogin());
+                Syst syst = datas.getDbService().getSyst();
                 School school = user.getRoles().get(user.getSelRole()).getYO();
                 ref.b = Objects.equals(subscriber.getLvlMore2(), "Por") && user.getRoles().containsKey(4L) && syst != null;
                 ref.b1 = Objects.equals(subscriber.getLvlMore2(), "Yo") && user.getRoles().containsKey(3L) && school != null;
@@ -112,13 +112,13 @@ import java.util.Objects;
                     if (!ObjectUtils.isEmpty(body.text)) {
                         news.setText(body.text);
                     }
-                    datas.getNewsRepository().saveAndFlush(news);
+                    datas.getDbService().getNewsRepository().saveAndFlush(news);
                     if (ref.b) {
                         syst.getNews().add(news);
-                        datas.getSystRepository().saveAndFlush(syst);
+                        datas.getDbService().getSystRepository().saveAndFlush(syst);
                     } else if (ref.b1) {
                         school.getNews().add(news);
-                        datas.getSchoolRepository().saveAndFlush(school);
+                        datas.getDbService().getSchoolRepository().saveAndFlush(school);
                     }
                     body.wrtr.name("title").value(news.getTitle())
                         .name("date").value(news.getDate())
@@ -151,8 +151,8 @@ import java.util.Objects;
             Syst syst = null;
             School school = null;
             if (subscriber != null) {
-                User user = datas.userByLogin(subscriber.getLogin());
-                syst = datas.getSyst();
+                User user = datas.getDbService().userByLogin(subscriber.getLogin());
+                syst = datas.getDbService().getSyst();
                 if (user != null) {
                     school = user.getRoles().get(user.getSelRole()).getYO();
                     if (Objects.equals(body.type, "Yo") && school != null && !ObjectUtils.isEmpty(school.getNews())) {

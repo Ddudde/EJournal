@@ -33,7 +33,7 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/addPer")
     public JsonObject addPer(@RequestBody DataPeriods body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null;
         };
@@ -46,9 +46,9 @@ import ru.mirea.services.ServerService;
                 period.setName(body.name);
                 period.setDateN(body.perN);
                 period.setDateK(body.perK);
-                datas.getPeriodRepository().saveAndFlush(period);
+                datas.getDbService().getPeriodRepository().saveAndFlush(period);
                 school.getPeriods().add(period);
-                datas.getSchoolRepository().saveAndFlush(school);
+                datas.getDbService().getSchoolRepository().saveAndFlush(school);
                 body.wrtr.name("id").value(period.getId())
                     .name("body").beginObject()
                     .name("name").value(period.getName())
@@ -65,7 +65,7 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/getInfo")
     public JsonObject getInfo(@RequestBody DataPeriods body) {
         Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.userByLogin(subscriber.getLogin());
+        User user = datas.getDbService().userByLogin(subscriber.getLogin());
         final var ref = new Object() {
             Long schId = null;
         };

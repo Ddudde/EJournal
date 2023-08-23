@@ -43,6 +43,14 @@ import java.util.Map;
         this.roles = new HashMap<>(roles);
     }
 
+    public User(String fio, Map<Long, Role> roles, Long selRole, String expDate, String code) {//inv
+        this.fio = fio;
+        this.code = code;
+        this.expDate = expDate;
+        this.selRole = selRole;
+        this.roles = new HashMap<>(roles);
+    }
+
     public User(String login, String password, SettingUser settings) {
         this.login = login;
         this.password = password;
@@ -80,5 +88,10 @@ import java.util.Map;
 
     public Role getRole(Long role) {
         return getRoles().get(role);
+    }
+
+    public SettingUser getSettings() {
+        if(settings == null) settings = new SettingUser();
+        return settings;
     }
 }

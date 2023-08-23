@@ -15,7 +15,7 @@ import javax.persistence.*;
 
     private String title, date, img_url;
 
-    @Column(columnDefinition="CLOB")
+    @Column(columnDefinition="text")
     private String text;
 
     public News(String title, String date, String text) {

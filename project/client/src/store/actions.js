@@ -3,6 +3,7 @@ export const CHANGE_CHECKBOX = "CHANGE_CHECKBOX";
 export const CHANGE_THEME = "CHANGE_THEME";
 
 export const CHANGE_DIALOG = "CHANGE_DIALOG";
+export const CHANGE_DIALOG_BUT = "CHANGE_DIALOG_BUT";
 export const CHANGE_DIALOG_DEL = "CHANGE_DIALOG_DEL";
 
 export const CHANGE_STATE = "CHANGE_STATE";
@@ -30,10 +31,20 @@ export const CHANGE_SCHEDULE_GL = "CHANGE_SCHEDULE_GL";
 export const CHANGE_SCHEDULE_DEL = "CHANGE_SCHEDULE_DEL";
 
 export const CHANGE_JOURNAL = "CHANGE_JOURNAL";
+export const CHANGE_JOURNAL_GL = "CHANGE_JOURNAL_GL";
 
 export const CHANGE_TEST_GL = "CHANGE_TEST_GL";
 
 export const CHANGE_PJOURNAL = "CHANGE_PJOURNAL";
+export const CHANGE_PJOURNAL_MARKS = "CHANGE_PJOURNAL_MARKS";
+export const CHANGE_PJOURNAL_GL = "CHANGE_PJOURNAL_GL";
+export const CHANGE_PJOURNAL_DEL_MARKS = "CHANGE_PJOURNAL_DEL_MARKS";
+export const CHANGE_PJOURNAL_PER_MARKS = "CHANGE_PJOURNAL_PER_MARKS";
+export const CHANGE_PJOURNAL_DEL_PER_MARKS = "CHANGE_PJOURNAL_DEL_PER_MARKS";
+export const CHANGE_PJOURNAL_TYPE = "CHANGE_PJOURNAL_TYPE";
+export const CHANGE_PJOURNAL_DEL_TYPE = "CHANGE_PJOURNAL_DEL_TYPE";
+export const CHANGE_PJOURNAL_NEW_TYPE = "CHANGE_PJOURNAL_NEW_TYPE";
+export const CHANGE_PJOURNAL_DZ = "CHANGE_PJOURNAL_DZ";
 
 export const CHANGE_PANE = "CHANGE_PANE";
 export const CHANGE_PANE_GRS = "CHANGE_PANE_GRS";
@@ -45,16 +56,6 @@ export const CHANGE_GROUPS_GRS = "CHANGE_GROUPS_GRS";
 export const CHANGE_GROUPS_DEL_GRS = "CHANGE_GROUPS_DEL_GRS";
 export const CHANGE_GROUPS_GR = "CHANGE_GROUPS_GR";
 export const CHANGE_GROUPS_GL = "CHANGE_GROUPS_GL";
-
-export const CHANGE_PJOURNAL_MARKS = "CHANGE_PJOURNAL_MARKS";
-export const CHANGE_PJOURNAL_GL = "CHANGE_PJOURNAL_GL";
-export const CHANGE_PJOURNAL_DEL_MARKS = "CHANGE_PJOURNAL_DEL_MARKS";
-export const CHANGE_PJOURNAL_PER_MARKS = "CHANGE_PJOURNAL_PER_MARKS";
-export const CHANGE_PJOURNAL_DEL_PER_MARKS = "CHANGE_PJOURNAL_DEL_PER_MARKS";
-export const CHANGE_PJOURNAL_TYPE = "CHANGE_PJOURNAL_TYPE";
-export const CHANGE_PJOURNAL_DEL_TYPE = "CHANGE_PJOURNAL_DEL_TYPE";
-export const CHANGE_PJOURNAL_NEW_TYPE = "CHANGE_PJOURNAL_NEW_TYPE";
-export const CHANGE_PJOURNAL_DZ = "CHANGE_PJOURNAL_DZ";
 
 export const CHANGE_TEACHERS_GL = "CHANGE_TEACHERS_GL";
 export const CHANGE_TEACHERS = "CHANGE_TEACHERS";
@@ -89,8 +90,6 @@ export const CHANGE_ADMINS_DEL = "CHANGE_ADMINS_DEL";
 export const CHANGE_MARKS = "CHANGE_MARKS";
 
 export const CHANGE_DNEVNIK = "CHANGE_DNEVNIK";
-export const CHANGE_DNEVNIK_DAY_UP = "CHANGE_DNEVNIK_DAY_UP";
-export const CHANGE_DNEVNIK_DAY_DOWN = "CHANGE_DNEVNIK_DAY_DOWN";
 
 export const CHANGE_INDICATOR = "CHANGE_INDICATOR";
 
@@ -148,24 +147,12 @@ export function changeState(type, id, state) {
 }
 
 export function changeJType(pret, t, st) {
+    let type = CHANGE_PJOURNAL_TYPE;
     if(!pret) {
-        if(!st)
-            return {
-                type: CHANGE_PJOURNAL_DEL_TYPE,
-                payload: {
-                    t: t
-                }
-            };
-        return {
-            type: CHANGE_PJOURNAL_NEW_TYPE,
-            payload: {
-                t: t,
-                st: st
-            }
-        };
+        type = st ? CHANGE_PJOURNAL_NEW_TYPE : CHANGE_PJOURNAL_DEL_TYPE;
     }
     return {
-        type: CHANGE_PJOURNAL_TYPE,
+        type: type,
         payload: {
             pret: pret,
             t: t,
@@ -256,27 +243,32 @@ export function changePeople(type, l0, l1, l2, state, param = "name") {
 }
 
 export function changeMarks(id, state) {
-    return { type: CHANGE_MARKS,
+    return {
+        type: CHANGE_MARKS,
         payload: {
-            markId: id,
-            markState: state
+            id: id,
+            state: state
         }
     };
 }
 
-export function changeJournal(id, state) {
-    return { type: CHANGE_JOURNAL,
-        payload: {
-            jourId: id,
-            jourState: state
-        }
-    };
-}
-
-export function changeDialog(type, state) {
+export function changeJournal(type, id, state) {
     return {
         type: type,
-        payload: state
+        payload: {
+            id: id,
+            state: state
+        }
+    };
+}
+
+export function changeDialog(type, state, id) {
+    return {
+        type: type,
+        payload: {
+            state: state,
+            id: id
+        }
     };
 }
 
@@ -292,12 +284,12 @@ export function changeAnalytics(type, l0, l1, l2, state) {
     };
 }
 
-export function changeDnevnik(id, state, type) {
+export function changeDnevnik(type, id, state) {
     return {
         type: type,
         payload: {
-            stateId: id,
-            cState: state
+            id: id,
+            state: state
         }
     };
 }
