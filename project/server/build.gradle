@@ -44,7 +44,7 @@ task build_exe(type: Exec) {
 }
 
 bootWar {
-    baseName = "EJournal"
+    archiveFileName = "EJournal"
 }
 
 task runnn_exe {
