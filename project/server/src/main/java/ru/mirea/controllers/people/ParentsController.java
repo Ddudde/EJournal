@@ -126,7 +126,7 @@ import java.util.UUID;
                     body.wrtr.name("id").value(kidU.getId())
                         .name("body").beginObject()
                         .name("name").value(kidU.getFio())
-                        .name("login").value(kidU.getLogin())
+                        .name("login").value(kidU.getUsername())
                         .name("par").beginObject();
                     for (String id : par.keySet()) {
                         Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, datas.getDbService().schoolById(Long.parseLong(subscriber.getLvlSch()))));
@@ -179,8 +179,8 @@ import java.util.UUID;
                             if (studU == null) continue;
                             body.wrtr.name(studU.getId() + "").beginObject()
                                 .name("name").value(studU.getFio());
-                            if (!ObjectUtils.isEmpty(studU.getLogin())) {
-                                body.wrtr.name("login").value(studU.getLogin());
+                            if (!ObjectUtils.isEmpty(studU.getUsername())) {
+                                body.wrtr.name("login").value(studU.getUsername());
                             }
                             if (!ObjectUtils.isEmpty(studU.getCode())) {
                                 body.wrtr.name("link").value(studU.getCode());

@@ -3,21 +3,26 @@ package ru.mirea.data.models.auth;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @ToString
-@Entity(name = "useer") public class User {
+@Entity(name = "useer") public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    private String login, password, code, expDate, fio;
+    private String username, password, code, expDate, fio;
 
     private Long selRole, selKid;
 
@@ -51,14 +56,14 @@ import java.util.Map;
         this.roles = new HashMap<>(roles);
     }
 
-    public User(String login, String password, SettingUser settings) {
-        this.login = login;
+    public User(String username, String password, SettingUser settings) {
+        this.username = username;
         this.password = password;
         this.settings = settings;
     }
 
-    public User(String login, String password, String fio, Map<Long, Role> roles, Long selRole, SettingUser settings) {
-        this.login = login;
+    public User(String username, String password, String fio, Map<Long, Role> roles, Long selRole, SettingUser settings) {
+        this.username = username;
         this.password = password;
         this.fio = fio;
         this.selRole = selRole;
@@ -66,8 +71,8 @@ import java.util.Map;
         this.settings = settings;
     }
 
-    public User(String login, String password, String fio, Map<Long, Role> roles, Long selRole, Long selKid, SettingUser settings) {
-        this.login = login;
+    public User(String username, String password, String fio, Map<Long, Role> roles, Long selRole, Long selKid, SettingUser settings) {
+        this.username = username;
         this.password = password;
         this.fio = fio;
         this.selRole = selRole;
@@ -93,5 +98,32 @@ import java.util.Map;
     public SettingUser getSettings() {
         if(settings == null) settings = new SettingUser();
         return settings;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.keySet().stream().map(String::valueOf)
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

@@ -1,3 +1,6 @@
+app:
+    jwtSecret: 'secret'
+    jwtExpirationInMs: 3600000
 spring:
     datasource:
         url: jdbc:h2:~/db_test

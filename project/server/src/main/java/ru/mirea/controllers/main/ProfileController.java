@@ -57,7 +57,7 @@ import java.util.Objects;
             body.wrtr.endObject();
         } catch (Exception e) { body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getLogin());
+            authController.sendMessageForAll("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, body.wrtr, body.bol);
     }
 
@@ -80,7 +80,7 @@ import java.util.Objects;
             body.wrtr.endObject();
         } catch (Exception e) { body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getLogin());
+            authController.sendMessageForAll("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, body.wrtr, body.bol);
     }
 
@@ -96,10 +96,10 @@ import java.util.Objects;
             body.wrtr = datas.ini(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && userN == null && Objects.equals(body.oLogin, subscriber.getLogin())) {
-                user.setLogin(body.nLogin);
+                user.setUsername(body.nLogin);
                 subscriber.setLogin(body.nLogin);
                 datas.getDbService().getUserRepository().saveAndFlush(user);
-                body.wrtr.name("login").value(user.getLogin());
+                body.wrtr.name("login").value(user.getUsername());
             }
             body.wrtr.endObject();
         } catch (Exception e) { body.bol = Main.excp(e);}
@@ -120,7 +120,7 @@ import java.util.Objects;
             body.wrtr.name("body").beginObject();
             if (user != null) {
                 SettingUser settingUser = user.getSettings();
-                body.wrtr.name("login").value(user.getLogin())
+                body.wrtr.name("login").value(user.getUsername())
                     .name("ico").value(settingUser.getIco())
                     .name("id").value(user.getId());
                 if (!ObjectUtils.isEmpty(user.getFio())) {

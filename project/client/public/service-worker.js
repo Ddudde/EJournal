@@ -1,7 +1,7 @@
-let CACHE_NAME, urlsToCache, num, cacheWhitelist, prefSite, prom;
+let CACHE_NAME, urlsToCache, cacheWhitelist, prefSite, prom;
 
 // Name our cache
-CACHE_NAME = 'my-pwa-cache-v2';
+CACHE_NAME = 'my-pwa-cache-v8';
 
 cacheWhitelist = [CACHE_NAME];
 

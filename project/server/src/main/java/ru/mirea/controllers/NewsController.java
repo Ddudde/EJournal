@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -139,10 +140,11 @@ import java.util.Objects;
     }
 
     @PostMapping(value = "/getNews")
-    public JsonObject getNews(@RequestBody DataNews body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
+    public JsonObject getNews(@RequestBody DataNews body, @AuthenticationPrincipal final User user) {
+//        Subscriber subscriber = authController.getSubscriber(body.uuid);
         final var ref = new Object() {
             Long schId = null;
+            String log = null;
         };
         try {
             body.wrtr = datas.ini(body.toString());
@@ -150,20 +152,19 @@ import java.util.Objects;
             body.wrtr.name("body").beginObject();
             Syst syst = null;
             School school = null;
-            if (subscriber != null) {
-                User user = datas.getDbService().userByLogin(subscriber.getLogin());
-                syst = datas.getDbService().getSyst();
-                if (user != null) {
-                    school = user.getRoles().get(user.getSelRole()).getYO();
-                    if (Objects.equals(body.type, "Yo") && school != null && !ObjectUtils.isEmpty(school.getNews())) {
-                        ref.schId = school.getId();
-                        list = school.getNews();
-                    }
+//                User user = datas.getDbService().userByLogin(subscriber.getLogin());
+            syst = datas.getDbService().getSyst();
+            if (user != null) {
+                ref.log = user.getUsername();
+                school = user.getRoles().get(user.getSelRole()).getYO();
+                if (Objects.equals(body.type, "Yo") && school != null && !ObjectUtils.isEmpty(school.getNews())) {
+                    ref.schId = school.getId();
+                    list = school.getNews();
                 }
-                if (Objects.equals(body.type, "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
-                    list = syst.getNews();
-                    ref.schId = null;
-                }
+            }
+            if (Objects.equals(body.type, "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
+                list = syst.getNews();
+                ref.schId = null;
             }
             if (!ObjectUtils.isEmpty(list)) {
                 for (News newsU : list) {
@@ -186,7 +187,7 @@ import java.util.Objects;
             body.wrtr.endObject();
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.infCon(body.uuid, subscriber.getLogin(), TypesConnect.NEWS, ref.schId + "", "main", "main", body.type);
+            authController.infCon(body.uuid, ref.log, TypesConnect.NEWS, ref.schId + "", "main", "main", body.type);
         }, body.wrtr, body.bol);
     }
 }

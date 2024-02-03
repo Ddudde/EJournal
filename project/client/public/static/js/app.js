@@ -112,11 +112,18 @@ function sendToServerApp(bod, typeC, url) {
     let sed = {method: typeC};
     if (bod) {
         sed.headers = {'Content-Type': 'application/json'};
+        if(localStorage.getItem("sec")) {
+            sed.headers.Authorization = localStorage.getItem("sec");
+            console.log("yyes send", localStorage.getItem("sec"));
+        }
         sed.body = JSON.stringify(bod);
     }
     if(!url) url = "";
     return fetch(servLink + "/" + url, sed)
         .then(res => {
+            if(res.statusCode == 401 && localStorage.getItem("sec")) {
+                localStorage.removeItem("sec");
+            }
             if (!res.ok) {
                 throw new Error(`This is an HTTP error: The status is ${res.status}`);
             }

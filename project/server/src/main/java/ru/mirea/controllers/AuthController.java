@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -19,14 +21,14 @@ import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.School;
+import ru.mirea.services.security.AuthenticationProvider;
+import ru.mirea.services.security.JwtProvider;
 import ru.mirea.services.ServerService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RequestMapping("/auth")
@@ -36,10 +38,20 @@ import java.util.concurrent.ConcurrentHashMap;
     @Autowired
     private ServerService datas;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtProvider tokenProvider;
+
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
+
     private final Map<UUID, Subscriber> subscriptions = new ConcurrentHashMap<>();
 
     @GetMapping(path = "/open-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent> openSseStream() {
+        System.out.println("YT3 " + SecurityContextHolder.getContext().getAuthentication());
         Flux<ServerSentEvent> stream = Flux.create(fluxSink -> {
             UUID uuid = UUID.randomUUID();
             Subscriber subscriber = new Subscriber(fluxSink);
@@ -251,10 +263,16 @@ import java.util.concurrent.ConcurrentHashMap;
                     }
                     datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                 }
+
+                UUID uuid = UUID.randomUUID();
+                Subscriber subscriber = new Subscriber(user.getUsername());
+                authenticationProvider.subscriptions.put(uuid, subscriber);
+
                 body.wrtr.name("auth").value(true)
-                    .name("login").value(user.getLogin())
+                    .name("login").value(user.getUsername())
 //                        bodyAns.addProperty("role", ObjectUtils.isEmpty(user.getRoles()) ? 0 : ((Long) user.getRoles().keySet().toArray()[4]));
                     .name("role").value(user.getSelRole())
+                    .name("uuidS").value(String.valueOf(uuid))
                     .name("ico").value(user.getSettings().getIco())
                     .name("roles").value(!ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1)
                     .name("secFr").value(!ObjectUtils.isEmpty(user.getSettings().getSecFr()))
@@ -300,7 +318,7 @@ import java.util.concurrent.ConcurrentHashMap;
                     user1.setCode(null);
                     user1.setExpDate(null);
                 }
-                user1.setLogin(body.login);
+                user1.setUsername(body.login);
                 user1.setPassword(body.par);
                 user1.getSettings().setIco(body.ico);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);

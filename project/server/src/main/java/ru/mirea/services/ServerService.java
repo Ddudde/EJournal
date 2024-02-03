@@ -48,8 +48,8 @@ import java.util.stream.Collectors;
             if (objU == null) continue;
             wrtr.name(i + "").beginObject()
                 .name("name").value(objU.getFio());
-            if (!ObjectUtils.isEmpty(objU.getLogin())) {
-                wrtr.name("login").value(objU.getLogin());
+            if (!ObjectUtils.isEmpty(objU.getUsername())) {
+                wrtr.name("login").value(objU.getUsername());
             }
             if (lin && !ObjectUtils.isEmpty(objU.getCode())) {
                 wrtr.name("link").value(objU.getCode());
@@ -64,8 +64,8 @@ import java.util.stream.Collectors;
             if (objU == null) continue;
             wrtr.name(objU.getId() + "").beginObject()
                 .name("name").value(objU.getFio());
-            if (!ObjectUtils.isEmpty(objU.getLogin())) {
-                wrtr.name("login").value(objU.getLogin());
+            if (!ObjectUtils.isEmpty(objU.getUsername())) {
+                wrtr.name("login").value(objU.getUsername());
             }
             if (lin && !ObjectUtils.isEmpty(objU.getCode())) {
                 wrtr.name("link").value(objU.getCode());
@@ -185,7 +185,7 @@ import java.util.stream.Collectors;
         for (User user : users) {
             wrtr.name(user.getId()+"").beginObject()
                 .name("fio").value(user.getFio())
-                .name("login").value(user.getLogin())
+                .name("login").value(user.getUsername())
                 .name("pass").value(user.getPassword())
                 .name("code").value(user.getCode())
                 .endObject();

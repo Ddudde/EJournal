@@ -226,6 +226,7 @@ function vxo(){
                 console.log(data);
                 dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
                 setSettings(cState.uuid, dispatch);
+                if(data.body.uuidS) localStorage.setItem("sec", data.body.uuidS);
             } else {
                 addEvent("Неверный логин или пароль", 10);
             }

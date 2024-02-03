@@ -1,15 +1,13 @@
 package ru.mirea.data.SSE;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.FluxSink;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class Subscriber {
 
@@ -29,5 +27,9 @@ public class Subscriber {
 
     public Subscriber(FluxSink<ServerSentEvent> fluxSink) {
         this.fluxSink = fluxSink;
+    }
+
+    public Subscriber(String login) {
+        this.login = login;
     }
 }

@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import com.google.gson.stream.JsonReader;
+import org.springframework.security.authentication.BadCredentialsException;
 import ru.mirea.data.SSE.TypesConnect;
 
 import java.io.IOException;
@@ -29,7 +30,13 @@ public class Test {
     private static final InputStream config = Test.class.getResourceAsStream("e-journalfcm-firebase-auth.json");
 
     public static void main(String[] args) throws Exception {
-        setTest2();
+        testOpt();
+    }
+
+    private static void testOpt() {
+        String t = null;
+        String opt = Optional.ofNullable(t)
+            .orElseThrow(() -> new BadCredentialsException("Miss"));
     }
 
     private static void testFaker() {

@@ -102,7 +102,7 @@ import static java.util.Arrays.asList;
             for(User user : getUsers()){
                 if(!ObjectUtils.isEmpty(user.getExpDate()) && now >= Main.df.parse(user.getExpDate()).getTime()){
                     System.out.println("Удалён код " + user.getCode() + " по истечению срока действия");
-                    if(user.getLogin() == null) {
+                    if(user.getUsername() == null) {
                         delInv(user);
                     } else {
                         delCodeUser(user);
@@ -282,10 +282,10 @@ import static java.util.Arrays.asList;
                 userL = getNUser(new Role(fakerEn.internet().emailAddress(), school), 3L);
                 users.add(userL);
                 school.getHteachers().add(userL);
-                if(userL.getLogin() != null) user = userL;
+                if(userL.getUsername() != null) user = userL;
             }
             if (user != null) {
-                System.out.println("htea " + user.getLogin() + " " + user.getPassword());
+                System.out.println("htea " + user.getUsername() + " " + user.getPassword());
                 user = null;
             }
 
@@ -294,10 +294,10 @@ import static java.util.Arrays.asList;
                 userL = getNUser(new Role(fakerEn.internet().emailAddress(), Set.of(namesSubj[(int) Math.round(Math.random() * 4)]), school), 2L);
                 users.add(userL);
                 school.getTeachers().add(userL);
-                if(userL.getLogin() != null) user = userL;
+                if(userL.getUsername() != null) user = userL;
             }
             if (user != null) {
-                System.out.println("tea " + user.getLogin() + " " + user.getPassword());
+                System.out.println("tea " + user.getUsername() + " " + user.getPassword());
             }
 
             school.setGroups(getRandGroups(school, new ArrayList<>(school.getTeachers())));

@@ -67,7 +67,7 @@ import java.util.Map;
     }
 
     public User userByLogin(String login) {
-        return userRepository.findByLogin(login);
+        return userRepository.findByUsername(login);
     }
 
     public User userByCode(String code) {

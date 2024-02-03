@@ -107,9 +107,9 @@ function getKids() {
     </div>
 }
 
-export function sendToServer(bod, typeC, url, type) {
+export function sendToServer(bod, typeC, url) {
     // eslint-disable-next-line no-undef
-    return sendToServerApp(bod, typeC, url, type);
+    return sendToServerApp(bod, typeC, url);
 }
 
 function chRoles() {
