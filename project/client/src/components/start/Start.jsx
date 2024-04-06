@@ -34,6 +34,7 @@ import {addEvent, eventSource, remEvent, sendToServer, setActived} from "../main
 import {Link, useNavigate, useParams} from "react-router-dom"
 import ErrFound from "../other/error/ErrFound";
 import {setSettings} from "../main/settings/Settings";
+import {cAuth, cSettings} from "../other/Controllers";
 
 let dispatch, warns, timer, indicInfo, cState, navigate, checkBoxInfo, elem, els, textYesInvNR, textNoInv, blocks, licField, selEmailR, emailCode, code, prop, selEmailZ, emailCodePas;
 elem = {regbut: undefined, vxbut: undefined, g_id: undefined, logv: undefined, pasv: undefined, logz: undefined, blockRecR: undefined, emalR:undefined, codEm:undefined, logoR:undefined, blockRecZ:undefined, emalZ:undefined, vxodBlock:undefined};
@@ -134,10 +135,10 @@ function checkPasCodeEmail() {
     sendToServer({
         login: els.logz,
         emailCode: elem.codEm.value,
-        par : els.pasnz
-    }, 'POST', "auth/checkPasCodeEmail")
+        nPar : els.pasnz
+    }, 'PATCH', cSettings+"checkPasCodeEmail")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeDialog(CHANGE_DIALOG_DEL));
                 addEvent("Код верный, пароль изменён успешно!", 10);
                 elem.vxodBlock.dataset.mod = '0';
@@ -152,9 +153,9 @@ function checkCodeEmail() {
         invCod: code,
         emailCode: elem.codEm.value,
         email: elem.emalR.value
-    }, 'POST', "auth/checkCodeEmail")
+    }, 'PATCH', cSettings+"checkCodeEmail")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeDialog(CHANGE_DIALOG_DEL));
                 addEvent("Почта подтверждена успешно!", 10);
                 rego();
@@ -168,9 +169,9 @@ function startEmail() {
     sendToServer({
         invCod: code,
         email: elem.emalR.value
-    }, 'POST', "auth/startEmail")
+    }, 'PATCH', cSettings+"startEmail")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeDialog(CHANGE_DIALOG, emailCode));
             }
         });
@@ -195,16 +196,16 @@ function rego(){
             mod: prop.mod,
             secFr: selEmailR ? undefined : els.secFrR,
             code: code
-        }, 'POST', "auth/reg")
+        }, 'POST', cAuth+"reg")
             .then(data => {
-                if(data.error == false){
+                if(data.status == 201){
                     onvxod({target: elem.logoR.firstElementChild});
                     navigate("/");
                     if(warns.logR != undefined) {
                         remEvent(warns.logR);
                         warns.logR = undefined;
                     }
-                } else if(data.error == 2){
+                } else if(data.body.error == "noInv"){
                     addEvent(textNoInv, 10);
                 } else if(warns.logR == undefined && prop.mod == undefined){
                     warns.logR = addEvent("Логин занят, попробуйте изменить");
@@ -215,18 +216,17 @@ function rego(){
 
 function vxo(){
     sendToServer({
-        uuid: cState.uuid,
         login: elem.logv.value,
         password: elem.pasv.value,
         notifToken: localStorage.getItem("notifToken"),
         permis: Notification.permission == "granted"
-    }, 'POST', "auth/auth")
+    }, 'POST', cAuth+"auth")
         .then(data => {
-            if(data.error == false && data.body.auth){
+            if(data.status == 200){
+            // if(data.error == false && data.body.auth){
                 console.log(data);
                 dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
-                setSettings(cState.uuid, dispatch);
-                if(data.body.uuidS) localStorage.setItem("sec", data.body.uuidS);
+                setSettings(dispatch);
             } else {
                 addEvent("Неверный логин или пароль", 10);
             }
@@ -340,10 +340,10 @@ function onRec(e) {
         emailSt: selEmailZ,
         email: selEmailZ ? els.emalZ : undefined,
         secFr: selEmailZ ? undefined : els.secFrZ,
-        par : els.pasnz
-    }, 'POST', "auth/chPass")
+        nPar : els.pasnz
+    }, 'PATCH', cSettings+"chPass")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 if(selEmailZ) {
                     dispatch(changeDialog(CHANGE_DIALOG, emailCodePas));
                 } else {
@@ -427,9 +427,8 @@ function chGotovo(e) {
 
 function onCon(e) {
     sendToServer({
-        type: "AUTH",
-        uuid: cState.uuid
-    }, 'POST', "auth/infCon");
+        type: "AUTH"
+    }, 'PATCH', cAuth+"infCon");
 }
 
 export function Start(props) {
@@ -447,29 +446,21 @@ export function Start(props) {
         console.log("I was triggered during componentDidMount Start.jsx")
         chStatVb({target: elem.logv});
         chStatZb({target: elem.logz});
-        if(props.mod == "inv" && code){
+        if(code){
             sendToServer({
                 code: code
-            }, 'POST', "auth/checkInvCode")
+            }, 'POST', cAuth+"checkInvCode")
                 .then(data => {
-                    if(data.error == false){
-                        if(cState.auth) {
-                            dispatch(changeState(CHANGE_STATE, "reaYes", true));
+                    if(data.status == 200){
+                        if(props.mod == "inv") {
+                            if (cState.auth) {
+                                dispatch(changeState(CHANGE_STATE, "reaYes", true));
+                            } else {
+                                addEvent("Поздравляем, приглашение активно! Вам разрешено зарегистроваться.", 10);
+                            }
                         } else {
-                            addEvent("Поздравляем, приглашение активно! Вам разрешено зарегистроваться.", 10);
+                            addEvent("Аккаунт существует. Открыта возможность перерегистрации.", 10);
                         }
-                    } else {
-                        dispatch(changeState(CHANGE_STATE, "invErr", true));
-                    }
-                });
-        }
-        if(props.mod == "rea" && code) {
-            sendToServer({
-                code: code
-            }, 'POST', "auth/checkReaCode")
-                .then(data => {
-                    if(data.error == false){
-                        addEvent("Аккаунт существует. Открыта возможность перерегистрации.", 10);
                     } else {
                         dispatch(changeState(CHANGE_STATE, "invErr", true));
                     }

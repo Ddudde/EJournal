@@ -41,13 +41,6 @@ import java.util.stream.Collectors;
         this.roles = new HashMap<>(roles);
     }
 
-    public User(String fio, Map<Long, Role> roles, String expDate, String code) {//inv
-        this.fio = fio;
-        this.code = code;
-        this.expDate = expDate;
-        this.roles = new HashMap<>(roles);
-    }
-
     public User(String fio, Map<Long, Role> roles, Long selRole, String expDate, String code) {//inv
         this.fio = fio;
         this.code = code;
@@ -56,27 +49,11 @@ import java.util.stream.Collectors;
         this.roles = new HashMap<>(roles);
     }
 
-    public User(String username, String password, SettingUser settings) {
-        this.username = username;
-        this.password = password;
-        this.settings = settings;
-    }
-
     public User(String username, String password, String fio, Map<Long, Role> roles, Long selRole, SettingUser settings) {
         this.username = username;
         this.password = password;
         this.fio = fio;
         this.selRole = selRole;
-        this.roles = new HashMap<>(roles);
-        this.settings = settings;
-    }
-
-    public User(String username, String password, String fio, Map<Long, Role> roles, Long selRole, Long selKid, SettingUser settings) {
-        this.username = username;
-        this.password = password;
-        this.fio = fio;
-        this.selRole = selRole;
-        this.selKid = selKid;
         this.roles = new HashMap<>(roles);
         this.settings = settings;
     }
@@ -93,6 +70,10 @@ import java.util.stream.Collectors;
 
     public Role getRole(Long role) {
         return getRoles().get(role);
+    }
+
+    public Role getSelecRole() {
+        return getRoles().get(selRole);
     }
 
     public SettingUser getSettings() {

@@ -24,6 +24,7 @@ import ErrFound from "../../other/error/ErrFound";
 import ls1 from "../../../media/ls-icon1.png";
 import ls2 from "../../../media/ls-icon2.png";
 import ls3 from "../../../media/ls-icon3.png";
+import {cProfiles} from "../../other/Controllers";
 
 let profilesInfo, dispatch, moore, errText, cState, navigate, icons;
 errText = "К сожалению, информация не найдена...";
@@ -70,7 +71,7 @@ function onFin(e) {
             login: cState.login,
             info: inp.value,
             uuid: cState.uuid
-        }, 'POST', "profiles/chInfo")
+        }, 'POST', cProfiles+"chInfo")
             .then(data => {
                 if(data.error == false){
                     par.setAttribute('data-mod', '0');
@@ -87,7 +88,7 @@ function onFin(e) {
                 login: cState.login,
                 email: inp.value,
                 uuid: cState.uuid
-            }, 'POST', "profiles/chEmail")
+            }, 'POST', cProfiles+"chEmail")
                 .then(data => {
                     if(data.error == false){
                         par.setAttribute('data-mod', '0');
@@ -98,7 +99,7 @@ function onFin(e) {
                 oLogin: cState.login,
                 nLogin: inp.value,
                 uuid: cState.uuid
-            }, 'POST', "profiles/chLogin")
+            }, 'POST', cProfiles+"chLogin")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeState(CHANGE_STATE, "login", data.body.login));
@@ -145,7 +146,7 @@ function setInfo(log) {
     sendToServer({
         login: log,
         uuid: cState.uuid
-    }, 'POST', "profiles/getProfile")
+    }, 'POST', cProfiles+"getProfile")
         .then(data => {
             if(data.error == false){
                 dispatch(changeProfile(CHANGE_PROFILE_GL, undefined, data.body));

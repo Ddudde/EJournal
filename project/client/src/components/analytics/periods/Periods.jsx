@@ -19,6 +19,7 @@ import {
 import no from "../../../media/no.png";
 import ed from "../../../media/edit.png";
 import {eventSource, sendToServer} from "../../main/Main";
+import {cPeriods} from "../../other/Controllers";
 
 let dispatch, periodsInfo, errText, cState, inps;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -37,7 +38,7 @@ export function addPer (name, perN, perK) {
         name: name,
         perN: perN,
         perK: perK
-    }, 'POST', "periods/addPer")
+    }, 'POST', cPeriods + "addPer")
 }
 
 function onCon(e) {
@@ -47,7 +48,7 @@ function onCon(e) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "periods/getInfo")
+    }, 'POST', cPeriods + "getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){

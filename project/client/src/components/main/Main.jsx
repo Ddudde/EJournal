@@ -31,7 +31,10 @@ import ls1 from "../../media/ls-icon1.png";
 import ls2 from "../../media/ls-icon2.png";
 import ls3 from "../../media/ls-icon3.png";
 
-let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling, timid, timidP, d1, warnErrNet, server;
+import {cAuth, cProfiles} from "../other/Controllers";
+
+let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling,
+timid, timidP, d1, warnErrNet, server;
 scrolling = false;
 // eslint-disable-next-line no-undef
 server = servLink;
@@ -76,13 +79,12 @@ function getLogin() {
 
 function selKid(kid) {
     sendToServer({
-        uuid: cState.uuid,
         idL: kid
-    }, 'POST', "auth/chKid")
+    }, 'PATCH', cProfiles+"chKid")
         .then(data => {
-            if(data.error == false) {
+            if(data.status == 200) {
                 console.log(data);
-                dispatch(changeState(CHANGE_STATE, "kid", data.kid));
+                dispatch(changeState(CHANGE_STATE, "kid", data.body.kid));
             }
         });
 }
@@ -113,11 +115,9 @@ export function sendToServer(bod, typeC, url) {
 }
 
 function chRoles() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', "auth/chRole")
+    sendToServer(0, 'PATCH', cProfiles+"chRole")
         .then(data => {
-            if(data.error == false && data.body.role != undefined){
+            if(data.status == 200 && data.body.role != undefined){
                 dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
             }
         });
@@ -134,9 +134,8 @@ function onExit() {
                 fun: () => {
                     dispatch(changeState(CHANGE_STATE_RESET));
                     sendToServer({
-                        uuid: cState.uuid,
                         notifToken: localStorage.getItem("notifToken")
-                    }, 'POST', "auth/exit");
+                    }, 'PATCH', cProfiles+"exit");
                     dispatch(changeDialog(CHANGE_DIALOG_DEL))
                 },
                 enab: true
@@ -208,39 +207,36 @@ function badPing() {
 }
 
 function iniNet() {
-    eventSource = new EventSource(server + '/auth/open-stream');
+    eventSource = new EventSource(server + '/' + cAuth + 'open-stream');
     eventSource.onopen = e => console.log('open');
     eventSource.onerror = e => {
         if (e.readyState == EventSource.CLOSED) {
             console.log('close');
             closeStream();
         } else {
-            console.log('try to reconnect...');
+            console.log('try to reconnect....');
         }
     };
     eventSource.addEventListener('chck', e => {
         const msg = JSON.parse(e.data);
         console.log(msg);
-        dispatch(changeState(CHANGE_STATE, "uuid", msg));
-        if(cState.login){
-            sendToServer({
-                login: cState.login,
-                uuid: msg,
-                notifToken: localStorage.getItem("notifToken"),
-                permis: Notification.permission == "granted"
-            }, 'POST', "auth/infCon")
-                .then(data => {
-                    if(data.error == false){
-                        dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
-                        // eslint-disable-next-line no-undef
-                        userServFin = msg;
-                        // eslint-disable-next-line no-undef
-                        appApp.dispatchEvent(new Event("op"));
-                        setSettings(msg, dispatch);
-                        eventSource.dispatchEvent(new Event("connect"));
-                    }
-                });
-        }
+        dispatch(changeState(CHANGE_STATE, "uuid", msg))
+        sendToServer({
+            login: cState.login,
+            uuid: msg,
+            notifToken: localStorage.getItem("notifToken"),
+            permis: Notification.permission == "granted"
+        }, 'PATCH', cAuth+"infCon")
+            .then(data => {
+                if(data.status == 200){
+                    dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
+                    if(data.body.uuid) localStorage.setItem("sec", data.body.uuid);
+                    // eslint-disable-next-line no-undef
+                    appApp.dispatchEvent(new Event("op"));
+                    if(cState.login) setSettings(dispatch);
+                    eventSource.dispatchEvent(new Event("connect"));
+                }
+            });
     }, false);
     eventSource.addEventListener('ping', e => {
         if(warnErrNet != undefined){
@@ -255,11 +251,7 @@ function iniNet() {
 function closeStream() {
     if(!eventSource) return;
     if(eventSource.readyState != EventSource.CLOSED) {
-        sendToServer({
-            uuid: cState.uuid
-        }, 'POST', "auth/remCon");
-        // eslint-disable-next-line no-undef
-        userServFin = undefined;
+        sendToServer(0, 'PATCH', cAuth+"remCon");
         eventSource.close();
         // dispatch(changeState(CHANGE_STATE, "uuid", undefined));
     }
@@ -300,7 +292,7 @@ export function Main() {
     gr.groups = {
         0: !cState.auth ? {
             nam: "Главная",
-            linke: "/"
+            linke: prefSite + "/"
         } : undefined,
         1: {
             nam: "Объявления",
@@ -332,7 +324,7 @@ export function Main() {
         } : undefined,
         8: cState.auth && cState.role == 2 ? {
             nam: "Расписание",
-            linke: "/"
+            linke: prefSite + "/"
         } : undefined,
         9: cState.auth && cState.role == 2 ? {
             nam: "Журнал",
@@ -340,11 +332,11 @@ export function Main() {
         } : undefined,
         10: cState.auth && cState.role == 3 ? {
             nam: "Администрирование УО",
-            linke: "/"
+            linke: prefSite + "/"
         } : undefined,
         11: cState.auth && cState.role == 4 ? {
             nam: "Заявки",
-            linke: "/"
+            linke: prefSite + "/"
         } : undefined,
         12: cState.auth && cState.role == 4 ? {
             nam: "Тестирование",
@@ -352,7 +344,7 @@ export function Main() {
         } : undefined,
         13: cState.auth && cState.role < 2 ? {
             nam: "Дневник",
-            linke: "/"
+            linke: prefSite + "/"
         } : undefined,
         14: cState.auth && cState.role < 2 ? {
             nam: "Аналитика",

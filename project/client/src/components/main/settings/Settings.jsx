@@ -23,6 +23,8 @@ import ls2 from "../../../media/ls-icon2.png";
 import ls3 from "../../../media/ls-icon3.png";
 import {addEvent, eventSource, remEvent, sendToServer, setActived} from "../Main";
 
+import {cAuth, cSettings} from "../../other/Controllers";
+
 let dispatch, elem, cState, emailSt, els, checkBoxInfo, emailCode, emailCodePas;
 emailSt = true;
 elem = {npasinp : undefined, powpasinp : undefined, zambut : undefined, secBut : undefined, emBut : undefined, emInp : undefined, secinp : undefined, emal : undefined, codEm : undefined, emBlock : undefined, zamBlock : undefined, zamBlockFir : undefined};
@@ -130,11 +132,11 @@ function onChSF(e) {
     par = e.target.parentElement.parentElement;
     inp = par.querySelector("input");
     sendToServer({
-        uuid: cState.uuid,
-        secFR: inp.value
-    }, 'POST', "settings/chSecFR")
+        id: 'chSecFR',
+        valString: inp.value
+    }, 'PATCH', cSettings+"chSettings")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 onCloseBlock(e);
                 inp.value = "";
                 dispatch(changeState(CHANGE_STATE, "secFr", true));
@@ -164,11 +166,11 @@ function chStatB(e) {
 
 function chStatAv(e) {
     sendToServer({
-        uuid: cState.uuid,
-        ico: e.target.firstChild.value
-    }, 'POST', "settings/chIco")
+        id: 'chIco',
+        valInt: e.target.firstChild.value
+    }, 'PATCH', cSettings+"chSettings")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 e.target.firstChild.checked = true;
                 dispatch(changeState(CHANGE_STATE, "ico", e.target.firstChild.value));
             }
@@ -185,14 +187,13 @@ function onCloseChPar(e) {
 
 function onFinChPar(e) {
     sendToServer({
-        uuid: cState.uuid,
         emailSt: emailSt,
         email: emailSt ? els.emInp : undefined,
         secFr: emailSt ? undefined : els.secinp,
         nPar : els.npasinp
-    }, 'POST', "settings/chPass")
+    }, 'PATCH', cSettings+"chPass")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 if(emailSt) {
                     dispatch(changeDialog(CHANGE_DIALOG, emailCodePas));
                 } else {
@@ -206,9 +207,9 @@ function onFinChPar(e) {
                     remEvent(els.warnErrEm);
                     els.warnErrEm = undefined;
                 }
-            } else if(data.error == 2 && els.warnErrEm == undefined){
+            } else if(data.body.error == "email" && els.warnErrEm == undefined){
                 els.warnErrEm = addEvent("Введённая почта неверна, попробуйте воспользоваться секретной фразой");
-            } else if(data.error == 3 && els.warnErrSecFr == undefined){
+            } else if(data.body.error == "secFr" && els.warnErrSecFr == undefined){
                 els.warnErrSecFr = addEvent("Секретная фраза неверна, попробуйте воспользоваться электронной почтой");
             }
         });
@@ -220,10 +221,9 @@ function chNotif(id) {
         dispatch(changeEvents(CHANGE_EVENTS_VISIBLE, !checkBoxInfo[id]));
     }
     sendToServer({
-        uuid: cState.uuid,
         id: id,
         val: !checkBoxInfo[id]
-    }, 'POST', "settings/chBool");
+    }, 'PATCH', cSettings+"chSettings");
 }
 
 function chStatSb(e) {
@@ -252,39 +252,35 @@ export function gen_pas(e){
     addEvent(`Сгенерирован пароль: ${password}. Он скопирован в буфер обмена`, 10);
 }
 
-export function setSettings(uuidP, dis) {
+export function setSettings(dis) {
     if(dis) dispatch = dis;
-    sendToServer({
-        uuid: uuidP ? uuidP : cState.uuid
-    }, 'POST', "settings/getSettings")
+    sendToServer(0, 'GET', cSettings+"getSettings")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 for(let id in data.body) {
                     dispatch(changeCB(id, !data.body[id]));
                     if(id == "checkbox_hints") {
                         dispatch(changeEvents(CHANGE_EVENTS_VISIBLE, data.body[id]));
                     }
                 }
-                elem.zamBlock.dataset.mod = +(cState.secFr || false);
+                if(elem.zamBlock) elem.zamBlock.dataset.mod = +(cState.secFr || false);
             }
         });
 }
 
 function onCon(e) {
     sendToServer({
-        uuid: cState.uuid
-    }, 'POST', "settings/setInfo")
-        .then(data => setSettings());
+        type: "SETTINGS"
+    }, 'PATCH', cAuth+"infCon");
 }
 
 function checkCodeEmail() {
     sendToServer({
-        uuid: cState.uuid,
         emailCode: elem.codEm.value,
         email: elem.emal.value
-    }, 'POST', "auth/checkCodeEmail")
+    }, 'PATCH', cSettings+"checkCodeEmail")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeDialog(CHANGE_DIALOG_DEL));
                 addEvent("Почта подтверждена успешно!", 10);
                 elem.emBlock.dataset.mod = '0';
@@ -297,12 +293,11 @@ function checkCodeEmail() {
 
 function checkPasCodeEmail() {
     sendToServer({
-        uuid: cState.uuid,
         emailCode: elem.codEm.value,
         nPar : els.npasinp
-    }, 'POST', "settings/checkPasCodeEmail")
+    }, 'PATCH', cSettings+"checkPasCodeEmail")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeDialog(CHANGE_DIALOG_DEL));
                 addEvent("Код верный, пароль изменён успешно!", 10);
                 elem.zamBlockFir.dataset.mod = '0';
@@ -314,11 +309,10 @@ function checkPasCodeEmail() {
 
 function startEmail() {
     sendToServer({
-        uuid: cState.uuid,
         email: elem.emal.value
-    }, 'POST', "auth/startEmail")
+    }, 'PATCH', cSettings+"startEmail")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeDialog(CHANGE_DIALOG, emailCode));
             }
         });

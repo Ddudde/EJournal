@@ -8,6 +8,8 @@ import ErrFound from "../../other/error/ErrFound";
 import {eventSource, sendToServer} from "../../main/Main";
 import {CHANGE_EVENTS_CLEAR, changeEvents, changeMarks} from "../../../store/actions";
 
+import {cJournal} from "../../other/Controllers";
+
 let dispatch, marksInfo, maxEl, errText, cState, selKid;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
 maxEl = 0;
@@ -19,7 +21,7 @@ function onCon(e) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "journal/getInfoPers")
+    }, 'POST', cJournal + "getInfoPers")
         .then(data => {
             console.log(data);
             if (data.error == false) {

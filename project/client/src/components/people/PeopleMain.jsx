@@ -20,6 +20,7 @@ import {
 import parentsCSS from "./parents/parents.module.css";
 import {addKid, codPar} from "./parents/Parents";
 import {addTea, codTea} from "./Teachers";
+import {cHteachers} from "../other/Controllers";
 
 let gr, cState, dispatch, groupsInfo, evsIni, navigate;
 gr = {
@@ -231,7 +232,7 @@ export function remGroup (id) {
     sendToServer({
         uuid: cState.uuid,
         grId: id
-    }, 'POST', "hteachers/remGroup")
+    }, 'POST', cHteachers+"remGroup")
 }
 
 export function chGroup (id, inp, par) {
@@ -240,7 +241,7 @@ export function chGroup (id, inp, par) {
         uuid: cState.uuid,
         grId: id,
         name: inp
-    }, 'POST', "hteachers/chGroup")
+    }, 'POST', cHteachers+"chGroup")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -254,7 +255,7 @@ export function addGroup (inp, par) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "hteachers/addGroup")
+    }, 'POST', cHteachers+"addGroup")
         .then(data => {
             console.log(data);
             if(data.error == false){

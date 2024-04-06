@@ -1,0 +1,17 @@
+export let cPeriods = "periods/";
+export let cAuth = "auth/";
+export let cSettings = "settings/";
+export let cNews = "news/";
+export let cJournal = "journal/";
+export let cSchedule = "schedule/";
+export let cContacts = "contacts/";
+export let cDnevnik = "dnevnik/";
+export let cProfiles = "profiles/";
+export let cAdmins = "admins/";
+export let cStudents = "students/";
+export let cHteachers = "hteachers/";
+export let cTeachers = "teachers/";
+export let cParents = "parents/";
+export let cPjournal = "pjournal/";
+export let cRequests = "requests/";
+export let cTest = "test/";

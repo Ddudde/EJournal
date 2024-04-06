@@ -18,7 +18,7 @@ import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,7 +30,7 @@ import java.util.Map;
 @RestController public class HTeachersController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -43,7 +43,7 @@ import java.util.Map;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(3L)) {
                 School school = user.getRoles().get(3L).getYO();
                 ref.schId = school.getId();
@@ -58,7 +58,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("remGroupC", ans, TypesConnect.MAIN, ref.schId + "", "main", "ht", "main");
+            authController.sendMessageFor("remGroupC", ans, TypesConnect.MAIN, ref.schId + "", "main", "ht", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -70,7 +70,7 @@ import java.util.Map;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(3L)) {
                 School school = user.getRoles().get(3L).getYO();
                 ref.schId = school.getId();
@@ -86,7 +86,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addGroupC", ans, TypesConnect.MAIN, ref.schId + "", "main", "ht", "main");
+            authController.sendMessageFor("addGroupC", ans, TypesConnect.MAIN, ref.schId + "", "main", "ht", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -98,7 +98,7 @@ import java.util.Map;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(3L)) {
                 School school = user.getRoles().get(3L).getYO();
                 ref.schId = school.getId();
@@ -113,7 +113,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chGroupC", ans, TypesConnect.MAIN, ref.schId + "", "main", "ht", "main");
+            authController.sendMessageFor("chGroupC", ans, TypesConnect.MAIN, ref.schId + "", "main", "ht", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -129,7 +129,7 @@ import java.util.Map;
             ref.sch = user1.getRoles().get(3L).getYO();
         }
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && ref.sch != null) {
                 if ((user.getSelRole() == 4L && user.getRoles().containsKey(4L)
                     || user.getSelRole() == 3L && user.getRoles().containsKey(3L))
@@ -145,14 +145,14 @@ import java.util.Map;
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             if (user.getSelRole() == 4L) {
-                authController.sendMessageForAll("chInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
-                authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "user", "main");
-                authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "ht", "main");
+                authController.sendMessageFor("chInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+                authController.sendMessageFor("chInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "user", "main");
+                authController.sendMessageFor("chInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "ht", "main");
             }
             if (user.getSelRole() == 3L) {
-                authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
-                authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
-                authController.sendMessageForAll("chInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
+                authController.sendMessageFor("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+                authController.sendMessageFor("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
+                authController.sendMessageFor("chInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
             }
         }, body.wrtr, body.bol);
     }
@@ -169,7 +169,7 @@ import java.util.Map;
             ref.sch = user1.getRoles().get(3L).getYO();
         }
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && ref.sch != null) {
                 if ((user.getSelRole() == 4L && user.getRoles().containsKey(4L)
                     || user.getSelRole() == 3L && user.getRoles().containsKey(3L))
@@ -186,14 +186,14 @@ import java.util.Map;
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             if (user.getSelRole() == 4L) {
-                authController.sendMessageForAll("remInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
-                authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "user", "main");
-                authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "ht", "main");
+                authController.sendMessageFor("remInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+                authController.sendMessageFor("remInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "user", "main");
+                authController.sendMessageFor("remInfoL1C", ans, TypesConnect.HTEACHERS, ref.sch.getId() + "", "main", "ht", "main");
             }
             if (user.getSelRole() == 3L) {
-                authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
-                authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
-                authController.sendMessageForAll("remInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
+                authController.sendMessageFor("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+                authController.sendMessageFor("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
+                authController.sendMessageFor("remInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
             }
         }, body.wrtr, body.bol);
     }
@@ -211,7 +211,7 @@ import java.util.Map;
         School sch = datas.getDbService().schoolById(ref.schId);
         User inv = null;
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && sch != null) {
                 if (user.getSelRole() == 3L && user.getRoles().containsKey(3L)
                     || user.getSelRole() == 4L && user.getRoles().containsKey(4L)) {
@@ -234,14 +234,14 @@ import java.util.Map;
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             if (user.getSelRole() == 4L) {
-                authController.sendMessageForAll("addInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
-                authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, ref.schId + "", "main", "user", "main");
-                authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, ref.schId + "", "main", "ht", "main");
+                authController.sendMessageFor("addInfoL2C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+                authController.sendMessageFor("addInfoL1C", ans, TypesConnect.HTEACHERS, ref.schId + "", "main", "user", "main");
+                authController.sendMessageFor("addInfoL1C", ans, TypesConnect.HTEACHERS, ref.schId + "", "main", "ht", "main");
             }
             if (user.getSelRole() == 3L) {
-                authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
-                authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
-                authController.sendMessageForAll("addInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
+                authController.sendMessageFor("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+                authController.sendMessageFor("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", "user", "main");
+                authController.sendMessageFor("addInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
             }
         }, body.wrtr, body.bol);
     }
@@ -252,7 +252,7 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         School school = datas.getDbService().schoolById(body.schId);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && school != null) {
                 school.setName(body.name);
                 datas.getDbService().getSchoolRepository().saveAndFlush(school);
@@ -262,7 +262,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+            authController.sendMessageFor("chInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
         }, body.wrtr, body.bol);
     }
 
@@ -271,7 +271,7 @@ import java.util.Map;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(4L)) {
                 School school = new School(body.name);
                 datas.getDbService().getSchoolRepository().saveAndFlush(school);
@@ -282,7 +282,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+            authController.sendMessageFor("addInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
         }, body.wrtr, body.bol);
     }
 
@@ -292,7 +292,7 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         School school = datas.getDbService().schoolById(body.schId);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && school != null) {
                 datas.getDbService().getSchoolRepository().delete(school);
 
@@ -300,7 +300,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
+            authController.sendMessageFor("remInfoL1C", ans, TypesConnect.HTEACHERS, subscriber.getLvlSch(), "main", subscriber.getLvlMore1(), "main");
         }, body.wrtr, body.bol);
     }
 
@@ -313,7 +313,7 @@ import java.util.Map;
             String l2 = "user";
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null) {
                 if (user.getSelRole() == 4L && user.getRoles().containsKey(4L)) {

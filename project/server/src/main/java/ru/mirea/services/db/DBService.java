@@ -20,8 +20,6 @@ import ru.mirea.data.reps.auth.RoleRepository;
 import ru.mirea.data.reps.auth.SettingUserRepository;
 import ru.mirea.data.reps.auth.UserRepository;
 import ru.mirea.data.reps.school.*;
-import ru.mirea.data.reps.school.DayRepository;
-import ru.mirea.data.reps.school.MarkRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -67,6 +65,7 @@ import java.util.Map;
     }
 
     public User userByLogin(String login) {
+        if(login == null) return null;
         return userRepository.findByUsername(login);
     }
 

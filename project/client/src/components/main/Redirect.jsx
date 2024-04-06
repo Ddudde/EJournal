@@ -1,12 +1,13 @@
 import React, {useEffect, useRef} from "react";
 import {useNavigate} from "react-router-dom"
+import {prefSite} from "./Main";
 
 export function Redirect() {
     const isFirstUpdate = useRef(true);
     const navigate = useNavigate();
     useEffect(() => {
         console.log("I was triggered during componentDidMount Redirect.jsx");
-        navigate("/DipvLom/");
+        navigate(prefSite + "/");
         return function() {
             console.log("I was triggered during componentWillUnmount Redirect.jsx");
         }

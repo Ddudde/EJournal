@@ -17,7 +17,7 @@ import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -29,7 +29,7 @@ import java.util.Map;
 @RestController public class AdminsController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -41,7 +41,7 @@ import java.util.Map;
         User user1 = datas.getDbService().userById(body.id);
         Syst syst = datas.getDbService().getSyst();
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && syst != null && user1 != null) {
                 user1.getRoles().remove(4L);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
@@ -52,7 +52,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            authController.sendMessageFor("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -62,7 +62,7 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         User user1 = datas.getDbService().userById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && user1 != null) {
                 user1.setFio(body.name);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
@@ -72,7 +72,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            authController.sendMessageFor("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -82,7 +82,7 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         Syst syst = datas.getDbService().getSyst();
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(4L) && syst != null) {
                 Instant after = Instant.now().plus(Duration.ofDays(30));
                 Date dateAfter = Date.from(after);
@@ -101,7 +101,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            authController.sendMessageFor("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -111,7 +111,7 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         Syst syst = datas.getDbService().getSyst();
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && syst != null) {
                 datas.usersByList(syst.getAdmins(), true, body.wrtr);

@@ -14,14 +14,14 @@ import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 @RequestMapping("/test")
 @NoArgsConstructor
 @RestController public class TestController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -31,7 +31,7 @@ import ru.mirea.services.ServerService;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(4L)) {
                 switch (body.id) {
                     case "checkbox_debug" -> Main.debug = body.val;
@@ -57,7 +57,7 @@ import ru.mirea.services.ServerService;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(4L)) {
                 body.wrtr.name("bodyS").beginObject()
                     .name("checkbox_debug").value(Main.debug)

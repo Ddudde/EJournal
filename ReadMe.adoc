@@ -1,0 +1,91 @@
+= Asciidoc
+Natik Muradov <myratoff25@gmail.com>
+:revnumber: v0.1
+:revdate: 27.02.2024
+:revremark: Основное описание
+:sectnums:
+:hardbreaks-option:
+:toc: left
+:toclevels: 4
+:toc-title: Содержание
+:imagesdir: ./img
+
+====
+Github: https://github.com/Ddudde/DipvLom
+Публикации в HTML и PDF форматах находятся в /project/server/docs/asciiDoc/build
+Основное описание проекта здесь. Также есть дополнительные:
+Также в /project/server/docs/start-web.bat можно стартануть Python http server для просмотра документации
+
+* Swagger:
+* JavaDoc: http://localhost:9001/javaDoc/
+* AsciiDoc: http://localhost:9001/asciiDoc/build/ReadMe.html
+
+Сервер:
+Находится в /project/server
+http://localhost:8080
+Java, Spring, REST + Server Sent Events
+
+Клиент:
+Находится в /project/client
+http://localhost:3000/DipvLom
+Github Pages: https://ddudde.github.io/DipvLom/
+JS, React, Redux
+====
+
+== Зависимости сервера
+====
+NOTE: БД H2 для тестирования, а PostgreSQL для остального.
+Intellij IDEA в качестве IDE
+BD: H2
+http://localhost:8080/console_db
+
+. H2
+. PostgreSQL
+. Gradle
+. Spring Boot
+. Spring Boot Test
+. Spring Security
+. JavaMail API
+. JavaFaker
+. JUnit
+. Mockito
+. Asciidoctor Gradle Plugin
+. Launch4j
+. Server-Sent Events
+. Hibernate
+. Lombok
+. Spring Data JPA
+====
+== Зависимости клиента
+====
+NOTE: WebStorm в качестве IDE
+
+. Github Pages
+. Single Page Application
+. Progressive Web App
+. React
+. Redux
+. React Router
+. Firebase Cloud Messaging
+====
+== Использование
+====
+Запускаем сервер
+И запускаем клиент по одному из адресов: http://localhost:3000/DipvLom
+, https://ddudde.github.io/DipvLom/
+Выбираем роль, допустим администратора
+И авторизируемся
+Логин: nm12
+Пароль: 1111
+Радуемся!
+====
+== Документы
+====
+JavaDoc и AsciiDoc генерируются при помощи Gradle
+команды:
+gradle javadoc
+gradle asciidoctor
+
+toDo - что нужно доделать
+beenDo - что уже сделано
+====

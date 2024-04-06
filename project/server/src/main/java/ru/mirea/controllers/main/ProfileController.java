@@ -1,17 +1,15 @@
 package ru.mirea.controllers.main;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
@@ -21,22 +19,95 @@ import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.security.CustomToken;
 
 import java.util.Objects;
+
+import static ru.mirea.Main.datas;
 
 @RequestMapping("/profiles")
 @NoArgsConstructor
 @RestController public class ProfileController {
 
     @Autowired
-    private Gson gson;
-
-    @Autowired
-    private ServerService datas;
-
-    @Autowired
     private AuthController authController;
+
+    /** RU: изменение контроллируемого ученика у родителя
+     * @param body Данные с клиента, задействуются свойства: idL
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Объект и код статуса */
+    @PatchMapping(value = "/chKid")
+    public ResponseEntity<JsonObject> chKid(@RequestBody DataProfile body, CustomToken auth) throws Exception {
+        User user = auth.getSub().getUser();
+        HttpStatus stat = HttpStatus.NOT_FOUND;
+        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chKid");
+        if(user != null && user.getSelRole() == 1L && body.idL != null) {
+            user.setSelKid(body.idL);
+            wrtr.name("kid").value(user.getSelKid());
+            datas.getDbService().getUserRepository().saveAndFlush(user);
+            stat = HttpStatus.OK;
+        }
+        return datas.getObjR(ans -> {}, wrtr, stat, false);
+    }
+
+    /** RU: изменение роли на следующую по иерархии из имеющихся у пользователя
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Объект и код статуса */
+    @PatchMapping(value = "/chRole")
+    public ResponseEntity<JsonObject> chRole(CustomToken auth) throws Exception {
+        User user = auth.getSub().getUser();
+        HttpStatus stat = HttpStatus.NOT_FOUND;
+        long curRol = user.getSelRole();
+        JsonTreeWriter wrtr = datas.init("", "[PATCH] /chRole");
+        if(user != null && user.getRoles().containsKey(curRol)) {
+            for(long i = (curRol == 4 ? 0 : curRol+1L); i < 5; i++){
+                if(!user.getRoles().containsKey(i)) continue;
+                wrtr.name("role").value(i);
+                user.setSelRole(i);
+                datas.getDbService().getUserRepository().saveAndFlush(user);
+                Role role = user.getRoles().get(i);
+                if(i == 1L) {
+                    wrtr.name("kid").value(user.getSelKid())
+                        .name("kids").beginObject();
+                    if (!ObjectUtils.isEmpty(role.getKids())) {
+                        for (User kid : role.getKids()) {
+                            wrtr.name(kid.getId() + "").value(kid.getFio());
+                        }
+                    }
+                    wrtr.endObject();
+                }
+                break;
+            }
+            stat = HttpStatus.OK;
+        }
+        return datas.getObjR(ans -> {}, wrtr, stat, false);
+    }
+
+    /** RU: выход с аккаунта
+     * @param body Данные с клиента, задействуются свойства: notifToken
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Код статуса */
+    @PatchMapping(value = "/exit")
+    public ResponseEntity<JsonObject> exit(@RequestBody DataProfile body, CustomToken auth) throws Exception {
+        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /exit");
+        HttpStatus stat = HttpStatus.NOT_FOUND;
+        if (!ObjectUtils.isEmpty(body.notifToken)) {
+            User user = auth.getSub().getUser();
+            if(user != null) {
+                SettingUser settingUser = user.getSettings();
+                datas.getPushService().remToken(settingUser, body.notifToken);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+                stat = HttpStatus.OK;
+            }
+        }
+        auth.getSub().setLogin(null);
+        auth.getSub().setLvlSch(null);
+        auth.getSub().setLvlGr(null);
+        return datas.getObjR(ans -> {}, wrtr, stat);
+    }
 
     @PostMapping(value = "/chEmail")
     public JsonObject chEmail(@RequestBody DataProfile body) {
@@ -46,7 +117,7 @@ import java.util.Objects;
         }
         User user = datas.getDbService().userByLogin(body.login);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
                 user.getRoles().get(user.getSelRole()).setEmail(body.email);
@@ -57,7 +128,7 @@ import java.util.Objects;
             body.wrtr.endObject();
         } catch (Exception e) { body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
+            authController.sendMessageFor("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, body.wrtr, body.bol);
     }
 
@@ -69,7 +140,7 @@ import java.util.Objects;
         }
         User user = datas.getDbService().userByLogin(body.login);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && Objects.equals(body.login, subscriber.getLogin())) {
                 SettingUser settingUser = user.getSettings();
@@ -80,7 +151,7 @@ import java.util.Objects;
             body.wrtr.endObject();
         } catch (Exception e) { body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
+            authController.sendMessageFor("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, body.wrtr, body.bol);
     }
 
@@ -93,7 +164,7 @@ import java.util.Objects;
         User user = datas.getDbService().userByLogin(body.oLogin);
         User userN = datas.getDbService().userByLogin(body.nLogin);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null && userN == null && Objects.equals(body.oLogin, subscriber.getLogin())) {
                 user.setUsername(body.nLogin);
@@ -104,7 +175,7 @@ import java.util.Objects;
             body.wrtr.endObject();
         } catch (Exception e) { body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chLogin", ans, TypesConnect.PROFILES, "main", "main", "main", body.oLogin);
+            authController.sendMessageFor("chLogin", ans, TypesConnect.PROFILES, "main", "main", "main", body.oLogin);
         }, body.wrtr, body.bol);
     }
 
@@ -116,7 +187,7 @@ import java.util.Objects;
         }
         User user = datas.getDbService().userByLogin(body.login);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             body.wrtr.name("body").beginObject();
             if (user != null) {
                 SettingUser settingUser = user.getSettings();
@@ -181,7 +252,8 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor @AllArgsConstructor
 class DataProfile {
-    public String login, nLogin, oLogin, info, email, uuid;
+    public String login, nLogin, oLogin, info, email, uuid, notifToken;
+    public Long idL;
     public transient boolean bol = true;
     public transient JsonTreeWriter wrtr;
 }

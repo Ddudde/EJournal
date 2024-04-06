@@ -32,6 +32,7 @@ import ed from "../../media/edit.png";
 import yes from "../../media/yes.png";
 import Pane from "../other/pane/Pane";
 import ErrFound from "../other/error/ErrFound";
+import {cPjournal} from "../other/Controllers";
 
 let jourInfo, errText, groupsInfo, cState, schedulesInfo, dispatch, theme, pari, parb, inps, days, lastD, lastDI, selGr;
 pari = {lMonth: 0};
@@ -394,7 +395,7 @@ function setInfoP1() {
     let scr, e, marks;
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "pjournal/getInfoP1")
+    }, 'POST', cPjournal+"getInfoP1")
         .then(data => {
             console.log(data);
             if(data.error == false) {
@@ -435,7 +436,7 @@ function setInfoP2(predm) {
     sendToServer({
         uuid: cState.uuid,
         predm: predm
-    }, 'POST', "pjournal/getInfoP2")
+    }, 'POST', cPjournal+"getInfoP2")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -457,7 +458,7 @@ function setInfoP3(group) {
     sendToServer({
         uuid: cState.uuid,
         group: group
-    }, 'POST', "pjournal/getInfoP3")
+    }, 'POST', cPjournal+"getInfoP3")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -524,7 +525,7 @@ function addMark (weight, kid, day, per) {
         style: jourInfo.typ,
         group: groupsInfo.els.group,
         per: per
-    }, 'POST', "pjournal/addMark")
+    }, 'POST', cPjournal+"addMark")
 }
 
 function addHomework (day, homework, par) {
@@ -534,7 +535,7 @@ function addHomework (day, homework, par) {
         day: day,
         group: groupsInfo.els.group,
         homework: homework
-    }, 'POST', "pjournal/addHomework")
+    }, 'POST', cPjournal+"addHomework")
         .then(data => {
             if(data.error == false) {
                 par.setAttribute('data-st', '0');

@@ -36,6 +36,7 @@ import yes from "../../media/yes.png";
 import no from "../../media/no.png";
 import ErrFound from "../other/error/ErrFound";
 import {eventSource, sendToServer} from "../main/Main";
+import {cHteachers, cTeachers} from "../other/Controllers";
 
 let dispatch, teachersInfo, cState, themeState, inps, errText, selKid;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -162,7 +163,7 @@ export function codTea (id, title, text) {
     sendToServer({
         uuid: cState.uuid,
         id: id
-    }, 'POST', "teachers/setCodePep")
+    }, 'POST', cTeachers+"setCodePep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -176,7 +177,7 @@ export function addTea(inp, par) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "teachers/addTea")
+    }, 'POST', cTeachers+"addTea")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -192,7 +193,7 @@ function onCon(e) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "teachers/getTeachers")
+    }, 'POST', cTeachers+"getTeachers")
         .then(data => {
             console.log(data);
             if(data.error == false){

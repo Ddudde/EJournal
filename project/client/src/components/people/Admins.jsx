@@ -25,6 +25,7 @@ import copyd from "../../media/copyd.png";
 import copyl from "../../media/copyl.png";
 import yes from "../../media/yes.png";
 import {eventSource, sendToServer} from "../main/Main";
+import {cAdmins, cAuth} from "../other/Controllers";
 
 let dispatch, errText, inps, adminsInfo, themeState, cState, tps;
 errText = "К сожалению, информация не найдена...";
@@ -55,12 +56,11 @@ function refreshLink(e) {
         // dispatch(changePeople(type, 0, id[0], id[1], sit + "/invite/" + gen_cod(), "link"));
         // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
         sendToServer({
-            uuid: cState.uuid,
             id: id[0]
-        }, 'POST', "auth/setCodePep")
+        }, 'PATCH', cAuth+"setCodePep")
             .then(data => {
                 console.log(data);
-                if(data.error == false){
+                if(data.status == 200){
                     dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
                 }
             });
@@ -173,7 +173,7 @@ function remInv (type, id) {
     sendToServer({
         uuid: cState.uuid,
         id: id
-    }, 'POST', "admins/remPep")
+    }, 'POST', cAdmins+"remPep")
 }
 
 function changeInv (type, id, inp, par) {
@@ -182,7 +182,7 @@ function changeInv (type, id, inp, par) {
         uuid: cState.uuid,
         id: id,
         name: inp
-    }, 'POST', "admins/chPep")
+    }, 'POST', cAdmins+"chPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -196,7 +196,7 @@ function addInv (type, inp, par) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "admins/addPep")
+    }, 'POST', cAdmins+"addPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -212,7 +212,7 @@ function onCon(e) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "admins/getAdmins")
+    }, 'POST', cAdmins+"getAdmins")
         .then(data => {
             console.log(data);
             if(data.error == false){

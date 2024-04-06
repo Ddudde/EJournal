@@ -29,6 +29,7 @@ import copyd from "../../media/copyd.png";
 import copyl from "../../media/copyl.png";
 import yes from "../../media/yes.png";
 import {eventSource, sendToServer} from "../main/Main";
+import {cAuth, cStudents} from "../other/Controllers";
 
 let dispatch, classmatesInfo, groupsInfo, selGr, errText, inps, themeState, cState, tps;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -58,12 +59,11 @@ function refreshLink(e) {
     if (inp.hasAttribute("data-id")) {
         id = inp.getAttribute("data-id").split("_");
         sendToServer({
-            uuid: cState.uuid,
             id: id[1]
-        }, 'POST', "auth/setCodePep")
+        }, 'PATCH', cAuth+"setCodePep")
             .then(data => {
                 console.log(data);
-                if(data.error == false){
+                if(data.status == 200){
                     dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
                 }
             });
@@ -171,7 +171,7 @@ function remInv (type, id) {
     sendToServer({
         uuid: cState.uuid,
         id: id
-    }, 'POST', "students/remPep")
+    }, 'POST', cStudents+"remPep")
 }
 
 function changeInv (type, id, inp, par) {
@@ -180,7 +180,7 @@ function changeInv (type, id, inp, par) {
         uuid: cState.uuid,
         id: id,
         name: inp
-    }, 'POST', "students/chPep")
+    }, 'POST', cStudents+"chPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -194,7 +194,7 @@ function addInv (type, inp, par) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "students/addPep")
+    }, 'POST', cStudents+"addPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -212,7 +212,7 @@ function setStud(firstG, bodyG) {
     sendToServer({
         uuid: cState.uuid,
         group: selGr
-    }, 'POST', "students/getStud")
+    }, 'POST', cStudents+"getStud")
         .then(data => {
             console.log(data);
             dispatch(changePeople(tps.gl, undefined, undefined, undefined, data.body));
@@ -229,7 +229,7 @@ function setStud(firstG, bodyG) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "students/getInfo")
+    }, 'POST', cStudents+"getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){

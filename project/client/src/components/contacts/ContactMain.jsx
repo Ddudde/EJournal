@@ -9,6 +9,7 @@ import {CHANGE_CONTACT_GL, CHANGE_CONTACT_PARAM, changeContacts} from "../../sto
 import ed from "../../media/edit.png";
 import yes from "../../media/yes.png";
 import no from "../../media/no.png";
+import {cContacts} from "../other/Controllers";
 
 let gr, cState, dispatch, type;
 type = "Por";
@@ -191,7 +192,7 @@ function setInfo() {
     sendToServer({
         type: type,
         uuid: cState.uuid
-    }, 'POST', "contacts/getContacts")
+    }, 'POST', cContacts+"getContacts")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -207,7 +208,7 @@ function chContact (inp, p, p1) {
         p: p,
         p1: p1,
         val: inp
-    }, 'POST', "contacts/chContact");
+    }, 'POST', cContacts+"chContact");
 }
 
 function chContactC(e) {

@@ -16,14 +16,14 @@ import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Request;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 @RequestMapping("/requests")
 @NoArgsConstructor
 @RestController public class RequestController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -31,7 +31,7 @@ import ru.mirea.services.ServerService;
     @PostMapping(value = "/addReq")
     public JsonObject addReq(@RequestBody DataRequest body) {
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(!ObjectUtils.isEmpty(body.email) && !ObjectUtils.isEmpty(body.date) && !ObjectUtils.isEmpty(body.fio)) {
                 Request request = new Request(body.email, body.date, body.fio);
                 datas.getDbService().getRequestRepository().saveAndFlush(request);
@@ -45,7 +45,7 @@ import ru.mirea.services.ServerService;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            authController.sendMessageFor("addReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -55,7 +55,7 @@ import ru.mirea.services.ServerService;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         Request request = datas.getDbService().requestById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
                 datas.getDbService().getRequestRepository().delete(request);
 
@@ -63,7 +63,7 @@ import ru.mirea.services.ServerService;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("delReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            authController.sendMessageFor("delReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -73,7 +73,7 @@ import ru.mirea.services.ServerService;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         Request request = datas.getDbService().requestById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
                 request.setEmail(body.title);
                 datas.getDbService().getRequestRepository().saveAndFlush(request);
@@ -83,7 +83,7 @@ import ru.mirea.services.ServerService;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chTitle", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            authController.sendMessageFor("chTitle", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -93,7 +93,7 @@ import ru.mirea.services.ServerService;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         Request request = datas.getDbService().requestById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
                 request.setDate(body.date);
                 datas.getDbService().getRequestRepository().saveAndFlush(request);
@@ -103,7 +103,7 @@ import ru.mirea.services.ServerService;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chDate", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            authController.sendMessageFor("chDate", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -113,7 +113,7 @@ import ru.mirea.services.ServerService;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         Request request = datas.getDbService().requestById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(4L) && request != null) {
                 request.setFio(body.text);
                 datas.getDbService().getRequestRepository().saveAndFlush(request);
@@ -123,7 +123,7 @@ import ru.mirea.services.ServerService;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chText", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            authController.sendMessageFor("chText", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -132,7 +132,7 @@ import ru.mirea.services.ServerService;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(4L)) {
                 body.wrtr.name("body").beginObject();
                 for(Request reqR : datas.getDbService().getRequests()){

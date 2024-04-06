@@ -45,6 +45,7 @@ import refreshCl from "../../../media/refreshCl.png";
 import copyd from "../../../media/copyd.png";
 import copyl from "../../../media/copyl.png";
 import {eventSource, sendToServer} from "../../main/Main";
+import {cParents} from "../../other/Controllers";
 
 let dispatch, parentsInfo, groupsInfo, selGr, classmatesInfo, errText, inps, themeState, cState;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -236,7 +237,7 @@ export function codPar (id, title, text) {
     sendToServer({
         uuid: cState.uuid,
         id: id
-    }, 'POST', "parents/setCodePep")
+    }, 'POST', cParents+"setCodePep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -257,7 +258,7 @@ export function addKid (bod, id, par) {
         uuid: cState.uuid,
         bod: bod,
         id: id
-    }, 'POST', "parents/addKid")
+    }, 'POST', cParents+"addKid")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -278,7 +279,7 @@ function setParents(firstG, bodyG) {
     sendToServer({
         uuid: cState.uuid,
         group: selGr
-    }, 'POST', "parents/getParents")
+    }, 'POST', cParents+"getParents")
         .then(data => {
             console.log(data);
             dispatch(changePeople(CHANGE_PARENTS_GL, undefined, undefined, undefined, data.bodyP));
@@ -306,7 +307,7 @@ function setParents(firstG, bodyG) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "parents/getInfo")
+    }, 'POST', cParents+"getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){

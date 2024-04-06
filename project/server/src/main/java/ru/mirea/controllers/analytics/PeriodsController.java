@@ -18,14 +18,14 @@ import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Period;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 @RequestMapping("/periods")
 @NoArgsConstructor
 @RestController public class PeriodsController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -38,7 +38,7 @@ import ru.mirea.services.ServerService;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(3L)) {
                 School school = user.getRoles().get(3L).getYO();
                 ref.schId = school.getId();
@@ -58,7 +58,7 @@ import ru.mirea.services.ServerService;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addPerC", ans, TypesConnect.PERIODS, ref.schId +"", "main", "main", "main");
+            authController.sendMessageFor("addPerC", ans, TypesConnect.PERIODS, ref.schId +"", "main", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -70,7 +70,7 @@ import ru.mirea.services.ServerService;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(3L)) {
                 School school = user.getRoles().get(3L).getYO();
                 ref.schId = school.getId();

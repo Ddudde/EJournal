@@ -13,6 +13,7 @@ import {
     changeJournal
 } from "../../../store/actions";
 import {eventSource, sendToServer} from "../../main/Main";
+import {cJournal} from "../../other/Controllers";
 
 let dispatch, journalsInfo, maxEl, errText, cState, selKid;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -53,7 +54,7 @@ function onCon(e) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "journal/getInfo")
+    }, 'POST', cJournal + "getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){

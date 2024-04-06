@@ -27,6 +27,7 @@ import mapd from "../../../media/Map_symbolD.png";
 import mapl from "../../../media/Map_symbolL.png";
 import ed from "../../../media/edit.png";
 import {setEvGr} from "../../people/PeopleMain";
+import {cSchedule} from "../../other/Controllers";
 
 let dispatch, cState, selGr, schedulesInfo, groupsInfo, errText, inps, teachersInfo, themeState, DoW, selKid;
 DoW = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
@@ -342,13 +343,13 @@ function addLesson(day, obj) {
         group: groupsInfo.els.group,
         day: day,
         obj: obj
-    }, 'POST', "schedule/addLesson");
+    }, 'POST', cSchedule+"addLesson");
 }
 
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "schedule/getInfo")
+    }, 'POST', cSchedule+"getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -370,7 +371,7 @@ function setSchedule() {
     sendToServer({
         uuid: cState.uuid,
         group: groupsInfo.els.group
-    }, 'POST', "schedule/getSchedule")
+    }, 'POST', cSchedule+"getSchedule")
         .then(data => {
             console.log(data);
             selGr = groupsInfo.els.group;

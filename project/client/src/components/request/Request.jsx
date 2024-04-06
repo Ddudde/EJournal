@@ -17,6 +17,7 @@ import {
     changeReq
 } from "../../store/actions";
 import {eventSource, sendToServer, setActived} from "../main/Main";
+import {cRequests} from "../other/Controllers";
 
 let dispatch, requestInfo, inps, cState, errText;
 inps = {inpntt : "Текст", inpnzt : "Заголовок", inpndt: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})};
@@ -108,7 +109,7 @@ function onFin(e) {
                 uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 text: inp.value
-            }, 'POST', "requests/chText")
+            }, 'POST', cRequests+"chText")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"text"));
@@ -121,7 +122,7 @@ function onFin(e) {
                 uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 date: inp.value
-            }, 'POST', "requests/chDate")
+            }, 'POST', cRequests+"chDate")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"date"));
@@ -134,7 +135,7 @@ function onFin(e) {
                 uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 title: inp.value
-            }, 'POST', "requests/chTitle")
+            }, 'POST', cRequests+"chTitle")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"title"));
@@ -154,7 +155,7 @@ function onDel(e) {
             sendToServer({
                 uuid: cState.uuid,
                 id: par.getAttribute("data-id")
-            }, 'POST', "requests/delReq")
+            }, 'POST', cRequests+"delReq")
                 .then(data => {
                     if(data.error == false){
                         dispatch(changeReq(CHANGE_REQUEST_DEL, par.getAttribute("data-id")));
@@ -179,7 +180,7 @@ function onClose(e) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "requests/getRequests")
+    }, 'POST', cRequests+"getRequests")
         .then(data => {
             if(data.error == false){
                 dispatch(changeReq(CHANGE_REQUEST_GL, undefined, data.body));

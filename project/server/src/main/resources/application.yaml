@@ -13,6 +13,7 @@ spring:
             path: /console_db/
     jpa:
         database-platform: org.hibernate.dialect.H2Dialect
+
 #spring:
 #    datasource:
 #        url: jdbc:postgresql://localhost:5432/EJournal
@@ -22,6 +23,7 @@ spring:
 #    jpa:
 #        database: postgresql
 #        database-platform: org.hibernate.dialect.PostgreSQLDialect
+
         hibernate.ddl-auto: create-drop
     mail:
         default-encoding: UTF-8

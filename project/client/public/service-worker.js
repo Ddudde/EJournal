@@ -1,7 +1,9 @@
-let CACHE_NAME, urlsToCache, cacheWhitelist, prefSite, prom;
+let CACHE_NAME, urlsToCache, cacheWhitelist, prefSite, prom, cacheOFF;
 
 // Name our cache
-CACHE_NAME = 'my-pwa-cache-v8';
+CACHE_NAME = 'my-pwa-cache-v1';
+
+cacheOFF = true;
 
 cacheWhitelist = [CACHE_NAME];
 
@@ -114,7 +116,7 @@ function forCache(cache, url) {
 }
 
 function fetchF(e) {
-    if(e.request.destination == '') return;
+    if(e.request.destination == '' || cacheOFF) return;
     e.respondWith((async () => {
         const responseCache = await caches.match(e.request)
         console.log(responseCache);

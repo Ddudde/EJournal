@@ -17,16 +17,28 @@ import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.util.Objects;
 
+/** RU: Контроллер для контактов + Server Sent Events
+ * <pre>
+ * beenDo: Сделано
+ *  Ничего:)
+ *
+ * toDo: Доделать
+ *  - Javadoc
+ *  - Security
+ *  - Переписка
+ *  - Переписка2
+ *  - Тестирование
+ * </pre> */
 @RequestMapping("/contacts")
 @NoArgsConstructor
 @RestController public class ContactsController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -38,7 +50,7 @@ import java.util.Objects;
         Syst syst = datas.getDbService().getSyst();
         Contacts contacts = null;
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 if(user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")){
                     contacts = syst.getContacts();
@@ -67,7 +79,7 @@ import java.util.Objects;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chContactC", ans, TypesConnect.CONTACTS, subscriber.getLvlSch(), "main", "main", subscriber.getLvlMore2());
+            authController.sendMessageFor("chContactC", ans, TypesConnect.CONTACTS, subscriber.getLvlSch(), "main", "main", subscriber.getLvlMore2());
         }, body.wrtr, body.bol);
     }
 
@@ -78,7 +90,7 @@ import java.util.Objects;
             Long schId = null, conId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(subscriber != null) {
                 User user = datas.getDbService().userByLogin(subscriber.getLogin());
                 Syst syst = datas.getDbService().getSyst();

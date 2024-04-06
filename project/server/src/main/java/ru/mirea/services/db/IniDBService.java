@@ -13,9 +13,7 @@ import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.*;
-import ru.mirea.data.models.school.Day;
-import ru.mirea.data.models.school.Mark;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.text.ParseException;
 import java.time.Duration;
@@ -24,35 +22,45 @@ import java.util.*;
 
 import static java.util.Arrays.asList;
 
+/** RU: Класс для рандомизация данных, тестовые данные для БД
+ * <pre>
+ * beenDo: Сделано
+ *  + Переписка
+ *  # Переписка2
+ *
+ * toDo: Доделать
+ *  - Javadoc
+ *  - Тестирование
+ * </pre> */
 @Getter
 @NoArgsConstructor
 @Service public class IniDBService {
 
-    private List<SettingUser> setts;
+    private final List<SettingUser> setts = new ArrayList<>();
 
-    private List<News> newsList;
+    private List<News> newsList = new ArrayList<>();
 
-    private List<Contacts> contactsList;
+    private List<Contacts> contactsList = new ArrayList<>();
 
-    private List<Period> periods;
+    private final List<Period> periods = new ArrayList<>();
 
-    private List<Group> groups;
+    private final List<Group> groups = new ArrayList<>();
 
-    private List<School> schools;
+    private final List<School> schools = new ArrayList<>();
 
-    private List<Lesson> lessons;
+    private final List<Lesson> lessons = new ArrayList<>();
 
-    private List<Role> roles;
+    private final List<Role> roles = new ArrayList<>();
 
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
 
     private Request request;
 
     private Syst syst;
 
-    private List<Mark> marks;
+    private final List<Mark> marks = new ArrayList<>();
 
-    private List<Day> days;
+    private final List<Day> days = new ArrayList<>();
 
     private final Faker fakerRu = new Faker(new Locale("ru"));
 
@@ -64,11 +72,13 @@ import static java.util.Arrays.asList;
 
     private final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
 
+    /** RU: открытие Server Sent Events для нового клиента */
     private Date dateAfter;
 
-    private ServerService serv;
+    /** RU: открытие Server Sent Events для нового клиента */
+    private MainService serv;
 
-    public void firstIni(ServerService serv) {
+    public void firstIni(MainService serv) {
         this.serv = serv;
         SettingUser setts = serv.getDbService().getSettingUserRepository().saveAndFlush(new SettingUser(1));
         Role role = serv.getDbService().getRoleRepository().saveAndFlush(new Role("ex@ya.ru"));
@@ -116,7 +126,7 @@ import static java.util.Arrays.asList;
                 }
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            Main.excp(e);
         }
     }
 
@@ -155,12 +165,12 @@ import static java.util.Arrays.asList;
                 "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
                 "/static/media/map.jpg")
         ));
-        syst = serv.getDbService().createSyst(new Syst(asList(newsList.get(0), newsList.get(1)), contactsList.get(0)));
+        syst = serv.getDbService().createSyst(new Syst(newsList, contactsList.get(0)));
         System.out.println(getSyst());
 
-        users = new ArrayList<>();
-        setts = new ArrayList<>();
-        roles = new ArrayList<>();
+        users.clear();
+        setts.clear();
+        roles.clear();
 
         int max = (int) Math.round(Math.random() * 3) + 2, i;
         for(i = 0; i < max; i++) {
@@ -244,10 +254,10 @@ import static java.util.Arrays.asList;
     }
 
     private void getRandSchools() {
-        groups = new ArrayList<>();
-        schools = new ArrayList<>();
-        periods = new ArrayList<>();
-        lessons = new ArrayList<>();
+        groups.clear();
+        schools.clear();
+        periods.clear();
+        lessons.clear();
 
         int max = (int) Math.round(Math.random() * 3) + 2, i, max1, i1;
         School school = null;
@@ -266,10 +276,10 @@ import static java.util.Arrays.asList;
 
             List<Period> periodsPerSch = serv.getDbService().getPeriodRepository()
                 .saveAllAndFlush(asList(
-                    new Period("I четверть", "01.09.22", "03.11.22"),//86L
-                    new Period("II четверть", "12.11.22", "29.12.22"),//87L
-                    new Period("III четверть", "12.01.22", "29.03.22"),//87L
-                    new Period("IV четверть", "01.04.23", "30.08.23")//88L
+                    new Period("I четверть", "01.09.23", "03.11.23"),
+                    new Period("II четверть", "12.11.23", "29.12.23"),
+                    new Period("III четверть", "12.01.24", "29.03.24"),
+                    new Period("IV четверть", "01.04.24", "30.08.24")
                 ));
             periods.addAll(periodsPerSch);
 

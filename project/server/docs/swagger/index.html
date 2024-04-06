@@ -1,0 +1,9366 @@
+<!DOCTYPE html>
+<html>
+<title>API Document</title>
+
+<xmp theme="united" style="display:none;">
+#Swagger Gradle Plugin Sample
+
+
+## HTTP://www.example.com:8080/api
+
+
+This is a sample.
+
+
+[**Contact the developer**](mailto:email@email.com)
+
+
+**Version** v1
+
+[**Terms of Service**](http://www.example.com/termsOfService)
+
+[**Apache 2.0**](http://www.apache.org/licenses/LICENSE-2.0.html)
+
+
+
+
+
+
+
+
+# Security Definitions
+
+
+### basicAuth
+
+
+
+
+<table>
+    <tr>
+        <th>type</th>
+        <th colspan="2">basic</th>
+    </tr>
+
+</table>
+
+
+
+
+# APIs
+
+
+## /admins/addPep
+
+
+
+
+
+
+### POST
+
+
+<a id="addPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAdmins">DataAdmins</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /admins/chPep
+
+
+
+
+
+
+### POST
+
+
+<a id="chPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAdmins">DataAdmins</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /admins/getAdmins
+
+
+
+
+
+
+### POST
+
+
+<a id="getAdmins"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAdmins">DataAdmins</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /admins/remPep
+
+
+
+
+
+
+### POST
+
+
+<a id="remPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAdmins">DataAdmins</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /auth/auth
+
+
+
+
+
+
+### POST
+
+
+<a id="auth"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAuth">DataAuth</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /auth/chKid
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="chKid"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAuth">DataAuth</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /auth/chRole
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="chRole"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+
+
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /auth/checkInvCode
+
+
+
+
+
+
+### POST
+
+
+<a id="checkInvCode"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAuth">DataAuth</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /auth/exit
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="exit"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAuth">DataAuth</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /auth/infCon
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="infCon"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAuth">DataAuth</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /auth/open-stream
+
+
+### GET
+
+<a id="openSseStream"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+
+
+
+
+
+#### Response
+
+**Content-Type: ** text/event-stream
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/SseEmitter">SseEmitter</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /auth/reg
+
+
+
+
+
+
+### POST
+
+
+<a id="reg"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAuth">DataAuth</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /auth/remCon
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="remCon"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+
+
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /auth/setCodePep
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="setCodePep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataAuth">DataAuth</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /contacts/chContact
+
+
+
+
+
+
+### POST
+
+
+<a id="chContact"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataContacts">DataContacts</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /contacts/getContacts
+
+
+
+
+
+
+### POST
+
+
+<a id="getContacts"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataContacts">DataContacts</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /dnevnik/getDnevnik
+
+
+
+
+
+
+### POST
+
+
+<a id="getDnevnik"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataDnevnik">DataDnevnik</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /dnevnik/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataDnevnik">DataDnevnik</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/addGroup
+
+
+
+
+
+
+### POST
+
+
+<a id="addGroup"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/addPep
+
+
+
+
+
+
+### POST
+
+
+<a id="addPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/addSch
+
+
+
+
+
+
+### POST
+
+
+<a id="addSch"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/chGroup
+
+
+
+
+
+
+### POST
+
+
+<a id="chGroup"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/chPep
+
+
+
+
+
+
+### POST
+
+
+<a id="chPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/chSch
+
+
+
+
+
+
+### POST
+
+
+<a id="chSch"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/remGroup
+
+
+
+
+
+
+### POST
+
+
+<a id="remGroup"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/remPep
+
+
+
+
+
+
+### POST
+
+
+<a id="remPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /hteachers/remSch
+
+
+
+
+
+
+### POST
+
+
+<a id="remSch"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataHTeachers">DataHTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /journal/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataJournal">DataJournal</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /journal/getInfoPers
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfoPers"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataJournal">DataJournal</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /news/addNews
+
+
+
+
+
+
+### POST
+
+
+<a id="addNews"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataNews">DataNews</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /news/chNews
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="chNews"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataNews">DataNews</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /news/delNews
+
+
+
+
+
+
+
+
+### DELETE
+
+<a id="delNews"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataNews">DataNews</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+## /news/getNews/{type}
+
+
+### GET
+
+<a id="getNews"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>type</th>
+    <td>path</td>
+    <td>yes</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    
+            <td>string </td>
+    
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /parents/addKid
+
+
+
+
+
+
+### POST
+
+
+<a id="addKid"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataParents">DataParents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /parents/chPep
+
+
+
+
+
+
+### POST
+
+
+<a id="chPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataParents">DataParents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /parents/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataParents">DataParents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /parents/getParents
+
+
+
+
+
+
+### POST
+
+
+<a id="getParents"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataParents">DataParents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /parents/remPep
+
+
+
+
+
+
+### POST
+
+
+<a id="remPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataParents">DataParents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /parents/setCodePep
+
+
+
+
+
+
+### POST
+
+
+<a id="setCodePep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataParents">DataParents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /periods/addPer
+
+
+
+
+
+
+### POST
+
+
+<a id="addPer"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataPeriods">DataPeriods</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /periods/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataPeriods">DataPeriods</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /pjournal/addHomework
+
+
+
+
+
+
+### POST
+
+
+<a id="addHomework"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataPJournal">DataPJournal</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /pjournal/addMark
+
+
+
+
+
+
+### POST
+
+
+<a id="addMark"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataPJournal">DataPJournal</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /pjournal/getInfoP1
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfoP1"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataPJournal">DataPJournal</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /pjournal/getInfoP2
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfoP2"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataPJournal">DataPJournal</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /pjournal/getInfoP3
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfoP3"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataPJournal">DataPJournal</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /profiles/chEmail
+
+
+
+
+
+
+### POST
+
+
+<a id="chEmail"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataProfile">DataProfile</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /profiles/chInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="chInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataProfile">DataProfile</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /profiles/chLogin
+
+
+
+
+
+
+### POST
+
+
+<a id="chLogin"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataProfile">DataProfile</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /profiles/getProfile
+
+
+
+
+
+
+### POST
+
+
+<a id="getProfile"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataProfile">DataProfile</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /requests/addReq
+
+
+
+
+
+
+### POST
+
+
+<a id="addReq"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataRequest">DataRequest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /requests/chDate
+
+
+
+
+
+
+### POST
+
+
+<a id="chDate"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataRequest">DataRequest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /requests/chText
+
+
+
+
+
+
+### POST
+
+
+<a id="chText"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataRequest">DataRequest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /requests/chTitle
+
+
+
+
+
+
+### POST
+
+
+<a id="chTitle"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataRequest">DataRequest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /requests/delReq
+
+
+
+
+
+
+### POST
+
+
+<a id="delReq"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataRequest">DataRequest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /requests/getRequests
+
+
+
+
+
+
+### POST
+
+
+<a id="getRequests"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataRequest">DataRequest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /schedule/addLesson
+
+
+
+
+
+
+### POST
+
+
+<a id="addLesson"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSchedule">DataSchedule</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /schedule/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSchedule">DataSchedule</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /schedule/getSchedule
+
+
+
+
+
+
+### POST
+
+
+<a id="getSchedule"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSchedule">DataSchedule</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /settings/addNotifToken
+
+
+
+
+
+
+### POST
+
+
+<a id="addNotifToken"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /settings/chBool
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="chBool"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /settings/chIco
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="chIco"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /settings/chPass
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="chPass"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /settings/chSecFR
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="chSecFR"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /settings/checkCodeEmail
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="checkCodeEmail"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /settings/checkPasCodeEmail
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="checkPasCodeEmail"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /settings/getSettings
+
+
+### GET
+
+<a id="getSettings"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+
+
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /settings/remNotifToken
+
+
+
+
+
+
+### POST
+
+
+<a id="remNotifToken"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /settings/startEmail
+
+
+
+
+
+
+
+
+
+
+
+
+### PATCH
+
+<a id="startEmail"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataSettings">DataSettings</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+## /students/addPep
+
+
+
+
+
+
+### POST
+
+
+<a id="addPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataStudents">DataStudents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /students/chPep
+
+
+
+
+
+
+### POST
+
+
+<a id="chPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataStudents">DataStudents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /students/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataStudents">DataStudents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /students/getStud
+
+
+
+
+
+
+### POST
+
+
+<a id="getStud"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataStudents">DataStudents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /students/remPep
+
+
+
+
+
+
+### POST
+
+
+<a id="remPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataStudents">DataStudents</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /teachers/addTea
+
+
+
+
+
+
+### POST
+
+
+<a id="addTea"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataTeachers">DataTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /teachers/chPep
+
+
+
+
+
+
+### POST
+
+
+<a id="chPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataTeachers">DataTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /teachers/getTeachers
+
+
+
+
+
+
+### POST
+
+
+<a id="getTeachers"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataTeachers">DataTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /teachers/remPep
+
+
+
+
+
+
+### POST
+
+
+<a id="remPep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataTeachers">DataTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /teachers/setCodePep
+
+
+
+
+
+
+### POST
+
+
+<a id="setCodePep"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataTeachers">DataTeachers</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /test/chBool
+
+
+
+
+
+
+### POST
+
+
+<a id="chBool"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataTest">DataTest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## /test/getInfo
+
+
+
+
+
+
+### POST
+
+
+<a id="getInfo"></a>
+
+
+
+
+
+
+
+
+
+#### Request
+
+
+
+##### Parameters
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Located in</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Default</th>
+        <th>Schema</th>
+    </tr>
+
+
+
+<tr>
+    <th>body</th>
+    <td>body</td>
+    <td>no</td>
+    <td>
+        
+        
+    </td>
+    <td> - </td>
+
+    <td>
+    
+    <a href="#/definitions/DataTest">DataTest</a> 
+    </td>
+
+</tr>
+
+
+</table>
+
+
+
+#### Response
+
+
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+| 200    | successful operation | <a href="#/definitions/JsonObject">JsonObject</a>|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Definitions
+
+## <a name="/definitions/DataAdmins">DataAdmins</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>login</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>name</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataAuth">DataAuth</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>code</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>notifToken</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>login</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>secFr</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>par</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>mod</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>password</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>type</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>idL</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>ico</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>permis</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataContacts">DataContacts</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>type</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>p</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>p1</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>val</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataDnevnik">DataDnevnik</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataHTeachers">DataHTeachers</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>login</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>name</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>schId</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>yo</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>grId</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataJournal">DataJournal</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataNews">DataNews</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>type</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>title</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>date</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>img_url</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>text</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>val</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataPJournal">DataPJournal</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>predm</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>style</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>day</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>mark</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>homework</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>group</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>kid</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>per</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>weight</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataParents">DataParents</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>name</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>group</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>bod</td>
+            <td>
+                
+                    <a href="#/definitions/JsonObject">JsonObject</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataPeriods">DataPeriods</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>name</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>perN</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>perK</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataProfile">DataProfile</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>login</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>nLogin</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>oLogin</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>info</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>email</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataRequest">DataRequest</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>text</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>date</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>title</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>email</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>fio</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataSchedule">DataSchedule</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>obj</td>
+            <td>
+                
+                    <a href="#/definitions/JsonObject">JsonObject</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>group</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>day</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataSettings">DataSettings</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>secFR</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>nPar</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>email</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>emailCode</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>login</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>notifToken</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>invCod</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>ico</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>val</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>emailSt</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataStudents">DataStudents</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>name</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>group</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataTeachers">DataTeachers</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>name</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/DataTest">DataTest</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>uuid</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>id</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>val</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/JsonArray">JsonArray</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>empty</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBoolean</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asDouble</td>
+            <td>
+                
+                    
+                    number (double)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asInt</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asLong</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asString</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asByte</td>
+            <td>
+                
+                    
+                    string (byte)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asNumber</td>
+            <td>
+                
+                    <a href="#/definitions/Number">Number</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asFloat</td>
+            <td>
+                
+                    
+                    number (float)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asCharacter</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigInteger</td>
+            <td>
+                
+                    
+                    integer
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asShort</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigDecimal</td>
+            <td>
+                
+                    
+                    number
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonArray</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonPrimitive</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonNull</td>
+            <td>
+                
+                    <a href="#/definitions/JsonNull">JsonNull</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonNull</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonObject</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonPrimitive</td>
+            <td>
+                
+                    <a href="#/definitions/JsonPrimitive">JsonPrimitive</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonArray</td>
+            <td>
+                
+                    <a href="#/definitions/JsonArray">JsonArray</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonObject</td>
+            <td>
+                
+                    <a href="#/definitions/JsonObject">JsonObject</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/JsonNull">JsonNull</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>asBoolean</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asDouble</td>
+            <td>
+                
+                    
+                    number (double)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asInt</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asLong</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asString</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asByte</td>
+            <td>
+                
+                    
+                    string (byte)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asNumber</td>
+            <td>
+                
+                    <a href="#/definitions/Number">Number</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonArray</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asFloat</td>
+            <td>
+                
+                    
+                    number (float)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asCharacter</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigInteger</td>
+            <td>
+                
+                    
+                    integer
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asShort</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonPrimitive</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonNull</td>
+            <td>
+                
+                    <a href="#/definitions/JsonNull">JsonNull</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonNull</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonObject</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigDecimal</td>
+            <td>
+                
+                    
+                    number
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonPrimitive</td>
+            <td>
+                
+                    <a href="#/definitions/JsonPrimitive">JsonPrimitive</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonArray</td>
+            <td>
+                
+                    <a href="#/definitions/JsonArray">JsonArray</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonObject</td>
+            <td>
+                
+                    <a href="#/definitions/JsonObject">JsonObject</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/JsonObject">JsonObject</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>empty</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBoolean</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asDouble</td>
+            <td>
+                
+                    
+                    number (double)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asInt</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asLong</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asString</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asByte</td>
+            <td>
+                
+                    
+                    string (byte)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asNumber</td>
+            <td>
+                
+                    <a href="#/definitions/Number">Number</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonArray</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asFloat</td>
+            <td>
+                
+                    
+                    number (float)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asCharacter</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigInteger</td>
+            <td>
+                
+                    
+                    integer
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asShort</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonPrimitive</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonNull</td>
+            <td>
+                
+                    <a href="#/definitions/JsonNull">JsonNull</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonNull</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonObject</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigDecimal</td>
+            <td>
+                
+                    
+                    number
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonPrimitive</td>
+            <td>
+                
+                    <a href="#/definitions/JsonPrimitive">JsonPrimitive</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonArray</td>
+            <td>
+                
+                    <a href="#/definitions/JsonArray">JsonArray</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonObject</td>
+            <td>
+                
+                    <a href="#/definitions/JsonObject">JsonObject</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/JsonPrimitive">JsonPrimitive</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>asBoolean</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asDouble</td>
+            <td>
+                
+                    
+                    number (double)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asInt</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asLong</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asString</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asByte</td>
+            <td>
+                
+                    
+                    string (byte)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>number</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asNumber</td>
+            <td>
+                
+                    <a href="#/definitions/Number">Number</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asFloat</td>
+            <td>
+                
+                    
+                    number (float)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asCharacter</td>
+            <td>
+                
+                    
+                    string
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigInteger</td>
+            <td>
+                
+                    
+                    integer
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asShort</td>
+            <td>
+                
+                    
+                    integer (int32)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asBigDecimal</td>
+            <td>
+                
+                    
+                    number
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>boolean</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>string</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonArray</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonPrimitive</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonNull</td>
+            <td>
+                
+                    <a href="#/definitions/JsonNull">JsonNull</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonNull</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>jsonObject</td>
+            <td>
+                
+                    
+                    boolean
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonPrimitive</td>
+            <td>
+                
+                    <a href="#/definitions/JsonPrimitive">JsonPrimitive</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonArray</td>
+            <td>
+                
+                    <a href="#/definitions/JsonArray">JsonArray</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+        <tr>
+            <td>asJsonObject</td>
+            <td>
+                
+                    <a href="#/definitions/JsonObject">JsonObject</a>
+                    
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+## <a name="/definitions/Number">Number</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+</table>
+
+## <a name="/definitions/SseEmitter">SseEmitter</a>
+
+<table border="1">
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>required</th>
+        <th>description</th>
+        <th>example</th>
+    </tr>
+    
+        <tr>
+            <td>timeout</td>
+            <td>
+                
+                    
+                    integer (int64)
+                
+            </td>
+            <td>optional</td>
+            <td>-</td>
+            <td></td>
+        </tr>
+    
+</table>
+
+
+
+</xmp>
+
+<script src="https://cdn.jsdelivr.net/gh/arturadib/strapdown@gh-pages/v/0.2/strapdown.min.js"></script>
+</html>

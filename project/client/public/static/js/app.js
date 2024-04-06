@@ -77,6 +77,7 @@ async function requestPerm(messaging) {
                 addNotifToken(token);
             } else {
                 appApp.addEventListener('op', e=> {
+                    userServFin = true;
                     delNotifToken();
                     addNotifToken(token);
                 }, {once: true});
@@ -92,9 +93,8 @@ function delNotifToken() {
     if(localStorage.getItem("notifToken")) {
         console.log("delNotifToken", localStorage.getItem("notifToken"));
         sendToServerApp({
-            uuid: userServFin,
             notifToken: localStorage.getItem("notifToken")
-        }, 'POST', "auth/remNotifToken")
+        }, 'POST', "settings/remNotifToken")
         localStorage.removeItem("notifToken");
     }
 }
@@ -102,32 +102,32 @@ function delNotifToken() {
 function addNotifToken(token) {
     console.log("addNotifToken", token);
     sendToServerApp({
-        uuid: userServFin,
         notifToken: token
-    }, 'POST', "auth/addNotifToken")
+    }, 'POST', "settings/addNotifToken")
     localStorage.setItem("notifToken", token);
 }
 
 function sendToServerApp(bod, typeC, url) {
-    let sed = {method: typeC};
-    if (bod) {
-        sed.headers = {'Content-Type': 'application/json'};
-        if(localStorage.getItem("sec")) {
-            sed.headers.Authorization = localStorage.getItem("sec");
-            console.log("yyes send", localStorage.getItem("sec"));
-        }
-        sed.body = JSON.stringify(bod);
+    let sed = {
+        method: typeC,
+        headers: {'Content-Type': 'application/json'}
+    };
+    if(localStorage.getItem("sec")) {
+        sed.headers.Authorization = localStorage.getItem("sec");
+        console.log("yyes send", localStorage.getItem("sec"));
     }
+    if(bod && typeC != 'GET') sed.body = JSON.stringify(bod);
     if(!url) url = "";
     return fetch(servLink + "/" + url, sed)
         .then(res => {
-            if(res.statusCode == 401 && localStorage.getItem("sec")) {
+            if(res.status == 401 && localStorage.getItem("sec")) {
                 localStorage.removeItem("sec");
             }
             if (!res.ok) {
                 throw new Error(`This is an HTTP error: The status is ${res.status}`);
             }
-            return res.json();
-        })
-        .catch(data => data);
+            return res.json().then(data => ({
+                status: res.status, body: data
+            }));
+        }).catch(data => data);
 }

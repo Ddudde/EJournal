@@ -7,6 +7,7 @@ import {checkbox, states, testRed} from "../../store/selector";
 import {CHANGE_EVENTS_CLEAR, CHANGE_TEST_GL, changeCB, changeEvents, changeTest} from "../../store/actions";
 import {eventSource, sendToServer, setActived} from "../main/Main";
 import CheckBox from "../other/checkBox/CheckBox";
+import {cTest} from "../other/Controllers";
 
 let dispatch, testInfo, inps, cState, errText, checkBoxInfo;
 inps = {inpntt : "Текст", inpnzt : "Заголовок", inpndt: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})};
@@ -59,7 +60,7 @@ function chNotif(id) {
         uuid: cState.uuid,
         id: id,
         val: !checkBoxInfo[id]
-    }, 'POST', "test/chBool")
+    }, 'POST', cTest+"chBool")
         .then(data => {
             if(data.error == false){
                 dispatch(changeTest(CHANGE_TEST_GL, data.bodyT));
@@ -72,7 +73,7 @@ function setInfo() {
     // dispatch(changeCB("checkbox_test", true));
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "test/getInfo")
+    }, 'POST', cTest+"getInfo")
         .then(data => {
             if(data.error == false){
                 for(let id in data.bodyS) {

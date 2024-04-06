@@ -25,8 +25,8 @@ import java.util.Set;
     private Integer ico;//1,2,3
 
     private Boolean notif = false, nChangeShedule = false,
-            nNewMarks = false, nNewNewsYO = false,
-            nNewNewsPor = false, nNewReqSch = false, hints = true;
+        nNewMarks = false, nNewNewsYO = false,
+        nNewNewsPor = false, nNewReqSch = false, hints = true;
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ElementCollection
@@ -34,12 +34,6 @@ import java.util.Set;
 
     public SettingUser(Integer ico) {
         this.ico = ico;
-    }
-
-    public SettingUser(Integer ico, Boolean notif, Set<String> topics) {
-        this.ico = ico;
-        this.notif = notif;
-        this.topics = topics;
     }
 
     public Set<String> getTokens() {
@@ -67,14 +61,7 @@ import java.util.Set;
             getTopics().forEach((topic) -> {
                 pushService.unsubscribe(new ArrayList<>(getTokens()), topic);
             });
-        }}
-
-    public void setNChangeShedule(Boolean nChangeShedule) {
-        this.nChangeShedule = nChangeShedule;
-    }
-
-    public void setNNewMarks(Boolean nNewMarks) {
-        this.nNewMarks = nNewMarks;
+        }
     }
 
     public void setNNewNewsYO(Boolean nNewNewsYO) {
@@ -85,10 +72,6 @@ import java.util.Set;
     public void setNNewNewsPor(Boolean nNewNewsPor) {
         this.nNewNewsPor = nNewNewsPor;
         changeSubscribe("news", nNewNewsPor);
-    }
-
-    public void setNNewReqSch(Boolean nNewReqSch) {
-        this.nNewReqSch = nNewReqSch;
     }
 
     private void changeSubscribe(String name, boolean val) {

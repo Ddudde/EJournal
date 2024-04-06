@@ -16,7 +16,7 @@ import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.*;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RestController public class DnevnikController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
             School school = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
                     ref.group = user.getRoles().get(0L).getGrp();
@@ -174,7 +174,7 @@ import java.util.stream.Collectors;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.schId = datas.getDbService().getFirstRole(user.getRoles()).getYO().getId();
                 if(user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L)) {

@@ -2,201 +2,229 @@ package ru.mirea.controllers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.mirea.Main;
+import org.springframework.web.bind.annotation.*;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.News;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.security.CustomToken;
 
 import java.util.List;
 import java.util.Objects;
 
+import static ru.mirea.Main.datas;
+
+/** RU: Контроллер для новостей + Server Sent Events
+ * <pre>
+ * beenDo: Сделано
+ *  + Javadoc
+ *  + Security
+ *  + Переписка
+ *  + Тестирование
+ *  + Переписка2
+ * </pre>
+ * @see Subscriber */
+@Api(tags = {"NewsController"})
+@SwaggerDefinition(tags = {
+    @Tag(name = "NewsController", description = "Контроллер для новостей + Server Sent Events")
+})
 @RequestMapping("/news")
-@NoArgsConstructor
+@RequiredArgsConstructor
 @RestController public class NewsController {
 
-    @Autowired
-    private ServerService datas;
+    /** RU: Контроллер авторизации + сервис */
+    private final AuthController authController;
 
-    @Autowired
-    private AuthController authController;
-
-    @PostMapping(value = "/delNews")
-    public JsonObject delNews(@RequestBody DataNews body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+    /** RU: удаление новости + Server Sent Events
+     * @param body Данные с клиента, задействуются свойства: id
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Код статуса */
+    @DeleteMapping(value = "/delNews")
+    public ResponseEntity<JsonObject> delNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+        JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /delNews");
+        User user = auth.getSub().getUser();
         News news = datas.getDbService().newsById(body.id);
         Syst syst = datas.getDbService().getSyst();
-        try {
-            body.wrtr = datas.ini(body.toString());
-            if (user != null && news != null && syst != null
-                && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
-                || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
-                datas.getDbService().getNewsRepository().delete(news);
-                if (!ObjectUtils.isEmpty(syst.getNews())) syst.getNews().remove(news.getId());
+        HttpStatus stat = HttpStatus.NOT_FOUND;
+        if (user != null && news != null
+            && (user.getRoles().containsKey(4L) && Objects.equals(auth.getSub().getLvlMore2(), "Por") && syst != null
+            || user.getRoles().containsKey(3L) && Objects.equals(auth.getSub().getLvlMore2(), "Yo"))) {
+            datas.getDbService().getNewsRepository().delete(news);
+            if (syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
+                syst.getNews().remove(news);
                 datas.getDbService().getSystRepository().saveAndFlush(syst);
-                body.wrtr.name("id").value(body.id);
             }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.sendMessageForAll("delNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
-        }, body.wrtr, body.bol);
+            wrtr.name("id").value(body.id);
+            stat = HttpStatus.OK;
+        }
+        return datas.getObjR(ans -> {
+            authController.sendMessageFor("delNewsC", ans, TypesConnect.NEWS, auth.getSub().getLvlSch(),
+                auth.getSub().getLvlGr(), auth.getSub().getLvlMore1(), auth.getSub().getLvlMore2());
+        }, wrtr, stat);
     }
 
-    @PostMapping(value = "/chNews")
-    public JsonObject chNews(@RequestBody DataNews body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        try {
-            body.wrtr = datas.ini(body.toString());
-            User user = datas.getDbService().userByLogin(subscriber.getLogin());
-            News news = datas.getDbService().newsById(body.id);
-            if (user != null && news != null
-                && (user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")
-                || user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo"))) {
-                switch (body.type) {
-                    case "title" -> news.setTitle(body.val);
-                    case "date" -> news.setDate(body.val);
-                    case "img_url" -> news.setImg_url(body.val);
-                    case "text" -> news.setText(body.val);
-                    default -> {}
-                }
-                datas.getDbService().getNewsRepository().saveAndFlush(news);
-                body.wrtr.name("id").value(body.id)
-                    .name("type").value(body.type)
-                    .name("val").value(body.val);
+    /** RU: изменение новости + Server Sent Events
+     * @param body Данные с клиента, задействуются свойства: id, val, type
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Код статуса */
+    @PatchMapping(value = "/chNews")
+    public ResponseEntity<JsonObject> chNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH]  /chNews");
+        User user = auth.getSub().getUser();
+        News news = datas.getDbService().newsById(body.id);
+        HttpStatus stat = HttpStatus.NOT_FOUND;
+        if (user != null && news != null
+            && (user.getRoles().containsKey(4L) && Objects.equals(auth.getSub().getLvlMore2(), "Por")
+            || user.getRoles().containsKey(3L) && Objects.equals(auth.getSub().getLvlMore2(), "Yo"))
+            && !ObjectUtils.isEmpty(body.type)) {
+            switch (body.type) {
+                case "title" -> news.setTitle(body.val);
+                case "date" -> news.setDate(body.val);
+                case "img_url" -> news.setImg_url(body.val);
+                case "text" -> news.setText(body.val);
+                default -> {}
             }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.sendMessageForAll("chNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
-        }, body.wrtr, body.bol);
+            datas.getDbService().getNewsRepository().saveAndFlush(news);
+            wrtr.name("id").value(body.id)
+                .name("type").value(body.type)
+                .name("val").value(body.val);
+            stat = HttpStatus.OK;
+        }
+        return datas.getObjR(ans -> {
+            authController.sendMessageFor("chNewsC", ans, TypesConnect.NEWS, auth.getSub().getLvlSch(),
+                auth.getSub().getLvlGr(), auth.getSub().getLvlMore1(), auth.getSub().getLvlMore2());
+        }, wrtr, stat);
     }
 
+    /** RU: добавление новой новости + Server Sent Events
+     * @param body Данные с клиента, задействуются свойства: title, date, img_url, text
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Код статуса */
+    @ApiOperation(value = "отправка новостей, портала/школы", notes = "Более подробное описание...")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = ""),
+            @ApiResponse(code = 201, message = "Не авторизован"),
+            @ApiResponse(code = 401, message = "Не авторизован"),
+            @ApiResponse(code = 403, message = "Нет прав"),
+            @ApiResponse(code = 404, message = "Что-то не найдено"),
+            @ApiResponse(code = 500, message = "Ошибка сервера, обычно JSON")
+    })
     @PostMapping(value = "/addNews")
-    public JsonObject addNews(@RequestBody DataNews body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
+    public ResponseEntity<JsonObject> addNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+        JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addNews");
+        User user = auth.getSub().getUser();
+        Syst syst = datas.getDbService().getSyst();
+        School school = user.getSelecRole().getYO();
+        HttpStatus stat = HttpStatus.NOT_FOUND;
         final var ref = new Object() {
-            boolean b, b1;
+            final boolean b = Objects.equals(auth.getSub().getLvlMore2(), "Por")
+                    && user.getRoles().containsKey(4L) && syst != null,
+                b1 = Objects.equals(auth.getSub().getLvlMore2(), "Yo")
+                    && user.getRoles().containsKey(3L) && school != null;
         };
-        try {
-            body.wrtr = datas.ini(body.toString());
-            if (subscriber != null) {
-                body.wrtr.name("body").beginObject();
-                User user = datas.getDbService().userByLogin(subscriber.getLogin());
-                Syst syst = datas.getDbService().getSyst();
-                School school = user.getRoles().get(user.getSelRole()).getYO();
-                ref.b = Objects.equals(subscriber.getLvlMore2(), "Por") && user.getRoles().containsKey(4L) && syst != null;
-                ref.b1 = Objects.equals(subscriber.getLvlMore2(), "Yo") && user.getRoles().containsKey(3L) && school != null;
-                if (user != null && (ref.b || ref.b1)) {
-                    News news = new News();
-                    if (!ObjectUtils.isEmpty(body.title)) {
-                        news.setTitle(body.title);
-                    }
-                    if (!ObjectUtils.isEmpty(body.date)) {
-                        news.setDate(body.date);
-                    }
-                    if (!ObjectUtils.isEmpty(body.img_url)) {
-                        news.setImg_url(body.img_url);
-                    }
-                    if (!ObjectUtils.isEmpty(body.text)) {
-                        news.setText(body.text);
-                    }
-                    datas.getDbService().getNewsRepository().saveAndFlush(news);
-                    if (ref.b) {
-                        syst.getNews().add(news);
-                        datas.getDbService().getSystRepository().saveAndFlush(syst);
-                    } else if (ref.b1) {
-                        school.getNews().add(news);
-                        datas.getDbService().getSchoolRepository().saveAndFlush(school);
-                    }
-                    body.wrtr.name("title").value(news.getTitle())
-                        .name("date").value(news.getDate())
-                        .name("img_url").value(news.getImg_url())
-                        .name("text").value(news.getText()).endObject()
-                        .name("id").value(news.getId());
-                }
+        if (user != null && (ref.b || ref.b1) && !ObjectUtils.isEmpty(body.date)) {
+            News news = datas.getDbService().getNewsRepository()
+                .saveAndFlush(new News(body.title, body.date, body.img_url,
+                    body.text));
+            if (ref.b) {
+                syst.getNews().add(news);
+                datas.getDbService().getSystRepository().saveAndFlush(syst);
+            } else if (ref.b1) {
+                school.getNews().add(news);
+                datas.getDbService().getSchoolRepository().saveAndFlush(school);
             }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            if(ref.b1 && !ObjectUtils.isEmpty(subscriber.getLvlSch())) {
-                datas.getPushService().send(subscriber.getLvlSch()+"News", "Новые объявления!", "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'", "/DipvLom/static/media/info.jpg");
+            wrtr.name("body").beginObject()
+                .name("title").value(news.getTitle())
+                .name("date").value(news.getDate())
+                .name("img_url").value(news.getImg_url())
+                .name("text").value(news.getText()).endObject()
+                .name("id").value(news.getId());
+            stat = HttpStatus.CREATED;
+        }
+        return datas.getObjR(ans -> {
+            if(ref.b1 && !ObjectUtils.isEmpty(auth.getSub().getLvlSch())) {
+                datas.getPushService().send(auth.getSub().getLvlSch()+"News", "Новые объявления!",
+                "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
+                "/DipvLom/static/media/info.jpg");
             } else if(ref.b) {
-                datas.getPushService().send("news", "Новые объявления!", "На портале появилось новое объявление!\nУведомления можно регулировать на странице 'Настройки'", "/DipvLom/static/media/info.jpg");
+                datas.getPushService().send("news", "Новые объявления!",
+                "На портале появилось новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
+                "/DipvLom/static/media/info.jpg");
             }
-            authController.sendMessageForAll("addNewsC", ans, TypesConnect.NEWS, subscriber.getLvlSch(), subscriber.getLvlGr(), subscriber.getLvlMore1(), subscriber.getLvlMore2());
-        }, body.wrtr, body.bol);
+            authController.sendMessageFor("addNewsC", ans, TypesConnect.NEWS, auth.getSub().getLvlSch(),
+                auth.getSub().getLvlGr(), auth.getSub().getLvlMore1(), auth.getSub().getLvlMore2());
+        }, wrtr, stat);
     }
 
-    @PostMapping(value = "/getNews")
-    public JsonObject getNews(@RequestBody DataNews body, @AuthenticationPrincipal final User user) {
-//        Subscriber subscriber = authController.getSubscriber(body.uuid);
+    /** RU: отправка новостей, портала/школы
+     * @param type Нужный тип: Por - портал, Yo - школы
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Объект и код статуса */
+    @ApiOperation(value = "отправка новостей, портала/школы", notes = "Более подробное описание...", response = EmptyInterface.class)
+    @ApiResponses({
+        @ApiResponse(code = 401, message = "Не авторизован"),
+        @ApiResponse(code = 403, message = "Нет прав"),
+        @ApiResponse(code = 404, message = "Что-то не найдено"),
+        @ApiResponse(code = 500, message = "Ошибка сервера, обычно JSON")
+    })
+    @GetMapping(value = "/getNews/{type}")
+    public ResponseEntity<JsonObject> getNews(
+        @ApiParam("Нужный тип: Por - портал, Yo - школы")
+        @PathVariable String type, CustomToken auth) throws Exception {
+        User user = auth.getSub().getUser();
+        JsonTreeWriter wrtr = datas.init("type= "+type, "[GET] /getNews");
+        List<News> list = null;
+        Syst syst = datas.getDbService().getSyst();
         final var ref = new Object() {
             Long schId = null;
             String log = null;
         };
-        try {
-            body.wrtr = datas.ini(body.toString());
-            List<News> list = null;
-            body.wrtr.name("body").beginObject();
-            Syst syst = null;
-            School school = null;
-//                User user = datas.getDbService().userByLogin(subscriber.getLogin());
-            syst = datas.getDbService().getSyst();
-            if (user != null) {
-                ref.log = user.getUsername();
-                school = user.getRoles().get(user.getSelRole()).getYO();
-                if (Objects.equals(body.type, "Yo") && school != null && !ObjectUtils.isEmpty(school.getNews())) {
-                    ref.schId = school.getId();
-                    list = school.getNews();
-                }
+        if (user != null) {
+            ref.log = user.getUsername();
+            School school = user.getSelecRole().getYO();
+            if (Objects.equals(type, "Yo") && school != null) {
+                ref.schId = school.getId();
+                list = school.getNews();
             }
-            if (Objects.equals(body.type, "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
-                list = syst.getNews();
-                ref.schId = null;
+        }
+        if (Objects.equals(type, "Por") && syst != null) {
+            list = syst.getNews();
+        }
+        if (!ObjectUtils.isEmpty(list)) {
+            for (News newsU : list) {
+                wrtr.name(newsU.getId() + "").beginObject()
+                    .name("title").value(newsU.getTitle())
+                    .name("date").value(newsU.getDate())
+                    .name("img_url").value(newsU.getImg_url())
+                    .name("text").value(newsU.getText())
+                    .endObject();
             }
-            if (!ObjectUtils.isEmpty(list)) {
-                for (News newsU : list) {
-                    if (newsU == null) {
-                        if (ref.schId == null) {
-                            syst.getNews().remove(newsU);
-                        } else {
-                            school.getNews().remove(newsU);
-                        }
-                        continue;
-                    }
-                    body.wrtr.name(newsU.getId() + "").beginObject()
-                        .name("title").value(newsU.getTitle())
-                        .name("date").value(newsU.getDate())
-                        .name("img_url").value(newsU.getImg_url())
-                        .name("text").value(newsU.getText())
-                        .endObject();
-                }
-            }
-            body.wrtr.endObject();
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.infCon(body.uuid, ref.log, TypesConnect.NEWS, ref.schId + "", "main", "main", body.type);
-        }, body.wrtr, body.bol);
+        }
+        return datas.getObjR(ans -> {
+            authController.infCon(auth.getUUID(), ref.log, TypesConnect.NEWS, ref.schId + "", "main", "main", type);
+        }, wrtr, HttpStatus.OK, false);
     }
-}
 
-@ToString
-@NoArgsConstructor @AllArgsConstructor
-class DataNews {
-    public String uuid, type, title, date, img_url, text, val;
-    public Long id;
-    public transient boolean bol = true;
-    public transient JsonTreeWriter wrtr;
+    /** RU: Данные клиента используемые NewsController в методах
+     * @see NewsController */
+    @ToString
+    @NoArgsConstructor @AllArgsConstructor
+    static class DataNews {
+        public String type, title, date, img_url, text, val;
+        public Long id;
+    }
 }

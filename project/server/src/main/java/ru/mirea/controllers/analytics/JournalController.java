@@ -16,8 +16,11 @@ import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.models.school.*;
-import ru.mirea.services.ServerService;
+import ru.mirea.data.models.school.Group;
+import ru.mirea.data.models.school.Mark;
+import ru.mirea.data.models.school.Period;
+import ru.mirea.data.models.school.School;
+import ru.mirea.services.MainService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,7 @@ import java.util.stream.Collectors;
 @RestController public class JournalController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -43,7 +46,7 @@ import java.util.stream.Collectors;
             School sch = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.sch = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 Group group = datas.getDbService().getFirstRole(user.getRoles()).getGrp();
@@ -97,7 +100,7 @@ import java.util.stream.Collectors;
             School sch = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.sch = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 Group group = datas.getDbService().getFirstRole(user.getRoles()).getGrp();

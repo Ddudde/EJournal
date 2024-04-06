@@ -6,6 +6,7 @@ import {states, themes} from "../../../store/selector";
 import button from "../../button.module.css";
 import {CHANGE_EVENT, changeEvents} from "../../../store/actions";
 import {sendToServer} from "../../main/Main";
+import {cRequests} from "../../other/Controllers";
 
 let dispatch, cState, inps;
 inps = {};
@@ -15,7 +16,7 @@ function addReq(e) {
         fio: inps.inpnnt_,
         email: inps.inpnet_,
         date: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})
-    }, 'POST', "requests/addReq")
+    }, 'POST', cRequests+"addReq")
         .then(data => {
             if(data.error == false){
                 let title, text;

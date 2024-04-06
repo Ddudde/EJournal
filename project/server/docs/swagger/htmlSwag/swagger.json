@@ -1,0 +1,2449 @@
+{
+  "basePath" : "/",
+  "definitions" : {
+    "DataAdmins" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "login" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataAuth" : {
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "string"
+        },
+        "ico" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "idL" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "login" : {
+          "type" : "string"
+        },
+        "mod" : {
+          "type" : "string"
+        },
+        "notifToken" : {
+          "type" : "string"
+        },
+        "par" : {
+          "type" : "string"
+        },
+        "password" : {
+          "type" : "string"
+        },
+        "permis" : {
+          "type" : "boolean"
+        },
+        "secFr" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataContacts" : {
+      "type" : "object",
+      "properties" : {
+        "p" : {
+          "type" : "string"
+        },
+        "p1" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        },
+        "val" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataDnevnik" : {
+      "type" : "object",
+      "properties" : {
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataHTeachers" : {
+      "type" : "object",
+      "properties" : {
+        "grId" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "id" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "login" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "schId" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "uuid" : {
+          "type" : "string"
+        },
+        "yo" : {
+          "format" : "int64",
+          "type" : "integer"
+        }
+      }
+    },
+    "DataJournal" : {
+      "type" : "object",
+      "properties" : {
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataNews" : {
+      "type" : "object",
+      "properties" : {
+        "date" : {
+          "type" : "string"
+        },
+        "id" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "img_url" : {
+          "type" : "string"
+        },
+        "text" : {
+          "type" : "string"
+        },
+        "title" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        },
+        "val" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataPJournal" : {
+      "type" : "object",
+      "properties" : {
+        "day" : {
+          "type" : "string"
+        },
+        "group" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "homework" : {
+          "type" : "string"
+        },
+        "kid" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "mark" : {
+          "type" : "string"
+        },
+        "per" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "predm" : {
+          "type" : "string"
+        },
+        "style" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        },
+        "weight" : {
+          "format" : "int32",
+          "type" : "integer"
+        }
+      }
+    },
+    "DataParents" : {
+      "type" : "object",
+      "properties" : {
+        "bod" : {
+          "$ref" : "#/definitions/JsonObject"
+        },
+        "group" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "id" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataPeriods" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "perK" : {
+          "type" : "string"
+        },
+        "perN" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataProfile" : {
+      "type" : "object",
+      "properties" : {
+        "email" : {
+          "type" : "string"
+        },
+        "info" : {
+          "type" : "string"
+        },
+        "login" : {
+          "type" : "string"
+        },
+        "nLogin" : {
+          "type" : "string"
+        },
+        "oLogin" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataRequest" : {
+      "type" : "object",
+      "properties" : {
+        "date" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        },
+        "fio" : {
+          "type" : "string"
+        },
+        "id" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "text" : {
+          "type" : "string"
+        },
+        "title" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataSchedule" : {
+      "type" : "object",
+      "properties" : {
+        "day" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "group" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "obj" : {
+          "$ref" : "#/definitions/JsonObject"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataSettings" : {
+      "type" : "object",
+      "properties" : {
+        "email" : {
+          "type" : "string"
+        },
+        "emailCode" : {
+          "type" : "string"
+        },
+        "emailSt" : {
+          "type" : "boolean"
+        },
+        "ico" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "invCod" : {
+          "type" : "string"
+        },
+        "login" : {
+          "type" : "string"
+        },
+        "nPar" : {
+          "type" : "string"
+        },
+        "notifToken" : {
+          "type" : "string"
+        },
+        "secFR" : {
+          "type" : "string"
+        },
+        "val" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "DataStudents" : {
+      "type" : "object",
+      "properties" : {
+        "group" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "id" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataTeachers" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DataTest" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "uuid" : {
+          "type" : "string"
+        },
+        "val" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "EmptyInterface" : {
+      "type" : "object"
+    },
+    "JsonArray" : {
+      "type" : "object",
+      "properties" : {
+        "asBigDecimal" : {
+          "type" : "number"
+        },
+        "asBigInteger" : {
+          "type" : "integer"
+        },
+        "asBoolean" : {
+          "type" : "boolean"
+        },
+        "asByte" : {
+          "format" : "byte",
+          "type" : "string"
+        },
+        "asCharacter" : {
+          "type" : "string"
+        },
+        "asDouble" : {
+          "format" : "double",
+          "type" : "number"
+        },
+        "asFloat" : {
+          "format" : "float",
+          "type" : "number"
+        },
+        "asInt" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asJsonArray" : {
+          "$ref" : "#/definitions/JsonArray"
+        },
+        "asJsonNull" : {
+          "$ref" : "#/definitions/JsonNull"
+        },
+        "asJsonObject" : {
+          "$ref" : "#/definitions/JsonObject"
+        },
+        "asJsonPrimitive" : {
+          "$ref" : "#/definitions/JsonPrimitive"
+        },
+        "asLong" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "asNumber" : {
+          "$ref" : "#/definitions/Number"
+        },
+        "asShort" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asString" : {
+          "type" : "string"
+        },
+        "empty" : {
+          "type" : "boolean"
+        },
+        "jsonArray" : {
+          "type" : "boolean"
+        },
+        "jsonNull" : {
+          "type" : "boolean"
+        },
+        "jsonObject" : {
+          "type" : "boolean"
+        },
+        "jsonPrimitive" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "JsonNull" : {
+      "type" : "object",
+      "properties" : {
+        "asBigDecimal" : {
+          "type" : "number"
+        },
+        "asBigInteger" : {
+          "type" : "integer"
+        },
+        "asBoolean" : {
+          "type" : "boolean"
+        },
+        "asByte" : {
+          "format" : "byte",
+          "type" : "string"
+        },
+        "asCharacter" : {
+          "type" : "string"
+        },
+        "asDouble" : {
+          "format" : "double",
+          "type" : "number"
+        },
+        "asFloat" : {
+          "format" : "float",
+          "type" : "number"
+        },
+        "asInt" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asJsonArray" : {
+          "$ref" : "#/definitions/JsonArray"
+        },
+        "asJsonNull" : {
+          "$ref" : "#/definitions/JsonNull"
+        },
+        "asJsonObject" : {
+          "$ref" : "#/definitions/JsonObject"
+        },
+        "asJsonPrimitive" : {
+          "$ref" : "#/definitions/JsonPrimitive"
+        },
+        "asLong" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "asNumber" : {
+          "$ref" : "#/definitions/Number"
+        },
+        "asShort" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asString" : {
+          "type" : "string"
+        },
+        "jsonArray" : {
+          "type" : "boolean"
+        },
+        "jsonNull" : {
+          "type" : "boolean"
+        },
+        "jsonObject" : {
+          "type" : "boolean"
+        },
+        "jsonPrimitive" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "JsonObject" : {
+      "type" : "object",
+      "properties" : {
+        "asBigDecimal" : {
+          "type" : "number"
+        },
+        "asBigInteger" : {
+          "type" : "integer"
+        },
+        "asBoolean" : {
+          "type" : "boolean"
+        },
+        "asByte" : {
+          "format" : "byte",
+          "type" : "string"
+        },
+        "asCharacter" : {
+          "type" : "string"
+        },
+        "asDouble" : {
+          "format" : "double",
+          "type" : "number"
+        },
+        "asFloat" : {
+          "format" : "float",
+          "type" : "number"
+        },
+        "asInt" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asJsonArray" : {
+          "$ref" : "#/definitions/JsonArray"
+        },
+        "asJsonNull" : {
+          "$ref" : "#/definitions/JsonNull"
+        },
+        "asJsonObject" : {
+          "$ref" : "#/definitions/JsonObject"
+        },
+        "asJsonPrimitive" : {
+          "$ref" : "#/definitions/JsonPrimitive"
+        },
+        "asLong" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "asNumber" : {
+          "$ref" : "#/definitions/Number"
+        },
+        "asShort" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asString" : {
+          "type" : "string"
+        },
+        "empty" : {
+          "type" : "boolean"
+        },
+        "jsonArray" : {
+          "type" : "boolean"
+        },
+        "jsonNull" : {
+          "type" : "boolean"
+        },
+        "jsonObject" : {
+          "type" : "boolean"
+        },
+        "jsonPrimitive" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "JsonPrimitive" : {
+      "type" : "object",
+      "properties" : {
+        "asBigDecimal" : {
+          "type" : "number"
+        },
+        "asBigInteger" : {
+          "type" : "integer"
+        },
+        "asBoolean" : {
+          "type" : "boolean"
+        },
+        "asByte" : {
+          "format" : "byte",
+          "type" : "string"
+        },
+        "asCharacter" : {
+          "type" : "string"
+        },
+        "asDouble" : {
+          "format" : "double",
+          "type" : "number"
+        },
+        "asFloat" : {
+          "format" : "float",
+          "type" : "number"
+        },
+        "asInt" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asJsonArray" : {
+          "$ref" : "#/definitions/JsonArray"
+        },
+        "asJsonNull" : {
+          "$ref" : "#/definitions/JsonNull"
+        },
+        "asJsonObject" : {
+          "$ref" : "#/definitions/JsonObject"
+        },
+        "asJsonPrimitive" : {
+          "$ref" : "#/definitions/JsonPrimitive"
+        },
+        "asLong" : {
+          "format" : "int64",
+          "type" : "integer"
+        },
+        "asNumber" : {
+          "$ref" : "#/definitions/Number"
+        },
+        "asShort" : {
+          "format" : "int32",
+          "type" : "integer"
+        },
+        "asString" : {
+          "type" : "string"
+        },
+        "boolean" : {
+          "type" : "boolean"
+        },
+        "jsonArray" : {
+          "type" : "boolean"
+        },
+        "jsonNull" : {
+          "type" : "boolean"
+        },
+        "jsonObject" : {
+          "type" : "boolean"
+        },
+        "jsonPrimitive" : {
+          "type" : "boolean"
+        },
+        "number" : {
+          "type" : "boolean"
+        },
+        "string" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "Number" : {
+      "type" : "object"
+    },
+    "SseEmitter" : {
+      "type" : "object",
+      "properties" : {
+        "timeout" : {
+          "format" : "int64",
+          "type" : "integer"
+        }
+      }
+    }
+  },
+  "host" : "localhost:8080",
+  "info" : {
+    "description" : "This is a sample.",
+    "title" : "EJournal",
+    "version" : "v1"
+  },
+  "paths" : {
+    "/admins/addPep" : {
+      "post" : {
+        "operationId" : "addPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAdmins"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/admins/chPep" : {
+      "post" : {
+        "operationId" : "chPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAdmins"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/admins/getAdmins" : {
+      "post" : {
+        "operationId" : "getAdmins",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAdmins"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/admins/remPep" : {
+      "post" : {
+        "operationId" : "remPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAdmins"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/auth" : {
+      "post" : {
+        "operationId" : "auth",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAuth"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/chKid" : {
+      "patch" : {
+        "operationId" : "chKid",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAuth"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/chRole" : {
+      "patch" : {
+        "operationId" : "chRole",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/checkInvCode" : {
+      "post" : {
+        "operationId" : "checkInvCode",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAuth"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/exit" : {
+      "patch" : {
+        "operationId" : "exit",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAuth"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/infCon" : {
+      "patch" : {
+        "operationId" : "infCon",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAuth"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/open-stream" : {
+      "get" : {
+        "operationId" : "openSseStream",
+        "produces" : [ "text/event-stream" ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/SseEmitter"
+            }
+          }
+        }
+      }
+    },
+    "/auth/reg" : {
+      "post" : {
+        "operationId" : "reg",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAuth"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/remCon" : {
+      "patch" : {
+        "operationId" : "remCon",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/auth/setCodePep" : {
+      "patch" : {
+        "operationId" : "setCodePep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataAuth"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/contacts/chContact" : {
+      "post" : {
+        "operationId" : "chContact",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataContacts"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/contacts/getContacts" : {
+      "post" : {
+        "operationId" : "getContacts",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataContacts"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/dnevnik/getDnevnik" : {
+      "post" : {
+        "operationId" : "getDnevnik",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataDnevnik"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/dnevnik/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataDnevnik"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/addGroup" : {
+      "post" : {
+        "operationId" : "addGroup",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/addPep" : {
+      "post" : {
+        "operationId" : "addPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/addSch" : {
+      "post" : {
+        "operationId" : "addSch",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/chGroup" : {
+      "post" : {
+        "operationId" : "chGroup",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/chPep" : {
+      "post" : {
+        "operationId" : "chPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/chSch" : {
+      "post" : {
+        "operationId" : "chSch",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/remGroup" : {
+      "post" : {
+        "operationId" : "remGroup",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/remPep" : {
+      "post" : {
+        "operationId" : "remPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/remSch" : {
+      "post" : {
+        "operationId" : "remSch",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataHTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/journal/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataJournal"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/journal/getInfoPers" : {
+      "post" : {
+        "operationId" : "getInfoPers",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataJournal"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/news/addNews" : {
+      "post" : {
+        "description" : "Более подробное описание...",
+        "operationId" : "addNews",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataNews"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          },
+          "201" : {
+            "description" : "Не авторизован"
+          },
+          "401" : {
+            "description" : "Не авторизован"
+          },
+          "403" : {
+            "description" : "Нет прав"
+          },
+          "404" : {
+            "description" : "Что-то не найдено"
+          },
+          "500" : {
+            "description" : "Ошибка сервера, обычно JSON"
+          }
+        },
+        "summary" : "отправка новостей, портала/школы",
+        "tags" : [ "NewsController" ]
+      }
+    },
+    "/news/chNews" : {
+      "patch" : {
+        "operationId" : "chNews",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataNews"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        },
+        "tags" : [ "NewsController" ]
+      }
+    },
+    "/news/delNews" : {
+      "delete" : {
+        "operationId" : "delNews",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataNews"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        },
+        "tags" : [ "NewsController" ]
+      }
+    },
+    "/news/getNews/{type}" : {
+      "get" : {
+        "description" : "Более подробное описание...",
+        "operationId" : "getNews",
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "path",
+          "description" : "Нужный тип: Por - портал, Yo - школы",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/EmptyInterface"
+            }
+          },
+          "401" : {
+            "description" : "Не авторизован"
+          },
+          "403" : {
+            "description" : "Нет прав"
+          },
+          "404" : {
+            "description" : "Что-то не найдено"
+          },
+          "500" : {
+            "description" : "Ошибка сервера, обычно JSON"
+          }
+        },
+        "summary" : "отправка новостей, портала/школы",
+        "tags" : [ "NewsController" ]
+      }
+    },
+    "/parents/addKid" : {
+      "post" : {
+        "operationId" : "addKid",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataParents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/parents/chPep" : {
+      "post" : {
+        "operationId" : "chPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataParents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/parents/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataParents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/parents/getParents" : {
+      "post" : {
+        "operationId" : "getParents",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataParents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/parents/remPep" : {
+      "post" : {
+        "operationId" : "remPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataParents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/parents/setCodePep" : {
+      "post" : {
+        "operationId" : "setCodePep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataParents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/periods/addPer" : {
+      "post" : {
+        "operationId" : "addPer",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataPeriods"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/periods/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataPeriods"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/pjournal/addHomework" : {
+      "post" : {
+        "operationId" : "addHomework",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataPJournal"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/pjournal/addMark" : {
+      "post" : {
+        "operationId" : "addMark",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataPJournal"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/pjournal/getInfoP1" : {
+      "post" : {
+        "operationId" : "getInfoP1",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataPJournal"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/pjournal/getInfoP2" : {
+      "post" : {
+        "operationId" : "getInfoP2",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataPJournal"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/pjournal/getInfoP3" : {
+      "post" : {
+        "operationId" : "getInfoP3",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataPJournal"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/profiles/chEmail" : {
+      "post" : {
+        "operationId" : "chEmail",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataProfile"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/profiles/chInfo" : {
+      "post" : {
+        "operationId" : "chInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataProfile"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/profiles/chLogin" : {
+      "post" : {
+        "operationId" : "chLogin",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataProfile"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/profiles/getProfile" : {
+      "post" : {
+        "operationId" : "getProfile",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataProfile"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/requests/addReq" : {
+      "post" : {
+        "operationId" : "addReq",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/requests/chDate" : {
+      "post" : {
+        "operationId" : "chDate",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/requests/chText" : {
+      "post" : {
+        "operationId" : "chText",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/requests/chTitle" : {
+      "post" : {
+        "operationId" : "chTitle",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/requests/delReq" : {
+      "post" : {
+        "operationId" : "delReq",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/requests/getRequests" : {
+      "post" : {
+        "operationId" : "getRequests",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/schedule/addLesson" : {
+      "post" : {
+        "operationId" : "addLesson",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSchedule"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/schedule/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSchedule"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/schedule/getSchedule" : {
+      "post" : {
+        "operationId" : "getSchedule",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSchedule"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/addNotifToken" : {
+      "post" : {
+        "operationId" : "addNotifToken",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/chBool" : {
+      "patch" : {
+        "operationId" : "chBool",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/chIco" : {
+      "patch" : {
+        "operationId" : "chIco",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/chPass" : {
+      "patch" : {
+        "operationId" : "chPass",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/chSecFR" : {
+      "patch" : {
+        "operationId" : "chSecFR",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/checkCodeEmail" : {
+      "patch" : {
+        "operationId" : "checkCodeEmail",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/checkPasCodeEmail" : {
+      "patch" : {
+        "operationId" : "checkPasCodeEmail",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/getSettings" : {
+      "get" : {
+        "operationId" : "getSettings",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/remNotifToken" : {
+      "post" : {
+        "operationId" : "remNotifToken",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/settings/startEmail" : {
+      "patch" : {
+        "operationId" : "startEmail",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataSettings"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/students/addPep" : {
+      "post" : {
+        "operationId" : "addPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataStudents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/students/chPep" : {
+      "post" : {
+        "operationId" : "chPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataStudents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/students/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataStudents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/students/getStud" : {
+      "post" : {
+        "operationId" : "getStud",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataStudents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/students/remPep" : {
+      "post" : {
+        "operationId" : "remPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataStudents"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/teachers/addTea" : {
+      "post" : {
+        "operationId" : "addTea",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/teachers/chPep" : {
+      "post" : {
+        "operationId" : "chPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/teachers/getTeachers" : {
+      "post" : {
+        "operationId" : "getTeachers",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/teachers/remPep" : {
+      "post" : {
+        "operationId" : "remPep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/teachers/setCodePep" : {
+      "post" : {
+        "operationId" : "setCodePep",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataTeachers"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/test/chBool" : {
+      "post" : {
+        "operationId" : "chBool",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataTest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    },
+    "/test/getInfo" : {
+      "post" : {
+        "operationId" : "getInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DataTest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/JsonObject"
+            }
+          }
+        }
+      }
+    }
+  },
+  "schemes" : [ "http" ],
+  "swagger" : "2.0",
+  "tags" : [ {
+    "description" : "Контроллер для новостей + Server Sent Events",
+    "name" : "NewsController"
+  } ]
+}

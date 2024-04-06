@@ -21,7 +21,7 @@ public class WebMVCConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedOrigins("http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io")
-            .allowedMethods("GET","POST");
+            .allowedMethods("GET","POST","PATCH","DELETE");
     }
 
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {

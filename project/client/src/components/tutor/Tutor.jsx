@@ -72,6 +72,7 @@ import hizo36 from "../../media/tutor/hteachers/izo36.png";
 import {eventSource, sendToServer, setActived} from "../main/Main";
 import knopka from "../../media/dnevnik/knopka.png";
 import Request from "./request/Request";
+import {cAuth, cTest} from "../other/Controllers";
 
 let dispatch, ev, timid, scrolling, cState, zag, endSod, CWSel, type;
 scrolling = false;
@@ -778,9 +779,8 @@ function getZag(text, link, b) {
 
 function onCon(e) {
     sendToServer({
-        type: "TUTOR",
-        uuid: cState.uuid
-    }, 'POST', "auth", "infCon");
+        type: "TUTOR"
+    }, 'PATCH', cAuth+"infCon");
 }
 
 function goTo(id) {

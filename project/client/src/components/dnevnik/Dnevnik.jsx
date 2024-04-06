@@ -15,6 +15,7 @@ import {
 import knopka from "../../media/dnevnik/knopka.png";
 import {eventSource, sendToServer, setActived} from "../main/Main";
 import ErrFound from "../other/error/ErrFound";
+import {cDnevnik} from "../other/Controllers";
 
 let ev, dnev, dispatch, selKid, timid, cState, schedulesInfo, errText, DoW, scrolling, days, elem;
 DoW = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
@@ -100,7 +101,7 @@ function getLessons(dLI, dayDate, day, dai, minLess) {
 function setDnevnik() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "dnevnik/getDnevnik")
+    }, 'POST', cDnevnik+"getDnevnik")
         .then(data => {
             console.log(data);
             if(cState.role == 1 && cState.kid) selKid = cState.kid;
@@ -114,7 +115,7 @@ function setDnevnik() {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "dnevnik/getInfo")
+    }, 'POST', cDnevnik+"getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false) setDnevnik();

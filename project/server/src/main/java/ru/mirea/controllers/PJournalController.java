@@ -15,14 +15,12 @@ import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.Period;
-import ru.mirea.data.models.school.School;
-import ru.mirea.data.models.school.Day;
-import ru.mirea.data.models.school.Mark;
-import ru.mirea.services.ServerService;
+import ru.mirea.data.models.school.*;
+import ru.mirea.services.MainService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
 @RestController public class PJournalController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -45,7 +43,7 @@ import java.util.stream.Collectors;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.group = datas.getDbService().groupById(body.group);
                 if (ref.group != null && user.getSelRole() == 2L) {
@@ -69,7 +67,7 @@ import java.util.stream.Collectors;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addHomeworkC", ans, TypesConnect.PJOURNAL, ref.schId +"", "main", "main", subscriber.getLvlMore2());
+            authController.sendMessageFor("addHomeworkC", ans, TypesConnect.PJOURNAL, ref.schId +"", "main", "main", subscriber.getLvlMore2());
         }, body.wrtr, body.bol);
     }
 
@@ -82,7 +80,7 @@ import java.util.stream.Collectors;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.group = datas.getDbService().groupById(body.group);
                 User objU = datas.getDbService().userById(body.kid);
@@ -156,7 +154,7 @@ import java.util.stream.Collectors;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addMarkC", ans, TypesConnect.PJOURNAL, ref.schId +"", "main", "main", subscriber.getLvlMore2());
+            authController.sendMessageFor("addMarkC", ans, TypesConnect.PJOURNAL, ref.schId +"", "main", "main", subscriber.getLvlMore2());
         }, body.wrtr, body.bol);
     }
 
@@ -165,7 +163,7 @@ import java.util.stream.Collectors;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(2L)) {
                 School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 Group group = datas.getDbService().groupById(body.group);
@@ -236,7 +234,7 @@ import java.util.stream.Collectors;
             School schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(2L)) {
                 ref.schId = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 List<Long> groupsL = datas.getDbService().getLessonRepository().uniqGroupsBySchoolAndSubNameAndTeacher(ref.schId.getId(), body.predm, user.getId());
@@ -265,7 +263,7 @@ import java.util.stream.Collectors;
             School school = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(2L)) {
                 ref.school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 List<String> subjs = datas.getDbService().getLessonRepository().uniqSubNameBySchoolAndTeacher(ref.school.getId(), user.getId());

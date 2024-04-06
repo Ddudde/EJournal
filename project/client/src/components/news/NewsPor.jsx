@@ -42,39 +42,37 @@ export function NewsPor() {
         }
         console.log('componentDidUpdate NewsPor.jsx');
     });
-    return (
-        <div className={newsCSS.header}>
-            <Helmet>
-                <title>Объявления портала</title>
-            </Helmet>
-            {Object.getOwnPropertyNames(newsInfo[type]).length == 0 && !(cState.auth && cState.role == 4) ?
-                    <ErrFound text={errText}/>
-                :
-                    <div className={newsCSS.block}>
-                        <section className={newsCSS.center_colum}>
-                            {(cState.auth && cState.role == 4) && getAdd(newsInfo, inps, forceUpdate)}
-                            {Object.getOwnPropertyNames(newsInfo[type]).reverse().map(param =>
-                                <div className={newsCSS.news_line} data-st="1" key={param}>
-                                    {(cState.auth && cState.role == 4) ?
-                                            getAdd(newsInfo, inps, forceUpdate, param)
-                                        : <>
-                                            <h2 className={newsCSS.zag}>{newsInfo[type][param].title}</h2>
-                                            <span className={newsCSS.date}>{newsInfo[type][param].date}</span>
-                                            <div className={newsCSS.te}>
-                                                <span className={newsCSS.banner}>
-                                                    <img alt="banner" src={prefSite+newsInfo[type][param].img_url + ''} onError={errorLoad}/>
-                                                </span>
-                                                <pre className={newsCSS.field}>
-                                                    {newsInfo[type][param].text}
-                                                </pre>
-                                            </div>
-                                    </>}
-                                </div>
-                            )}
-                        </section>
-                    </div>
-            }
-        </div>
-    )
+    return <div className={newsCSS.header}>
+        <Helmet>
+            <title>Объявления портала</title>
+        </Helmet>
+        {Object.getOwnPropertyNames(newsInfo[type]).length == 0 && !(cState.auth && cState.role == 4) ?
+                <ErrFound text={errText}/>
+            :
+                <div className={newsCSS.block}>
+                    <section className={newsCSS.center_colum}>
+                        {(cState.auth && cState.role == 4) && getAdd(newsInfo, inps, forceUpdate)}
+                        {Object.getOwnPropertyNames(newsInfo[type]).reverse().map(param =>
+                            <div className={newsCSS.news_line} data-st="1" key={param}>
+                                {(cState.auth && cState.role == 4) ?
+                                        getAdd(newsInfo, inps, forceUpdate, param)
+                                    : <>
+                                        <h2 className={newsCSS.zag}>{newsInfo[type][param].title}</h2>
+                                        <span className={newsCSS.date}>{newsInfo[type][param].date}</span>
+                                        <div className={newsCSS.te}>
+                                            <span className={newsCSS.banner}>
+                                                <img alt="banner" src={prefSite+newsInfo[type][param].img_url + ''} onError={errorLoad}/>
+                                            </span>
+                                            <pre className={newsCSS.field}>
+                                                {newsInfo[type][param].text}
+                                            </pre>
+                                        </div>
+                                </>}
+                            </div>
+                        )}
+                    </section>
+                </div>
+        }
+    </div>
 }
 export default NewsPor;

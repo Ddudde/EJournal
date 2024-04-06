@@ -9,12 +9,13 @@ import {CHANGE_NEWS, CHANGE_NEWS_DEL, CHANGE_NEWS_GL, CHANGE_NEWS_PARAM, changeN
 import ed from "../../media/edit.png";
 import yes from "../../media/yes.png";
 import no from "../../media/no.png";
+import {cNews} from "../other/Controllers";
 
 let gr, cState, dispatch, type;
 type = "Por";
 gr = {
     group: 0
-}
+};
 
 export function getEdField(edFi, titleEd, x, inf, inp, info, inps, forceUpdate, placeholder, pattern) {
     return (<>
@@ -32,8 +33,8 @@ export function getEdField(edFi, titleEd, x, inf, inp, info, inps, forceUpdate, 
                     <input className={newsCSS.inp} id={inp} placeholder={placeholder} pattern={pattern} defaultValue={inf} data-id={x} onChange={(e)=>chStatB(e, inps)}/>
             }
             {ele(false, inp, inps)}
-            <img className={newsCSS.imginp+" yes "} src={yes} onClick={(e)=>onFin(e, inps, forceUpdate)} title="Подтвердить" alt=""/>
-            <img className={newsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={(e)=>onClose(e, inps, forceUpdate)} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+            <img className={newsCSS.imginp+" yes "} src={yes} onClick={(e)=>onFin(e, inps, forceUpdate, info, x)} title="Подтвердить" alt=""/>
+            <img className={newsCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={(e)=>onClose(e, inps, forceUpdate, info, x)} title="Отменить изменения и выйти из режима редактирования" alt=""/>
         </div>
     </>)
 }
@@ -77,8 +78,8 @@ export function getAdd(info, inps, forceUpdate, x) {
                             </div>
                         </span>
                     :
-                        <div className={newsCSS.im} data-st={inps.edAddIm ? "1" : "0"}>
-                            {getEdField(imiFi, "Ссылка:", x, inps.edAddIm, "inpnit_" + (x?x:""), info, inps, forceUpdate, "/media/tuman.jpg")}
+                        <div className={newsCSS.im} data-st={(x ? info[type][x].edImg_url : inps.edAddIm) ? "1" : "0"}>
+                            {getEdField(imiFi, "Ссылка:", x, (x ? info[type][x].edImg_url : inps.edAddIm), "inpnit_" + (x?x:""), info, inps, forceUpdate, "/media/tuman.jpg")}
                         </div>
                 }
                 {getEdField(texFi, "Текст:", x, tex, "inpntt_" + (x?x:""), info, inps, forceUpdate)}
@@ -143,8 +144,10 @@ export function onEdit(e, inps, forceUpdate, info) {
     if(par.classList.contains(newsCSS.upr)){
         ima = par.parentElement.querySelector("img");
         if (ima.hasAttribute("data-id")) {
-            inps.edAddIm = info[type][ima.getAttribute("data-id")].img_url;
-            dispatch(changeNews(CHANGE_NEWS_PARAM, type, ima.getAttribute("data-id"), "", "img_url"));
+            let objNews = info[type][ima.getAttribute("data-id")];
+            objNews.edImg_url = objNews.img_url;
+            objNews.img_url = undefined;
+            dispatch(changeNews(CHANGE_NEWS, type, ima.getAttribute("data-id"), objNews));
         } else {
             inps.edAddIm = inps.addIm;
             inps.addIm = undefined;
@@ -153,7 +156,7 @@ export function onEdit(e, inps, forceUpdate, info) {
     }
 }
 
-export function onFin(e, inps, forceUpdate) {
+export function onFin(e, inps, forceUpdate, info, id) {
     let par, inp, bul;
     par = e.target.parentElement;
     bul = par.parentElement.classList.contains(newsCSS.te);
@@ -166,6 +169,9 @@ export function onFin(e, inps, forceUpdate) {
         inp.setAttribute("data-mod", '0');
         if(par.parentElement.classList.contains(newsCSS.im)) {
             if (inps.edAddIm) inps.edAddIm = undefined;
+            if (info[type][id].edImg_url) {
+                dispatch(changeNews(CHANGE_NEWS_PARAM, type, id, undefined, "edAddIm"));
+            }
             if (inp.hasAttribute("data-id")) {
                 chNews(inp.getAttribute("data-id"), inp.value, "img_url");
             } else {
@@ -206,23 +212,28 @@ export function onFin(e, inps, forceUpdate) {
     }
 }
 
-export function onClose(e, inps, forceUpdate) {
+export function onClose(e, inps, forceUpdate, info, id) {
     let par = e.target.parentElement;
-    if(par.parentElement.classList.contains(newsCSS.im) || par.parentElement.classList.contains(newsCSS.te) || par.parentElement.classList.contains(newsCSS.da) || par.parentElement.classList.contains(newsCSS.za)){
-        par = par.parentElement;
-        if(inps.edAddIm) {
-            inps.addIm = inps.edAddIm;
-            inps.edAddIm = undefined;
-            forceUpdate();
-        } else {
-            par.setAttribute('data-st', '0');
-        }
-    }
     if(par.classList.contains(newsCSS.upr)){
         if (par.hasAttribute("data-id")) {
             delNews(par.getAttribute("data-id"));
         }else {
             par = par.parentElement.parentElement;
+            par.setAttribute('data-st', '0');
+        }
+    }
+    if(par.parentElement.classList.contains(newsCSS.im) || par.parentElement.classList.contains(newsCSS.te) || par.parentElement.classList.contains(newsCSS.da) || par.parentElement.classList.contains(newsCSS.za)){
+        par = par.parentElement;
+        if(id) {
+            let objNews = info[type][id];
+            objNews.img_url = objNews.edImg_url;
+            objNews.edImg_url = undefined;
+            dispatch(changeNews(CHANGE_NEWS, type, id, objNews));
+        } else if(inps.edAddIm) {
+            inps.addIm = inps.edAddIm;
+            inps.edAddIm = undefined;
+            forceUpdate();
+        } else {
             par.setAttribute('data-st', '0');
         }
     }
@@ -257,13 +268,10 @@ function onCon() {
 }
 
 function setInfo() {
-    sendToServer({
-        type: type,
-        uuid: cState.uuid
-    }, 'POST', "news/getNews")
+    sendToServer(0, 'GET', cNews+"getNews/"+type)
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeNews(CHANGE_NEWS_GL, type, undefined, data.body));
             }
         });
@@ -287,30 +295,27 @@ function addNewsC(e) {
 function delNews (id) {
     console.log("delNews");
     sendToServer({
-        uuid: cState.uuid,
         id: id
-    }, 'POST', "news/delNews")
+    }, 'DELETE', cNews+"delNews")
 }
 
 function chNews (id, inps, typ) {
     console.log("chNews");
     sendToServer({
-        uuid: cState.uuid,
         type: typ,
         val: inps,
         id: id
-    }, 'POST', "news/chNews")
+    }, 'PATCH', cNews+"chNews")
 }
 
 function addNews (inps) {
     console.log("addNews");
     sendToServer({
-        uuid: cState.uuid,
         title: inps.inpnzt,
         date: inps.inpndt,
         img_url: inps.addIm,
         text: inps.inpntt
-    }, 'POST', "news/addNews")
+    }, 'POST', cNews+"addNews")
 }
 
 export function setActNew(name) {
@@ -350,15 +355,13 @@ export function NewsMain() {
         }
         console.log('componentDidUpdate NewsMain.jsx');
     });
-    return (
-        <div className={newsCSS.AppHeader}>
-            {(cState.auth && cState.role != 4) &&
-                <div className={newsCSS.pane}>
-                    <Pane gro={gr}/>
-                </div>
-            }
-            <Outlet />
-        </div>
-    )
+    return <div className={newsCSS.AppHeader}>
+        {(cState.auth && cState.role != 4) &&
+            <div className={newsCSS.pane}>
+                <Pane gro={gr}/>
+            </div>
+        }
+        <Outlet />
+    </div>
 }
 export default NewsMain;

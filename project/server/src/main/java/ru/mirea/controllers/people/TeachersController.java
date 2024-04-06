@@ -19,7 +19,7 @@ import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,7 +33,7 @@ import java.util.UUID;
 @RestController public class TeachersController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -44,7 +44,7 @@ import java.util.UUID;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         User user1 = datas.getDbService().userById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(3L) && user1 != null) {
                 Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
                 if(group != null) {
@@ -58,7 +58,7 @@ import java.util.UUID;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("remPepC", ans, TypesConnect.TEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+            authController.sendMessageFor("remPepC", ans, TypesConnect.TEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -68,7 +68,7 @@ import java.util.UUID;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         User user1 = datas.getDbService().userById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(3L) && user1 != null) {
                 user1.setFio(body.name);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
@@ -78,7 +78,7 @@ import java.util.UUID;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chPepC", ans, TypesConnect.TEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+            authController.sendMessageFor("chPepC", ans, TypesConnect.TEACHERS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -91,7 +91,7 @@ import java.util.UUID;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user1 != null
                 && user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
                 UUID uuid = UUID.randomUUID();
@@ -109,7 +109,7 @@ import java.util.UUID;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("codPepL1C", ans, subscriber.getType(), ref.schId+"", "main", "ht", "main");
+            authController.sendMessageFor("codPepL1C", ans, subscriber.getType(), ref.schId+"", "main", "ht", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -118,7 +118,7 @@ import java.util.UUID;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(3L)) {
                 School school = datas.getDbService().schoolById(Long.parseLong(subscriber.getLvlSch()));
                 if(school != null) {
@@ -138,7 +138,7 @@ import java.util.UUID;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addTeaC", ans, TypesConnect.TEACHERS, subscriber.getLvlSch(), "main", "ht", "main");
+            authController.sendMessageFor("addTeaC", ans, TypesConnect.TEACHERS, subscriber.getLvlSch(), "main", "ht", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -150,7 +150,7 @@ import java.util.UUID;
             Long schId = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 ref.schId = school.getId();

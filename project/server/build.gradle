@@ -1,8 +1,18 @@
+buildscript {
+    ext {
+        spring_version = '2.7.15'
+        lombok_version = '1.18.26'
+    }
+}
+
 plugins {
-    id 'org.springframework.boot' version '2.7.5'
-    id 'io.spring.dependency-management' version "1.0.11.RELEASE"
+    id 'org.springframework.boot' version "${spring_version}"
+    id 'io.spring.dependency-management' version "1.1.4"
     id 'war'
     id 'java'
+    id 'org.asciidoctor.jvm.convert' version '4.0.2'
+    id 'org.asciidoctor.jvm.pdf' version '4.0.2'
+    id "com.benjaminsproule.swagger" version "1.0.14"
 }
 
 group = 'ru.mirea'
@@ -19,12 +29,17 @@ configurations {
     }
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.5'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.5'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.5'
-    implementation 'org.springframework.boot:spring-boot-starter-mail:2.7.5'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.7.5'
+    implementation 'org.asciidoctor:asciidoctorj:2.5.7'
+    implementation 'org.asciidoctor:asciidoctorj-pdf:1.6.2'
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${spring_version}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${spring_version}"
+    implementation "org.springframework.boot:spring-boot-starter-mail:${spring_version}"
+    implementation "org.springframework.boot:spring-boot-starter-security:${spring_version}"
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation ('com.github.javafaker:javafaker:1.0.2'){
@@ -36,8 +51,13 @@ dependencies {
     implementation 'com.h2database:h2:2.1.214'
 //    implementation 'org.postgresql:postgresql'
     implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-    compileOnly 'org.projectlombok:lombok:1.18.26'
-    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+    implementation 'io.swagger:swagger-annotations:1.6.11'
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${lombok_version}"
+    testImplementation "org.projectlombok:lombok:${lombok_version}"
+    testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${spring_version}"
+    testImplementation 'org.springframework.security:spring-security-test:5.7.10'
 }
 
 task build_exe(type: Exec) {
@@ -49,7 +69,89 @@ bootWar {
     archiveFileName = "EJournal"
 }
 
+javadoc {
+    destinationDir = file("docs/javaDoc")
+    options.encoding = 'UTF-8'
+    options.memberLevel = JavadocMemberLevel.PACKAGE
+    options.overview = 'docs/javaDocDescription.html'
+//    source = file("build/classes/")
+//    include("**/*.class")
+}
+
 task runnn_exe {
     dependsOn(bootWar)
     dependsOn(build_exe)
+}
+
+asciidoctorPdf {
+    sourceDir '../../'
+    outputDir 'docs/asciiDoc/build'
+    asciidoctorj {
+        attributes \
+            'icons': 'font',
+            'idseparator': '-',
+            'docinfo': 'shared',
+            'source-highlighter' : 'rouge'
+    }
+}
+
+asciidoctor {
+    sourceDir '../../'
+    outputDir 'docs/asciiDoc/build'
+    baseDirFollowsSourceFile()
+    attributes \
+        'icons': 'font',
+        'idseparator': '-',
+        'docinfo': 'shared'
+    dependsOn asciidoctorPdf
+}
+
+swagger {
+    apiSource {
+        springmvc = true
+        locations = [ 'ru.mirea.controllers']
+        schemes = [ 'http' ]
+        host = 'localhost:8080'
+        basePath = '/'
+        info {
+            title = 'EJournal'
+            version = 'v1'
+            description = 'This is a sample.'
+//            contact {
+//                email = 'email@email.com'
+//                name = 'Name'
+//                url = 'http://www.example.com'
+//            }
+        }
+//        securityDefinition {
+//            name = 'basicAuth'
+//            type = 'basic'
+//        }
+//        securityDefinition {
+//            json = 'securityDefinition.json'
+//        }
+        expandSuperTypes = false
+        outputFormats = ['json', 'html']
+//        templatePath = "${project.rootDir}/src/main/resources/tempSwagger/strapdown.html.hbs"
+        outputPath = "${project.rootDir}/docs/swagger/index.html"
+        swaggerDirectory = "${project.rootDir}/docs/swagger/htmlSwag"
+        attachSwaggerArtifact = true
+    }
+}
+
+//task fixGenerateSwaggerDocumentation {
+//    doLast {
+//        configurations.compileClasspath.resolve()
+//                .collect { it.toURI().toURL() }
+//                .each { buildscript.classLoader.addURL it }
+//
+//        sourceSets.main.output.files
+//                .collect { it.toURI().toURL() }
+//                .each { buildscript.classLoader.addURL it }
+//    }
+//}
+
+task ter {
+//    dependsOn fixGenerateSwaggerDocumentation
+    dependsOn generateSwaggerDocumentation
 }

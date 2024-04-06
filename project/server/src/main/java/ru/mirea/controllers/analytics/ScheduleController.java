@@ -19,7 +19,7 @@ import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.Lesson;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
 @RestController public class ScheduleController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -44,7 +44,7 @@ import java.util.List;
             Lesson lesson = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null && user.getRoles().containsKey(3L)) {
                 ref.group = datas.getDbService().groupById(body.group);
                 if(ref.group != null) {
@@ -89,10 +89,10 @@ import java.util.List;
         return datas.getObj(ans -> {
             ans.add("body", body.obj);
             if(ref.teaU != null) {
-                authController.sendMessageForAll("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), "main", "tea", ref.teaU.getId()+"");
+                authController.sendMessageFor("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), "main", "tea", ref.teaU.getId()+"");
             }
-            authController.sendMessageForAll("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), "main", "ht", "main");
-            authController.sendMessageForAll("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), ref.group.getId()+"", "main", "main");
+            authController.sendMessageFor("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), "main", "ht", "main");
+            authController.sendMessageFor("addLessonC", ans, TypesConnect.SCHEDULE, subscriber.getLvlSch(), ref.group.getId()+"", "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -104,7 +104,7 @@ import java.util.List;
             Group group = null;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
                     ref.group = user.getRoles().get(0L).getGrp();
@@ -133,12 +133,12 @@ import java.util.List;
             Long schId = null, firstG;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.schId = datas.getDbService().getFirstRole(user.getRoles()).getYO().getId();
                 if(user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L)) {
                     body.wrtr.name("bodyG").beginObject();
-                    ref.firstG = datas.groupsByUser(user, body.wrtr);
+                    ref.firstG = datas.groupsBySchoolOfUser(user, body.wrtr);
                     School school = datas.getDbService().schoolById(ref.schId);
                     body.wrtr.name("firstG").value(ref.firstG)
                         .name("bodyT").beginObject();

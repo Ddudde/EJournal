@@ -19,7 +19,7 @@ import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.ServerService;
+import ru.mirea.services.MainService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -31,7 +31,7 @@ import java.util.Map;
 @RestController public class StudentsController {
 
     @Autowired
-    private ServerService datas;
+    private MainService datas;
 
     @Autowired
     private AuthController authController;
@@ -42,7 +42,7 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         User user1 = datas.getDbService().userById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
                 Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
                 if (group != null) {
@@ -58,7 +58,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("remPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+            authController.sendMessageFor("remPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -68,7 +68,7 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         User user1 = datas.getDbService().userById(body.id);
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
                 user1.setFio(body.name);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
@@ -78,7 +78,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("chPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+            authController.sendMessageFor("chPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -87,7 +87,7 @@ import java.util.Map;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null && user.getRoles().containsKey(3L)) {
                 Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
                 if (group != null) {
@@ -108,7 +108,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.sendMessageForAll("addPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
+            authController.sendMessageFor("addPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
         }, body.wrtr, body.bol);
     }
 
@@ -120,7 +120,7 @@ import java.util.Map;
             Long schId = null, grId = body.group;
         };
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null) {
                 School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 ref.schId = school.getId();
@@ -145,11 +145,11 @@ import java.util.Map;
         Subscriber subscriber = authController.getSubscriber(body.uuid);
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
-            body.wrtr = datas.ini(body.toString());
+            body.wrtr = datas.init(body.toString());
             if (user != null) {
                 if(user.getSelRole() == 3L) {
                     body.wrtr.name("bodyG").beginObject();
-                    Long firstG = datas.groupsByUser(user, body.wrtr);
+                    Long firstG = datas.groupsBySchoolOfUser(user, body.wrtr);
                     body.wrtr.name("firstG").value(firstG);
                 } else {
                     body.wrtr.name("yes").value(true);

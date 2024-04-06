@@ -28,6 +28,7 @@ import refreshCl from "../../media/refreshCl.png";
 import copyd from "../../media/copyd.png";
 import copyl from "../../media/copyl.png";
 import {eventSource, sendToServer} from "../main/Main";
+import {cAuth, cHteachers} from "../other/Controllers";
 
 let dispatch, errText, cState, inps, selKid, hteachersInfo, themeState, tps;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -73,12 +74,11 @@ function refreshLink(e) {
     }
     if(id) {
         sendToServer({
-            uuid: cState.uuid,
             id: id
-        }, 'POST', "auth/setCodePep")
+        }, 'PATCH', cAuth+"setCodePep")
             .then(data => {
                 console.log(data);
-                if (data.error == false) {
+                if (data.status == 200) {
                     dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
                 }
             });
@@ -240,7 +240,7 @@ function addSch (par, inp) {
     sendToServer({
         uuid: cState.uuid,
         name: inp
-    }, 'POST', "hteachers/addSch")
+    }, 'POST', cHteachers+"addSch")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -254,7 +254,7 @@ function remSch (id) {
     sendToServer({
         uuid: cState.uuid,
         schId: id
-    }, 'POST', "hteachers/remSch")
+    }, 'POST', cHteachers+"remSch")
 }
 
 function chSch (par, id, inp) {
@@ -263,7 +263,7 @@ function chSch (par, id, inp) {
         uuid: cState.uuid,
         chSch: id,
         name: inp
-    }, 'POST', "hteachers/chSch")
+    }, 'POST', cHteachers+"chSch")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -277,7 +277,7 @@ function remPep (id) {
     sendToServer({
         uuid: cState.uuid,
         id: id
-    }, 'POST', "hteachers/remPep")
+    }, 'POST', cHteachers+"remPep")
 }
 
 function chPep (par, id, inp) {
@@ -286,7 +286,7 @@ function chPep (par, id, inp) {
         uuid: cState.uuid,
         id: id,
         name: inp
-    }, 'POST', "hteachers/chPep")
+    }, 'POST', cHteachers+"chPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -301,7 +301,7 @@ function addPep (par, id, inp) {
         uuid: cState.uuid,
         yo: id,
         name: inp
-    }, 'POST', "hteachers/addPep")
+    }, 'POST', cHteachers+"addPep")
         .then(data => {
             console.log(data);
             if(data.error == false){
@@ -313,7 +313,7 @@ function addPep (par, id, inp) {
 function setInfo() {
     sendToServer({
         uuid: cState.uuid
-    }, 'POST', "hteachers/getInfo")
+    }, 'POST', cHteachers+"getInfo")
         .then(data => {
             console.log(data);
             if(data.error == false){
