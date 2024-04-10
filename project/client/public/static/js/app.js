@@ -126,8 +126,11 @@ function sendToServerApp(bod, typeC, url) {
             if (!res.ok) {
                 throw new Error(`This is an HTTP error: The status is ${res.status}`);
             }
+            console.log("sdfdsfdsf", res);
             return res.json().then(data => ({
                 status: res.status, body: data
+            })).catch(data => ({
+                status: res.status
             }));
         }).catch(data => data);
 }

@@ -1,7 +1,9 @@
 package utils;
 
 import com.github.javafaker.Faker;
+import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
+import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.News;
 import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.User;
@@ -28,6 +30,8 @@ public class RandomUtils {
 
     private final Faker fakerEn = new Faker();
 
+    private static final Gson gson = new Gson();
+
     public final User parentTest = getUser(3872, "Якушева", "Аркадий", "Оксана", "esse_et", "k02o9ezp8tacrfp", false);
 
     public final List<User> usersTest = asList(
@@ -42,6 +46,26 @@ public class RandomUtils {
         getNews(1213L, "День рождения портала!","25.04.2022", null, "Начались первые работы"),
         getNews(352L, "А проект вышел большим...","02.12.2022", "/static/media/tuman.jpg", "Да-да, всё ещё не конец...")
     ));
+
+    public final List<Contacts> contactsTest = new ArrayList<>(asList(
+        getContacts(1213L, "8 (800) 555 35 37\n5 (353) 555 00 88",
+            "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
+            "/static/media/map.jpg")
+    ));
+
+    public Contacts getContactsTest() {
+        return (Contacts) getClone(contactsTest.get(0), Contacts.class);
+    }
+
+    public static Object getClone(Object object, Class clas) {
+        return gson.fromJson(gson.toJson(object),clas);
+    }
+
+    private Contacts getContacts(long id, String contact, String text, String imgUrl) {
+        Contacts contacts = new Contacts(contact, text, imgUrl);
+        contacts.setId(id);
+        return contacts;
+    }
 
     private News getNews(long id, String title, String date, String img_url, String text) {
         News news = new News(title, date, img_url, text);

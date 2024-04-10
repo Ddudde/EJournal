@@ -1,4 +1,4 @@
-package ru.mirea.controllers.analytics;
+package ru.mirea.controllers.school.analytics;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;

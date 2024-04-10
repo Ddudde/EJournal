@@ -19,7 +19,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.security.CustomToken;
 import ru.mirea.services.MainService;
@@ -79,7 +78,6 @@ public class NewsControllerTest {
     @BeforeEach
     void setUp() {
         mainService.postConstruct();
-        Main.datas = mainService;
         mockMvc = MockMvcBuilders.standaloneSetup(newsController)
             .setMessageConverters(converter)
             .addFilters(authInjector).build();
@@ -89,6 +87,8 @@ public class NewsControllerTest {
         return ((CustomToken) SecurityContextHolder.getContext()
             .getAuthentication()).getSub();
     }
+
+
 
     /** RU: админ для новостей сайта
      * удаляет новость с пустыми данными и отправляет 404-код ответа*/
@@ -204,8 +204,7 @@ public class NewsControllerTest {
             "val": "А проект вышел большим...",
             "type": "title"
         }
-        """))
-            .andExpect(status().isOk());
+            """)).andExpect(status().isOk());
         verify(authController).sendMessageFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
             answer.getValue().toString());

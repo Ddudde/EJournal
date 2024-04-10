@@ -189,13 +189,9 @@ function onCon() {
 }
 
 function setInfo() {
-    sendToServer({
-        type: type,
-        uuid: cState.uuid
-    }, 'POST', cContacts+"getContacts")
+    sendToServer(0, 'GET', cContacts+"getContacts/"+type)
         .then(data => {
-            console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeContacts(CHANGE_CONTACT_GL, type, data.body));
             }
         });
@@ -204,11 +200,10 @@ function setInfo() {
 function chContact (inp, p, p1) {
     console.log("chContact");
     sendToServer({
-        uuid: cState.uuid,
         p: p,
         p1: p1,
         val: inp
-    }, 'POST', cContacts+"chContact");
+    }, 'PATCH', cContacts+"chContact");
 }
 
 function chContactC(e) {

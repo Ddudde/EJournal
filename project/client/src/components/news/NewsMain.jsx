@@ -315,7 +315,7 @@ function addNews (inps) {
         date: inps.inpndt,
         img_url: inps.addIm,
         text: inps.inpntt
-    }, 'POST', cNews+"addNews")
+    }, 'POST', cNews+"addNews");
 }
 
 export function setActNew(name) {

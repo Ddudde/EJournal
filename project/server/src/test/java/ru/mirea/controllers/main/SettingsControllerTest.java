@@ -19,7 +19,6 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.mirea.Main;
 import ru.mirea.controllers.AuthController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.models.auth.SettingUser;
@@ -83,7 +82,6 @@ public class SettingsControllerTest {
     @BeforeEach
     void setUp() {
         mainService.postConstruct();
-        Main.datas = mainService;
         mockMvc = MockMvcBuilders.standaloneSetup(settingsController)
             .setMessageConverters(converter)
             .addFilters(authInjector).build();

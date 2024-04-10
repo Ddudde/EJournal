@@ -211,7 +211,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PatchMapping(value = "/remCon")
-    public ResponseEntity<JsonObject> remCon(CustomToken auth) throws Exception {
+    public ResponseEntity<Void> remCon(CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init("", "[PATCH] /remCon");
         if(auth.getSub().getLogin() != null) {
             System.out.println("subscription remCon " + auth.getUUID() + " was noclosed " + auth.getSub().getLogin());
@@ -323,7 +323,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PostMapping(value = "/checkInvCode")
-    public ResponseEntity<JsonObject> checkInvCode(@RequestBody DataAuth body) throws Exception {
+    public ResponseEntity<Void> checkInvCode(@RequestBody DataAuth body) throws Exception {
         User user = datas.getDbService().userByCode(body.code);
         JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /checkInvCode");
         HttpStatus stat = HttpStatus.NOT_FOUND;
@@ -366,7 +366,7 @@ import static ru.mirea.Main.datas;
         return datas.getObjR(ans -> {
             sendMessageFor("codPepL2C", ans, auth.getSub().getType(), "null", auth.getSub().getLvlGr(), "adm", "main");
             sendMessageFor("codPepL1C", ans, auth.getSub().getType(), ref.schId +"", auth.getSub().getLvlGr(), "ht", "main");
-        }, wrtr, stat);
+        }, wrtr, stat, false);
     }
 
     /** RU: Данные клиента используемые AuthController в методах

@@ -20,7 +20,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.security.CustomToken;
@@ -80,7 +79,6 @@ public class AuthControllerTest {
     @BeforeEach
     void setUp() {
         mainService.postConstruct();
-        Main.datas = mainService;
         mockMvc = MockMvcBuilders.standaloneSetup(authController)
             .setMessageConverters(converter)
             .addFilters(authInjector).build();

@@ -4,126 +4,124 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.mirea.Main;
-import ru.mirea.data.SSE.Subscriber;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.Syst;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.School;
-import ru.mirea.services.MainService;
+import ru.mirea.security.CustomToken;
 
 import java.util.Objects;
+
+import static ru.mirea.Main.datas;
 
 /** RU: Контроллер для контактов + Server Sent Events
  * <pre>
  * beenDo: Сделано
- *  Ничего:)
+ *  + Javadoc
+ *  + Security
+ *  + Переписка
+ *  + Переписка2
+ *  + Тестирование
  *
  * toDo: Доделать
- *  - Javadoc
- *  - Security
- *  - Переписка
- *  - Переписка2
- *  - Тестирование
+ *
  * </pre> */
 @RequestMapping("/contacts")
-@NoArgsConstructor
+@RequiredArgsConstructor
 @RestController public class ContactsController {
 
-    @Autowired
-    private MainService datas;
+    /** RU: Контроллер авторизации + сервис */
+    private final AuthController authController;
 
-    @Autowired
-    private AuthController authController;
-
-    @PostMapping(value = "/chContact")
-    public JsonObject chContact(@RequestBody DataContacts body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
+    /** RU: изменение контакта + Server Sent Events
+     * @param body Данные с клиента, задействуются свойства: p, p1, val
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Код статуса */
+    @PatchMapping(value = "/chContact")
+    public ResponseEntity<JsonObject> chContact(@RequestBody DataContacts body, CustomToken auth) throws Exception {
+        User user = auth.getSub().getUser();
         Syst syst = datas.getDbService().getSyst();
         Contacts contacts = null;
-        try {
-            body.wrtr = datas.init(body.toString());
-            if(user != null) {
-                if(user.getRoles().containsKey(4L) && Objects.equals(subscriber.getLvlMore2(), "Por")){
-                    contacts = syst.getContacts();
+        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH]  /chContact");
+        HttpStatus stat = HttpStatus.NOT_FOUND;
+        if(user != null) {
+            if(user.getRoles().containsKey(4L) && Objects.equals(auth.getSub().getLvlMore2(), "Por")){
+                contacts = syst.getContacts();
+            }
+            if(user.getRoles().containsKey(3L) && Objects.equals(auth.getSub().getLvlMore2(), "Yo")){
+                School school = user.getRoles().get(user.getSelRole()).getYO();
+                if(school != null) contacts = school.getContacts();
+            }
+        }
+        if(contacts != null) {
+            if(Objects.equals(body.p, "contact")) {
+                contacts.setContact(body.val);
+            }
+            if(Objects.equals(body.p, "mapPr")) {
+                if(Objects.equals(body.p1, "text")) {
+                    contacts.setText(body.val);
                 }
-                if(user.getRoles().containsKey(3L) && Objects.equals(subscriber.getLvlMore2(), "Yo")){
-                    School school = user.getRoles().get(user.getSelRole()).getYO();
-                    if(school != null) contacts = school.getContacts();
+                if(Objects.equals(body.p1, "imgUrl")) {
+                    contacts.setImgUrl(body.val);
                 }
             }
-            if(contacts != null) {
-                if(Objects.equals(body.p, "contact")) {
-                    contacts.setContact(body.val);
-                }
-                if(Objects.equals(body.p, "mapPr")) {
-                    if(Objects.equals(body.p1, "text")) {
-                        contacts.setText(body.val);
-                    }
-                    if(Objects.equals(body.p1, "imgUrl")) {
-                        contacts.setImgUrl(body.val);
-                    }
-                }
-                datas.getDbService().getContactsRepository().saveAndFlush(contacts);
-                body.wrtr.name("val").value(body.val)
-                    .name("p").value(body.p)
-                    .name("p1").value(body.p1);
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.sendMessageFor("chContactC", ans, TypesConnect.CONTACTS, subscriber.getLvlSch(), "main", "main", subscriber.getLvlMore2());
-        }, body.wrtr, body.bol);
+            datas.getDbService().getContactsRepository().saveAndFlush(contacts);
+            wrtr.name("val").value(body.val)
+                .name("p").value(body.p)
+                .name("p1").value(body.p1);
+            stat = HttpStatus.OK;
+        }
+        return datas.getObjR(ans -> {
+            authController.sendMessageFor("chContactC", ans, TypesConnect.CONTACTS, auth.getSub().getLvlSch(), "main", "main", auth.getSub().getLvlMore2());
+        }, wrtr, stat);
     }
 
-    @PostMapping(value = "/getContacts")
-    public JsonObject getContacts(@RequestBody DataContacts body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
+    /** RU: отправка контактов, портала/школы
+     * @param type Нужный тип: Por - портал, Yo - школы
+     * @param auth Авторизация, в ней подписка и пользователь
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @return Объект и код статуса */
+    @GetMapping(value = "/getContacts/{type}")
+    public ResponseEntity<JsonObject> getContacts(@PathVariable String type, CustomToken auth) throws Exception {
+        User user = auth.getSub().getUser();
+        JsonTreeWriter wrtr = datas.init("type= "+type, "[GET] /getContacts");
+        Syst syst = datas.getDbService().getSyst();
+        Contacts contacts = null;
+        HttpStatus stat = HttpStatus.NOT_FOUND;
         final var ref = new Object() {
-            Long schId = null, conId = null;
+            Long schId = null;
         };
-        try {
-            body.wrtr = datas.init(body.toString());
-            if(subscriber != null) {
-                User user = datas.getDbService().userByLogin(subscriber.getLogin());
-                Syst syst = datas.getDbService().getSyst();
-                if (Objects.equals(body.type, "Yo") && user != null) {
-                    School school = user.getRoles().get(user.getSelRole()).getYO();
-                    ref.schId = school.getId();
-                    if(school != null) ref.conId = school.getContacts().getId();
-                }
-                if (Objects.equals(body.type, "Por") && syst != null) {
-                    ref.conId = syst.getContacts().getId();
-                    ref.schId = null;
-                }
-                if(ref.conId != null) {
-                    Contacts conM = datas.getDbService().contactsById(ref.conId);
-                    body.wrtr.name("body").beginObject()
-                        .name("contact").value(conM.getContact())
-                        .name("mapPr").beginObject()
-                        .name("text").value(conM.getText())
-                        .name("imgUrl").value(conM.getImgUrl())
-                        .endObject().endObject();
-                }
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.infCon(body.uuid, subscriber.getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", body.type);
-        }, body.wrtr, body.bol);
+        if (Objects.equals(type, "Yo") && user != null) {
+            School school = user.getRoles().get(user.getSelRole()).getYO();
+            ref.schId = school.getId();
+            if(school != null) contacts = school.getContacts();
+        }
+        if (Objects.equals(type, "Por") && syst != null) {
+            contacts = syst.getContacts();
+        }
+        if(contacts != null) {
+            wrtr.name("contact").value(contacts.getContact())
+                .name("mapPr").beginObject()
+                .name("text").value(contacts.getText())
+                .name("imgUrl").value(contacts.getImgUrl())
+                .endObject();
+            stat = HttpStatus.OK;
+        }
+        return datas.getObjR(ans -> {
+            authController.infCon(auth.getUUID(), auth.getSub().getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", type);
+        }, wrtr, stat, false);
     }
-}
 
-@ToString
-@NoArgsConstructor @AllArgsConstructor
-class DataContacts {
-    public String uuid, type, p, p1, val;
-    public transient boolean bol = true;
-    public transient JsonTreeWriter wrtr;
+    @ToString
+    @NoArgsConstructor @AllArgsConstructor
+    static class DataContacts {
+        public String p, p1, val;
+    }
 }

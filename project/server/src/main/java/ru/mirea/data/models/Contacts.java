@@ -18,11 +18,6 @@ import javax.persistence.*;
 
     private String imgUrl;
 
-    public Contacts(String contact, String text) {
-        this.contact = contact;
-        this.text = text;
-    }
-
     public Contacts(String contact, String text, String imgUrl) {
         this.contact = contact;
         this.text = text;

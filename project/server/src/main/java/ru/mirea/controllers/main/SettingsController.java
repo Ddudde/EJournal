@@ -42,15 +42,13 @@ import static ru.mirea.Main.datas;
     /** RU: Контроллер авторизации + сервис */
     private final AuthController authController;
 
-
-
     /** RU: подтверждение емэйла
      * @param body Данные с клиента, задействуются свойства: invCod, emailCode, email
      * @param auth Авторизация, в ней подписка и пользователь
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PatchMapping(value = "/checkCodeEmail")
-    public ResponseEntity<JsonObject> checkCodeEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /checkCodeEmail");
         HttpStatus stat = HttpStatus.NOT_FOUND;
         User user = null;
@@ -76,7 +74,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PatchMapping(value = "/startEmail")
-    public ResponseEntity<JsonObject> startEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /startEmail");
         User user = null;
         HttpStatus stat = HttpStatus.NOT_FOUND;
@@ -104,7 +102,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PostMapping(value = "/remNotifToken")
-    public ResponseEntity<JsonObject> remNotifToken(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /remNotifToken");
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if(!ObjectUtils.isEmpty(body.notifToken)) {
@@ -123,7 +121,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PostMapping(value = "/addNotifToken")
-    public ResponseEntity<JsonObject> addNotifToken(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addNotifToken");
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if(!ObjectUtils.isEmpty(body.notifToken)) {
@@ -142,7 +140,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PatchMapping(value = "/chSettings")
-    public ResponseEntity<JsonObject> chSettings(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, CustomToken auth) throws Exception {
         User user = auth.getSub().getUser();
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chBool");
         HttpStatus stat = HttpStatus.NOT_FOUND;
@@ -172,7 +170,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PatchMapping(value = "/checkPasCodeEmail")
-    public ResponseEntity<JsonObject> checkPasCodeEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
         boolean empLogin = ObjectUtils.isEmpty(body.login);
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /checkPasCodeEmail");
         User user = empLogin ? auth.getSub().getUser() : datas.getDbService().userByLogin(body.login);

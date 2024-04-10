@@ -11,12 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.mirea.Main;
 import ru.mirea.controllers.CallInterface;
-import ru.mirea.controllers.TestController;
-import ru.mirea.controllers.analytics.JournalController;
-import ru.mirea.controllers.analytics.ScheduleController;
 import ru.mirea.controllers.main.SettingsController;
 import ru.mirea.controllers.people.StudentsController;
 import ru.mirea.controllers.people.TeachersController;
+import ru.mirea.controllers.school.analytics.JournalController;
+import ru.mirea.controllers.school.analytics.ScheduleController;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.Group;
@@ -25,7 +24,6 @@ import ru.mirea.data.models.school.Period;
 import ru.mirea.data.models.school.School;
 import ru.mirea.security.CustomToken;
 import ru.mirea.services.db.DBService;
-import ru.mirea.services.db.IniDBService;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
@@ -60,8 +58,6 @@ import static java.util.concurrent.TimeUnit.DAYS;
 
     private final PushService pushService;
 
-    private final IniDBService iniDBService;
-
     private final DBService dbService;
 
     private final EmailService emailService;
@@ -69,21 +65,11 @@ import static java.util.concurrent.TimeUnit.DAYS;
     /** RU: Глобальные подписки, для авторизации и Server Sent Events*/
     public final Map<UUID, Subscriber> subscriptions = new ConcurrentHashMap<>();
 
-//    /** RU: инициирует побочные сервисы */
-//    public MainService(DBService dbService, IniDBService iniDBService) {
-//        this.dbService = dbService;
-//        errObj.addProperty("error", true);
-//        iniDBService.firstIni(this);
-//        this.iniDBService = iniDBService;
-//        iniDBService.checkDates();
-//    }
-
     /** RU: инициирует побочные сервисы */
     @PostConstruct
     public void postConstruct() {
+        Main.datas = this;
         errObj.addProperty("error", true);
-        iniDBService.firstIni(this);
-        iniDBService.checkDates();
     }
 
     /** RU: готовит JSON с данными списка пользователей.
@@ -209,14 +195,14 @@ import static java.util.concurrent.TimeUnit.DAYS;
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Новая версия с пустым JSON
      * @see SettingsController#getSettings(CustomToken) Пример использования */
-    public ResponseEntity<JsonObject> getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat) {
+    public ResponseEntity getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat) {
         return getObjR(callable, wrtr, stat, true);
     }
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Новая версия с не пустым JSON
      * @see SettingsController#getSettings(CustomToken) Пример использования */
-    public ResponseEntity<JsonObject> getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat, boolean nul) {
+    public ResponseEntity getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat, boolean nul) {
         var obj = getObj(callable, wrtr, !stat.isError());
         ResponseEntity.BodyBuilder build;
         if(obj == errObj && !stat.isError()) {
@@ -224,7 +210,7 @@ import static java.util.concurrent.TimeUnit.DAYS;
         } else {
             build = ResponseEntity.status(stat);
         }
-        return build.body(nul ? nullObj : obj);
+        return nul ? build.build() : build.body(obj);
     }
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
@@ -329,91 +315,6 @@ import static java.util.concurrent.TimeUnit.DAYS;
         }
         if (k1 != -1) wrtr.endObject().endObject();
         wrtr.endObject();
-    }
-
-    /** RU: готовит JSON с данными списка пользователей
-     * <pre>
-     * user.id : {
-     *     "fio",
-     *     "login",
-     *     "pass",
-     *     "code",
-     * }
-     * </pre>
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @see #getTestInfo(JsonTreeWriter) Пример использования */
-    private void getUsersT(JsonTreeWriter wrtr, List<User> users) throws Exception {
-        for (User user : users) {
-            wrtr.name(user.getId()+"").beginObject()
-                .name("fio").value(user.getFio())
-                .name("login").value(user.getUsername())
-                .name("pass").value(user.getPassword())
-                .name("code").value(user.getCode())
-                .endObject();
-        }
-    }
-
-    /** RU: готовит JSON с данными приготовленными для тестирования по всей системе
-     * <pre>
-     * "bodyT" : {
-     *     "admins" :{{@link #getUsersT}},
-     *     "schools" :{
-     *         school.id : {
-     *             "name",
-     *             "hteachers" :{{@link #getUsersT}},
-     *             "teachers" :{{@link #getUsersT}},
-     *             "groups" :{
-     *                 group.id : {
-     *                     "name",
-     *                     "kids" :{{@link #getUsersT}},
-     *                     "parents" :{{@link #getUsersT}}
-     *                 }
-     *             }
-     *         }
-     *     }
-     * }
-     * </pre>
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @see TestController#getInfo(ru.mirea.controllers.DataTest) Пример использования */
-    @SuppressWarnings("JavadocReference")
-    public void getTestInfo(JsonTreeWriter wrtr) throws Exception {
-        wrtr.name("bodyT").beginObject()
-            .name("admins").beginObject();
-        if(iniDBService.getSyst() != null) getUsersT(wrtr, iniDBService.getSyst().getAdmins());
-        wrtr.endObject()
-            .name("schools").beginObject();
-        if(iniDBService.getSchools() != null) {
-            for (School school : iniDBService.getSchools()) {
-                wrtr.name(school.getId()+"").beginObject()
-                    .name("name").value(school.getName())
-                    .name("hteachers").beginObject();
-                getUsersT(wrtr, school.getHteachers());
-                wrtr.endObject()
-                    .name("teachers").beginObject();
-                List<User> teachersUBySchool = dbService.getLessonRepository().uniqTeachersUBySchool(school.getId());
-                getUsersT(wrtr, teachersUBySchool);
-                wrtr.endObject()
-                    .name("groups").beginObject();
-                for (Group group : school.getGroups()) {
-                    wrtr.name(group.getId()+"").beginObject()
-                        .name("name").value(group.getName())
-                        .name("kids").beginObject();
-                    getUsersT(wrtr, group.getKids());
-                    wrtr.endObject()
-                        .name("parents").beginObject();
-                    for (User user : group.getKids()) {
-                        if(!user.getRoles().containsKey(0L)) continue;
-                        getUsersT(wrtr, user.getRole(0L).getParents());
-                    }
-                    wrtr.endObject()
-                        .endObject();
-                }
-                wrtr.endObject()
-                    .endObject();
-            }
-        }
-        wrtr.endObject()
-            .endObject();
     }
 
     /** RU: исходя из заданных периодов в школе и актуальной даты

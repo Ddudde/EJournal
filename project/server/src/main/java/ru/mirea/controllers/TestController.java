@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,17 +14,17 @@ import ru.mirea.Main;
 import ru.mirea.data.SSE.Subscriber;
 import ru.mirea.data.SSE.TypesConnect;
 import ru.mirea.data.models.auth.User;
-import ru.mirea.services.MainService;
+import ru.mirea.services.db.IniDBService;
+
+import static ru.mirea.Main.datas;
 
 @RequestMapping("/test")
-@NoArgsConstructor
+@RequiredArgsConstructor
 @RestController public class TestController {
 
-    @Autowired
-    private MainService datas;
+    private final AuthController authController;
 
-    @Autowired
-    private AuthController authController;
+    private final IniDBService iniDBService;
 
     @PostMapping(value = "/chBool")
     public JsonObject chBool(@RequestBody DataTest body) {
@@ -38,11 +38,11 @@ import ru.mirea.services.MainService;
                     case "checkbox_test" -> {
                         Main.test = body.val;
                         if(Main.test) {
-                            datas.getIniDBService().testOn();
+                            iniDBService.testOn();
                         } else {
-                            datas.getIniDBService().testOff();
+                            iniDBService.testOff();
                         }
-                        datas.getTestInfo(body.wrtr);
+                        iniDBService.getTestInfo(body.wrtr);
                     }
                     default -> {}
                 }
@@ -63,7 +63,7 @@ import ru.mirea.services.MainService;
                     .name("checkbox_debug").value(Main.debug)
                     .name("checkbox_test").value(Main.test)
                     .endObject();
-                datas.getTestInfo(body.wrtr);
+                iniDBService.getTestInfo(body.wrtr);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {

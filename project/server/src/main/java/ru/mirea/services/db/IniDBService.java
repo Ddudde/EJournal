@@ -1,11 +1,14 @@
 package ru.mirea.services.db;
 
 import com.github.javafaker.Faker;
+import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.mirea.Main;
+import ru.mirea.controllers.TestController;
 import ru.mirea.data.models.Contacts;
 import ru.mirea.data.models.News;
 import ru.mirea.data.models.Syst;
@@ -13,26 +16,25 @@ import ru.mirea.data.models.auth.Role;
 import ru.mirea.data.models.auth.SettingUser;
 import ru.mirea.data.models.auth.User;
 import ru.mirea.data.models.school.*;
-import ru.mirea.services.MainService;
 
+import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
 import static java.util.Arrays.asList;
+import static ru.mirea.Main.datas;
 
 /** RU: Класс для рандомизация данных, тестовые данные для БД
  * <pre>
  * beenDo: Сделано
  *  + Переписка
  *  # Переписка2
- *
- * toDo: Доделать
- *  - Javadoc
- *  - Тестирование
+ *  + Javadoc
+ *  + Тестирование
  * </pre> */
-@Getter
+@Getter @Setter
 @NoArgsConstructor
 @Service public class IniDBService {
 
@@ -72,41 +74,42 @@ import static java.util.Arrays.asList;
 
     private final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
 
-    /** RU: открытие Server Sent Events для нового клиента */
+    /** RU: дата: +30 дней от актуальной */
     private Date dateAfter;
 
-    /** RU: открытие Server Sent Events для нового клиента */
-    private MainService serv;
-
-    public void firstIni(MainService serv) {
-        this.serv = serv;
-        SettingUser setts = serv.getDbService().getSettingUserRepository().saveAndFlush(new SettingUser(1));
-        Role role = serv.getDbService().getRoleRepository().saveAndFlush(new Role("ex@ya.ru"));
-        User user = serv.getDbService().getUserRepository().saveAndFlush(new User("nm12", "1111",
+    @PostConstruct
+    private void postConstruct() {
+        SettingUser setts = datas.getDbService().getSettingUserRepository().saveAndFlush(new SettingUser(1));
+        Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role("ex@ya.ru"));
+        User user = datas.getDbService().getUserRepository().saveAndFlush(new User("nm12", "1111",
             "Петров В.В.", Map.of(
             4L, role
         ), 4L, setts));
         if(Main.test) testOn();
+        checkDates();
     }
 
+    /** RU: удаление инвайта для новой роли */
     private void delCodeUser(User user){
         if(user != null){
             user.setCode(null);
             user.setExpDate(null);
-            serv.getDbService().getUserRepository().saveAndFlush(user);
+            datas.getDbService().getUserRepository().saveAndFlush(user);
         }
     }
 
+    /** RU: удаление инвайта для регистрации нового пользователя */
     private void delInv(User inv) {
-        if(inv != null){
-            School school = serv.getDbService().getFirstRole(inv.getRoles()).getYO();
+        if(inv != null) {
+            School school = datas.getDbService().getFirstRole(inv.getRoles()).getYO();
             school.getHteachers().remove(inv);
-            serv.getDbService().getSchoolRepository().saveAndFlush(school);
-            serv.getDbService().getUserRepository().delete(inv);
+            datas.getDbService().getSchoolRepository().saveAndFlush(school);
+            datas.getDbService().getUserRepository().delete(inv);
         }
     }
 
-    public void checkDates(){
+    /** RU: проверяет коды подтверждений электронных почт и инвайтов на истечение срока */
+    private void checkDates() {
         try {
             long now = Main.df.parse(Main.df.format(new Date())).getTime();
             for(User user : getUsers()){
@@ -118,11 +121,12 @@ import static java.util.Arrays.asList;
                         delCodeUser(user);
                     }
                 }
-                if(user.getSettings() != null && !ObjectUtils.isEmpty(user.getSettings().getExpDateEC()) && now >= Main.df.parse(user.getSettings().getExpDateEC()).getTime()){
-                    System.out.println("Удалён код email" + user.getSettings().getEmailCode() + " по истечению срока действия");
-                    user.getSettings().setEmailCode(null);
-                    user.getSettings().setExpDateEC(null);
-                    serv.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
+                SettingUser settingUser = user.getSettings();
+                if(settingUser != null && !ObjectUtils.isEmpty(settingUser.getExpDateEC()) && now >= Main.df.parse(settingUser.getExpDateEC()).getTime()){
+                    System.out.println("Удалён код email" + settingUser.getEmailCode() + " по истечению срока действия");
+                    settingUser.setEmailCode(null);
+                    settingUser.setExpDateEC(null);
+                    datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                 }
             }
         } catch (ParseException e) {
@@ -130,20 +134,24 @@ import static java.util.Arrays.asList;
         }
     }
 
-    public User getNUser(Role roleN, Long selRole) {
-        SettingUser settingUser = serv.getDbService().getSettingUserRepository()
+    /** RU: создаёт данные пользователя:
+     * настройки, роль
+     * @param roleN Роль пользователя
+     * @param selRole Выбранная роль пользователя */
+    private User getNUser(Role roleN, Long selRole) {
+        SettingUser settingUser = datas.getDbService().getSettingUserRepository()
             .saveAndFlush(new SettingUser((int) (Math.round(Math.random() * 2) + 1)));
         setts.add(settingUser);
-        Role role = serv.getDbService().getRoleRepository().saveAndFlush(roleN);
+        Role role = datas.getDbService().getRoleRepository().saveAndFlush(roleN);
         roles.add(role);
         String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
         if(fakerEn.bool().bool()) {
             String uuid = UUID.randomUUID().toString();
-            return serv.getDbService().getUserRepository().saveAndFlush(new User(fio, Map.of(
+            return datas.getDbService().getUserRepository().saveAndFlush(new User(fio, Map.of(
                 selRole, role
             ), selRole, Main.df.format(dateAfter), uuid));
         } else {
-            return serv.getDbService().getUserRepository()
+            return datas.getDbService().getUserRepository()
                 .saveAndFlush(new User(fakerEn.internet().slug(), fakerEn.internet().password(),
                     fio, Map.of(
                     selRole, role
@@ -151,21 +159,23 @@ import static java.util.Arrays.asList;
         }
     }
 
+    /** RU: создаёт данные системы:
+     * Новости, контакты, админы-пользователи */
     private void getRandSystem() {
         Instant after = Instant.now().plus(Duration.ofDays(30));
         dateAfter = Date.from(after);
-        newsList = serv.getDbService().getNewsRepository().saveAllAndFlush(asList(
+        newsList = datas.getDbService().getNewsRepository().saveAllAndFlush(asList(
             new News("День рождения портала!","25.04.2022", "Начались первые работы"),
             new News("А проект вышел большим...","02.12.2022", "/static/media/tuman.jpg", "Да-да, всё ещё не конец...")
         ));
 
-        contactsList = serv.getDbService().getContactsRepository().saveAllAndFlush(asList(
+        contactsList = datas.getDbService().getContactsRepository().saveAllAndFlush(asList(
             new Contacts(
                 "8 (800) 555 35 37\n5 (353) 555 00 88",
                 "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
                 "/static/media/map.jpg")
         ));
-        syst = serv.getDbService().createSyst(new Syst(newsList, contactsList.get(0)));
+        syst = datas.getDbService().createSyst(new Syst(newsList, contactsList.get(0)));
         System.out.println(getSyst());
 
         users.clear();
@@ -178,9 +188,11 @@ import static java.util.Arrays.asList;
             users.add(user);
             syst.getAdmins().add(user);
         }
-        syst = serv.getDbService().getSystRepository().saveAndFlush(syst);
+        syst = datas.getDbService().getSystRepository().saveAndFlush(syst);
     }
 
+    /** RU: рандомит расписание:
+     * 6 возможных дней, 7 возможных уроков, и записывает учителю урок */
     private void getRandSchedule(School school, Group group, List<User> tea){
         int day, les;
         Lesson lesson;
@@ -198,15 +210,17 @@ import static java.util.Arrays.asList;
                 }
                 if(!teaU.getRoles().get(2L).getSubjects().contains(nameSubj)) {
                     teaU.getRoles().get(2L).getSubjects().add(nameSubj);
-                    serv.getDbService().getRoleRepository().saveAndFlush(teaU.getRoles().get(2L));
+                    datas.getDbService().getRoleRepository().saveAndFlush(teaU.getRoles().get(2L));
                 }
-                lesson = serv.getDbService().getLessonRepository()
+                lesson = datas.getDbService().getLessonRepository()
                     .saveAndFlush(new Lesson(school, group, day, les, kab, nameSubj, teaU));
                 lessons.add(lesson);
             }
         }
     }
 
+    /** RU: создаёт данные групп и относящиеся к ним данные:
+     * учеников, родителей, группа, расписание */
     private List<Group> getRandGroups(School school, List<User> tea) {
         List<Group> groupsPerSch = new ArrayList<>();
         int max = (int) Math.round(Math.random() * 3) + 2, i, max1, i1,
@@ -223,7 +237,7 @@ import static java.util.Arrays.asList;
                 namI++;
                 maxGrI--;
             }
-            Group group = serv.getDbService().getGroupRepository().saveAndFlush(new Group(nameGrp));
+            Group group = datas.getDbService().getGroupRepository().saveAndFlush(new Group(nameGrp));
 
             max1 = (int) Math.round(Math.random() * 3) + 2;
             for(i1 = 0; i1 < max1; i1++) {
@@ -240,12 +254,12 @@ import static java.util.Arrays.asList;
                 userP.getRole(1L).getKids().add(userK1);
                 userP.getRole(1L).getKids().add(userK2);
                 userP.setSelKid(userK1.getId());
-                users.add(serv.getDbService().getUserRepository().saveAndFlush(userP));
-                users.add(serv.getDbService().getUserRepository().saveAndFlush(userK1));
-                users.add(serv.getDbService().getUserRepository().saveAndFlush(userK2));
+                users.add(datas.getDbService().getUserRepository().saveAndFlush(userP));
+                users.add(datas.getDbService().getUserRepository().saveAndFlush(userK1));
+                users.add(datas.getDbService().getUserRepository().saveAndFlush(userK2));
             }
 
-            group = serv.getDbService().getGroupRepository().saveAndFlush(group);
+            group = datas.getDbService().getGroupRepository().saveAndFlush(group);
             groupsPerSch.add(group);
 
             getRandSchedule(school, group, tea);
@@ -253,6 +267,9 @@ import static java.util.Arrays.asList;
         return groupsPerSch;
     }
 
+    /** RU: создаёт данные школ и относящиеся к ним данные:
+     * школа, новости, контакты, периоды обучения, групп
+     * пользователей: завучей, учителей, учеников, родителей*/
     private void getRandSchools() {
         groups.clear();
         schools.clear();
@@ -263,18 +280,18 @@ import static java.util.Arrays.asList;
         School school = null;
         for(i = 0; i < max; i++) {
             String nameSch = namesSch[(int) Math.round(Math.random() * 2)] + (Math.round(Math.random() * 5000) + 1);
-            News news = serv.getDbService().getNewsRepository()
+            News news = datas.getDbService().getNewsRepository()
                 .saveAndFlush(new News("Мы(" + nameSch + ") перешли на этот сервис","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
             newsList.add(news);
 
-            Contacts contacts = serv.getDbService().getContactsRepository()
+            Contacts contacts = datas.getDbService().getContactsRepository()
                 .saveAndFlush(new Contacts(
                     "8 (800) 555 35 36\n5 (353) 555 00 88",
                     nameSch + "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
                     "/static/media/map.jpg"));
             contactsList.add(contacts);
 
-            List<Period> periodsPerSch = serv.getDbService().getPeriodRepository()
+            List<Period> periodsPerSch = datas.getDbService().getPeriodRepository()
                 .saveAllAndFlush(asList(
                     new Period("I четверть", "01.09.23", "03.11.23"),
                     new Period("II четверть", "12.11.23", "29.12.23"),
@@ -283,7 +300,7 @@ import static java.util.Arrays.asList;
                 ));
             periods.addAll(periodsPerSch);
 
-            school = serv.getDbService().getSchoolRepository()
+            school = datas.getDbService().getSchoolRepository()
                 .saveAndFlush(new School(nameSch, asList(news), contacts, periodsPerSch));
 
             User user = null, userL;
@@ -312,75 +329,161 @@ import static java.util.Arrays.asList;
 
             school.setGroups(getRandGroups(school, new ArrayList<>(school.getTeachers())));
 
-            schools.add(serv.getDbService().getSchoolRepository().saveAndFlush(school));
+            schools.add(datas.getDbService().getSchoolRepository().saveAndFlush(school));
         }
-        System.out.println("testAcP " + serv.getActualPeriodBySchool(school));
-        System.out.println("testP " + serv.getDbService().getSchoolRepository().uniqPeriodsById(school.getId()));
     }
 
+    /** RU: рандомизируются данные системы(новости, админы), создаются несколько школ
+     * и сохраняются в базу данных */
     public void testOn() {
         getRandSystem();
         getRandSchools();
     }
 
+    /** RU: очищаются/удаляются все данные */
     public void testOff(){
         if(!ObjectUtils.isEmpty(days)) {
-            serv.getDbService().getDayRepository().deleteAll(days);
+            datas.getDbService().getDayRepository().deleteAll(days);
             days.clear();
         }
         if(!ObjectUtils.isEmpty(marks)) {
-            serv.getDbService().getMarkRepository().deleteAll(marks);
+            datas.getDbService().getMarkRepository().deleteAll(marks);
             marks.clear();
         }
         if(syst != null) {
-            serv.getDbService().getSystRepository().delete(syst);
+            datas.getDbService().getSystRepository().delete(syst);
             syst = null;
         }
         if(!ObjectUtils.isEmpty(lessons)) {
-            serv.getDbService().getLessonRepository().deleteAll(lessons);
+            datas.getDbService().getLessonRepository().deleteAll(lessons);
             lessons.clear();
         }
         if(!ObjectUtils.isEmpty(users)) {
             for(User user : users) {
                 user.rem();
             }
-            users = serv.getDbService().getUserRepository().saveAllAndFlush(users);
+            users = datas.getDbService().getUserRepository().saveAllAndFlush(users);
         }
         if(!ObjectUtils.isEmpty(roles)) {
-            serv.getDbService().getRoleRepository().deleteAll(roles);
+            datas.getDbService().getRoleRepository().deleteAll(roles);
             roles.clear();
         }
         if(!ObjectUtils.isEmpty(groups)) {
-            serv.getDbService().getGroupRepository().deleteAll(groups);
+            datas.getDbService().getGroupRepository().deleteAll(groups);
             groups.clear();
         }
         if(!ObjectUtils.isEmpty(schools)) {
-            serv.getDbService().getSchoolRepository().deleteAll(schools);
+            datas.getDbService().getSchoolRepository().deleteAll(schools);
             schools.clear();
         }
         if(!ObjectUtils.isEmpty(users)) {
-            serv.getDbService().getUserRepository().deleteAll(users);
+            datas.getDbService().getUserRepository().deleteAll(users);
             users.clear();
         }
         if(request != null) {
-            serv.getDbService().getRequestRepository().delete(request);
+            datas.getDbService().getRequestRepository().delete(request);
             request = null;
         }
         if(!ObjectUtils.isEmpty(periods)) {
-            serv.getDbService().getPeriodRepository().deleteAll(periods);
+            datas.getDbService().getPeriodRepository().deleteAll(periods);
             periods.clear();
         }
         if(!ObjectUtils.isEmpty(contactsList)) {
-            serv.getDbService().getContactsRepository().deleteAll(contactsList);
+            datas.getDbService().getContactsRepository().deleteAll(contactsList);
             contactsList.clear();
         }
         if(!ObjectUtils.isEmpty(newsList)) {
-            serv.getDbService().getNewsRepository().deleteAll(newsList);
+            datas.getDbService().getNewsRepository().deleteAll(newsList);
             newsList.clear();
         }
         if(!ObjectUtils.isEmpty(setts)) {
-            serv.getDbService().getSettingUserRepository().deleteAll(setts);
+            datas.getDbService().getSettingUserRepository().deleteAll(setts);
             setts.clear();
         }
+    }
+
+    /** RU: готовит JSON с данными списка пользователей
+     * <pre>
+     * user.id : {
+     *     "fio",
+     *     "login",
+     *     "pass",
+     *     "code",
+     * }
+     * </pre>
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @see #getTestInfo(JsonTreeWriter) Пример использования */
+    private void getUsersT(JsonTreeWriter wrtr, List<User> users) throws Exception {
+        for (User user : users) {
+            wrtr.name(user.getId()+"").beginObject()
+                .name("fio").value(user.getFio())
+                .name("login").value(user.getUsername())
+                .name("pass").value(user.getPassword())
+                .name("code").value(user.getCode())
+                .endObject();
+        }
+    }
+
+    /** RU: готовит JSON с данными приготовленными для тестирования по всей системе
+     * <pre>
+     * "bodyT" : {
+     *     "admins" :{{@link #getUsersT}},
+     *     "schools" :{
+     *         school.id : {
+     *             "name",
+     *             "hteachers" :{{@link #getUsersT}},
+     *             "teachers" :{{@link #getUsersT}},
+     *             "groups" :{
+     *                 group.id : {
+     *                     "name",
+     *                     "kids" :{{@link #getUsersT}},
+     *                     "parents" :{{@link #getUsersT}}
+     *                 }
+     *             }
+     *         }
+     *     }
+     * }
+     * </pre>
+     * @exception Exception Исключение вызывается при ошибках с Json
+     * @see TestController#getInfo(ru.mirea.controllers.DataTest) Пример использования */
+    @SuppressWarnings("JavadocReference")
+    public void getTestInfo(JsonTreeWriter wrtr) throws Exception {
+        wrtr.name("bodyT").beginObject()
+            .name("admins").beginObject();
+        if(getSyst() != null) getUsersT(wrtr, getSyst().getAdmins());
+        wrtr.endObject()
+            .name("schools").beginObject();
+        if(getSchools() != null) {
+            for (School school : getSchools()) {
+                wrtr.name(school.getId()+"").beginObject()
+                    .name("name").value(school.getName())
+                    .name("hteachers").beginObject();
+                getUsersT(wrtr, school.getHteachers());
+                wrtr.endObject()
+                    .name("teachers").beginObject();
+                List<User> teachersUBySchool = datas.getDbService().getLessonRepository().uniqTeachersUBySchool(school.getId());
+                getUsersT(wrtr, teachersUBySchool);
+                wrtr.endObject()
+                    .name("groups").beginObject();
+                for (Group group : school.getGroups()) {
+                    wrtr.name(group.getId()+"").beginObject()
+                        .name("name").value(group.getName())
+                        .name("kids").beginObject();
+                    getUsersT(wrtr, group.getKids());
+                    wrtr.endObject()
+                        .name("parents").beginObject();
+                    for (User user : group.getKids()) {
+                        if(!user.getRoles().containsKey(0L)) continue;
+                        getUsersT(wrtr, user.getRole(0L).getParents());
+                    }
+                    wrtr.endObject()
+                        .endObject();
+                }
+                wrtr.endObject()
+                    .endObject();
+            }
+        }
+        wrtr.endObject()
+            .endObject();
     }
 }

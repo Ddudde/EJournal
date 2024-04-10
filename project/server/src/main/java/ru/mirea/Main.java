@@ -47,7 +47,6 @@ public class Main {
     public static void main(String... args) {
         ctx = SpringApplication.run(Main.class);
         System.out.println("Hello world!");
-        datas = (MainService) ctx.getBean("mainService");
 //        User user = datas.getDbService().userByLogin("nm12");
 //        System.out.println(user);
 //        School school = datas.getDbService().schoolById(26L);

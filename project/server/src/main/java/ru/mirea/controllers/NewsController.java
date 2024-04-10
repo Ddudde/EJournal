@@ -51,7 +51,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @DeleteMapping(value = "/delNews")
-    public ResponseEntity<JsonObject> delNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> delNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /delNews");
         User user = auth.getSub().getUser();
         News news = datas.getDbService().newsById(body.id);
@@ -80,7 +80,7 @@ import static ru.mirea.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PatchMapping(value = "/chNews")
-    public ResponseEntity<JsonObject> chNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH]  /chNews");
         User user = auth.getSub().getUser();
         News news = datas.getDbService().newsById(body.id);
@@ -123,7 +123,7 @@ import static ru.mirea.Main.datas;
             @ApiResponse(code = 500, message = "Ошибка сервера, обычно JSON")
     })
     @PostMapping(value = "/addNews")
-    public ResponseEntity<JsonObject> addNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addNews");
         User user = auth.getSub().getUser();
         Syst syst = datas.getDbService().getSyst();
@@ -189,6 +189,7 @@ import static ru.mirea.Main.datas;
         JsonTreeWriter wrtr = datas.init("type= "+type, "[GET] /getNews");
         List<News> list = null;
         Syst syst = datas.getDbService().getSyst();
+        HttpStatus stat = HttpStatus.NOT_FOUND;
         final var ref = new Object() {
             Long schId = null;
             String log = null;
@@ -213,10 +214,11 @@ import static ru.mirea.Main.datas;
                     .name("text").value(newsU.getText())
                     .endObject();
             }
+            stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
             authController.infCon(auth.getUUID(), ref.log, TypesConnect.NEWS, ref.schId + "", "main", "main", type);
-        }, wrtr, HttpStatus.OK, false);
+        }, wrtr, stat, false);
     }
 
     /** RU: Данные клиента используемые NewsController в методах
