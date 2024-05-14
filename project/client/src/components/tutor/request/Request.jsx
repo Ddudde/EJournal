@@ -18,7 +18,7 @@ function addReq(e) {
         date: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})
     }, 'POST', cRequests+"addReq")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 let title, text;
                 title = "Внимание!";
                 text = "Данные отправлены. В течении дня мы с вами свяжемся. До связи:3";

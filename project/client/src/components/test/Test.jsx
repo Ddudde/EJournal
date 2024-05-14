@@ -57,13 +57,12 @@ function getPep(x) {
 function chNotif(id) {
     console.log(id, checkBoxInfo[id]);
     sendToServer({
-        uuid: cState.uuid,
         id: id,
         val: !checkBoxInfo[id]
-    }, 'POST', cTest+"chBool")
+    }, 'PATCH', cTest+"chTests")
         .then(data => {
-            if(data.error == false){
-                dispatch(changeTest(CHANGE_TEST_GL, data.bodyT));
+            if(data.status == 200){
+                dispatch(changeTest(CHANGE_TEST_GL, data.body.bodyT));
             }
         });
 }
@@ -71,15 +70,13 @@ function chNotif(id) {
 function setInfo() {
     // dispatch(changeCB("checkbox_debug", true));
     // dispatch(changeCB("checkbox_test", true));
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cTest+"getInfo")
+    sendToServer(0, 'GET', cTest+"getInfo")
         .then(data => {
-            if(data.error == false){
-                for(let id in data.bodyS) {
-                    dispatch(changeCB(id, !data.bodyS[id]));
+            if(data.status == 200){
+                for(let id in data.body.bodyS) {
+                    dispatch(changeCB(id, !data.body.bodyS[id]));
                 }
-                dispatch(changeTest(CHANGE_TEST_GL, data.bodyT));
+                dispatch(changeTest(CHANGE_TEST_GL, data.body.bodyT));
             }
         });
 }

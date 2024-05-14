@@ -34,7 +34,7 @@ import ls3 from "../../media/ls-icon3.png";
 import {cAuth, cProfiles} from "../other/Controllers";
 
 let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling,
-timid, timidP, d1, warnErrNet, server;
+timid, d1, warnErrNet, server;
 scrolling = false;
 // eslint-disable-next-line no-undef
 server = servLink;
@@ -200,14 +200,8 @@ export function remEvent(id) {
     dispatch(changeEvents(CHANGE_EVENT_DEL, undefined, id));
 }
 
-function badPing() {
-    if(warnErrNet == undefined){
-        warnErrNet = addEvent("Отсутствует подключение к серверу", undefined, true);
-    }
-}
-
 function iniNet() {
-    eventSource = new EventSource(server + '/' + cAuth + 'open-stream');
+    eventSource = new EventSource(server + '/' + cAuth + 'start/' + localStorage.getItem("sec"));
     eventSource.onopen = e => console.log('open');
     eventSource.onerror = e => {
         if (e.readyState == EventSource.CLOSED) {
@@ -216,35 +210,35 @@ function iniNet() {
         } else {
             console.log('try to reconnect....');
         }
+        if(warnErrNet == undefined) {
+            warnErrNet = addEvent("Отсутствует подключение к серверу", undefined, true);
+        }
     };
     eventSource.addEventListener('chck', e => {
         const msg = JSON.parse(e.data);
         console.log(msg);
-        dispatch(changeState(CHANGE_STATE, "uuid", msg))
+        if (msg) {
+            localStorage.setItem("sec", msg);
+            dispatch(changeState(CHANGE_STATE, "uuid", msg));
+        }
+        if(warnErrNet != undefined){
+            remEvent(warnErrNet);
+            warnErrNet = undefined;
+        }
         sendToServer({
             login: cState.login,
-            uuid: msg,
             notifToken: localStorage.getItem("notifToken"),
             permis: Notification.permission == "granted"
         }, 'PATCH', cAuth+"infCon")
             .then(data => {
-                if(data.status == 200){
+                if(data.status == 200) {
                     dispatch(changeState(CHANGE_STATE_GL, undefined, data.body));
-                    if(data.body.uuid) localStorage.setItem("sec", data.body.uuid);
                     // eslint-disable-next-line no-undef
                     appApp.dispatchEvent(new Event("op"));
                     if(cState.login) setSettings(dispatch);
                     eventSource.dispatchEvent(new Event("connect"));
                 }
             });
-    }, false);
-    eventSource.addEventListener('ping', e => {
-        if(warnErrNet != undefined){
-            remEvent(warnErrNet);
-            warnErrNet = undefined;
-        }
-        clearTimeout(timidP);
-        timidP = setTimeout(badPing,15000);
     }, false);
 }
 
@@ -286,7 +280,6 @@ export function Main() {
         closeStream();
         clearTimeout(timid);
         themeInfo = undefined;
-        clearInterval(timidP);
         console.log("I was triggered during componentWillUnmount Main.jsx")
     };
     gr.groups = {
@@ -363,7 +356,6 @@ export function Main() {
                 timid = setTimeout(tim,300);
             }
         };
-        timidP = setTimeout(badPing,15000);
         return unMount;
     }, []);
     useEffect(() => {

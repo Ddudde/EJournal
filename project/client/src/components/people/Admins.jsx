@@ -52,7 +52,7 @@ function refreshLink(e) {
     text = "Ссылка успешно обновлена"
     inp = e.target.parentElement.querySelector("input");
     if (inp.hasAttribute("data-id")) {
-        id = inp.getAttribute("data-id").split("_");
+        id = inp.getAttribute("data-id").split("*");
         // dispatch(changePeople(type, 0, id[0], id[1], sit + "/invite/" + gen_cod(), "link"));
         // dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
         sendToServer({
@@ -73,7 +73,7 @@ function onDel(e, type) {
     if(par.classList.contains(peopleCSS.pepl)){
         inp = par.querySelector("input:not([readOnly])");
         if (inp.hasAttribute("data-id")) {
-            id = inp.getAttribute("data-id").split("_");
+            id = inp.getAttribute("data-id").split("*");
             // dispatch(changePeople(type, 0, id[0], id[1]));
             remInv(type, id[1]);
         }
@@ -109,7 +109,7 @@ function onFin(e, type) {
             par = par.parentElement;
             if(type){
                 if(inp.hasAttribute("data-id")){
-                    let id = inp.getAttribute("data-id").split("_");
+                    let id = inp.getAttribute("data-id").split("*");
                     changeInv(type, id[1], inp.value, par);
                     // dispatch(changePeople(type, 2, id, undefined, inp.value));
                 }
@@ -169,23 +169,21 @@ function addPepC(e) {
 }
 
 function remInv (type, id) {
-    console.log("remInv");
+    console.log("remInv", id);
     sendToServer({
-        uuid: cState.uuid,
         id: id
-    }, 'POST', cAdmins+"remPep")
+    }, 'DELETE', cAdmins+"remPep")
 }
 
 function changeInv (type, id, inp, par) {
-    console.log("changeInv");
+    console.log("changeInv", id, inp);
     sendToServer({
-        uuid: cState.uuid,
         id: id,
         name: inp
-    }, 'POST', cAdmins+"chPep")
+    }, 'PATCH', cAdmins+"chPep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -194,12 +192,11 @@ function changeInv (type, id, inp, par) {
 function addInv (type, inp, par) {
     console.log("addInv");
     sendToServer({
-        uuid: cState.uuid,
         name: inp
     }, 'POST', cAdmins+"addPep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -210,12 +207,10 @@ function onCon(e) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cAdmins+"getAdmins")
+    sendToServer(0, 'GET', cAdmins+"getAdmins")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changePeople(tps.gl, undefined, undefined, undefined, data.body));
             }
             for(let el of document.querySelectorAll("." + peopleCSS.ed + " > *[id^='inpn']")){
@@ -239,7 +234,7 @@ function getBlock(x, b) {
                 {info.login && <img className={peopleCSS.profIm} src={themeState.theme_ch ? profd : profl} onClick={e=>goToProf(info.login)} title="Перейти в профиль" alt=""/>}
                 <img className={peopleCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
                 <img className={peopleCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={e=>onDel(e, tps.del)} title="Удалить" alt=""/>
-                <input className={peopleCSS.inp+" "+peopleCSS.copyInp} data-id={x ? info.login+"_"+x : undefined} id={"inpcpt_" + x} placeholder="Ссылка не создана" defaultValue={codeLink} type="text" readOnly/>
+                <input className={peopleCSS.inp+" "+peopleCSS.copyInp} data-id={x ? info.login+"*"+x : undefined} id={"inpcpt_" + x} placeholder="Ссылка не создана" defaultValue={codeLink} type="text" readOnly/>
                 <img className={peopleCSS.imginp+" "+peopleCSS.refrC} src={themeState.theme_ch ? refreshCd : refreshCl} onClick={refreshLink} title="Создать ссылку-приглашение" alt=""/>
                 <img className={peopleCSS.imginp} src={themeState.theme_ch ? copyd : copyl} title="Копировать" data-enable={info.link ? "1" : "0"} onClick={(e)=>copyLink(e, codeLink, info.name)} alt=""/>
             </div>
@@ -258,7 +253,7 @@ function getBlock(x, b) {
             <div className={peopleCSS.preinf}>
                 ФИО:
             </div>
-            <input className={peopleCSS.inp} data-id={x ? info.login+"_"+x : undefined} id={"inpnpt_" + (x?x:"")} placeholder={"Фамилия И.О."} defaultValue={x ? info.name : inps.inpnpt} onChange={chStatB} type="text"/>
+            <input className={peopleCSS.inp} data-id={x ? info.login+"*"+x : undefined} id={"inpnpt_" + (x?x:"")} placeholder={"Фамилия И.О."} defaultValue={x ? info.name : inps.inpnpt} onChange={chStatB} type="text"/>
             {ele(false, "inpnpt_" + (x?x:""), inps)}
             <img className={peopleCSS.imginp+" yes "} src={yes} onClick={e=>onFin(e, x ? tps.ch : undefined)} title="Подтвердить" alt=""/>
             <img className={peopleCSS.imginp} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>

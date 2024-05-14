@@ -1,0 +1,8 @@
+AuthController: Контроллер для раздела авторизации и управлением Server Sent Events
+AdminsController: Контроллер для раздела управления/просмотра администраторов + Server Sent Events
+RequestController: Контроллер для раздела заявок на подключение к системе учебных учреждений + Server Sent Events
+ProfileController: Контроллер для раздела профиля и частично управлением аккаунтом + Server Sent Events
+TestController: Контроллер для раздела тестирования
+NewsController: Контроллер для раздела новостей + Server Sent Events
+SettingsController: Контроллер для раздела настроек
+ContactsController: Контроллер для раздела контактов + Server Sent Events

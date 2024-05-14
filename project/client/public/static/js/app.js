@@ -113,7 +113,7 @@ function sendToServerApp(bod, typeC, url) {
         headers: {'Content-Type': 'application/json'}
     };
     if(localStorage.getItem("sec")) {
-        sed.headers.Authorization = localStorage.getItem("sec");
+        sed.headers["x-access-token"] = localStorage.getItem("sec");
         console.log("yyes send", localStorage.getItem("sec"));
     }
     if(bod && typeC != 'GET') sed.body = JSON.stringify(bod);
@@ -126,7 +126,6 @@ function sendToServerApp(bod, typeC, url) {
             if (!res.ok) {
                 throw new Error(`This is an HTTP error: The status is ${res.status}`);
             }
-            console.log("sdfdsfdsf", res);
             return res.json().then(data => ({
                 status: res.status, body: data
             })).catch(data => ({

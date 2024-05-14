@@ -106,41 +106,23 @@ function onFin(e) {
         if(bul) {
             par = par.parentElement;
             sendToServer({
-                uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 text: inp.value
-            }, 'POST', cRequests+"chText")
-                .then(data => {
-                    if(data.error == false){
-                        dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"text"));
-                    }
-                });
+            }, 'PATCH', cRequests+"chText");
         }
         if(par.parentElement.classList.contains(requestCSS.da)){
             par = par.parentElement;
             sendToServer({
-                uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 date: inp.value
-            }, 'POST', cRequests+"chDate")
-                .then(data => {
-                    if(data.error == false){
-                        dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"date"));
-                    }
-                });
+            }, 'PATCH', cRequests+"chDate");
         }
         if(par.parentElement.classList.contains(requestCSS.za)){
             par = par.parentElement;
             sendToServer({
-                uuid: cState.uuid,
                 id: inp.getAttribute("data-id"),
                 title: inp.value
-            }, 'POST', cRequests+"chTitle")
-                .then(data => {
-                    if(data.error == false){
-                        dispatch(changeReq(CHANGE_REQUEST_PARAM, inp.getAttribute("data-id"), inp.value,"title"));
-                    }
-                });
+            }, 'PATCH', cRequests+"chTitle");
         }
         par.setAttribute('data-st', '0');
     } else {
@@ -153,14 +135,8 @@ function onDel(e) {
     if(par.classList.contains(requestCSS.upr)){
         if (par.hasAttribute("data-id")) {
             sendToServer({
-                uuid: cState.uuid,
                 id: par.getAttribute("data-id")
-            }, 'POST', cRequests+"delReq")
-                .then(data => {
-                    if(data.error == false){
-                        dispatch(changeReq(CHANGE_REQUEST_DEL, par.getAttribute("data-id")));
-                    }
-                });
+            }, 'DELETE', cRequests+"delReq");
         }
     }
 }
@@ -178,11 +154,9 @@ function onClose(e) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cRequests+"getRequests")
+    sendToServer(0, 'GET', cRequests+"getRequests")
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeReq(CHANGE_REQUEST_GL, undefined, data.body));
                 for(let el of document.querySelectorAll("." + requestCSS.ed + " > *[id^='inpn']")){
                     chStatB({target: el});

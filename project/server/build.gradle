@@ -2,20 +2,22 @@ buildscript {
     ext {
         spring_version = '2.7.15'
         lombok_version = '1.18.26'
+        restdocs_plugin_version = '0.16.4'
+        asciiDocPlugin_version = '4.0.2'
     }
 }
 
 plugins {
+    id 'com.epages.restdocs-api-spec' version "${restdocs_plugin_version}"
     id 'org.springframework.boot' version "${spring_version}"
     id 'io.spring.dependency-management' version "1.1.4"
     id 'war'
     id 'java'
-    id 'org.asciidoctor.jvm.convert' version '4.0.2'
-    id 'org.asciidoctor.jvm.pdf' version '4.0.2'
-    id "com.benjaminsproule.swagger" version "1.0.14"
+    id 'org.asciidoctor.jvm.convert' version "${asciiDocPlugin_version}"
+    id 'org.asciidoctor.jvm.pdf' version "${asciiDocPlugin_version}"
 }
 
-group = 'ru.mirea'
+group = 'ru'
 version = '1.0'
 sourceCompatibility = 17
 
@@ -26,6 +28,9 @@ repositories {
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
+    }
+    testCompileOnly {
+        extendsFrom testAnnotationProcessor
     }
 }
 
@@ -51,13 +56,18 @@ dependencies {
     implementation 'com.h2database:h2:2.1.214'
 //    implementation 'org.postgresql:postgresql'
     implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-    implementation 'io.swagger:swagger-annotations:1.6.11'
+
     compileOnly "org.projectlombok:lombok:${lombok_version}"
     annotationProcessor "org.projectlombok:lombok:${lombok_version}"
-    testImplementation "org.projectlombok:lombok:${lombok_version}"
+
     testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
     testImplementation "org.springframework.boot:spring-boot-starter-test:${spring_version}"
+    testImplementation "com.epages:restdocs-api-spec-mockmvc:${restdocs_plugin_version}"
+    testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc:2.0.8.RELEASE"
     testImplementation 'org.springframework.security:spring-security-test:5.7.10'
+
+    testCompileOnly "org.projectlombok:lombok:${lombok_version}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
 }
 
 task build_exe(type: Exec) {
@@ -73,9 +83,7 @@ javadoc {
     destinationDir = file("docs/javaDoc")
     options.encoding = 'UTF-8'
     options.memberLevel = JavadocMemberLevel.PACKAGE
-    options.overview = 'docs/javaDocDescription.html'
-//    source = file("build/classes/")
-//    include("**/*.class")
+    options.overview = 'src/docs/docDescription.html'
 }
 
 task runnn_exe {
@@ -85,7 +93,7 @@ task runnn_exe {
 
 asciidoctorPdf {
     sourceDir '../../'
-    outputDir 'docs/asciiDoc/build'
+    outputDir 'docs/asciiDoc'
     asciidoctorj {
         attributes \
             'icons': 'font',
@@ -97,61 +105,75 @@ asciidoctorPdf {
 
 asciidoctor {
     sourceDir '../../'
-    outputDir 'docs/asciiDoc/build'
+    outputDir 'docs/asciiDoc'
     baseDirFollowsSourceFile()
     attributes \
         'icons': 'font',
+        'snippets': file("build/generated-snippets"),
         'idseparator': '-',
         'docinfo': 'shared'
-    dependsOn asciidoctorPdf
+//    dependsOn asciidoctorPdf
 }
 
-swagger {
-    apiSource {
-        springmvc = true
-        locations = [ 'ru.mirea.controllers']
-        schemes = [ 'http' ]
-        host = 'localhost:8080'
-        basePath = '/'
-        info {
-            title = 'EJournal'
-            version = 'v1'
-            description = 'This is a sample.'
-//            contact {
-//                email = 'email@email.com'
-//                name = 'Name'
-//                url = 'http://www.example.com'
-//            }
-        }
-//        securityDefinition {
-//            name = 'basicAuth'
-//            type = 'basic'
-//        }
-//        securityDefinition {
-//            json = 'securityDefinition.json'
-//        }
-        expandSuperTypes = false
-        outputFormats = ['json', 'html']
-//        templatePath = "${project.rootDir}/src/main/resources/tempSwagger/strapdown.html.hbs"
-        outputPath = "${project.rootDir}/docs/swagger/index.html"
-        swaggerDirectory = "${project.rootDir}/docs/swagger/htmlSwag"
-        attachSwaggerArtifact = true
+openapi {
+    host = 'localhost:8080'
+    title = 'EJournal'
+    description = file('src/docs/docDescription.html').text
+//    tagDescriptionsPropertiesFile = 'src/docs/tag-descriptions.yaml'
+    version = '1.0'
+    format = 'json'
+    outputDirectory = '/docs/swagger/htmlSwag'
+    outputFileNamePrefix = 'swagger'
+    snippetsDirectory = "build/generated-snippets"
+}
+
+openapi3 {
+    servers = [ { url = "http://localhost:8080" } ]
+    title = 'EJournal'
+    description = file('src/docs/docDescription.html').text
+    tagDescriptionsPropertiesFile = 'src/docs/swagger/tags.yaml'
+    version = '1.0'
+    format = 'json'
+    outputDirectory = 'docs/swagger/htmlSwag'
+    outputFileNamePrefix = 'swagger'
+    snippetsDirectory = "build/generated-snippets"
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(':openapi3') || graph.hasTask(':openapi')) {
+        test.enabled = false
     }
 }
 
-//task fixGenerateSwaggerDocumentation {
-//    doLast {
-//        configurations.compileClasspath.resolve()
-//                .collect { it.toURI().toURL() }
-//                .each { buildscript.classLoader.addURL it }
-//
-//        sourceSets.main.output.files
-//                .collect { it.toURI().toURL() }
-//                .each { buildscript.classLoader.addURL it }
+//swagger {
+//    apiSource {
+//        springmvc = true
+//        locations = [ 'ru.mirea.controllers']
+//        schemes = [ 'http' ]
+//        host = 'localhost:8080'
+//        basePath = '/'
+//        info {
+//            title = 'EJournal'
+//            version = 'v1'
+//            description = 'This is a sample.'
+////            contact {
+////                email = 'email@email.com'
+////                name = 'Name'
+////                url = 'http://www.example.com'
+////            }
+//        }
+////        securityDefinition {
+////            name = 'basicAuth'
+////            type = 'basic'
+////        }
+////        securityDefinition {
+////            json = 'securityDefinition.json'
+////        }
+//        expandSuperTypes = false
+//        outputFormats = ['json', 'html']
+////        templatePath = "${project.rootDir}/src/main/resources/tempSwagger/strapdown.html.hbs"
+//        outputPath = "${project.rootDir}/docs/swagger/index.html"
+//        swaggerDirectory = "${project.rootDir}/docs/swagger/htmlSwag"
+//        attachSwaggerArtifact = true
 //    }
 //}
-
-task ter {
-//    dependsOn fixGenerateSwaggerDocumentation
-    dependsOn generateSwaggerDocumentation
-}

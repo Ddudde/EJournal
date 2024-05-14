@@ -271,7 +271,7 @@ export function setSettings(dis) {
 function onCon(e) {
     sendToServer({
         type: "SETTINGS"
-    }, 'PATCH', cAuth+"infCon");
+    }, 'PATCH',  cAuth+"infCon");
 }
 
 function checkCodeEmail() {

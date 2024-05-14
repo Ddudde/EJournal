@@ -1,0 +1,24 @@
+= Asciidoc
+Natik Muradov <myratoff25@gmail.com>
+:revnumber: v0.1
+:revdate: 27.02.2024
+:revremark: Основное описание
+:sectnums:
+:hardbreaks-option:
+:toc: left
+:toclevels: 4
+:toc-title: Содержание
+:imagesdir: ./img
+
+[introduction]
+== Introduction
+====
+... some warm introductory words... .
+====
+
+== Creating a Project
+=== Example Request
+include::{snippets}/contacts-controller-test/get-contacts_when-good_-portal_-admin-user/http-request.adoc[]
+
+=== Example Response
+include::{snippets}/contacts-controller-test/get-contacts_when-good_-portal_-admin-user/http-response.adoc[]

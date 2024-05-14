@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
-import ru.mirea.data.SSE.TypesConnect;
+import ru.data.SSE.TypesConnect;
 
 import java.io.IOException;
 import java.io.InputStream;

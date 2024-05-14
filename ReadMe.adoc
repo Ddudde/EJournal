@@ -16,9 +16,9 @@ Github: https://github.com/Ddudde/DipvLom
 Основное описание проекта здесь. Также есть дополнительные:
 Также в /project/server/docs/start-web.bat можно стартануть Python http server для просмотра документации
 
-* Swagger:
+* Swagger: http://localhost:9001/swagger/htmlSwag/
 * JavaDoc: http://localhost:9001/javaDoc/
-* AsciiDoc: http://localhost:9001/asciiDoc/build/ReadMe.html
+* AsciiDoc: http://localhost:9001/asciiDoc/ReadMe.html
 
 Сервер:
 Находится в /project/server
@@ -67,6 +67,7 @@ NOTE: WebStorm в качестве IDE
 . Redux
 . React Router
 . Firebase Cloud Messaging
+. React Helmet
 ====
 == Использование
 ====
@@ -81,11 +82,13 @@ NOTE: WebStorm в качестве IDE
 ====
 == Документы
 ====
-JavaDoc и AsciiDoc генерируются при помощи Gradle
+JavaDoc, AsciiDoc и Swagger генерируются при помощи Gradle
 команды:
 gradle javadoc
 gradle asciidoctor
+gradle openapi3
 
 toDo - что нужно доделать
 beenDo - что уже сделано
+
 ====

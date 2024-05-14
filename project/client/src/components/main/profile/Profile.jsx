@@ -68,12 +68,10 @@ function onFin(e) {
     inp = par.querySelector("." + profileCSS.inp);
     if(inp.tagName == "TEXTAREA") {
         sendToServer({
-            login: cState.login,
-            info: inp.value,
-            uuid: cState.uuid
-        }, 'POST', cProfiles+"chInfo")
+            info: inp.value
+        }, 'PATCH', cProfiles+"chInfo")
             .then(data => {
-                if(data.error == false){
+                if(data.status == 200){
                     par.setAttribute('data-mod', '0');
                 }
             });
@@ -85,24 +83,19 @@ function onFin(e) {
         // warner.style.display = "none";
         if (inp.type == "email") {
             sendToServer({
-                login: cState.login,
-                email: inp.value,
-                uuid: cState.uuid
-            }, 'POST', cProfiles+"chEmail")
+                email: inp.value
+            }, 'PATCH', cProfiles+"chEmail")
                 .then(data => {
-                    if(data.error == false){
+                    if(data.status == 200){
                         par.setAttribute('data-mod', '0');
                     }
                 });
         } else {
             sendToServer({
-                oLogin: cState.login,
-                nLogin: inp.value,
-                uuid: cState.uuid
-            }, 'POST', cProfiles+"chLogin")
+                nLogin: inp.value
+            }, 'PATCH', cProfiles+"chLogin")
                 .then(data => {
-                    if(data.error == false){
-                        dispatch(changeState(CHANGE_STATE, "login", data.body.login));
+                    if(data.status == 200){
                         par.setAttribute('data-mod', '0');
                         navigate(prefSite + "/profiles");
                     } else {
@@ -126,7 +119,10 @@ function chInfo(e) {
 
 function chLogin(e) {
     const msg = JSON.parse(e.data);
-    dispatch(changeProfile(CHANGE_PROFILE, "login", msg.body.login));
+    if (cState.login == msg.body.oLogin) {
+        dispatch(changeState(CHANGE_STATE, "login", msg.body.nLogin));
+    }
+    dispatch(changeProfile(CHANGE_PROFILE, "login", msg.body.nLogin));
 }
 
 function chEmail(e) {
@@ -143,12 +139,9 @@ function onCon(e, log) {
 }
 
 function setInfo(log) {
-    sendToServer({
-        login: log,
-        uuid: cState.uuid
-    }, 'POST', cProfiles+"getProfile")
+    sendToServer(0, 'GET', cProfiles+"getProfile/"+log)
         .then(data => {
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeProfile(CHANGE_PROFILE_GL, undefined, data.body));
             }
         });

@@ -3,13 +3,14 @@ package utils;
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
-import ru.mirea.data.models.Contacts;
-import ru.mirea.data.models.News;
-import ru.mirea.data.models.auth.Role;
-import ru.mirea.data.models.auth.User;
-import ru.mirea.data.models.school.Group;
-import ru.mirea.data.models.school.Lesson;
-import ru.mirea.data.models.school.School;
+import ru.data.models.Contacts;
+import ru.data.models.News;
+import ru.data.models.auth.Role;
+import ru.data.models.auth.User;
+import ru.data.models.school.Group;
+import ru.data.models.school.Lesson;
+import ru.data.models.school.Request;
+import ru.data.models.school.School;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ import static org.mockito.Mockito.mock;
 @NoArgsConstructor
 public class RandomUtils {
 
+    public static final String defaultDescription = "Также возможны 401, 403 и 500 коды ответов";
+
     public static final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
 
     public static final String[] namesGroup = {"1А", "1Б", "1В"};
@@ -32,13 +35,14 @@ public class RandomUtils {
 
     private static final Gson gson = new Gson();
 
-    public final User parentTest = getUser(3872, "Якушева", "Аркадий", "Оксана", "esse_et", "k02o9ezp8tacrfp", false);
+    public static final User parentTest = getUser(3872, "Якушева", "Аркадий", "Оксана", "esse_et", "k02o9ezp8tacrfp", false);
 
-    public final List<User> usersTest = asList(
+    public static final List<User> usersTest = asList(
         getUser(3872, "Якушева", "Аркадий", "Оксана", "esse_et", "k02o9ezp8tacrfp", false),
         getUser(1705, "Дроздов", "Андрей", "Антон", "debitis_accusantium", "9an3e5ykj8", false),
         getUser(1840, "Пестов", "Людмила", "Арина", "sed_commodi", "zjitnc71x", false),
         getUser(3225, "Никифорова", "Надежда", "Александр", "numquam_nobis", "hx45205la", false),
+        getUser(9764, "Силин", "Александр", "Кира", "facere_a", "2qiasp5nsk4mq7", true),
         getUser(9764, "Силин", "Александр", "Кира", "facere_a", "2qiasp5nsk4mq7", true)
     );
 
@@ -53,12 +57,24 @@ public class RandomUtils {
             "/static/media/map.jpg")
     ));
 
+    public final List<Request> requestTest = new ArrayList<>(asList(
+        getRequest(352L, "mail1@mail.com", "11.11.2011", "Дроздов А.А."),
+        getRequest(3872L, "mail10@mail.com", "11.01.2011", "Силин А.К."),
+        getRequest(9764L, "mail11@mail.com", "01.11.2011", "Пестов Л.А.")
+    ));
+
+    private Request getRequest(long id, String email, String date, String fio) {
+        Request request = new Request(email, date, fio);
+        request.setId(id);
+        return request;
+    }
+
     public Contacts getContactsTest() {
         return (Contacts) getClone(contactsTest.get(0), Contacts.class);
     }
 
-    public static Object getClone(Object object, Class clas) {
-        return gson.fromJson(gson.toJson(object),clas);
+    public static Object getClone(Object object, Class className) {
+        return gson.fromJson(gson.toJson(object),className);
     }
 
     private Contacts getContacts(long id, String contact, String text, String imgUrl) {
@@ -115,15 +131,17 @@ public class RandomUtils {
         return school;
     }
 
-    private User getUser(long id, String lastName, String firstName, String middleName, String slug, String password, boolean existsParents) {
+    private static User getUser(long id, String lastName, String firstName, String middleName, String slug, String password, boolean existsParents) {
         String fio = lastName + " " + firstName.charAt(0) + "." + middleName.charAt(0) + ".";
         User user = new User(slug, password, fio, mock(Map.class), null, null);
         user.setId(id);
         if(existsParents) {
             Role role = new Role();
+            role.setEmail("example@mail.com");
             role.getParents().add(parentTest);
             user.getRoles().put(0L, role);
         }
+        user.setSelRole(0L);
         return user;
     }
 }

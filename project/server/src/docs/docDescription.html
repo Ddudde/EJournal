@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<HTML lang="RU">
+	<HEAD>
+		<TITLE>API Overview</TITLE>
+	</HEAD>
+	<BODY>
+		<PRE style="font-size: 20px; margin: 10px 0;">
+Основное описание в AsciiDoc.
+* Swagger:<a href="http://localhost:9001/swagger/htmlSwag">http://localhost:9001/swagger/htmlSwag</a>
+* JavaDoc: <a href="http://localhost:9001/javaDoc">http://localhost:9001/javaDoc</a>
+* AsciiDoc: <a href="http://localhost:9001/asciiDoc/ReadMe.html">http://localhost:9001/asciiDoc/ReadMe.html</a>
+
+Все примеры из модульных тестов.
+
+Внимание! Для того чтобы попробовать "Try It Out" блок в Swagger не забудь в CORS конфиг сервера добавить нужную ссылку.
+CORS конфиг находится в ru.configs.WebMVCConfig.
+
+Тестовый режим включается в ru.Main.test
+Тестовый режим подключает тестового пользователя.
+UUID-токен: 9693b2a1-77bb-4426-8045-9f9b4395d454, администратор с ником "nm12"
+Для аутентификации с "Try It Out" ввести в header "x-access-token" тестовый UUID-токен
+
+Для смены пользователя на тестовом токене перейти к запросу "/auth/infCon/"
+и в теле запроса указать логин нужного пользователя.
+Пример тела:
+{
+	"login": "testLogin"
+}
+
+Обычно у всех разделов есть эндпоинт с которого обязательно начинать работу, а иногда и несколько.
+Перед описанием эндпоинта пишется [start]
+		</PRE>
+	</BODY>
+</HTML>

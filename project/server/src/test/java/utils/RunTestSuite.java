@@ -3,10 +3,10 @@ package utils;
 import org.junit.platform.suite.api.IncludeTags;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
-import ru.mirea.controllers.main.SettingsControllerTest;
+import ru.controllers.people.AdminsControllerTest;
 
 @Suite
-@SelectClasses(SettingsControllerTest.class)
+@SelectClasses(AdminsControllerTest.class)
 //@SelectPackages("ru.mirea")
-@IncludeTags({"addNews"})
+@IncludeTags({"chPep", "remPep"})
 public class RunTestSuite {}
