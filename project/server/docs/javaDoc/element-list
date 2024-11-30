@@ -14,5 +14,6 @@ ru.data.reps.school
 ru.data.SSE
 ru.security
 ru.security.JWT
+ru.security.user
 ru.services
 ru.services.db
