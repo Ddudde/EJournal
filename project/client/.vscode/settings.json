@@ -1,0 +1,24 @@
+{
+    "editor.defaultFormatter": null,
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact"
+    },
+    "less.validate": false,
+    "scss.validate": false,
+    "telemetry.enableTelemetry": false,
+    "search.exclude": {
+        "**/.idea": true,
+        "**/.vscode": true,
+        "**/node_modules": true
+    },
+    "files.watcherExclude": {
+        "**/.idea": true,
+        "**/.vscode": true,
+        "**/node_modules": true
+    },
+    "files.exclude": {
+        "**/.idea": true,
+        "src.zip": true
+    },
+    "js/ts.implicitProjectConfig.checkJs": false
+}

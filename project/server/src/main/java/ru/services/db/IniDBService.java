@@ -16,9 +16,9 @@ import ru.data.models.auth.Role;
 import ru.data.models.auth.SettingUser;
 import ru.data.models.auth.User;
 import ru.data.models.school.*;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
-import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
@@ -78,14 +78,13 @@ import static java.util.Arrays.asList;
 
     private final MainService datas;
 
-    @PostConstruct
     private void postConstruct() {
         SettingUser setts = datas.getDbService().getSettingUserRepository().saveAndFlush(new SettingUser(1));
         Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role("ex@ya.ru"));
         User user = datas.getDbService().getUserRepository().saveAndFlush(new User("nm12", "1111",
             "Петров В.В.", Map.of(
-            4L, role
-        ), 4L, setts));
+            Roles.ADMIN, role
+        ), Roles.ADMIN, setts));
         if(Main.test) testOn();
         checkDates();
     }
@@ -139,7 +138,7 @@ import static java.util.Arrays.asList;
      * настройки, роль
      * @param roleN Роль пользователя
      * @param selRole Выбранная роль пользователя */
-    private User getNUser(Role roleN, Long selRole) {
+    private User getNUser(Role roleN, Roles selRole) {
         SettingUser settingUser = datas.getDbService().getSettingUserRepository()
             .saveAndFlush(new SettingUser((int) (Math.round(Math.random() * 2) + 1)));
         setts.add(settingUser);
@@ -185,7 +184,7 @@ import static java.util.Arrays.asList;
 
         int max = (int) Math.round(Math.random() * 3) + 2, i;
         for(i = 0; i < max; i++) {
-            User user = getNUser(new Role(fakerEn.internet().emailAddress()), 4L);
+            User user = getNUser(new Role(fakerEn.internet().emailAddress()), Roles.ADMIN);
             users.add(user);
             syst.getAdmins().add(user);
         }
@@ -209,9 +208,9 @@ import static java.util.Arrays.asList;
                         && school.getTeachers().contains(teaU)){
                     school.getTeachers().remove(teaU);
                 }
-                if(!teaU.getRoles().get(2L).getSubjects().contains(nameSubj)) {
-                    teaU.getRoles().get(2L).getSubjects().add(nameSubj);
-                    datas.getDbService().getRoleRepository().saveAndFlush(teaU.getRoles().get(2L));
+                if(!teaU.getRoles().get(Roles.TEACHER).getSubjects().contains(nameSubj)) {
+                    teaU.getRoles().get(Roles.TEACHER).getSubjects().add(nameSubj);
+                    datas.getDbService().getRoleRepository().saveAndFlush(teaU.getRoles().get(Roles.TEACHER));
                 }
                 lesson = datas.getDbService().getLessonRepository()
                     .saveAndFlush(new Lesson(school, group, day, les, kab, nameSubj, teaU));
@@ -242,18 +241,18 @@ import static java.util.Arrays.asList;
 
             max1 = (int) Math.round(Math.random() * 3) + 2;
             for(i1 = 0; i1 < max1; i1++) {
-                User userP = getNUser(new Role(fakerEn.internet().emailAddress(), school), 1L);
+                User userP = getNUser(new Role(fakerEn.internet().emailAddress(), school), Roles.PARENT);
 
-                User userK1 = getNUser(new Role(fakerEn.internet().emailAddress(), school, group), 0L);
-                userK1.getRole(0L).getParents().add(userP);
+                User userK1 = getNUser(new Role(fakerEn.internet().emailAddress(), school, group), Roles.KID);
+                userK1.getRole(Roles.KID).getParents().add(userP);
 
-                User userK2 = getNUser(new Role(fakerEn.internet().emailAddress(), school, group), 0L);
-                userK2.getRole(0L).getParents().add(userP);
+                User userK2 = getNUser(new Role(fakerEn.internet().emailAddress(), school, group), Roles.KID);
+                userK2.getRole(Roles.KID).getParents().add(userP);
 
                 group.getKids().add(userK1);
                 group.getKids().add(userK2);
-                userP.getRole(1L).getKids().add(userK1);
-                userP.getRole(1L).getKids().add(userK2);
+                userP.getRole(Roles.PARENT).getKids().add(userK1);
+                userP.getRole(Roles.PARENT).getKids().add(userK2);
                 userP.setSelKid(userK1.getId());
                 users.add(datas.getDbService().getUserRepository().saveAndFlush(userP));
                 users.add(datas.getDbService().getUserRepository().saveAndFlush(userK1));
@@ -307,7 +306,7 @@ import static java.util.Arrays.asList;
             User user = null, userL;
             max1 = (int) Math.round(Math.random() * 3) + 2;
             for(i1 = 0; i1 < max1; i1++) {
-                userL = getNUser(new Role(fakerEn.internet().emailAddress(), school), 3L);
+                userL = getNUser(new Role(fakerEn.internet().emailAddress(), school), Roles.HTEACHER);
                 users.add(userL);
                 school.getHteachers().add(userL);
                 if(userL.getUsername() != null) user = userL;
@@ -319,7 +318,7 @@ import static java.util.Arrays.asList;
 
             max1 = (int) Math.round(Math.random() * 3) + 2;
             for(i1 = 0; i1 < max1; i1++) {
-                userL = getNUser(new Role(fakerEn.internet().emailAddress(), Set.of(namesSubj[(int) Math.round(Math.random() * 4)]), school), 2L);
+                userL = getNUser(new Role(fakerEn.internet().emailAddress(), Set.of(namesSubj[(int) Math.round(Math.random() * 4)]), school), Roles.TEACHER);
                 users.add(userL);
                 school.getTeachers().add(userL);
                 if(userL.getUsername() != null) user = userL;
@@ -474,8 +473,8 @@ import static java.util.Arrays.asList;
                     wrtr.endObject()
                         .name("parents").beginObject();
                     for (User user : group.getKids()) {
-                        if(!user.getRoles().containsKey(0L)) continue;
-                        getUsersT(wrtr, user.getRole(0L).getParents());
+                        if(!user.getRoles().containsKey(Roles.KID)) continue;
+                        getUsersT(wrtr, user.getRole(Roles.KID).getParents());
                     }
                     wrtr.endObject()
                         .endObject();

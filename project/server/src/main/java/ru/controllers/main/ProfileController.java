@@ -2,8 +2,6 @@ package ru.controllers.main;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,8 @@ import ru.data.models.auth.SettingUser;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
+import ru.security.user.Roles;
 
 import static ru.Main.datas;
 
@@ -50,7 +49,7 @@ import static ru.Main.datas;
         User user = auth.getSub().getUser();
         HttpStatus stat = HttpStatus.NOT_FOUND;
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chKid");
-        if(user != null && user.getSelRole() == 1L && body.idL != null) {
+        if(user != null && user.getSelRole() == Roles.PARENT && body.idL != null) {
             user.setSelKid(body.idL);
             wrtr.name("kid").value(user.getSelKid());
             datas.getDbService().getUserRepository().saveAndFlush(user);
@@ -64,29 +63,36 @@ import static ru.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @return Объект и код статуса */
     @PatchMapping("/chRole")
-    public ResponseEntity<JsonObject> chRole(CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> chRole(final CustomToken auth) throws Exception {
         User user = auth.getSub().getUser();
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        JsonTreeWriter wrtr = datas.init("", "[PATCH] /chRole");
+        final JsonTreeWriter wrtr = datas.init("", "[PATCH] /chRole");
         if(user != null && user.getRoles().containsKey(user.getSelRole())) {
-            long curRol = user.getSelRole();
-            for(long i = (curRol == 4 ? 0 : curRol+1L); i < 5; i++){
-                if(!user.getRoles().containsKey(i)) continue;
-                wrtr.name("role").value(i);
-                user.setSelRole(i);
-                datas.getDbService().getUserRepository().saveAndFlush(user);
-                Role role = user.getRoles().get(i);
-                if(i == 1L) {
-                    wrtr.name("kid").value(user.getSelKid())
-                        .name("kids").beginObject();
-                    if (!ObjectUtils.isEmpty(role.getKids())) {
-                        for (User kid : role.getKids()) {
-                            wrtr.name(kid.getId() + "").value(kid.getFio());
-                        }
-                    }
-                    wrtr.endObject();
+            final Roles curRol = user.getSelRole();
+            int i = curRol.i+1;
+            Roles roleI;
+            while(true){
+                if(i == 5) i = 0;
+                roleI = Roles.roleByI(i);
+                if(!user.getRoles().containsKey(roleI)) {
+                    i++;
+                    continue;
                 }
                 break;
+            }
+            wrtr.name("role").value(i);
+            user.setSelRole(roleI);
+            datas.getDbService().getUserRepository().saveAndFlush(user);
+            Role role = user.getRoles().get(roleI);
+            if(roleI == Roles.PARENT) {
+                wrtr.name("kid").value(user.getSelKid())
+                    .name("kids").beginObject();
+                if (!ObjectUtils.isEmpty(role.getKids())) {
+                    for (User kid : role.getKids()) {
+                        wrtr.name(kid.getId() + "").value(kid.getFio());
+                    }
+                }
+                wrtr.endObject();
             }
             stat = HttpStatus.OK;
         }
@@ -132,7 +138,7 @@ import static ru.Main.datas;
             datas.getDbService().getUserRepository().saveAndFlush(user);
             wrtr.name("body").beginObject()
                 .name("email").value(body.email)
-                .name("role").value(user.getSelRole())
+                .name("role").value(user.getSelRole().i)
                 .endObject();
             stat = HttpStatus.OK;
         }
@@ -219,10 +225,11 @@ import static ru.Main.datas;
                 wrtr.name("more").value(settingUser.getInfo());
             }
             wrtr.name("roles").beginObject();
-            for (long i = 0; i < 5; i++) {
-                if (!user.getRoles().containsKey(i)) continue;
+            for (int i = 0; i < 5; i++) {
+                Roles roleI = Roles.roleByI(i);
+                if (!user.getRoles().containsKey(roleI)) continue;
                 wrtr.name(i + "").beginObject();
-                Role role = user.getRoles().get(i);
+                Role role = user.getRoles().get(roleI);
                 if (!ObjectUtils.isEmpty(role.getEmail())) {
                     wrtr.name("email").value(role.getEmail());
                 }
@@ -268,9 +275,9 @@ import static ru.Main.datas;
     /** RU: Данные клиента используемые ProfileController в методах
      * @see ProfileController */
     @ToString
-    @NoArgsConstructor @AllArgsConstructor
+    @RequiredArgsConstructor
     static class DataProfile {
-        public String nLogin, info, email, notifToken;
-        public Long idL;
+        public final String nLogin, info, email, notifToken;
+        public final Long idL;
     }
 }

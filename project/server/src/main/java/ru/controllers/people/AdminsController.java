@@ -16,7 +16,8 @@ import ru.data.SSE.TypesConnect;
 import ru.data.models.Syst;
 import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
+import ru.security.user.Roles;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -55,8 +56,8 @@ import static ru.Main.datas;
         JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /remPep");
         HttpStatus stat = HttpStatus.NOT_FOUND;
         Syst syst = datas.getDbService().getSyst();
-        if (user != null && user.getRoles().containsKey(4L) && syst != null && user1 != null) {
-            user1.getRoles().remove(4L);
+        if (user != null && user.getRoles().containsKey(Roles.ADMIN) && syst != null && user1 != null) {
+            user1.getRoles().remove(Roles.ADMIN);
             datas.getDbService().getUserRepository().saveAndFlush(user1);
             syst.getAdmins().remove(user1);
             datas.getDbService().getSystRepository().saveAndFlush(syst);
@@ -80,7 +81,7 @@ import static ru.Main.datas;
         User user1 = datas.getDbService().userById(body.id);
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chPep");
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if (user != null && user.getRoles().containsKey(4L) && user1 != null) {
+        if (user != null && user.getRoles().containsKey(Roles.ADMIN) && user1 != null) {
             user1.setFio(body.name);
             datas.getDbService().getUserRepository().saveAndFlush(user1);
 
@@ -104,13 +105,13 @@ import static ru.Main.datas;
         Syst syst = datas.getDbService().getSyst();
         JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addPep");
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if (user != null && user.getRoles().containsKey(4L) && syst != null) {
+        if (user != null && user.getRoles().containsKey(Roles.ADMIN) && syst != null) {
             Instant after = Instant.now().plus(Duration.ofDays(30));
             Date dateAfter = Date.from(after);
             Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role());
             User inv = new User(body.name, Map.of(
-                4L, role
-            ), Main.df.format(dateAfter));
+                Roles.ADMIN, role
+                ), Main.df.format(dateAfter));
             datas.getDbService().getUserRepository().saveAndFlush(inv);
             syst.getAdmins().add(inv);
             datas.getDbService().getSystRepository().saveAndFlush(syst);
@@ -132,16 +133,20 @@ import static ru.Main.datas;
      * @return Объект и код статуса */
     @GetMapping("/getAdmins")
     public ResponseEntity<JsonObject> getAdmins(CustomToken auth) throws Exception {
-        User user = auth.getSub().getUser();
         Syst syst = datas.getDbService().getSyst();
         JsonTreeWriter wrtr = datas.init("", "[GET] /getAdmins");
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if (user != null && syst != null) {
+        if (syst != null) {
             datas.usersByList(syst.getAdmins(), true, wrtr);
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", user.getRoles().containsKey(4L) ? "adm" : "main", "main");
+            final User user = auth.getSub().getUser();
+            String role = "main";
+            if (user.getRoles().containsKey(Roles.ADMIN)) {
+                role = "adm";
+            }
+            authController.infCon(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
         }, wrtr, stat, false);
     }
 

@@ -28,7 +28,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.configs.SecurityConfig;
 import ru.data.SSE.Subscriber;
 import ru.data.models.auth.User;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
 import ru.services.EmailService;
 import ru.services.MainService;
 import ru.services.PushService;
@@ -74,7 +74,7 @@ public class AuthControllerTest {
     @Captor
     private ArgumentCaptor<Object> obj;
 
-    private AuthController authController = spy(new AuthController());
+    private final AuthController authController = spy(new AuthController());
 
     private MockMvc mockMvc;
 
@@ -105,7 +105,7 @@ public class AuthControllerTest {
     }
 
     private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
-        ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
+        final ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
             .tag("AuthController").requestFields()
@@ -141,10 +141,10 @@ public class AuthControllerTest {
     @Test @Tag("start")
     @CustomUser
     void start_whenGood_AdminUser() throws Exception {
-        CustomToken cu = ((CustomToken) SecurityContextHolder.getContext()
+        final CustomToken cu = ((CustomToken) SecurityContextHolder.getContext()
             .getAuthentication());
-        String uuid = cu.getUUID();
-        Subscriber sub = mock(Subscriber.class, Answers.RETURNS_DEEP_STUBS);
+        final String uuid = cu.getUUID();
+        final Subscriber sub = mock(Subscriber.class, Answers.RETURNS_DEEP_STUBS);
         when(sub.getLogin()).thenReturn("nm12");
         mainService.subscriptions.put(UUID.fromString(uuid), sub);
         mockMvc.perform(get("/auth/start/{uuidAuth}", uuid))

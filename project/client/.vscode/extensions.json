@@ -1,0 +1,12 @@
+{
+    // Рекомендованные расширения
+    "recommendations": [
+      "VisualStudioExptTeam.intellicode-api-usage-examples",
+      "stylelint.vscode-stylelint",
+      "dbaeumer.vscode-eslint",
+      "VisualStudioExptTeam.vscodeintellicode"
+    ],
+  
+    // Нежелательные расширения
+    "unwantedRecommendations": []
+  }

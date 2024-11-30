@@ -59,7 +59,7 @@ function chNotif(id) {
     sendToServer({
         id: id,
         val: !checkBoxInfo[id]
-    }, 'PATCH', cTest+"chTests")
+    }, 'PUT', cTest+"chTests")
         .then(data => {
             if(data.status == 200){
                 dispatch(changeTest(CHANGE_TEST_GL, data.body.bodyT));

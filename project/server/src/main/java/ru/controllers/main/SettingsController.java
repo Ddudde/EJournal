@@ -14,7 +14,7 @@ import ru.Main;
 import ru.controllers.AuthController;
 import ru.data.models.auth.SettingUser;
 import ru.data.models.auth.User;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
 
 import java.time.Duration;
 import java.time.Instant;

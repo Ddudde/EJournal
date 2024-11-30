@@ -28,7 +28,7 @@ import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
 import ru.data.SSE.Subscriber;
 import ru.data.models.auth.User;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
 import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
@@ -227,11 +227,11 @@ public class AdminsControllerTest {
     private final String getAdmins_Summary = "[start] Отправляет список администраторов";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * не находит систему и отправляет 404 код-ответ */
     @Test @Tag("getAdmins")
     @CustomAuth
     void getAdmins_whenEmpty_Anonim() throws Exception {
-        when(dbService.userByLogin(any())).thenReturn(null);
+        when(dbService.getSyst()).thenReturn(null);
         mockMvc.perform(get("/admins/getAdmins")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isNotFound())

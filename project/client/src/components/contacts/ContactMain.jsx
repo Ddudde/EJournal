@@ -203,7 +203,7 @@ function chContact (inp, p, p1) {
         p: p,
         p1: p1,
         val: inp
-    }, 'PATCH', cContacts+"chContact");
+    }, 'PUT', cContacts+"chContact");
 }
 
 function chContactC(e) {

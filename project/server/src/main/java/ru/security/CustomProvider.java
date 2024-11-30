@@ -6,10 +6,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import ru.security.user.CustomToken;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class CustomProvider implements AuthenticationProvider {
@@ -53,6 +53,6 @@ public class CustomProvider implements AuthenticationProvider {
     public static Collection<? extends GrantedAuthority> getAuthorities(Set<String> roles) {
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -28,7 +28,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
 import ru.data.SSE.Subscriber;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
+import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
@@ -127,7 +128,7 @@ public class ProfileControllerTest {
     /** RU: родитель
      * отправляет 200 код-ответ и меняет наблюдаемого ребёнка */
     @Test @Tag("chKid")
-    @CustomUser(roles = "1")
+    @CustomUser(roles = Roles.PARENT)
     void chKid_whenGood_Parent() throws Exception {
         mockMvc.perform(patch("/profiles/chKid")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
@@ -163,7 +164,7 @@ public class ProfileControllerTest {
     @Test @Tag("chRole")
     @CustomUser
     void chRole_whenGood_Kid() throws Exception {
-        getSub().getUser().setSelRole(0L);
+        getSub().getUser().setSelRole(Roles.KID);
         mockMvc.perform(patch("/profiles/chRole")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())

@@ -17,6 +17,7 @@ import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.data.models.auth.User;
 import ru.data.models.school.*;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
 import java.util.ArrayList;
@@ -47,8 +48,8 @@ import java.util.stream.Collectors;
             body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.group = datas.getDbService().groupById(body.group);
-                if (ref.group != null && user.getSelRole() == 2L) {
-                    School school = user.getRoles().get(2L).getYO();
+                if (ref.group != null && user.getSelRole() == Roles.TEACHER) {
+                    School school = user.getSelecRole().getYO();
                     ref.schId = school.getId();
                     String[] lesDay = body.day.split(",");
                     Day day = datas.getDbService().getDayRepository().findBySchoolIdAndTeacherIdAndGrpIdAndNameSubjectAndDat(ref.schId, user.getId(), ref.group.getId(), subscriber.getLvlMore2(), lesDay[0]);
@@ -85,8 +86,8 @@ import java.util.stream.Collectors;
             if(user != null) {
                 ref.group = datas.getDbService().groupById(body.group);
                 User objU = datas.getDbService().userById(body.kid);
-                if (ref.group != null && user.getSelRole() == 2L && objU != null) {
-                    School school = user.getRoles().get(2L).getYO();
+                if (ref.group != null && user.getSelRole() == Roles.TEACHER && objU != null) {
+                    School school = user.getSelecRole().getYO();
                     ref.schId = school.getId();
                     Mark mark = null;
                     Day day = null;
@@ -165,7 +166,7 @@ import java.util.stream.Collectors;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(2L)) {
+            if(user != null && user.getRoles().containsKey(Roles.TEACHER)) {
                 School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 Group group = datas.getDbService().groupById(body.group);
                 if (group != null) {
@@ -236,7 +237,7 @@ import java.util.stream.Collectors;
         };
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(2L)) {
+            if(user != null && user.getRoles().containsKey(Roles.TEACHER)) {
                 ref.schId = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 List<Long> groupsL = datas.getDbService().getLessonRepository().uniqGroupsBySchoolAndSubNameAndTeacher(ref.schId.getId(), body.predm, user.getId());
                 if (!ObjectUtils.isEmpty(groupsL)){
@@ -265,7 +266,7 @@ import java.util.stream.Collectors;
         };
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(2L)) {
+            if(user != null && user.getRoles().containsKey(Roles.TEACHER)) {
                 ref.school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 List<String> subjs = datas.getDbService().getLessonRepository().uniqSubNameBySchoolAndTeacher(ref.school.getId(), user.getId());
                 if (!ObjectUtils.isEmpty(subjs)){

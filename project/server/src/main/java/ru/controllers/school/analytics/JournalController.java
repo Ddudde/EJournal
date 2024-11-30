@@ -20,6 +20,7 @@ import ru.data.models.school.Group;
 import ru.data.models.school.Mark;
 import ru.data.models.school.Period;
 import ru.data.models.school.School;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ import java.util.stream.Collectors;
             if(user != null) {
                 ref.sch = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 Group group = datas.getDbService().getFirstRole(user.getRoles()).getGrp();
-                if(group != null && (user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L))) {
+                if(group != null && (user.getRoles().containsKey(Roles.KID) || user.getRoles().containsKey(Roles.PARENT))) {
                     List<Period> periods = ref.sch.getPeriods();
                     if (!ObjectUtils.isEmpty(periods)){
                         body.wrtr.name("bodyPers").beginObject();
@@ -104,7 +105,7 @@ import java.util.stream.Collectors;
             if(user != null) {
                 ref.sch = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 Group group = datas.getDbService().getFirstRole(user.getRoles()).getGrp();
-                if(group != null && (user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L))) {
+                if(group != null && (user.getRoles().containsKey(Roles.KID) || user.getRoles().containsKey(Roles.PARENT))) {
                     Period actPeriod = datas.getActualPeriodBySchool(ref.sch);
                     List<Object[]> marks = datas.getDbService().getDayRepository().uniqNameSubjectAndDatAndMarksByParams(ref.sch.getId(), group.getId(), actPeriod.getId());
                     Map<String, Map<String, List<Mark>>> mapD = marks.stream().collect(Collectors.groupingBy(

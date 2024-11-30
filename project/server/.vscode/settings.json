@@ -1,0 +1,46 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.runtimes": [
+
+    ],
+    "telemetry.enableTelemetry": false,
+    "search.exclude": {
+        "**/.gradle": true,
+        "**/.idea": true,
+        "**/.vscode": true,
+        "**/build": true,
+        "**/docs": true,
+        "**/logs": true,
+        "**/bin": true
+    },
+    "files.watcherExclude": {
+        "**/.gradle": true,
+        "**/.idea": true,
+        "**/.vscode": true,
+        "**/build": true,
+        "**/docs": true,
+        "**/logs": true,
+        "**/bin": true
+    },
+    "files.exclude": {
+       "**/.gradle": true,
+        "**/.idea": true,
+        "**/build": true
+    },
+    "java.import.gradle.wrapper.enabled": false,
+    "java.import.maven.enabled": false,
+    "java.autobuild.enabled": false,
+    "gradle.javaDebug.cleanOutput": false,
+    "java.gradle.buildServer.enabled": "off",
+    "java.server.launchMode": "Hybrid",
+    "java.sharedIndexes.enabled": "off",
+    "java.jdt.ls.protobufSupport.enabled": false,
+    "java.jdt.ls.androidSupport.enabled": "off",
+    "redhat.telemetry.enabled": false,
+    "java.import.gradle.enabled": false,
+    "java.jdt.ls.java.home": "C:\\Program Files\\Java\\graalvm-jdk-21.0.3",
+    "java.configuration.detectJdksAtStart": false,
+    "java.foldingRange.enabled": false,
+    "java.selectionRange.enabled": false,
+    "java.jdt.ls.vmargs": "-Xmx256m"
+}

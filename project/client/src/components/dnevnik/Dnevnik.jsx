@@ -99,26 +99,24 @@ function getLessons(dLI, dayDate, day, dai, minLess) {
 }
 
 function setDnevnik() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cDnevnik+"getDnevnik")
+    sendToServer(0, 'GET', cDnevnik+"getDnevnik")
         .then(data => {
             console.log(data);
-            if(cState.role == 1 && cState.kid) selKid = cState.kid;
-            dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body));
-            dispatch(changeDnevnik(CHANGE_DNEVNIK, "jur", data.bodyD || {}));
-            dispatch(changeDnevnik(CHANGE_DNEVNIK, "min", data.min));
-            dispatch(changeDnevnik(CHANGE_DNEVNIK, "max", data.max));
+            if(data.status == 200) {
+                if(cState.role == 1 && cState.kid) selKid = cState.kid;
+                dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body.body));
+                dispatch(changeDnevnik(CHANGE_DNEVNIK, "jur", data.body.bodyD || {}));
+                dispatch(changeDnevnik(CHANGE_DNEVNIK, "min", data.body.min));
+                dispatch(changeDnevnik(CHANGE_DNEVNIK, "max", data.body.max));
+            }
         });
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cDnevnik+"getInfo")
+    sendToServer(0, 'GET', cDnevnik+"getInfo")
         .then(data => {
             console.log(data);
-            if(data.error == false) setDnevnik();
+            if(data.status == 200) setDnevnik();
         });
 }
 

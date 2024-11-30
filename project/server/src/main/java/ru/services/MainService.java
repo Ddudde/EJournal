@@ -5,6 +5,7 @@ import com.google.gson.internal.bind.JsonTreeWriter;
 import com.google.gson.stream.JsonWriter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,10 @@ import ru.data.models.school.Group;
 import ru.data.models.school.Lesson;
 import ru.data.models.school.Period;
 import ru.data.models.school.School;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
+import ru.security.user.Roles;
 import ru.services.db.DBService;
 
-import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -45,6 +46,7 @@ import static ru.Main.datas;
  *  + Javadoc
  *  + Тестирование
  * </pre> */
+@Slf4j
 @RequiredArgsConstructor
 @Getter
 @Service public class MainService {
@@ -65,7 +67,6 @@ import static ru.Main.datas;
     public final Map<UUID, Subscriber> subscriptions = new ConcurrentHashMap<>();
 
     /** RU: инициирует побочные сервисы */
-    @PostConstruct
     public void postConstruct() {
         datas = this;
         errObj.addProperty("error", true);
@@ -223,7 +224,7 @@ import static ru.Main.datas;
         try {
             wrtr.endObject();
             ans = wrtr.get().getAsJsonObject();
-            System.out.println("dsf" + ans);
+            log.debug("dsf" + ans);
             wrtr.close();
         } catch (Exception e) {
             bol = Main.excp(e);
@@ -251,7 +252,7 @@ import static ru.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @see SettingsController#getSettings(CustomToken) Пример использования */
     public JsonTreeWriter init(String data, String type) throws Exception {
-        System.out.println(type + "! " + data);
+        log.debug(type + "! " + data);
         JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();
         return wrtr;
@@ -281,7 +282,7 @@ import static ru.Main.datas;
     public void getShedule(String nameWrtr, User user, JsonTreeWriter wrtr, Long gId) throws Exception {
         Long schId = dbService.getFirstRole(user.getRoles()).getYO().getId();
         List<Lesson> lessons;
-        if (user.getSelRole() == 2L && user.getRoles().containsKey(2L)) {
+        if (user.getSelRole() == Roles.TEACHER) {
             lessons = dbService.getLessonRepository().findBySchoolIdAndTeacherId(schId, user.getId());
         } else {
             lessons = dbService.getLessonRepository().findBySchoolIdAndGrpId(schId, gId);
@@ -301,7 +302,7 @@ import static ru.Main.datas;
                 wrtr.name("name").value(les.getNameSubject());
             }
             wrtr.name("cabinet").value(les.getKab());
-            if (user.getSelRole() == 2L) {
+            if (user.getSelRole() == Roles.TEACHER) {
                 Group grp = les.getGrp();
                 wrtr.name("group").value(grp.getName());
             } else {

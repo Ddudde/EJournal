@@ -238,12 +238,11 @@ function addInfoL2C(e) {
 function addSch (par, inp) {
     console.log("addSch");
     sendToServer({
-        uuid: cState.uuid,
         name: inp
     }, 'POST', cHteachers+"addSch")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 201){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -252,44 +251,40 @@ function addSch (par, inp) {
 function remSch (id) {
     console.log("remSch");
     sendToServer({
-        uuid: cState.uuid,
         schId: id
-    }, 'POST', cHteachers+"remSch")
+    }, 'DELETE', cHteachers+"remSch")
 }
 
 function chSch (par, id, inp) {
     console.log("chSch");
     sendToServer({
-        uuid: cState.uuid,
         chSch: id,
         name: inp
-    }, 'POST', cHteachers+"chSch")
+    }, 'PATCH', cHteachers+"chSch")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 par.setAttribute('data-st', '0');
             }
         });
 }
 
 function remPep (id) {
-    console.log("remInv");
+    console.log("remInv", id);
     sendToServer({
-        uuid: cState.uuid,
         id: id
-    }, 'POST', cHteachers+"remPep")
+    }, 'DELETE', cHteachers+"remPep")
 }
 
 function chPep (par, id, inp) {
-    console.log("changeInv");
+    console.log("changeInv", id, inp);
     sendToServer({
-        uuid: cState.uuid,
         id: id,
         name: inp
-    }, 'POST', cHteachers+"chPep")
+    }, 'PATCH', cHteachers+"chPep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -298,25 +293,23 @@ function chPep (par, id, inp) {
 function addPep (par, id, inp) {
     console.log("addInv");
     sendToServer({
-        uuid: cState.uuid,
         yo: id,
         name: inp
     }, 'POST', cHteachers+"addPep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 201){
                 par.setAttribute('data-st', '0');
             }
         });
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cHteachers+"getInfo")
+    let uri = cState.role == 4 ? "getInfoFA" : "getInfo";
+    sendToServer(0, 'GET', cHteachers+uri)
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 if(cState.role == 1 && cState.kid) selKid = cState.kid;
                 dispatch(changePeople(CHANGE_HTEACHERS_GL, undefined, undefined, undefined, data.body));
             }

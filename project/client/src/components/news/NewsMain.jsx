@@ -305,7 +305,7 @@ function chNews (id, inps, typ) {
         type: typ,
         val: inps,
         id: id
-    }, 'PATCH', cNews+"chNews")
+    }, 'PUT', cNews+"chNews")
 }
 
 function addNews (inps) {
@@ -315,7 +315,7 @@ function addNews (inps) {
         date: inps.inpndt,
         img_url: inps.addIm,
         text: inps.inpntt
-    }, 'POST', cNews+"addNews");
+    }, 'POST', cNews+"addNews"+type);
 }
 
 export function setActNew(name) {

@@ -19,6 +19,7 @@ import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
 import java.time.Duration;
@@ -45,8 +46,8 @@ import java.util.UUID;
         try {
             body.wrtr = datas.init(body.toString());
             Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
-            if (user != null && user.getRoles().containsKey(3L) && group != null && user1 != null) {
-                user1.getRoles().remove(3L);
+            if (user != null && user.getRoles().containsKey(Roles.HTEACHER) && group != null && user1 != null) {
+                user1.getRoles().remove(Roles.HTEACHER);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
                 if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
                 datas.getDbService().getGroupRepository().saveAndFlush(group);
@@ -66,7 +67,7 @@ import java.util.UUID;
         User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
+            if (user != null && user.getRoles().containsKey(Roles.HTEACHER) && user1 != null) {
                 user1.setFio(body.name);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
 
@@ -90,7 +91,7 @@ import java.util.UUID;
         try {
             body.wrtr = datas.init(body.toString());
             if (user != null && user1 != null
-                    && user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
+                    && user.getSelRole() == Roles.HTEACHER) {
                 UUID uuid = UUID.randomUUID();
                 Instant after = Instant.now().plus(Duration.ofDays(30));
                 Date dateAfter = Date.from(after);
@@ -117,7 +118,7 @@ import java.util.UUID;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(3L)) {
+            if (user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
                 User kidU = datas.getDbService().userById(body.id);
                 JsonObject par = body.bod.getAsJsonObject("par");
                 Instant after = Instant.now().plus(Duration.ofDays(30));
@@ -131,17 +132,17 @@ import java.util.UUID;
                     for (String id : par.keySet()) {
                         Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, datas.getDbService().schoolById(Long.parseLong(subscriber.getLvlSch()))));
                         User inv = new User(par.getAsJsonObject(id).get("name").getAsString(), Map.of(
-                            1L, role
+                            Roles.PARENT, role
                         ), Main.df.format(dateAfter));
                         datas.getDbService().getUserRepository().saveAndFlush(inv);
 
                         body.wrtr.name(inv.getId() + "").beginObject()
                             .name("name").value(inv.getFio());
 
-                        if (!inv.getRoles().get(1L).getKids().contains(kidU)) {
-                            inv.getRoles().get(1L).getKids().add(kidU);
+                        if (!inv.getRoles().get(Roles.PARENT).getKids().contains(kidU)) {
+                            inv.getRoles().get(Roles.PARENT).getKids().add(kidU);
                         }
-                        kidU.getRoles().get(0L).getParents().add(inv);
+                        kidU.getRoles().get(Roles.KID).getParents().add(inv);
                         datas.getDbService().getUserRepository().saveAndFlush(kidU);
 
                         body.wrtr.endObject();
@@ -168,7 +169,7 @@ import java.util.UUID;
             if (user != null) {
                 School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 ref.schId = school.getId();
-                if (!user.getRoles().containsKey(3L)) {
+                if (!user.getRoles().containsKey(Roles.HTEACHER)) {
                     ref.grId = datas.getDbService().getFirstRole(user.getRoles()).getGrp().getId();
                 }
                 Group group = datas.getDbService().groupById(ref.grId);
@@ -186,7 +187,7 @@ import java.util.UUID;
                                 body.wrtr.name("link").value(studU.getCode());
                             }
                             body.wrtr.name("par").beginObject();
-                            datas.usersByList(studU.getRoles().get(0L).getParents(), true, body.wrtr);
+                            datas.usersByList(studU.getRoles().get(Roles.KID).getParents(), true, body.wrtr);
                             body.wrtr.endObject().endObject();
                         }
                     }
@@ -208,7 +209,7 @@ import java.util.UUID;
         try {
             body.wrtr = datas.init(body.toString());
             if (user != null) {
-                if(user.getSelRole() == 3L) {
+                if(user.getSelRole() == Roles.HTEACHER) {
                     body.wrtr.name("bodyG").beginObject();
                     Long firstG = datas.groupsBySchoolOfUser(user, body.wrtr);
                     body.wrtr.name("firstG").value(firstG);
@@ -218,7 +219,7 @@ import java.util.UUID;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.infCon(body.uuid, null, TypesConnect.PARENTS, "main", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
+            authController.infCon(body.uuid, null, TypesConnect.PARENTS, "main", "main", user.getRoles().containsKey(Roles.HTEACHER) ? "ht" : "main", "main");
         }, body.wrtr, body.bol);
     }
 }

@@ -6,12 +6,13 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.security.user.Roles;
 
+import javax.annotation.PreDestroy;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -24,7 +25,9 @@ import java.util.stream.Collectors;
 
     private String username, password, code, expDate, fio;
 
-    private Long selRole, selKid;
+    private Roles selRole;
+
+    private Long selKid;
 
     @OneToOne(orphanRemoval = true)
     private SettingUser settings;
@@ -33,15 +36,15 @@ import java.util.stream.Collectors;
     @OneToMany(orphanRemoval = true)
     @JoinColumn(name = "user_id")
     @MapKeyColumn(name = "role")
-    private Map<Long, Role> roles;
+    private Map<Roles, Role> roles;
 
-    public User(String fio, Map<Long, Role> roles, String expDate) {//inv
+    public User(String fio, Map<Roles, Role> roles, String expDate) {//inv
         this.fio = fio;
         this.expDate = expDate;
         this.roles = new HashMap<>(roles);
     }
 
-    public User(String fio, Map<Long, Role> roles, Long selRole, String expDate, String code) {//inv
+    public User(String fio, Map<Roles, Role> roles, Roles selRole, String expDate, String code) {//inv
         this.fio = fio;
         this.code = code;
         this.expDate = expDate;
@@ -49,7 +52,7 @@ import java.util.stream.Collectors;
         this.roles = new HashMap<>(roles);
     }
 
-    public User(String username, String password, String fio, Map<Long, Role> roles, Long selRole, SettingUser settings) {
+    public User(String username, String password, String fio, Map<Roles, Role> roles, Roles selRole, SettingUser settings) {
         this.username = username;
         this.password = password;
         this.fio = fio;
@@ -59,22 +62,23 @@ import java.util.stream.Collectors;
     }
 
 //    @PreRemove
+    @PreDestroy
     public void rem() {
         getRoles().clear();
         settings = null;
     }
 
-    public Map<Long, Role> getRoles() {
+    public Map<Roles, Role> getRoles() {
         if(roles == null) roles = new HashMap<>();
         return roles;
     }
 
-    public Role getRole(Long role) {
+    public Role getRole(Roles role) {
         return getRoles().get(role);
     }
 
     public Role getSelecRole() {
-        return getRoles().get(selRole);
+        return getRole(selRole);
     }
 
     public SettingUser getSettings() {
@@ -86,7 +90,7 @@ import java.util.stream.Collectors;
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.keySet().stream().map(String::valueOf)
             .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override

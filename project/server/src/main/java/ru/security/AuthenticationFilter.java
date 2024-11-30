@@ -1,5 +1,6 @@
 package ru.security;
 
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -7,6 +8,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.configs.SecurityConfig;
 import ru.data.SSE.Subscriber;
+import ru.security.user.CustomToken;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,9 +24,9 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 
     private final UUID rU = UUID.randomUUID();
 
-    public AuthenticationFilter(RequestMatcher req) {
-        super(req);
-        System.out.println("AuthenticationFilter ");
+    public AuthenticationFilter(RequestMatcher req, AuthenticationManager authenticationManager) {
+        super(req, authenticationManager);
+        System.out.println("AuthenticationFilter " + getAuthenticationManager());
     }
 
     @Override

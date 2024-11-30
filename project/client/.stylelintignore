@@ -1,0 +1,11 @@
+*.tsx
+*.jsx
+*.ts
+*.js
+*.md
+*.svg
+/node_modules
+/.idea
+/.vscode
+package.json
+src.zip

@@ -19,6 +19,7 @@ import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.Lesson;
 import ru.data.models.school.School;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
 import java.util.Comparator;
@@ -45,7 +46,7 @@ import java.util.List;
         };
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(3L)) {
+            if(user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
                 ref.group = datas.getDbService().groupById(body.group);
                 if(ref.group != null) {
                     ref.lesson = new Lesson();
@@ -59,10 +60,10 @@ import java.util.List;
                         ref.lesson.setTeacher(ref.teaU);
                         if(!ObjectUtils.isEmpty(school.getTeachers())
                             && school.getTeachers().contains(ref.teaU)){
-                            school.getTeachers().remove(ref.teaU);
+                                school.getTeachers().remove(ref.teaU);
                         }
-                        if(!ref.teaU.getRoles().get(2L).getSubjects().contains(ref.lesson.getNameSubject())) {
-                            ref.teaU.getRoles().get(2L).getSubjects().add(ref.lesson.getNameSubject());
+                        if(!ref.teaU.getRoles().get(Roles.TEACHER).getSubjects().contains(ref.lesson.getNameSubject())) {
+                            ref.teaU.getRoles().get(Roles.TEACHER).getSubjects().add(ref.lesson.getNameSubject());
                             datas.getDbService().getUserRepository().saveAndFlush(ref.teaU);
                         }
                     }
@@ -106,21 +107,21 @@ import java.util.List;
         try {
             body.wrtr = datas.init(body.toString());
             if(user != null) {
-                if(user.getSelRole() == 0L && user.getRoles().containsKey(0L)) {
-                    ref.group = user.getRoles().get(0L).getGrp();
-                } else if(user.getSelRole() == 1L && user.getRoles().containsKey(1L)) {
+                if(user.getSelRole() == Roles.KID) {
+                    ref.group = user.getSelecRole().getGrp();
+                } else if(user.getSelRole() == Roles.PARENT) {
                     User kidU = datas.getDbService().userById(user.getSelKid());
                     if(kidU != null) {
-                        ref.group = kidU.getRoles().get(0L).getGrp();
+                        ref.group = kidU.getRoles().get(Roles.KID).getGrp();
                     }
-                } else if(user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
+                } else if(user.getSelRole() == Roles.HTEACHER) {
                     ref.group = datas.getDbService().groupById(body.group);
                 }
                 datas.getShedule("body", user, body.wrtr, ref.group != null ? ref.group.getId() : null);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            boolean b = user.getSelRole() == 2L || user.getSelRole() == 3L;
+            boolean b = user.getSelRole() == Roles.TEACHER || user.getSelRole() == Roles.HTEACHER;
             authController.infCon(body.uuid, null, null, null, b ? null : ref.group.getId()+"", null, null);
         }, body.wrtr, body.bol);
     }
@@ -136,7 +137,7 @@ import java.util.List;
             body.wrtr = datas.init(body.toString());
             if(user != null) {
                 ref.schId = datas.getDbService().getFirstRole(user.getRoles()).getYO().getId();
-                if(user.getRoles().containsKey(2L) || user.getRoles().containsKey(3L)) {
+                if(user.getRoles().containsKey(Roles.TEACHER) || user.getRoles().containsKey(Roles.HTEACHER)) {
                     body.wrtr.name("bodyG").beginObject();
                     ref.firstG = datas.groupsBySchoolOfUser(user, body.wrtr);
                     School school = datas.getDbService().schoolById(ref.schId);
@@ -144,15 +145,15 @@ import java.util.List;
                         .name("bodyT").beginObject();
                     datas.teachersBySchool(school, body.wrtr);
                 }
-                if(user.getRoles().containsKey(0L) || user.getRoles().containsKey(1L)) {
+                if(user.getRoles().containsKey(Roles.KID) || user.getRoles().containsKey(Roles.PARENT)) {
                     body.wrtr.name("yes").value(true);
                 }
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
             String l1 = "main", l2 = "main";
-            if(user.getSelRole() == 3L) l1 = "ht";
-            if(user.getSelRole() == 2L) {
+            if(user.getSelRole() == Roles.HTEACHER) l1 = "ht";
+            if(user.getSelRole() == Roles.TEACHER) {
                 l1 = "tea";
                 l2 = user.getId()+"";
             }

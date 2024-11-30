@@ -15,7 +15,8 @@ import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.data.models.auth.User;
 import ru.data.models.school.Request;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
+import ru.security.user.Roles;
 
 import static ru.Main.datas;
 
@@ -73,7 +74,7 @@ import static ru.Main.datas;
         JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /delReq");
         Request request = datas.getDbService().requestById(body.id);
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user != null && user.getRoles().containsKey(4L) && request != null) {
+        if(user != null && user.getRoles().containsKey(Roles.ADMIN) && request != null) {
             datas.getDbService().getRequestRepository().delete(request);
 
             wrtr.name("id").value(request.getId());
@@ -95,7 +96,7 @@ import static ru.Main.datas;
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chTitle");
         Request request = datas.getDbService().requestById(body.id);
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user != null && user.getRoles().containsKey(4L) && request != null) {
+        if(user != null && user.getRoles().containsKey(Roles.ADMIN) && request != null) {
             request.setEmail(body.title);
             datas.getDbService().getRequestRepository().saveAndFlush(request);
 
@@ -119,7 +120,7 @@ import static ru.Main.datas;
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chDate");
         Request request = datas.getDbService().requestById(body.id);
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user != null && user.getRoles().containsKey(4L) && request != null) {
+        if(user != null && user.getRoles().containsKey(Roles.ADMIN) && request != null) {
             request.setDate(body.date);
             datas.getDbService().getRequestRepository().saveAndFlush(request);
 
@@ -143,7 +144,7 @@ import static ru.Main.datas;
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chText");
         Request request = datas.getDbService().requestById(body.id);
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user != null && user.getRoles().containsKey(4L) && request != null) {
+        if(user != null && user.getRoles().containsKey(Roles.ADMIN) && request != null) {
             request.setFio(body.text);
             datas.getDbService().getRequestRepository().saveAndFlush(request);
 
@@ -165,7 +166,7 @@ import static ru.Main.datas;
         User user = auth.getSub().getUser();
         JsonTreeWriter wrtr = datas.init("", "[GET] /getRequests");
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user != null && user.getRoles().containsKey(4L)) {
+        if(user != null && user.getRoles().containsKey(Roles.ADMIN)) {
             for(Request reqR : datas.getDbService().getRequests()){
                 wrtr.name(reqR.getId()+"").beginObject()
                     .name("title").value(reqR.getEmail())

@@ -29,7 +29,7 @@ import ru.controllers.AuthController;
 import ru.data.SSE.Subscriber;
 import ru.data.models.auth.SettingUser;
 import ru.data.models.auth.User;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
 import ru.services.EmailService;
 import ru.services.MainService;
 import ru.services.PushService;

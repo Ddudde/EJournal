@@ -2,8 +2,8 @@ package ru.controllers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +19,8 @@ import ru.data.models.auth.Role;
 import ru.data.models.auth.SettingUser;
 import ru.data.models.auth.User;
 import ru.data.models.school.School;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
+import ru.security.user.Roles;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -56,7 +57,7 @@ import static ru.Main.datas;
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         UUID uuid;
         Subscriber subscriber;
-        if (uuidAuth != null) {
+        if (uuidAuth != null && !uuidAuth.equals("null")) {
             uuid = UUID.fromString(uuidAuth);
             subscriber = getSubscriber(uuidAuth);
             if (subscriber != null && subscriber.getLogin() != null) {
@@ -161,10 +162,6 @@ import static ru.Main.datas;
     public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, CustomToken auth) throws Exception {
         JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /infCon");
         User user = auth.getSub().getUser();
-        TypesConnect type = null;
-        if(!ObjectUtils.isEmpty(body.type)) {
-            type = TypesConnect.valueOf(body.type);
-        }
         if(user != null) {
             if (!ObjectUtils.isEmpty(body.notifToken)) {
                 SettingUser settingUser = user.getSettings();
@@ -177,9 +174,9 @@ import static ru.Main.datas;
                     datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
                 }
             }
-            wrtr.name("role").value(user.getSelRole());
-            if (user.getSelRole() == 1L) {
-                Role role = user.getRoles().get(1L);
+            wrtr.name("role").value(user.getSelRole().i);
+            if (user.getSelRole() == Roles.PARENT) {
+                Role role = user.getRoles().get(Roles.PARENT);
                 wrtr.name("kid").value(user.getSelKid())
                     .name("kids").beginObject();
                 if (!ObjectUtils.isEmpty(role.getKids())) {
@@ -190,16 +187,15 @@ import static ru.Main.datas;
                 wrtr.endObject();
             }
         }
-        infCon(auth.getUUID(), body.login, type, null, null, null, null);
+        infCon(auth.getUUID(), body.login, body.type, null, null, null, null);
         return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: завершение сеанса
      * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PatchMapping("/remCon")
-    public ResponseEntity<Void> remCon(CustomToken auth) throws Exception {
+    public ResponseEntity<Void> remCon(CustomToken auth) {
         System.out.println("[PATCH] /remCon");
         if(auth.getSub().getLogin() != null) {
             System.out.println("subscription remCon " + auth.getUUID() + " was noclosed " + auth.getSub().getLogin());
@@ -234,15 +230,14 @@ import static ru.Main.datas;
 
             wrtr.name("auth").value(true)
                 .name("login").value(user.getUsername())
-//                        bodyAns.addProperty("role", ObjectUtils.isEmpty(user.getRoles()) ? 0 : ((Long) user.getRoles().keySet().toArray()[4]));
-                .name("role").value(user.getSelRole())
+                .name("role").value(user.getSelRole().i)
                 .name("uuidS").value(auth.getUUID())
                 .name("ico").value(user.getSettings().getIco())
                 .name("roles").value(!ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1)
                 .name("secFr").value(!ObjectUtils.isEmpty(user.getSettings().getSecFr()))
                 .name("email").value(!ObjectUtils.isEmpty(user.getSettings().getEmail()));
-            if(user.getSelRole() == 1L) {
-                Role role = user.getRoles().get(1L);
+            if(user.getSelRole() == Roles.PARENT) {
+                Role role = user.getRoles().get(Roles.PARENT);
                 wrtr.name("kid").value(user.getSelKid())
                     .name("kids").beginObject();
                 if (!ObjectUtils.isEmpty(role.getKids())) {
@@ -277,10 +272,8 @@ import static ru.Main.datas;
                     user1.setSettings(datas.getDbService().createSettingUser(new SettingUser(body.ico)));
                 }
                 user1.setSelRole(datas.getDbService().getFirstRoleId(user1.getRoles()));
-                if(user1.getRoles().containsKey(1L)) {
-                    if(!ObjectUtils.isEmpty(user1.getRoles().get(1L).getKids())) {
-                        user1.setSelKid(user1.getRoles().get(1L).getKids().get(0).getId());
-                    }
+                if(user1.getRoles().containsKey(Roles.PARENT) && !ObjectUtils.isEmpty(user1.getRoles().get(Roles.PARENT).getKids())) {
+                    user1.setSelKid(user1.getRoles().get(Roles.PARENT).getKids().get(0).getId());
                 }
             } else if(Objects.equals(body.mod, "rea")){
                 user1.setCode(null);
@@ -308,12 +301,11 @@ import static ru.Main.datas;
 
     /** RU: проверка инвайта для регистрации/регистрации новой роли
      * @param body Данные с клиента, задействуются свойства: code
-     * @exception Exception Исключение вызывается при ошибках с Json
      * @return Код статуса */
     @PostMapping("/checkInvCode")
-    public ResponseEntity<Void> checkInvCode(@RequestBody DataAuth body) throws Exception {
+    public ResponseEntity<Void> checkInvCode(@RequestBody DataAuth body) {
         User user = datas.getDbService().userByCode(body.code);
-        System.out.println("[POST] /checkInvCode ! " + body.toString());
+        System.out.println("[POST] /checkInvCode ! " + body);
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if(user != null) stat = HttpStatus.OK;
         return ResponseEntity.status(stat).build();
@@ -334,8 +326,8 @@ import static ru.Main.datas;
             Long schId = null;
         };
         if(user != null && user1 != null
-                && (user.getSelRole() == 3L && user.getRoles().containsKey(3L)
-                || user.getSelRole() == 4L && user.getRoles().containsKey(4L))) {
+                && (user.getSelRole() == Roles.HTEACHER && user.getRoles().containsKey(Roles.HTEACHER)
+                || user.getSelRole() == Roles.ADMIN && user.getRoles().containsKey(Roles.ADMIN))) {
             UUID uuid = UUID.randomUUID();
             Instant after = Instant.now().plus(Duration.ofDays(30));
             Date dateAfter = Date.from(after);
@@ -360,11 +352,12 @@ import static ru.Main.datas;
     /** RU: Данные клиента используемые AuthController в методах
      * @see AuthController */
     @ToString
-    @NoArgsConstructor @AllArgsConstructor
+    @RequiredArgsConstructor
     static class DataAuth {
-        public String code, notifToken, login, secFr, par, mod,
-            password, type, id;
-        public int ico;
-        public boolean permis;
+        public final TypesConnect type;
+        public final String code, notifToken, login, secFr, par, mod,
+            password, id;
+        public final int ico;
+        public final boolean permis;
     }
 }

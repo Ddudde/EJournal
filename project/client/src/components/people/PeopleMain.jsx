@@ -230,21 +230,19 @@ export function setActNew(name) {
 export function remGroup (id) {
     console.log("remGroup");
     sendToServer({
-        uuid: cState.uuid,
         grId: id
-    }, 'POST', cHteachers+"remGroup")
+    }, 'DELETE', cHteachers+"remGroup")
 }
 
 export function chGroup (id, inp, par) {
     console.log("chGroup");
     sendToServer({
-        uuid: cState.uuid,
         grId: id,
         name: inp
-    }, 'POST', cHteachers+"chGroup")
+    }, 'PATCH', cHteachers+"chGroup")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -253,12 +251,11 @@ export function chGroup (id, inp, par) {
 export function addGroup (inp, par) {
     console.log("addGroup");
     sendToServer({
-        uuid: cState.uuid,
         name: inp
     }, 'POST', cHteachers+"addGroup")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 par.setAttribute('data-st', '0');
             }
         });

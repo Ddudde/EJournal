@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <logger name="org.springframework" level="info"/>
+    <logger name="org.hibernate" level="info"/>
+    <logger name="ru" level="trace"/>
+    <logger name="ch.qos.logback" level="error"/>
+    <property name="LOGS" value="./logs" />
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%highlight([%-5level]) %black(%d{dd-MM-yyyy hh:mm:ss}) %green([%thread]) %highlight(%logger{50} - %msg%n)</pattern>
+        </encoder>
+    </appender>
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/app.log</file>
+        <encoder>
+            <pattern>[%-5level] %d{dd-MM-yyyy hh:mm:ss} [%thread] %logger{50} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOGS}/%d{yyyy-MM, aux}/app.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <!--each archived file, size max 50MB -->
+            <maxFileSize>50MB</maxFileSize>
+            <!--total size of all archive files, if total size > 500MB, it will delete old archived file -->
+            <totalSizeCap>500MB</totalSizeCap>
+            <!--5 days to keep -->
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
+    </appender>
+    <!-- LOG everything at INFO level -->
+    <root level="error">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </root>
+</configuration>

@@ -445,7 +445,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author" class="author">Natik Muradov</span><br>
 <span id="email" class="email"><a href="mailto:myratoff25@gmail.com">myratoff25@gmail.com</a></span><br>
 <span id="revnumber">version v0.1,</span>
-<span id="revdate">27.02.2024</span>
+<span id="revdate">15.05.2024</span>
 <br><span id="revremark">Основное описание</span>
 </div>
 <div id="toc" class="toc2">
@@ -455,6 +455,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_зависимости-клиента">2. Зависимости клиента</a></li>
 <li><a href="#_использование">3. Использование</a></li>
 <li><a href="#_документы">4. Документы</a></li>
+<li><a href="#_api">5. API</a>
+<ul class="sectlevel2">
+<li><a href="#_http-методы">5.1. HTTP методы</a></li>
+<li><a href="#_http-статус-коды">5.2. HTTP статус коды</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -663,11 +669,104 @@ beenDo - что уже сделано</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_api">5. API</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_http-методы">5.1. HTTP методы</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Метод</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Использование</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>GET</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Метод GET используется для чтения ресурса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>POST</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Метод POST чаще всего используется для создания новых ресурсов</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PATCH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PATCH используется для частичного изменения ресурса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PUT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PUT используется для обновления ресурса целиком</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DELETE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DELETE используется для удаления ресурса</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_http-статус-коды">5.2. HTTP статус коды</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Статус код</th>
+<th class="tableblock halign-left valign-top">Использование</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>200 OK</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Запрос принят и корректно обработан веб-сервером</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>201 Created</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Запрос корректно обработан и в результате был создан новый ресурс</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>202 Accepted</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Запрос принят. Используется в проекте как альтернатива 200 коду</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>204 No Content</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Запрос успешно обработан, однако в ответе только заголовки без контента сообщения</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>400 Bad Request</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Запрос от клиента к веб-серверу составлен некорректно. Обычно это происходит, если клиент не передаёт необходимые заголовки или параметры или они неправильные</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>401 Unauthorized</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Получение запрашиваемого ресурса доступно только аутентифицированным пользователям</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>403 Forbidden</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">У клиента не хватает прав для получения запрашиваемого ресурса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>404 Not Found</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Сервер не смог найти запрашиваемый ресурс</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>500 Internal Server Error</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">На сервере произошла непредвиденная ошибка</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version v0.1<br>
-Last updated 2024-04-13 18:59:54 +0300
+Last updated 2024-05-15 20:29:37 +0300
 </div>
 </div>
 </body>

@@ -19,6 +19,7 @@ import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
 import java.time.Duration;
@@ -45,10 +46,10 @@ import java.util.UUID;
         User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(3L) && user1 != null) {
+            if(user != null && user.getRoles().containsKey(Roles.HTEACHER) && user1 != null) {
                 Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
                 if(group != null) {
-                    user1.getRoles().remove(3L);
+                    user1.getRoles().remove(Roles.HTEACHER);
                     datas.getDbService().getUserRepository().saveAndFlush(user1);
                     if (!ObjectUtils.isEmpty(group.getKids())) group.getKids().remove(user1.getId());
                     datas.getDbService().getGroupRepository().saveAndFlush(group);
@@ -69,7 +70,7 @@ import java.util.UUID;
         User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(3L) && user1 != null) {
+            if(user != null && user.getRoles().containsKey(Roles.HTEACHER) && user1 != null) {
                 user1.setFio(body.name);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
 
@@ -93,19 +94,19 @@ import java.util.UUID;
         try {
             body.wrtr = datas.init(body.toString());
             if(user != null && user1 != null
-                && user.getSelRole() == 3L && user.getRoles().containsKey(3L)) {
-                UUID uuid = UUID.randomUUID();
-                Instant after = Instant.now().plus(Duration.ofDays(30));
-                Date dateAfter = Date.from(after);
-                user1.setCode(uuid.toString());
-                user1.setExpDate(Main.df.format(dateAfter));
-                datas.getDbService().getUserRepository().saveAndFlush(user1);
-                ref.schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
+                && user.getSelRole() == Roles.HTEACHER) {
+                    UUID uuid = UUID.randomUUID();
+                    Instant after = Instant.now().plus(Duration.ofDays(30));
+                    Date dateAfter = Date.from(after);
+                    user1.setCode(uuid.toString());
+                    user1.setExpDate(Main.df.format(dateAfter));
+                    datas.getDbService().getUserRepository().saveAndFlush(user1);
+                    ref.schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
 
-                System.out.println("setCode " + uuid);
-                body.wrtr.name("id1").value(user1.getId())
-                    .name("code").value(uuid.toString())
-                    .name("id").value(body.id);
+                    System.out.println("setCode " + uuid);
+                    body.wrtr.name("id1").value(user1.getId())
+                        .name("code").value(uuid.toString())
+                        .name("id").value(body.id);
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
@@ -119,15 +120,15 @@ import java.util.UUID;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(3L)) {
+            if(user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
                 School school = datas.getDbService().schoolById(Long.parseLong(subscriber.getLvlSch()));
                 if(school != null) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
                     Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, Set.of(), school));
                     User inv = new User(body.name, Map.of(
-                        2L, role
-                    ), Main.df.format(dateAfter));
+                        Roles.TEACHER, role
+                        ), Main.df.format(dateAfter));
                     datas.getDbService().getUserRepository().saveAndFlush(inv);
                     school.getTeachers().add(inv);
                     datas.getDbService().getSchoolRepository().saveAndFlush(school);
@@ -161,7 +162,7 @@ import java.util.UUID;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.infCon(body.uuid, null, TypesConnect.TEACHERS, ref.schId+"", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
+            authController.infCon(body.uuid, null, TypesConnect.TEACHERS, ref.schId+"", "main", user.getRoles().containsKey(Roles.HTEACHER) ? "ht" : "main", "main");
         }, body.wrtr, body.bol);
     }
 }

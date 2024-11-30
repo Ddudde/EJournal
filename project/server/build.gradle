@@ -1,7 +1,7 @@
 buildscript {
     ext {
         spring_version = '2.7.15'
-        lombok_version = '1.18.26'
+        lombok_version = '1.18.30'
         restdocs_plugin_version = '0.16.4'
         asciiDocPlugin_version = '4.0.2'
     }
@@ -15,11 +15,13 @@ plugins {
     id 'java'
     id 'org.asciidoctor.jvm.convert' version "${asciiDocPlugin_version}"
     id 'org.asciidoctor.jvm.pdf' version "${asciiDocPlugin_version}"
+    id "org.sonarqube" version "5.0.0.4638"
+    id 'jacoco'
 }
 
 group = 'ru'
 version = '1.0'
-sourceCompatibility = 17
+sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenCentral()
@@ -29,13 +31,30 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    testCompileOnly {
+    testCompileClasspath {
         extendsFrom testAnnotationProcessor
+    }
+    configureEach {
+        it.resolutionStrategy {
+            eachDependency { DependencyResolveDetails details ->
+                /*
+                spring-boot-starter-data-jpa:2.7.15 требует net.bytebuddy:1.12.+
+                C Java21 минимальная net.bytebuddy:1.14.17
+                 */
+                if (details.requested.group == 'org.mockito') {
+                    details.useVersion '5.4.0'
+                }
+                if (details.requested.group == 'net.bytebuddy') {
+                    details.useVersion '1.14.17'
+                }
+            }
+        }
     }
 }
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 dependencies {
@@ -61,7 +80,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombok_version}"
 
     testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
-    testImplementation "org.springframework.boot:spring-boot-starter-test:${spring_version}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:2.7.18"
     testImplementation "com.epages:restdocs-api-spec-mockmvc:${restdocs_plugin_version}"
     testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc:2.0.8.RELEASE"
     testImplementation 'org.springframework.security:spring-security-test:5.7.10'
@@ -115,18 +134,6 @@ asciidoctor {
 //    dependsOn asciidoctorPdf
 }
 
-openapi {
-    host = 'localhost:8080'
-    title = 'EJournal'
-    description = file('src/docs/docDescription.html').text
-//    tagDescriptionsPropertiesFile = 'src/docs/tag-descriptions.yaml'
-    version = '1.0'
-    format = 'json'
-    outputDirectory = '/docs/swagger/htmlSwag'
-    outputFileNamePrefix = 'swagger'
-    snippetsDirectory = "build/generated-snippets"
-}
-
 openapi3 {
     servers = [ { url = "http://localhost:8080" } ]
     title = 'EJournal'
@@ -140,40 +147,25 @@ openapi3 {
 }
 
 gradle.taskGraph.whenReady { graph ->
-    if (graph.hasTask(':openapi3') || graph.hasTask(':openapi')) {
+    if (graph.hasTask(':openapi3')) {
         test.enabled = false
     }
 }
 
-//swagger {
-//    apiSource {
-//        springmvc = true
-//        locations = [ 'ru.mirea.controllers']
-//        schemes = [ 'http' ]
-//        host = 'localhost:8080'
-//        basePath = '/'
-//        info {
-//            title = 'EJournal'
-//            version = 'v1'
-//            description = 'This is a sample.'
-////            contact {
-////                email = 'email@email.com'
-////                name = 'Name'
-////                url = 'http://www.example.com'
-////            }
-//        }
-////        securityDefinition {
-////            name = 'basicAuth'
-////            type = 'basic'
-////        }
-////        securityDefinition {
-////            json = 'securityDefinition.json'
-////        }
-//        expandSuperTypes = false
-//        outputFormats = ['json', 'html']
-////        templatePath = "${project.rootDir}/src/main/resources/tempSwagger/strapdown.html.hbs"
-//        outputPath = "${project.rootDir}/docs/swagger/index.html"
-//        swaggerDirectory = "${project.rootDir}/docs/swagger/htmlSwag"
-//        attachSwaggerArtifact = true
-//    }
-//}
+sonar {
+    properties {
+        property "sonar.host.url", "http://192.168.111.150:9000"
+        property "sonar.projectKey", "EJournal"
+        property "sonar.projectName", "EJournal"
+        property "sonar.token", "sqp_2de0acfa3e7d9552ac072fc5d6ccc9ab3821a233"
+        property "sonar.scm.disabled", "True"
+        property "sonar.coverage.jacoco.xmlReportPath", "${layout.buildDirectory}/reports/jacoco.xml"
+    }
+}
+
+jacocoTestReport {
+    reports {
+//        csv.required = true
+        xml.required = true
+    }
+}

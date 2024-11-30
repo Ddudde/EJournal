@@ -7,10 +7,8 @@ import ru.data.models.Contacts;
 import ru.data.models.News;
 import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Lesson;
-import ru.data.models.school.Request;
-import ru.data.models.school.School;
+import ru.data.models.school.*;
+import ru.security.user.Roles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +18,7 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 
+/** RU: Класс для получения случайных сущностей и их хранения */
 @NoArgsConstructor
 public class RandomUtils {
 
@@ -63,14 +62,25 @@ public class RandomUtils {
         getRequest(9764L, "mail11@mail.com", "01.11.2011", "Пестов Л.А.")
     ));
 
+    public final List<Period> periods = new ArrayList<>(asList(
+        new Period("I четверть", "01.09.23", "03.11.23"),
+        new Period("II четверть", "12.11.23", "29.12.23"),
+        new Period("III четверть", "12.01.24", "29.03.24"),
+        new Period("IV четверть", "01.04.24", "30.08.24")
+    ));
+
     private Request getRequest(long id, String email, String date, String fio) {
         Request request = new Request(email, date, fio);
         request.setId(id);
         return request;
     }
 
-    public Contacts getContactsTest() {
-        return (Contacts) getClone(contactsTest.get(0), Contacts.class);
+    public static Contacts getCloneContacts(Contacts contacts) {
+        return (Contacts) getClone(contacts, Contacts.class);
+    }
+
+    public static User getCloneUsers(User user) {
+        return (User) getClone(user, User.class);
     }
 
     public static Object getClone(Object object, Class className) {
@@ -139,9 +149,9 @@ public class RandomUtils {
             Role role = new Role();
             role.setEmail("example@mail.com");
             role.getParents().add(parentTest);
-            user.getRoles().put(0L, role);
+            user.getRoles().put(Roles.KID, role);
         }
-        user.setSelRole(0L);
+        user.setSelRole(Roles.KID);
         return user;
     }
 }

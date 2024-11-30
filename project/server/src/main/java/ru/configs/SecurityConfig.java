@@ -4,36 +4,35 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import ru.controllers.AuthController;
 import ru.security.AuthenticationFilter;
 import ru.security.CustomProvider;
-import ru.security.UserService;
+import ru.security.user.Roles;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-@EnableWebSecurity public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private final UserService userService;
+@EnableWebSecurity public class SecurityConfig {
 
     private final CustomProvider provider;
-
-    private final AuthController authController;
 
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
         new AntPathRequestMatcher("/console_db"),
@@ -44,45 +43,19 @@ import ru.security.UserService;
 
     public static final String authHeader = "x-access-token";
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(provider)
-            .userDetailsService(userService);
-        auth.inMemoryAuthentication()
-            .withUser("foo")
-            .password("foo")
-            .roles("0")
-            .and()
-            .withUser("admin")
-            .password("admin")
-            .roles("4")
-            .and()
-            .withUser("nm12")
-            .password("1111")
-            .roles("0")
-            .and()
-            .withUser("anonymousUser")
-            .password("")
-            .roles("ANONYMOUS");
-    }
+    private final AuthenticationConfiguration authConfig;
 
     private AuthenticationEntryPoint forbiddenEntryPoint() {
         return new HttpStatusEntryPoint(HttpStatus.FORBIDDEN);
     }
 
     private AuthenticationFilter authenticationFilter() throws Exception {
-        final AuthenticationFilter filter = new AuthenticationFilter(PROTECTED_URLS);
-        filter.setAuthenticationManager(authenticationManager());
-//        filter.setAuthenticationSuccessHandler(successHandler());
-        return filter;
+        return new AuthenticationFilter(PROTECTED_URLS, authConfig.getAuthenticationManager());
     }
 
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authenticationProvider(provider);
         http.cors().and().sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().exceptionHandling()
@@ -92,15 +65,31 @@ import ru.security.UserService;
             .formLogin().disable()
             .httpBasic().disable()
             .logout().disable()
-//            .anonymous().disable()
             .rememberMe().disable()
-//            .authenticationProvider(provider)
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             .requestMatchers(PUBLIC_URLS).permitAll()
-//            .requestMatchers(PUBLIC_URLS).access("isAuthenticated() OR isAnonymous()")
-//            .requestMatchers(PUBLIC_URLS).hasAnyRole("ANONYMOUS", "0", "1", "2", "3", "4")
-//            .requestMatchers(PROTECTED_URLS).hasRole("0")
             .anyRequest().authenticated();
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig1) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails user = User.withDefaultPasswordEncoder()
+                .username("anonymousUser")
+                .password("")
+                .roles(Roles.ANONYMOUS.toString())
+                .build();
+        return new InMemoryUserDetailsManager(user);
     }
 }

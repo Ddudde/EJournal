@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import ru.controllers.main.SettingsController;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;

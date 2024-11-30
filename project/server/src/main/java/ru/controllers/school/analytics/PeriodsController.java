@@ -18,6 +18,7 @@ import ru.data.SSE.TypesConnect;
 import ru.data.models.auth.User;
 import ru.data.models.school.Period;
 import ru.data.models.school.School;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
 @RequestMapping("/periods")
@@ -39,8 +40,8 @@ import ru.services.MainService;
         };
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(3L)) {
-                School school = user.getRoles().get(3L).getYO();
+            if(user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
+                School school = user.getRoles().get(Roles.HTEACHER).getYO();
                 ref.schId = school.getId();
                 Period period = new Period();
                 period.setName(body.name);
@@ -71,8 +72,8 @@ import ru.services.MainService;
         };
         try {
             body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(3L)) {
-                School school = user.getRoles().get(3L).getYO();
+            if(user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
+                School school = user.getRoles().get(Roles.HTEACHER).getYO();
                 ref.schId = school.getId();
                 if (!ObjectUtils.isEmpty(school.getPeriods())){
                     System.out.println(school.getPeriods());

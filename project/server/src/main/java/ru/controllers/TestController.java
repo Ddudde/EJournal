@@ -2,17 +2,15 @@ package ru.controllers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.security.CustomToken;
+import ru.security.user.CustomToken;
 import ru.services.db.IniDBService;
 
 import static ru.Main.datas;
@@ -33,66 +31,52 @@ import static ru.Main.datas;
 @RestController public class TestController {
 
     private final AuthController authController;
-
     private final IniDBService iniDBService;
 
     /** RU: изменяет параметры тестирования
-     * @param body Данные с клиента, задействуются свойства: id, val
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Объект и код статуса */
-    @PatchMapping("/chTests")
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null) and hasAuthority('ADMIN')")
+    @PutMapping("/chTests")
     public ResponseEntity<JsonObject> chTests(@RequestBody DataTest body, CustomToken auth) throws Exception {
-        User user = auth.getSub().getUser();
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chBool");
-        if(user != null && user.getRoles().containsKey(4L)) {
-            switch (body.id) {
-                case "checkbox_debug" -> Main.debug = body.val;
-                case "checkbox_test" -> {
-                    Main.test = body.val;
-                    if(Main.test) {
-                        iniDBService.testOn();
-                    } else {
-                        iniDBService.testOff();
-                    }
-                    iniDBService.getTestInfo(wrtr);
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chTests");
+        switch (body.id) {
+            case "checkbox_debug" -> Main.debug = body.val;
+            case "checkbox_test" -> {
+                Main.test = body.val;
+                if(Main.test) {
+                    iniDBService.testOn();
+                } else {
+                    iniDBService.testOff();
                 }
-                default -> {}
+                iniDBService.getTestInfo(wrtr);
             }
-            stat = HttpStatus.OK;
+            default -> {}
         }
-        return datas.getObjR(ans -> {}, wrtr, stat, false);
+        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: [start] отправка инфы для тестов
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Объект и код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null) and hasAuthority('ADMIN')")
     @GetMapping("/getInfo")
     public ResponseEntity<JsonObject> getInfo(CustomToken auth) throws Exception {
-        User user = auth.getSub().getUser();
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
-        if(user != null && user.getRoles().containsKey(4L)) {
-            wrtr.name("bodyS").beginObject()
-                .name("checkbox_debug").value(Main.debug)
-                .name("checkbox_test").value(Main.test)
-                .endObject();
-            iniDBService.getTestInfo(wrtr);
-            stat = HttpStatus.OK;
-        }
+        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
+        wrtr.name("bodyS").beginObject()
+            .name("checkbox_debug").value(Main.debug)
+            .name("checkbox_test").value(Main.test)
+            .endObject();
+        iniDBService.getTestInfo(wrtr);
         return datas.getObjR(ans -> {
             authController.infCon(auth.getUUID(), null, TypesConnect.TEST, "main", "main", "main", "main");
-        }, wrtr, stat, false);
+        }, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: Данные клиента используемые TestController в методах
      * @see TestController */
     @ToString
-    @NoArgsConstructor @AllArgsConstructor
-    static class DataTest {
-        public String id;
-        public Boolean val;
+    @RequiredArgsConstructor
+    static final class DataTest {
+        public final String id;
+        public final boolean val;
     }
 }

@@ -54,7 +54,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AdminsController/addPep_whenEmpty_Anonim" : {
@@ -97,7 +97,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AdminsController/chPep_whenEmpty_Anonim" : {
@@ -142,7 +142,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AdminsController/getAdmins_whenEmpty_Anonim" : {
@@ -157,7 +157,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AdminsController/getAdmins_whenGood_Admin" : {
@@ -190,7 +190,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AdminsController/remPep_whenEmpty_Anonim" : {
@@ -225,11 +225,11 @@
             "content" : {
               "text/event-stream" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/start_whenGoodNext_Anonim" : {
-                    "value" : "event:chck\ndata:\"cffae951-039f-4762-b2e7-b5f846a17385\"\n\n"
+                    "value" : "event:chck\ndata:\"7433ad58-bcdd-42ad-8b7e-279333840958\"\n\n"
                   }
                 }
               }
@@ -258,7 +258,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AuthController/auth_whenGood_AdminUser" : {
@@ -277,11 +277,11 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/auth_whenGood_AdminUser" : {
-                    "value" : "{\"auth\":true,\"login\":\"nm12\",\"role\":4,\"uuidS\":\"b0a5df1c-0d11-4c89-833a-12ebb4478692\",\"roles\":true,\"secFr\":false,\"email\":false}"
+                    "value" : "{\"auth\":true,\"login\":\"nm12\",\"role\":4,\"uuidS\":\"5d05c779-c7ac-42a3-9e29-2e509dd5c608\",\"roles\":true,\"secFr\":false,\"email\":false}"
                   }
                 }
               }
@@ -292,7 +292,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/auth_whenWrong_AdminUser" : {
@@ -325,7 +325,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AuthController/checkInvCode_whenGood_AdminUser" : {
@@ -368,7 +368,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AuthController/infCon_whenGood_AdminUser" : {
@@ -384,7 +384,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/infCon_whenGood_AdminUser" : {
@@ -417,7 +417,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AuthController/reg_whenGood_Anonim" : {
@@ -439,7 +439,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/reg_whenGood_Anonim" : {
@@ -454,7 +454,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/reg_whenWrongLogin_Anonim" : {
@@ -469,7 +469,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/reg_whenWrong_Anonim" : {
@@ -525,7 +525,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "AuthController/setCodePep_whenEmpty_AdminUser" : {
@@ -544,7 +544,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/setCodePep_whenEmpty_AdminUser" : {
@@ -559,11 +559,11 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/setCodePep_whenGood_AdminUser" : {
-                    "value" : "{\"id\":9764,\"code\":\"85833b8f-7ca4-4ef0-b0b2-1d7ac7857a7e\",\"id1\":0}"
+                    "value" : "{\"id\":9764,\"code\":\"36247412-3fb5-4c98-b842-af02429b1541\",\"id1\":0}"
                   }
                 }
               }
@@ -593,11 +593,11 @@
             "content" : {
               "text/event-stream" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "AuthController/start_whenGood_AdminUser" : {
-                    "value" : "event:chck\ndata:\"0f6efb11-9a80-4aed-a72b-a35221af7f65\"\n\n"
+                    "value" : "event:chck\ndata:\"6b61eda7-e4c6-4a6f-a60c-527962a90db7\"\n\n"
                   }
                 }
               }
@@ -607,7 +607,7 @@
       }
     },
     "/contacts/chContact/" : {
-      "patch" : {
+      "put" : {
         "tags" : [ "ContactsController" ],
         "summary" : "Изменение контакта + Server Sent Events",
         "description" : "Также возможны 401, 403 и 500 коды ответов",
@@ -626,7 +626,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "ContactsController/chContact_whenEmpty_Portal_AdminUser" : {
@@ -682,7 +682,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "ContactsController/getContacts_whenEmpty_Portal_AdminUser" : {
@@ -713,12 +713,82 @@
         }
       }
     },
-    "/news/addNews/" : {
-      "post" : {
-        "tags" : [ "NewsController" ],
-        "summary" : "Добавление новой новости + Server Sent Events",
+    "/dnevnik/getDnevnik" : {
+      "get" : {
+        "tags" : [ "DnevnikController" ],
+        "summary" : "Отправляет данные о расписании, оценках, домашних заданиях",
         "description" : "Также возможны 401, 403 и 500 коды ответов",
-        "operationId" : "NewsController/addNews_when",
+        "operationId" : "DnevnikController/getDnevnik_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "DnevnikController/getDnevnik_whenGood_KID" : {
+                    "value" : "{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"mark\":\"Н\",\"weight\":1},\"i\":0},\"10.06.22\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0},\"11.06.22\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}}}}"
+                  },
+                  "DnevnikController/getDnevnik_whenGood_KID_onlyHomework" : {
+                    "value" : "{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"homework\":\"Стр. 62-63 пересказ\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"homework\":\"Упр. 5Стр. 103\"},\"i\":0},\"10.06.22\":{\"0\":{\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"homework\":\"Упр. 6Стр. 103\"},\"i\":0},\"11.06.22\":{\"0\":{\"homework\":\"Упр. 7Стр. 103\"},\"i\":0}}}}"
+                  },
+                  "DnevnikController/getDnevnik_whenGood_KID_withHomework" : {
+                    "value" : "{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Стр. 62-63 пересказ\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"mark\":\"Н\",\"weight\":1,\"homework\":\"Упр. 5Стр. 103\"},\"i\":0},\"10.06.22\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 6Стр. 103\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0},\"11.06.22\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 7Стр. 103\"},\"i\":0}}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dnevnik/getInfo" : {
+      "get" : {
+        "tags" : [ "DnevnikController" ],
+        "summary" : "[start] запускает клиента в раздел дневника и подтверждает клиенту права",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "DnevnikController/getInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/addGroup" : {
+      "post" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Создаёт группу + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/addGroup_when",
         "parameters" : [ {
           "name" : "x-access-token",
           "in" : "header",
@@ -733,16 +803,519 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
-                "NewsController/addNews_whenEmpty_Portal_AdminUser" : {
+                "HTeachersController/addGroup_whenEmpty_Anonim" : {
                   "value" : "{}"
                 },
-                "NewsController/addNews_whenGood_Portal_AdminUser" : {
-                  "value" : "{\n    \"title\": \"День рождения портала!\",\n    \"date\": \"25.04.2022\",\n    \"text\": \"Начались первые работы\"\n}\n"
+                "HTeachersController/addGroup_whenGood_Hteacher" : {
+                  "value" : "{\n    \"name\": \"31В\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/addPep" : {
+      "post" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Создаёт пользователя-завуча + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/addPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/addPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
                 },
-                "NewsController/addNews_whenGood_YO_HTeacher" : {
+                "HTeachersController/addPep_whenGood_Admin" : {
+                  "value" : "{\n    \"yo\": 20,\n    \"name\": \"Дрыздов А.А.\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/hteachers/addSch" : {
+      "post" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Добавление учебного центра администратором портала",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/addSch_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/addSch_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/addSch_whenGood_Admin" : {
+                  "value" : "{\n    \"name\": \"Гимназия ? 4\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/hteachers/chGroup" : {
+      "patch" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Изменяет название группы + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/chGroup_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/chGroup_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/chGroup_whenGood_Hteacher" : {
+                  "value" : "{\n    \"grId\": 20,\n    \"name\": \"31В\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/chPep" : {
+      "patch" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Изменяет фамилию пользователя + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/chPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/chPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/chPep_whenGood_Admin" : {
+                  "value" : "{\n    \"id\": 20,\n    \"name\": \"Дрыздов А.А.\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/chSch" : {
+      "patch" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Изменение имени учебного центра администратором портала",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/chSch_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/chSch_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/chSch_whenGood_Admin" : {
+                  "value" : "{\n    \"schId\": 20,\n    \"name\": \"Гимназия ? 4\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/getInfo" : {
+      "get" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "[start] отправка список завучей учебного центра",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/getInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "HTeachersController/getInfo_whenGood_HTEACHER" : {
+                    "value" : "{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/getInfoFA" : {
+      "get" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "[start] отправка список завучей учебного центра для администраторов",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/getInfoForAdmins_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "HTeachersController/getInfoForAdmins_whenGood_Admin" : {
+                    "value" : "{\"0\":{\"pep\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/remGroup" : {
+      "delete" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Удаляет группу + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/remGroup_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/remGroup_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/remGroup_whenGood_Hteacher" : {
+                  "value" : "{\n    \"grId\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/remPep" : {
+      "delete" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Удаляет у пользователя роль завуча + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/remPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/remPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/remPep_whenGood_Admin" : {
+                  "value" : "{\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/remSch" : {
+      "delete" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Удаление учебного центра администратором портала",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/remSch_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/remSch_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/remSch_whenGood_Admin" : {
+                  "value" : "{\n    \"schId\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/news/addNewsPor/" : {
+      "post" : {
+        "tags" : [ "NewsController" ],
+        "summary" : "Добавление новой новости портала + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "NewsController/addNewsPortal_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "NewsController/addNewsPortal_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "NewsController/addNewsPortal_whenGood_AdminUser" : {
+                  "value" : "{\n    \"title\": \"День рождения портала!\",\n    \"date\": \"25.04.2022\",\n    \"text\": \"Начались первые работы\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/news/addNewsYo/" : {
+      "post" : {
+        "tags" : [ "NewsController" ],
+        "summary" : "Добавление новой новости портала + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "NewsController/addNewsYO_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "NewsController/addNewsYO_whenEmpty_HTeacher" : {
+                  "value" : "{}"
+                },
+                "NewsController/addNewsYO_whenGood_HTeacher" : {
                   "value" : "{\n    \"title\": \"День рождения портала!\",\n    \"date\": \"25.04.2022\",\n    \"text\": \"Начались первые работы\"\n}\n"
                 }
               }
@@ -760,7 +1333,7 @@
       }
     },
     "/news/chNews/" : {
-      "patch" : {
+      "put" : {
         "tags" : [ "NewsController" ],
         "summary" : "Изменение новости + Server Sent Events",
         "description" : "Также возможны 401, 403 и 500 коды ответов",
@@ -779,7 +1352,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "NewsController/chNews_whenEmpty_Portal_AdminUser" : {
@@ -825,7 +1398,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "NewsController/delNews_whenEmpty_Portal_AdminUser" : {
@@ -881,7 +1454,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "NewsController/getNews_whenEmpty_Portal_Admin" : {
@@ -920,7 +1493,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "ProfileController/chEmail_whenEmpty_Anonim" : {
@@ -963,7 +1536,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "ProfileController/chInfo_whenEmpty_Anonim" : {
@@ -1006,7 +1579,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "ProfileController/chKid_whenEmpty_Anonim" : {
@@ -1025,7 +1598,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "ProfileController/chKid_whenEmpty_Anonim" : {
@@ -1040,7 +1613,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "ProfileController/chKid_whenGood_Parent" : {
@@ -1073,7 +1646,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "ProfileController/chLogin_whenEmpty_Anonim" : {
@@ -1116,7 +1689,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "ProfileController/chRole_whenEmpty_Anonim" : {
@@ -1132,7 +1705,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "ProfileController/chRole_whenEmpty_Anonim" : {
@@ -1147,12 +1720,9 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
-                  "ProfileController/chRole_whenGood_Admin" : {
-                    "value" : "{\"role\":4}"
-                  },
                   "ProfileController/chRole_whenGood_Kid" : {
                     "value" : "{\"role\":4}"
                   }
@@ -1166,7 +1736,7 @@
     "/profiles/exit" : {
       "patch" : {
         "tags" : [ "ProfileController" ],
-        "summary" : "Изменение/добавление электронной почты определённой роли пользователя + Server Sent Events",
+        "summary" : "Выход с аккаунта",
         "description" : "Также возможны 401, 403 и 500 коды ответов",
         "operationId" : "ProfileController/exit_when",
         "parameters" : [ {
@@ -1183,7 +1753,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "ProfileController/exit_whenEmpty_Anonim" : {
@@ -1236,7 +1806,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "ProfileController/getProfile_whenEmpty_Anonim" : {
@@ -1251,14 +1821,11 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "ProfileController/getProfile_whenGood_AuthLogin_Admin" : {
                     "value" : "{\"login\":\"nm12\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}},\"4\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"
-                  },
-                  "ProfileController/getProfile_whenGood_CustomLogin_Admin" : {
-                    "value" : "{\"login\":\"facere_a\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"
                   },
                   "ProfileController/getProfile_whenGood_CustomLogin_Anonim" : {
                     "value" : "{\"login\":\"facere_a\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"
@@ -1290,7 +1857,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "RequestController/addReq_whenEmpty_Anonim" : {
@@ -1333,7 +1900,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "RequestController/chDate_whenEmpty_Anonim" : {
@@ -1376,7 +1943,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "RequestController/chText_whenEmpty_Anonim" : {
@@ -1419,7 +1986,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "RequestController/chTitle_whenEmpty_Anonim" : {
@@ -1462,7 +2029,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "RequestController/delReq_whenEmpty_Anonim" : {
@@ -1507,7 +2074,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "RequestController/getRequests_whenEmpty_Anonim" : {
@@ -1522,7 +2089,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "RequestController/getRequests_whenGood_Admin" : {
@@ -1555,7 +2122,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "SettingsController/addNotifToken_whenEmpty_AdminUser" : {
@@ -1598,7 +2165,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "SettingsController/chPass_whenError_secFr_AdminUser" : {
@@ -1620,7 +2187,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "SettingsController/chPass_whenError_secFr_AdminUser" : {
@@ -1635,7 +2202,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "SettingsController/chPass_whenGood_Email_AdminUser" : {
@@ -1671,7 +2238,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "SettingsController/chSettings_whenEmpty_AdminUser" : {
@@ -1714,7 +2281,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "SettingsController/checkCodeEmail_whenEmpty_AdminUser" : {
@@ -1757,7 +2324,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "SettingsController/checkPasCodeEmail_whenGood_AdminUser" : {
@@ -1802,7 +2369,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "SettingsController/getSettings_whenEmpty_AdminUser" : {
@@ -1817,7 +2384,7 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "SettingsController/getSettings_whenGood_AdminUser" : {
@@ -1850,7 +2417,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "SettingsController/remNotifToken_whenEmpty_AdminUser" : {
@@ -1893,7 +2460,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "SettingsController/startEmail_whenEmpty_AdminUser" : {
@@ -1917,7 +2484,7 @@
       }
     },
     "/test/chTests" : {
-      "patch" : {
+      "put" : {
         "tags" : [ "TestController" ],
         "summary" : "Изменяет параметры тестирования",
         "description" : "Также возможны 401, 403 и 500 коды ответов",
@@ -1936,7 +2503,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/profiles-exit486549215"
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
               },
               "examples" : {
                 "TestController/chTests_whenBad_Anonim" : {
@@ -1950,27 +2517,15 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
-                },
-                "examples" : {
-                  "TestController/chTests_whenBad_Anonim" : {
-                    "value" : "{\"error\":true}"
-                  }
-                }
-              }
-            }
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200",
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "TestController/chTests_whenGood_AdminUser" : {
@@ -2000,27 +2555,15 @@
           "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
         } ],
         "responses" : {
-          "404" : {
-            "description" : "404",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
-                },
-                "examples" : {
-                  "TestController/getInfo_whenBad_AnonimUser" : {
-                    "value" : "{\"error\":true}"
-                  }
-                }
-              }
-            }
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200",
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/profiles-exit486549215"
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
                 },
                 "examples" : {
                   "TestController/getInfo_whenGood_TestModeOff_AdminUser" : {
@@ -2062,7 +2605,7 @@
           }
         }
       },
-      "profiles-exit486549215" : {
+      "requests-chTitle486549215" : {
         "type" : "object"
       }
     }

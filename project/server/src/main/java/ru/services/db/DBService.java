@@ -19,6 +19,7 @@ import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.*;
+import ru.security.user.Roles;
 
 import java.util.List;
 import java.util.Map;
@@ -80,11 +81,11 @@ import java.util.Map;
         return id == null ? null : userRepository.findById(id).orElse(null);
     }
 
-    public Long getFirstRoleId(Map<Long, Role> map) {
-        return (Long) map.keySet().toArray()[0];
+    public Roles getFirstRoleId(Map<Roles, Role> map) {
+        return map.keySet().iterator().next();
     }
 
-    public Role getFirstRole(Map<Long, Role> map) {
+    public Role getFirstRole(Map<Roles, Role> map) {
         return map.get(getFirstRoleId(map));
     }
 

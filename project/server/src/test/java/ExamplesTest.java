@@ -9,10 +9,12 @@ import com.google.gson.JsonParser;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import com.google.gson.stream.JsonReader;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import ru.data.SSE.TypesConnect;
+import ru.security.user.Roles;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,14 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 
 class ExamplesTest {
+
+    @Test
+    void testEnumSet() {
+        Map<Roles, Integer> f = new HashMap<>(Map.of(Roles.HTEACHER, 2, Roles.PARENT, 6));
+        System.out.println(f);
+        f.put(Roles.TEACHER, 8);
+        System.out.println(f.keySet());
+    }
 
     @Test
     void codesTest() {
@@ -75,7 +85,7 @@ class ExamplesTest {
     }
 
     @Test
-    void setTest2() throws Exception {
+    void setTest2() {
         List<Object[]> arr = List.of(new Object[]{"Англ. Яз", "10.06.22", 1L}, new Object[]{"Математика", "10.06.22", 2L}, new Object[]{"Химия", "10.06.22", 4L}, new Object[]{"Математика", "10.06.22", 5L}, new Object[]{"Математика", "11.06.22", 5L}, new Object[]{"Англ. Яз", "12.06.22", 6L});
         System.out.println(arr);
         Map<String, Map<String, List<Long>>> mapM = arr.stream().collect(Collectors.groupingBy(
@@ -87,13 +97,13 @@ class ExamplesTest {
                     (list, item) -> list.add((Long) item[2]),
                     (left, right) -> right
                 ))));
-        mapM.put("Англ. Яз", null);
+//        mapM.put("Англ. Яз", null);
         mapM.put("Англ. Яз1", null);
         System.out.println(mapM);
     }
 
     @Test
-    void setTest1() throws Exception {
+    void setTest1() {
         Map<String, List<Long>> map = Map.of("Англ. Яз", List.of(67L), "Математика", List.of(67L, 68L));
         Set<String> arr = new HashSet<>(map.keySet());
         System.out.println(arr.addAll(List.of("dfgg", "fdg5", "Математика")));
@@ -157,7 +167,10 @@ class ExamplesTest {
         Assertions.assertNotNull(wrtr);
     }
 
+    /**
+    Пропускается тест, из-за возможной необходимости перенастройки подключения к гуглу */
     @Test
+    @Disabled
     void notifTest1() throws IOException, FirebaseMessagingException {
         initialize();
         List<String> registrationTokens = asList(
@@ -225,7 +238,10 @@ class ExamplesTest {
         System.out.println(stringSet);
     }
 
+    /**
+     Пропускается тест, из-за возможной необходимости перенастройки подключения к гуглу */
     @Test
+    @Disabled
     void notifTestFailurs() throws IOException {
         initialize();
         BatchResponse response = null;

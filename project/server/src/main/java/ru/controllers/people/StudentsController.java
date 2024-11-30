@@ -19,6 +19,7 @@ import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
+import ru.security.user.Roles;
 import ru.services.MainService;
 
 import java.time.Duration;
@@ -43,10 +44,10 @@ import java.util.Map;
         User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
+            if (user != null && user.getRoles().containsKey(Roles.HTEACHER) && user1 != null) {
                 Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
                 if (group != null) {
-                    user1.getRoles().remove(3L);
+                    user1.getRoles().remove(Roles.HTEACHER);
                     datas.getDbService().getUserRepository().saveAndFlush(user1);
                     if (!ObjectUtils.isEmpty(group.getKids())) {
                         group.getKids().remove(user1);
@@ -69,7 +70,7 @@ import java.util.Map;
         User user1 = datas.getDbService().userById(body.id);
         try {
             body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(3L) && user1 != null) {
+            if (user != null && user.getRoles().containsKey(Roles.HTEACHER) && user1 != null) {
                 user1.setFio(body.name);
                 datas.getDbService().getUserRepository().saveAndFlush(user1);
 
@@ -88,15 +89,15 @@ import java.util.Map;
         User user = datas.getDbService().userByLogin(subscriber.getLogin());
         try {
             body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(3L)) {
+            if (user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
                 Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
                 if (group != null) {
                     Instant after = Instant.now().plus(Duration.ofDays(30));
                     Date dateAfter = Date.from(after);
                     Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, datas.getDbService().schoolById(Long.parseLong(subscriber.getLvlSch())), group));
                     User inv = new User(body.name, Map.of(
-                        0L, role
-                    ), Main.df.format(dateAfter));
+                        Roles.KID, role
+                        ), Main.df.format(dateAfter));
                     datas.getDbService().getUserRepository().saveAndFlush(inv);
                     group.getKids().add(inv);
                     datas.getDbService().getGroupRepository().saveAndFlush(group);
@@ -124,7 +125,7 @@ import java.util.Map;
             if (user != null) {
                 School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
                 ref.schId = school.getId();
-                if (!user.getRoles().containsKey(3L)) {
+                if (!user.getRoles().containsKey(Roles.HTEACHER)) {
                     ref.grId = datas.getDbService().getFirstRole(user.getRoles()).getGrp().getId();
                 }
                 Group group = datas.getDbService().groupById(ref.grId);
@@ -147,7 +148,7 @@ import java.util.Map;
         try {
             body.wrtr = datas.init(body.toString());
             if (user != null) {
-                if(user.getSelRole() == 3L) {
+                if(user.getSelRole() == Roles.HTEACHER) {
                     body.wrtr.name("bodyG").beginObject();
                     Long firstG = datas.groupsBySchoolOfUser(user, body.wrtr);
                     body.wrtr.name("firstG").value(firstG);
@@ -157,7 +158,7 @@ import java.util.Map;
             }
         } catch (Exception e) {body.bol = Main.excp(e);}
         return datas.getObj(ans -> {
-            authController.infCon(body.uuid, null, TypesConnect.STUDENTS, "main", "main", user.getRoles().containsKey(3L) ? "ht" : "main", "main");
+            authController.infCon(body.uuid, null, TypesConnect.STUDENTS, "main", "main", user.getRoles().containsKey(Roles.HTEACHER) ? "ht" : "main", "main");
         }, body.wrtr, body.bol);
     }
 }
