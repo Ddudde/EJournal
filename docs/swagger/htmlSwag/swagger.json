@@ -1,0 +1,2613 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "EJournal",
+    "description" : "<!DOCTYPE HTML>\r\n<HTML lang=\"RU\">\r\n\t<HEAD>\r\n\t\t<TITLE>API Overview</TITLE>\r\n\t</HEAD>\r\n\t<BODY>\r\n\t\t<PRE style=\"font-size: 20px; margin: 10px 0;\">\r\nОсновное описание в AsciiDoc.\r\n* Swagger:<a href=\"http://localhost:9001/swagger/htmlSwag\">http://localhost:9001/swagger/htmlSwag</a>\r\n* JavaDoc: <a href=\"http://localhost:9001/javaDoc\">http://localhost:9001/javaDoc</a>\r\n* AsciiDoc: <a href=\"http://localhost:9001/asciiDoc/ReadMe.html\">http://localhost:9001/asciiDoc/ReadMe.html</a>\r\n\r\nВсе примеры из модульных тестов.\r\n\r\nВнимание! Для того чтобы попробовать \"Try It Out\" блок в Swagger не забудь в CORS конфиг сервера добавить нужную ссылку.\r\nCORS конфиг находится в ru.configs.WebMVCConfig.\r\n\r\nТестовый режим включается в ru.Main.test\r\nТестовый режим подключает тестового пользователя.\r\nUUID-токен: 9693b2a1-77bb-4426-8045-9f9b4395d454, администратор с ником \"nm12\"\r\nДля аутентификации с \"Try It Out\" ввести в header \"x-access-token\" тестовый UUID-токен\r\n\r\nДля смены пользователя на тестовом токене перейти к запросу \"/auth/infCon/\"\r\nи в теле запроса указать логин нужного пользователя.\r\nПример тела:\r\n{\r\n\t\"login\": \"testLogin\"\r\n}\r\n\r\nОбычно у всех разделов есть эндпоинт с которого обязательно начинать работу, а иногда и несколько.\r\nПеред описанием эндпоинта пишется [start]\r\n\t\t</PRE>\r\n\t</BODY>\r\n</HTML>",
+    "version" : "1.0"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8080"
+  } ],
+  "tags" : [ {
+    "name" : "AuthController",
+    "description" : "Контроллер для раздела авторизации и управлением Server Sent Events"
+  }, {
+    "name" : "AdminsController",
+    "description" : "Контроллер для раздела управления/просмотра администраторов + Server Sent Events"
+  }, {
+    "name" : "RequestController",
+    "description" : "Контроллер для раздела заявок на подключение к системе учебных учреждений + Server Sent Events"
+  }, {
+    "name" : "ProfileController",
+    "description" : "Контроллер для раздела профиля и частично управлением аккаунтом + Server Sent Events"
+  }, {
+    "name" : "TestController",
+    "description" : "Контроллер для раздела тестирования"
+  }, {
+    "name" : "NewsController",
+    "description" : "Контроллер для раздела новостей + Server Sent Events"
+  }, {
+    "name" : "SettingsController",
+    "description" : "Контроллер для раздела настроек"
+  }, {
+    "name" : "ContactsController",
+    "description" : "Контроллер для раздела контактов + Server Sent Events"
+  } ],
+  "paths" : {
+    "/admins/addPep" : {
+      "post" : {
+        "tags" : [ "AdminsController" ],
+        "summary" : "Cоздаёт пользователя-администратора + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AdminsController/addPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AdminsController/addPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "AdminsController/addPep_whenGood_Admin" : {
+                  "value" : "{\n    \"name\": \"Дрыздов А.А.\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/admins/chPep" : {
+      "patch" : {
+        "tags" : [ "AdminsController" ],
+        "summary" : "Изменяет фамилию пользователя + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AdminsController/chPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AdminsController/chPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "AdminsController/chPep_whenGood_Admin" : {
+                  "value" : "{\n    \"name\": \"Дрыздов А.А.\",\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/admins/getAdmins" : {
+      "get" : {
+        "tags" : [ "AdminsController" ],
+        "summary" : "[start] Отправляет список администраторов",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AdminsController/getAdmins_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AdminsController/getAdmins_whenEmpty_Anonim" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AdminsController/getAdmins_whenGood_Admin" : {
+                    "value" : "{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admins/remPep" : {
+      "delete" : {
+        "tags" : [ "AdminsController" ],
+        "summary" : "Удаляет у пользователя роль администратора + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AdminsController/remPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AdminsController/remPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "AdminsController/remPep_whenGood_Admin" : {
+                  "value" : "{\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/auth/start" : {
+      "get" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "[start#1] Открытие Server Sent Events для нового клиента или сохранение подписки для старого пользователя",
+        "description" : "Также возможны 401, 403 и 500 коды ответовПодписка сохраняется в течении одного запуска сервера.\n",
+        "operationId" : "AuthController/start_whenGoodNext_Anonim",
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "text/event-stream" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/start_whenGoodNext_Anonim" : {
+                    "value" : "event:chck\ndata:\"7433ad58-bcdd-42ad-8b7e-279333840958\"\n\n"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/auth/" : {
+      "post" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "Авторизация пользователя",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AuthController/auth_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AuthController/auth_whenGood_AdminUser" : {
+                  "value" : "{\n    \"login\": \"nm12\",\n    \"notifToken\": \"uuidTest\",\n    \"password\": \"passTest\",\n    \"permis\": true\n}\n"
+                },
+                "AuthController/auth_whenWrong_AdminUser" : {
+                  "value" : "{\n    \"login\": \"nm12\",\n    \"notifToken\": \"uuidTest\",\n    \"password\": \"passTest\",\n    \"permis\": true\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/auth_whenGood_AdminUser" : {
+                    "value" : "{\"auth\":true,\"login\":\"nm12\",\"role\":4,\"uuidS\":\"5d05c779-c7ac-42a3-9e29-2e509dd5c608\",\"roles\":true,\"secFr\":false,\"email\":false}"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/auth_whenWrong_AdminUser" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/checkInvCode/" : {
+      "post" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "Проверка инвайта для регистрации/регистрации новой роли",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AuthController/checkInvCode_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AuthController/checkInvCode_whenGood_AdminUser" : {
+                  "value" : "{\n    \"code\": \"uuidTest\"\n}\n"
+                },
+                "AuthController/checkInvCode_whenWrong_AdminUser" : {
+                  "value" : "{}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          },
+          "404" : {
+            "description" : "404"
+          }
+        }
+      }
+    },
+    "/auth/infCon/" : {
+      "patch" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "[start#2] Изменение подписки",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AuthController/infCon_whenGood_AdminUser",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AuthController/infCon_whenGood_AdminUser" : {
+                  "value" : "{\n    \"login\": \"nm12\",\n    \"type\": \"TUTOR\",\n    \"notifToken\": \"passTest\",\n    \"permis\": true\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/infCon_whenGood_AdminUser" : {
+                    "value" : "{\"role\":4}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reg/" : {
+      "post" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "Регистрация пользователя",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AuthController/reg_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AuthController/reg_whenGood_Anonim" : {
+                  "value" : "{\n    \"login\": \"nm\",\n    \"code\": \"uuidTest\",\n    \"mod\": \"inv\",\n    \"ico\": \"3\",\n    \"secFr\": \"secretTest\",\n    \"par\": \"passTest\"\n}\n"
+                },
+                "AuthController/reg_whenWrongLogin_Anonim" : {
+                  "value" : "{\n    \"login\": \"nm\",\n    \"code\": \"uuidTest\",\n    \"mod\": \"inv\",\n    \"ico\": \"3\",\n    \"secFr\": \"secretTest\",\n    \"par\": \"passTest\"\n}\n"
+                },
+                "AuthController/reg_whenWrong_Anonim" : {
+                  "value" : "{\n    \"login\": \"nm\",\n    \"code\": \"uuidTest\",\n    \"mod\": \"inv\",\n    \"ico\": \"3\",\n    \"secFr\": \"secretTest\",\n    \"par\": \"passTest\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "201",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/reg_whenGood_Anonim" : {
+                    "value" : "{}"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/reg_whenWrongLogin_Anonim" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "202" : {
+            "description" : "202",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/reg_whenWrong_Anonim" : {
+                    "value" : "{\"error\":\"noInv\"}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/remCon/" : {
+      "patch" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "Завершение сеанса",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AuthController/remCon_whenGood_AdminUser",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/auth/setCodePep/" : {
+      "patch" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "Установка/обновление инвайта для регистрации + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "AuthController/setCodePep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "AuthController/setCodePep_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "AuthController/setCodePep_whenGood_AdminUser" : {
+                  "value" : "{\n    \"id\": \"nm12\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/setCodePep_whenEmpty_AdminUser" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/setCodePep_whenGood_AdminUser" : {
+                    "value" : "{\"id\":9764,\"code\":\"36247412-3fb5-4c98-b842-af02429b1541\",\"id1\":0}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/start/{uuidAuth}" : {
+      "get" : {
+        "tags" : [ "AuthController" ],
+        "summary" : "[start#1] Открытие Server Sent Events для нового клиента или сохранение подписки для старого пользователя",
+        "description" : "Также возможны 401, 403 и 500 коды ответовПодписка сохраняется в течении одного запуска сервера.\n",
+        "operationId" : "AuthController/start_whenGood_AdminUser",
+        "parameters" : [ {
+          "name" : "uuidAuth",
+          "in" : "path",
+          "description" : "Авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "text/event-stream" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "AuthController/start_whenGood_AdminUser" : {
+                    "value" : "event:chck\ndata:\"6b61eda7-e4c6-4a6f-a60c-527962a90db7\"\n\n"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contacts/chContact/" : {
+      "put" : {
+        "tags" : [ "ContactsController" ],
+        "summary" : "Изменение контакта + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ContactsController/chContact_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ContactsController/chContact_whenEmpty_Portal_AdminUser" : {
+                  "value" : "{}"
+                },
+                "ContactsController/chContact_whenGood_Portal_AdminUser" : {
+                  "value" : "{\n    \"p\": \"mapPr\",\n    \"p1\": \"text\",\n    \"val\": \"А проект вышел большим...\"\n}\n"
+                },
+                "ContactsController/chContact_whenGood_YO_HTeacher" : {
+                  "value" : "{\n    \"p\": \"mapPr\",\n    \"p1\": \"text\",\n    \"val\": \"А проект вышел большим...\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/contacts/getContacts/{type}" : {
+      "get" : {
+        "tags" : [ "ContactsController" ],
+        "summary" : "[start] Отправка контактов, портала/школы",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ContactsController/getContacts_when",
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "path",
+          "description" : "Нужный тип: Por - портал, Yo - школы",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ContactsController/getContacts_whenEmpty_Portal_AdminUser" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/contacts-getContacts-type1554439890"
+                },
+                "examples" : {
+                  "ContactsController/getContacts_whenGood_Portal_AdminUser" : {
+                    "value" : "{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"
+                  },
+                  "ContactsController/getContacts_whenGood_YO_HTeacher" : {
+                    "value" : "{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dnevnik/getDnevnik" : {
+      "get" : {
+        "tags" : [ "DnevnikController" ],
+        "summary" : "Отправляет данные о расписании, оценках, домашних заданиях",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "DnevnikController/getDnevnik_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "DnevnikController/getDnevnik_whenGood_KID" : {
+                    "value" : "{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"mark\":\"Н\",\"weight\":1},\"i\":0},\"10.06.22\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0},\"11.06.22\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}}}}"
+                  },
+                  "DnevnikController/getDnevnik_whenGood_KID_onlyHomework" : {
+                    "value" : "{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"homework\":\"Стр. 62-63 пересказ\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"homework\":\"Упр. 5Стр. 103\"},\"i\":0},\"10.06.22\":{\"0\":{\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"homework\":\"Упр. 6Стр. 103\"},\"i\":0},\"11.06.22\":{\"0\":{\"homework\":\"Упр. 7Стр. 103\"},\"i\":0}}}}"
+                  },
+                  "DnevnikController/getDnevnik_whenGood_KID_withHomework" : {
+                    "value" : "{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Стр. 62-63 пересказ\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"mark\":\"Н\",\"weight\":1,\"homework\":\"Упр. 5Стр. 103\"},\"i\":0},\"10.06.22\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 6Стр. 103\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0},\"11.06.22\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 7Стр. 103\"},\"i\":0}}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dnevnik/getInfo" : {
+      "get" : {
+        "tags" : [ "DnevnikController" ],
+        "summary" : "[start] запускает клиента в раздел дневника и подтверждает клиенту права",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "DnevnikController/getInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/addGroup" : {
+      "post" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Создаёт группу + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/addGroup_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/addGroup_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/addGroup_whenGood_Hteacher" : {
+                  "value" : "{\n    \"name\": \"31В\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/addPep" : {
+      "post" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Создаёт пользователя-завуча + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/addPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/addPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/addPep_whenGood_Admin" : {
+                  "value" : "{\n    \"yo\": 20,\n    \"name\": \"Дрыздов А.А.\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/hteachers/addSch" : {
+      "post" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Добавление учебного центра администратором портала",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/addSch_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/addSch_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/addSch_whenGood_Admin" : {
+                  "value" : "{\n    \"name\": \"Гимназия ? 4\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/hteachers/chGroup" : {
+      "patch" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Изменяет название группы + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/chGroup_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/chGroup_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/chGroup_whenGood_Hteacher" : {
+                  "value" : "{\n    \"grId\": 20,\n    \"name\": \"31В\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/chPep" : {
+      "patch" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Изменяет фамилию пользователя + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/chPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/chPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/chPep_whenGood_Admin" : {
+                  "value" : "{\n    \"id\": 20,\n    \"name\": \"Дрыздов А.А.\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/chSch" : {
+      "patch" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Изменение имени учебного центра администратором портала",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/chSch_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/chSch_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/chSch_whenGood_Admin" : {
+                  "value" : "{\n    \"schId\": 20,\n    \"name\": \"Гимназия ? 4\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/getInfo" : {
+      "get" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "[start] отправка список завучей учебного центра",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/getInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "HTeachersController/getInfo_whenGood_HTEACHER" : {
+                    "value" : "{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/getInfoFA" : {
+      "get" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "[start] отправка список завучей учебного центра для администраторов",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/getInfoForAdmins_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "HTeachersController/getInfoForAdmins_whenGood_Admin" : {
+                    "value" : "{\"0\":{\"pep\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hteachers/remGroup" : {
+      "delete" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Удаляет группу + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/remGroup_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/remGroup_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/remGroup_whenGood_Hteacher" : {
+                  "value" : "{\n    \"grId\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/remPep" : {
+      "delete" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Удаляет у пользователя роль завуча + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/remPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/remPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/remPep_whenGood_Admin" : {
+                  "value" : "{\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/hteachers/remSch" : {
+      "delete" : {
+        "tags" : [ "HTeachersController" ],
+        "summary" : "Удаление учебного центра администратором портала",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "HTeachersController/remSch_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "HTeachersController/remSch_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "HTeachersController/remSch_whenGood_Admin" : {
+                  "value" : "{\n    \"schId\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/news/addNewsPor/" : {
+      "post" : {
+        "tags" : [ "NewsController" ],
+        "summary" : "Добавление новой новости портала + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "NewsController/addNewsPortal_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "NewsController/addNewsPortal_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "NewsController/addNewsPortal_whenGood_AdminUser" : {
+                  "value" : "{\n    \"title\": \"День рождения портала!\",\n    \"date\": \"25.04.2022\",\n    \"text\": \"Начались первые работы\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/news/addNewsYo/" : {
+      "post" : {
+        "tags" : [ "NewsController" ],
+        "summary" : "Добавление новой новости портала + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "NewsController/addNewsYO_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "NewsController/addNewsYO_whenEmpty_HTeacher" : {
+                  "value" : "{}"
+                },
+                "NewsController/addNewsYO_whenGood_HTeacher" : {
+                  "value" : "{\n    \"title\": \"День рождения портала!\",\n    \"date\": \"25.04.2022\",\n    \"text\": \"Начались первые работы\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/news/chNews/" : {
+      "put" : {
+        "tags" : [ "NewsController" ],
+        "summary" : "Изменение новости + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "NewsController/chNews_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "NewsController/chNews_whenEmpty_Portal_AdminUser" : {
+                  "value" : "{}"
+                },
+                "NewsController/chNews_whenGood_Portal_AdminUser" : {
+                  "value" : "{\n    \"id\": 1,\n    \"val\": \"А проект вышел большим...\",\n    \"type\": \"title\"\n}\n"
+                },
+                "NewsController/chNews_whenGood_YO_HTeacher" : {
+                  "value" : "{\n    \"id\": 1,\n    \"val\": \"А проект вышел большим...\",\n    \"type\": \"title\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/news/delNews/" : {
+      "delete" : {
+        "tags" : [ "NewsController" ],
+        "summary" : "Удаление новости + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "NewsController/delNews_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "NewsController/delNews_whenEmpty_Portal_AdminUser" : {
+                  "value" : "{}"
+                },
+                "NewsController/delNews_whenGood_Portal_AdminUser" : {
+                  "value" : "{\n    \"id\": 1\n}\n"
+                },
+                "NewsController/delNews_whenGood_YO_HTeacher" : {
+                  "value" : "{\n    \"id\": 1\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/news/getNews/{type}" : {
+      "get" : {
+        "tags" : [ "NewsController" ],
+        "summary" : "[start] Отправка новостей, портала/школы",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "NewsController/getNews_when",
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "path",
+          "description" : "Нужный тип: Por - портал, Yo - школы",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "NewsController/getNews_whenEmpty_Portal_Admin" : {
+                    "value" : "{}"
+                  },
+                  "NewsController/getNews_whenGood_Portal_AdminUser" : {
+                    "value" : "{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"
+                  },
+                  "NewsController/getNews_whenGood_YO_HTeacher" : {
+                    "value" : "{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profiles/chEmail" : {
+      "patch" : {
+        "tags" : [ "ProfileController" ],
+        "summary" : "Изменение/добавление электронной почты определённой роли пользователя + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ProfileController/chEmail_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ProfileController/chEmail_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ProfileController/chEmail_whenGood_Admin" : {
+                  "value" : "{\n    \"email\": \"mail1@example.com\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/profiles/chInfo" : {
+      "patch" : {
+        "tags" : [ "ProfileController" ],
+        "summary" : "Изменение/добавление дополнительной информации о пользователе + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ProfileController/chInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ProfileController/chInfo_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ProfileController/chInfo_whenGood_Admin" : {
+                  "value" : "{\n    \"info\": \"testInfo\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/profiles/chKid" : {
+      "patch" : {
+        "tags" : [ "ProfileController" ],
+        "summary" : "Изменение контроллируемого ученика у родителя",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ProfileController/chKid_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ProfileController/chKid_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ProfileController/chKid_whenGood_Parent" : {
+                  "value" : "{\n    \"idL\": \"123\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ProfileController/chKid_whenEmpty_Anonim" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ProfileController/chKid_whenGood_Parent" : {
+                    "value" : "{\"kid\":123}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profiles/chLogin" : {
+      "patch" : {
+        "tags" : [ "ProfileController" ],
+        "summary" : "Изменение логина пользователя + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ProfileController/chLogin_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ProfileController/chLogin_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ProfileController/chLogin_whenGood_Admin" : {
+                  "value" : "{\n    \"nLogin\": nm\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/profiles/chRole" : {
+      "patch" : {
+        "tags" : [ "ProfileController" ],
+        "summary" : "Изменение роли на следующую по иерархии из имеющихся у пользователя",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ProfileController/chRole_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ProfileController/chRole_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ProfileController/chRole_whenEmpty_Anonim" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ProfileController/chRole_whenGood_Kid" : {
+                    "value" : "{\"role\":4}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profiles/exit" : {
+      "patch" : {
+        "tags" : [ "ProfileController" ],
+        "summary" : "Выход с аккаунта",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ProfileController/exit_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ProfileController/exit_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ProfileController/exit_whenGood_Admin" : {
+                  "value" : "{\n    \"notifToken\": \"notifTest\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/profiles/getProfile/{login}" : {
+      "get" : {
+        "tags" : [ "ProfileController" ],
+        "summary" : "[start] Отправляет инфу профиля либо другого пользователя либо личную",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ProfileController/getProfile_when",
+        "parameters" : [ {
+          "name" : "login",
+          "in" : "path",
+          "description" : "Логин пользователя",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ProfileController/getProfile_whenEmpty_Anonim" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ProfileController/getProfile_whenGood_AuthLogin_Admin" : {
+                    "value" : "{\"login\":\"nm12\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}},\"4\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"
+                  },
+                  "ProfileController/getProfile_whenGood_CustomLogin_Anonim" : {
+                    "value" : "{\"login\":\"facere_a\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requests/addReq" : {
+      "post" : {
+        "tags" : [ "RequestController" ],
+        "summary" : "Добавляет заявку + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "RequestController/addReq_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "RequestController/addReq_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "RequestController/addReq_whenGood_Admin" : {
+                  "value" : "{\n    \"email\": \"mail@mail.com\",\n    \"date\": \"11.11.1111\",\n    \"fio\": \"Дрыздов А.А.\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/requests/chDate" : {
+      "patch" : {
+        "tags" : [ "RequestController" ],
+        "summary" : "Изменение даты заявки + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "RequestController/chDate_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "RequestController/chDate_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "RequestController/chDate_whenGood_Admin" : {
+                  "value" : "{\n    \"date\": \"01.01.2001\",\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/requests/chText" : {
+      "patch" : {
+        "tags" : [ "RequestController" ],
+        "summary" : "Изменение текста заявки + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "RequestController/chText_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "RequestController/chText_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "RequestController/chText_whenGood_Admin" : {
+                  "value" : "{\n    \"text\": \"Дроздич Г.Г.\",\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/requests/chTitle" : {
+      "patch" : {
+        "tags" : [ "RequestController" ],
+        "summary" : "Изменение заголовка заявки + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "RequestController/chTitle_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "RequestController/chTitle_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "RequestController/chTitle_whenGood_Admin" : {
+                  "value" : "{\n    \"title\": \"example@pepl.qq\",\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/requests/delReq" : {
+      "delete" : {
+        "tags" : [ "RequestController" ],
+        "summary" : "Удаление заявки + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "RequestController/delReq_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "RequestController/delReq_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "RequestController/delReq_whenGood_Admin" : {
+                  "value" : "{\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/requests/getRequests" : {
+      "get" : {
+        "tags" : [ "RequestController" ],
+        "summary" : "[start] Отправляет инфу о заявках",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "RequestController/getRequests_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "RequestController/getRequests_whenEmpty_Anonim" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "RequestController/getRequests_whenGood_Admin" : {
+                    "value" : "{\"352\":{\"title\":\"mail1@mail.com\",\"date\":\"11.11.2011\",\"text\":\"Дроздов А.А.\"},\"3872\":{\"title\":\"mail10@mail.com\",\"date\":\"11.01.2011\",\"text\":\"Силин А.К.\"},\"9764\":{\"title\":\"mail11@mail.com\",\"date\":\"01.11.2011\",\"text\":\"Пестов Л.А.\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/addNotifToken/" : {
+      "post" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Установка токена уведомлений",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/addNotifToken_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "SettingsController/addNotifToken_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "SettingsController/addNotifToken_whenGood_AdminUser" : {
+                  "value" : "{\n    \"notifToken\": \"testtoken\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/settings/chPass/" : {
+      "patch" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Изменяет пароль пользователя при помощи емэйла/секретной фразы",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/chPass_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "SettingsController/chPass_whenError_secFr_AdminUser" : {
+                  "value" : "{\n    \"emailSt\": false,\n    \"secFR\": \"victoria_secret\"\n}\n"
+                },
+                "SettingsController/chPass_whenGood_Email_AdminUser" : {
+                  "value" : "{\n    \"login\": \"nm12\",\n    \"emailSt\": true,\n    \"email\": \"test@mail.com\"\n}\n"
+                },
+                "SettingsController/chPass_whenGood_secFr_AdminUser" : {
+                  "value" : "{\n    \"login\": \"nm12\",\n    \"emailSt\": false,\n    \"secFR\": \"victoria_secret\",\n    \"nPar\": \"passs\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "202" : {
+            "description" : "202",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "SettingsController/chPass_whenError_secFr_AdminUser" : {
+                    "value" : "{\"error\":\"secFr\"}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "SettingsController/chPass_whenGood_Email_AdminUser" : {
+                    "value" : "{}"
+                  },
+                  "SettingsController/chPass_whenGood_secFr_AdminUser" : {
+                    "value" : "{}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/chSettings/" : {
+      "patch" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Вкл/выкл подсказки или ряд уведомлений",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/chSettings_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "SettingsController/chSettings_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "SettingsController/chSettings_whenGood_AdminUser" : {
+                  "value" : "{\n    \"id\": \"checkbox_notify_new_sch\",\n    \"val\": true\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/settings/checkCodeEmail/" : {
+      "patch" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Подтверждение емэйла",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/checkCodeEmail_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "SettingsController/checkCodeEmail_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "SettingsController/checkCodeEmail_whenGood_AdminUser" : {
+                  "value" : "{\n    \"invCod\": \"uuid\",\n    \"emailCode\": \"code\",\n    \"email\": \"test@mail.com\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/settings/checkPasCodeEmail/" : {
+      "patch" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Изменяет пароль пользователя при помощи емэйла",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/checkPasCodeEmail_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "SettingsController/checkPasCodeEmail_whenGood_AdminUser" : {
+                  "value" : "{\n    \"login\": \"nm12\",\n    \"emailCode\": \"1111\",\n    \"nPar\": \"1234\"\n}\n"
+                },
+                "SettingsController/checkPasCodeEmail_whenWrongCode_AdminUser" : {
+                  "value" : "{\n    \"emailCode\": \"1111\",\n    \"nPar\": \"1234\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          },
+          "404" : {
+            "description" : "404"
+          }
+        }
+      }
+    },
+    "/settings/getSettings/" : {
+      "get" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Отправляет настройки клиенту",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/getSettings_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "404" : {
+            "description" : "404",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "SettingsController/getSettings_whenEmpty_AdminUser" : {
+                    "value" : "{\"error\":true}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "SettingsController/getSettings_whenGood_AdminUser" : {
+                    "value" : "{\"checkbox_hints\":true,\"checkbox_notify\":false,\"checkbox_notify_sched\":false,\"checkbox_notify_marks\":false,\"checkbox_notify_yo\":false,\"checkbox_notify_por\":false,\"checkbox_notify_new_sch\":true}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/remNotifToken/" : {
+      "post" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Удаление токена уведомлений",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/remNotifToken_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "SettingsController/remNotifToken_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "SettingsController/remNotifToken_whenGood_AdminUser" : {
+                  "value" : "{\n    \"notifToken\": \"testtoken\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/settings/startEmail/" : {
+      "patch" : {
+        "tags" : [ "SettingsController" ],
+        "summary" : "Изменение электронной почты пользователя или добавление при регистрации",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "SettingsController/startEmail_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "SettingsController/startEmail_whenEmpty_AdminUser" : {
+                  "value" : "{}"
+                },
+                "SettingsController/startEmail_whenGood_AdminUser" : {
+                  "value" : "{\n    \"invCod\": \"uuid\",\n    \"email\": \"test@mail.com\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "description" : "404"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/test/chTests" : {
+      "put" : {
+        "tags" : [ "TestController" ],
+        "summary" : "Изменяет параметры тестирования",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "TestController/chTests_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "TestController/chTests_whenBad_Anonim" : {
+                  "value" : "{}"
+                },
+                "TestController/chTests_whenGood_AdminUser" : {
+                  "value" : "{\n    \"id\": \"checkbox_test\",\n    \"val\": false\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "TestController/chTests_whenGood_AdminUser" : {
+                    "value" : "{\"bodyT\":{\"admins\":{},\"schools\":{}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test/getInfo" : {
+      "get" : {
+        "tags" : [ "TestController" ],
+        "summary" : "[start] Отправка инфы для тестов",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "TestController/getInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "TestController/getInfo_whenGood_TestModeOff_AdminUser" : {
+                    "value" : "{\"bodyS\":{\"checkbox_debug\":true,\"checkbox_test\":true},\"bodyT\":{\"admins\":{},\"schools\":{}}}"
+                  },
+                  "TestController/getInfo_whenGood_TestModeOn_AdminUser" : {
+                    "value" : "{\"bodyS\":{\"checkbox_debug\":true,\"checkbox_test\":true},\"bodyT\":{\"admins\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"schools\":{\"9600\":{\"name\":\"Лицей №3293\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"2616\":{\"name\":\"1A\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4866\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4117\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}},\"1137\":{\"name\":\"Гимназия №2246\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"3146\":{\"name\":\"1A\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4701\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"5506\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}},\"2903\":{\"name\":\"Школа №217\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"1973\":{\"name\":\"1A\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"5375\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"7100\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}}}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "contacts-getContacts-type1554439890" : {
+        "type" : "object",
+        "properties" : {
+          "mapPr" : {
+            "type" : "object",
+            "properties" : {
+              "imgUrl" : {
+                "type" : "string",
+                "description" : ""
+              },
+              "text" : {
+                "type" : "string",
+                "description" : ""
+              }
+            },
+            "description" : ""
+          },
+          "contact" : {
+            "type" : "string",
+            "description" : ""
+          }
+        }
+      },
+      "requests-chTitle486549215" : {
+        "type" : "object"
+      }
+    }
+  }
+}
