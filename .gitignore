@@ -1,12 +1,15 @@
 /project/client/node_modules/
-/project/client/.idea/
 /project/client/build/
 /project/client/mark/
+
 /project/server/build/
 /project/server/exe/
 /project/server/mark/
-/project/server/.idea/
+/project/server/.idea/sonarlint/
 /project/server/.gradle/
 /project/server/gradle/
+/project/server/bin/
+/project/server/logs/
+
 /project/Доки
 /release/

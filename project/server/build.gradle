@@ -124,11 +124,14 @@ asciidoctorPdf {
 
 asciidoctor {
     sourceDir '../../'
+    sources {
+        exclude '/project/', '/release/'
+    }
     outputDir 'docs/asciiDoc'
     baseDirFollowsSourceFile()
     attributes \
         'icons': 'font',
-        'snippets': file("build/generated-snippets"),
+//        'snippets': file("build/generated-snippets"),
         'idseparator': '-',
         'docinfo': 'shared'
 //    dependsOn asciidoctorPdf
