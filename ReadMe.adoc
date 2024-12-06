@@ -1,0 +1,91 @@
+= Asciidoc
+Natik Muradov <myratoff25@gmail.com>
+:revnumber: v0.1
+:revdate: 06.12.2024
+:revremark: Основное описание
+:sectnums:
+:hardbreaks-option:
+:toc: left
+:toclevels: 4
+:toc-title: Содержание
+:imagesdir: ./img
+
+====
+Основное описание в AsciiDoc.
+Github: https://github.com/Ddudde/DipvLom
+
+* Swagger: https://ddudde.github.io/DipvLom/swagger/htmlSwag/
+* JavaDoc: https://ddudde.github.io/DipvLom/javaDoc/
+* AsciiDoc: https://ddudde.github.io/DipvLom/asciiDoc/
+
+Сервер:
+Находится в /project/server
+http://localhost:8080
+Java, Spring, REST + Server Sent Events
+
+Клиент:
+Находится в /project/client
+http://localhost:3000/DipvLom
+Github Pages: https://ddudde.github.io/DipvLom/
+JS, React, Redux
+====
+
+== Использование
+====
+Запускаем сервер
+И запускаем клиент по одному из адресов: http://localhost:3000/DipvLom
+, https://ddudde.github.io/DipvLom/
+Выбираем роль, допустим администратора
+И авторизируемся
+Логин: nm12
+Пароль: 1111
+Радуемся!
+====
+
+== API
+=== HTTP методы
+|===
+| Метод | Использование
+| `GET`
+| Метод GET используется для чтения ресурса
+| `POST`
+| Метод POST чаще всего используется для создания новых ресурсов
+| `PATCH`
+| PATCH используется для частичного изменения ресурса
+| `PUT`
+| PUT используется для обновления ресурса целиком
+| `DELETE`
+| DELETE используется для удаления ресурса
+|===
+=== HTTP статус коды
+|===
+| Статус код | Использование
+
+| `200 OK`
+| Запрос принят и корректно обработан веб-сервером
+
+| `201 Created`
+| Запрос корректно обработан и в результате был создан новый ресурс
+
+| `202 Accepted`
+| Запрос принят. Используется в проекте как альтернатива 200 коду
+
+| `204 No Content`
+| Запрос успешно обработан, однако в ответе только заголовки без контента сообщения
+
+| `400 Bad Request`
+| Запрос от клиента к веб-серверу составлен некорректно. Обычно это происходит, если клиент не передаёт необходимые заголовки или параметры или они неправильные
+
+| `401 Unauthorized`
+| Получение запрашиваемого ресурса доступно только аутентифицированным пользователям
+
+| `403 Forbidden`
+| У клиента не хватает прав для получения запрашиваемого ресурса
+
+| `404 Not Found`
+| Сервер не смог найти запрашиваемый ресурс
+
+| `500 Internal Server Error`
+| На сервере произошла непредвиденная ошибка
+
+|===

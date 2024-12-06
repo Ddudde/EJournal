@@ -451,11 +451,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Содержание</div>
 <ul class="sectlevel1">
-<li><a href="#_использование">1. Использование</a></li>
-<li><a href="#_api">2. API</a>
+<li><a href="#_зависимости-сервера">1. Зависимости сервера</a></li>
+<li><a href="#_зависимости-клиента">2. Зависимости клиента</a></li>
+<li><a href="#_использование">3. Использование</a></li>
+<li><a href="#_документы">4. Документы</a></li>
+<li><a href="#_api">5. API</a>
 <ul class="sectlevel2">
-<li><a href="#_http-методы">2.1. HTTP методы</a></li>
-<li><a href="#_http-статус-коды">2.2. HTTP статус коды</a></li>
+<li><a href="#_http-методы">5.1. HTTP методы</a></li>
+<li><a href="#_http-статус-коды">5.2. HTTP статус коды</a></li>
 </ul>
 </li>
 </ul>
@@ -467,19 +470,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="exampleblock">
 <div class="content">
 <div class="paragraph">
-<p>Основное описание в AsciiDoc.<br>
-Github: <a href="https://github.com/Ddudde/DipvLom" class="bare">https://github.com/Ddudde/DipvLom</a></p>
+<p>Github: <a href="https://github.com/Ddudde/DipvLom" class="bare">https://github.com/Ddudde/DipvLom</a><br>
+Публикации в HTML и PDF форматах находятся в /docs/asciiDoc/.<br>
+Основное описание проекта здесь. Также есть дополнительные:<br>
+Также в /docs/start-web.bat можно стартануть Python http server для просмотра документации</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Swagger: <a href="https://ddudde.github.io/DipvLom/swagger/htmlSwag/" class="bare">https://ddudde.github.io/DipvLom/swagger/htmlSwag/</a></p>
+<p>Swagger: /swagger/htmlSwag/</p>
 </li>
 <li>
-<p>JavaDoc: <a href="https://ddudde.github.io/DipvLom/javaDoc/" class="bare">https://ddudde.github.io/DipvLom/javaDoc/</a></p>
+<p>JavaDoc: /javaDoc/</p>
 </li>
 <li>
-<p>AsciiDoc: <a href="https://ddudde.github.io/DipvLom/asciiDoc/" class="bare">https://ddudde.github.io/DipvLom/asciiDoc/</a></p>
+<p>AsciiDoc: /asciiDoc/</p>
 </li>
 </ul>
 </div>
@@ -501,7 +506,132 @@ JS, React, Redux</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_использование">1. Использование</h2>
+<h2 id="_зависимости-сервера">1. Зависимости сервера</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="content">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+БД H2 для тестирования, а PostgreSQL для остального.<br>
+Intellij IDEA в качестве IDE<br>
+BD: H2<br>
+<a href="http://localhost:8080/console_db" class="bare">http://localhost:8080/console_db</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>H2</p>
+</li>
+<li>
+<p>PostgreSQL</p>
+</li>
+<li>
+<p>Gradle</p>
+</li>
+<li>
+<p>Spring Boot</p>
+</li>
+<li>
+<p>Spring Boot Test</p>
+</li>
+<li>
+<p>Spring Security</p>
+</li>
+<li>
+<p>JavaMail API</p>
+</li>
+<li>
+<p>JavaFaker</p>
+</li>
+<li>
+<p>JUnit</p>
+</li>
+<li>
+<p>Mockito</p>
+</li>
+<li>
+<p>Asciidoctor Gradle Plugin</p>
+</li>
+<li>
+<p>Launch4j</p>
+</li>
+<li>
+<p>Server-Sent Events</p>
+</li>
+<li>
+<p>Hibernate</p>
+</li>
+<li>
+<p>Lombok</p>
+</li>
+<li>
+<p>Spring Data JPA</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_зависимости-клиента">2. Зависимости клиента</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="content">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+WebStorm в качестве IDE
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Github Pages</p>
+</li>
+<li>
+<p>Single Page Application</p>
+</li>
+<li>
+<p>Progressive Web App</p>
+</li>
+<li>
+<p>React</p>
+</li>
+<li>
+<p>Redux</p>
+</li>
+<li>
+<p>React Router</p>
+</li>
+<li>
+<p>Firebase Cloud Messaging</p>
+</li>
+<li>
+<p>React Helmet</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_использование">3. Использование</h2>
 <div class="sectionbody">
 <div class="exampleblock">
 <div class="content">
@@ -520,10 +650,30 @@ JS, React, Redux</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_api">2. API</h2>
+<h2 id="_документы">4. Документы</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>JavaDoc, AsciiDoc и Swagger генерируются при помощи Gradle<br>
+команды:<br>
+gradle javadoc<br>
+gradle asciidoctor<br>
+gradle openapi3</p>
+</div>
+<div class="paragraph">
+<p>toDo - что нужно доделать<br>
+beenDo - что уже сделано</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_api">5. API</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_http-методы">2.1. HTTP методы</h3>
+<h3 id="_http-методы">5.1. HTTP методы</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -558,7 +708,7 @@ JS, React, Redux</p>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_http-статус-коды">2.2. HTTP статус коды</h3>
+<h3 id="_http-статус-коды">5.2. HTTP статус коды</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -616,7 +766,7 @@ JS, React, Redux</p>
 <div id="footer">
 <div id="footer-text">
 Version v0.1<br>
-Last updated 2024-12-06 23:46:54 +0300
+Last updated 2024-12-06 23:42:56 +0300
 </div>
 </div>
 </body>
