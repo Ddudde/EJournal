@@ -102,7 +102,7 @@ javadoc {
     destinationDir = file("../../docs/javaDoc")
     options.encoding = 'UTF-8'
     options.memberLevel = JavadocMemberLevel.PACKAGE
-    options.overview = 'src/docs/docDescription.html'
+    options.overview = 'src/docs/docDescriptionJavaDoc.html'
 }
 
 task runnn_exe {
@@ -140,7 +140,7 @@ asciidoctor {
 openapi3 {
     servers = [ { url = "http://localhost:8080" } ]
     title = 'EJournal'
-    description = file('src/docs/docDescription.html').text
+    description = file('src/docs/docDescriptionSwagger.html').text
     tagDescriptionsPropertiesFile = 'src/docs/swagger/tags.yaml'
     version = '1.0'
     format = 'json'
