@@ -2,6 +2,7 @@ let fireApp, messag, servLink, appApp, userServFin;
 servLink = "http://localhost:8080";
 appApp = this;
 userServFin = false;
+
 async function init() {
     if ("serviceWorker" in navigator) {
         try {
@@ -11,7 +12,7 @@ async function init() {
                 projectId: "e-journalfcm",
                 appId: "1:781991460409:web:a900bf500869ddd6f097e8"
             });
-            const reg = await navigator.serviceWorker.register("/DipvLom/service-worker.js")
+            const reg = await navigator.serviceWorker.register("/EJournal/service-worker.js")
             navigator.serviceWorker.addEventListener('message', event => {
                 console.log(`The service worker sent me a message: ${event.data}`);
             });

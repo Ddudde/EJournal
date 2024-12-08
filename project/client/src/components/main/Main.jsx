@@ -38,7 +38,7 @@ timid, d1, warnErrNet, server;
 scrolling = false;
 // eslint-disable-next-line no-undef
 server = servLink;
-export let prefSite = "/DipvLom";
+export let prefSite = "/EJournal";
 gr = {
     group: 4
 };
@@ -390,7 +390,7 @@ export function Main() {
             </div>
         </div>
         <div className={mainCSS.d}>
-            © 2023 ООО "Рога и Копыта" Все права защищены. Project on <a href="https://github.com/Ddudde/DipvLom" style={{color: "var(--cV2)"}}>github</a>.
+            © 2023 ООО "Рога и Копыта" Все права защищены. Project on <a href="https://github.com/Ddudde/EJournal" style={{color: "var(--cV2)"}}>github</a>.
         </div>
         <img className={mainCSS.d1} src={up} title="Вверх" alt="" onClick={onTop} ref={el=>d1 = el}/>
     </>

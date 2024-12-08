@@ -7,7 +7,7 @@ cacheOFF = true;
 
 cacheWhitelist = [CACHE_NAME];
 
-prefSite = "/DipvLom";
+prefSite = "/EJournal";
 
 async function init() {
     // num = 0;

@@ -1,8 +1,8 @@
-= Asciidoc
+= ReadMe
 Natik Muradov <myratoff25@gmail.com>
 :revnumber: v0.1
-:revdate: 06.12.2024
-:revremark: Основное описание
+:revdate: 08.12.2024
+:revremark: Поверхностное описание
 :sectnums:
 :hardbreaks-option:
 :toc: left
@@ -12,11 +12,11 @@ Natik Muradov <myratoff25@gmail.com>
 
 ====
 Основное описание в AsciiDoc.
-Github: https://github.com/Ddudde/DipvLom
+Github: https://github.com/Ddudde/EJournal
 
-* Swagger: https://ddudde.github.io/DipvLom/swagger/htmlSwag/
-* JavaDoc: https://ddudde.github.io/DipvLom/javaDoc/
-* AsciiDoc: https://ddudde.github.io/DipvLom/asciiDoc/
+* Swagger: https://ddudde.github.io/EJournal/swagger/htmlSwag/
+* JavaDoc: https://ddudde.github.io/EJournal/javaDoc/
+* AsciiDoc: https://ddudde.github.io/EJournal/asciiDoc/
 
 Сервер:
 Находится в /project/server
@@ -25,16 +25,16 @@ Java, Spring, REST + Server Sent Events
 
 Клиент:
 Находится в /project/client
-http://localhost:3000/DipvLom
-Github Pages: https://ddudde.github.io/DipvLom/
+http://localhost:3000/EJournal
+Github Pages: https://ddudde.github.io/EJournal/
 JS, React, Redux
 ====
 
 == Использование
 ====
 Запускаем сервер
-И запускаем клиент по одному из адресов: http://localhost:3000/DipvLom
-, https://ddudde.github.io/DipvLom/
+И запускаем клиент по одному из адресов: http://localhost:3000/EJournal
+, https://ddudde.github.io/EJournal/
 Выбираем роль, допустим администратора
 И авторизируемся
 Логин: nm12

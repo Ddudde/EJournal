@@ -1,7 +1,7 @@
 = Asciidoc
 Natik Muradov <myratoff25@gmail.com>
 :revnumber: v0.1
-:revdate: 06.12.2024
+:revdate: 08.12.2024
 :revremark: Основное описание
 :sectnums:
 :hardbreaks-option:
@@ -11,14 +11,14 @@ Natik Muradov <myratoff25@gmail.com>
 :imagesdir: ./img
 
 ====
-Github: https://github.com/Ddudde/DipvLom
-Публикации в HTML и PDF форматах находятся в /docs/asciiDoc/.
+Github: https://github.com/Ddudde/EJournal
+Публикации в HTML и PDF форматах находятся в /docs/EJournal/asciiDoc/.
 Основное описание проекта здесь. Также есть дополнительные:
 Также в /docs/start-web.bat можно стартануть Python http server для просмотра документации
 
-* Swagger: /swagger/htmlSwag/
-* JavaDoc: /javaDoc/
-* AsciiDoc: /asciiDoc/
+* Swagger: link:/EJournal/swagger/htmlSwag/[]
+* JavaDoc: link:/EJournal/javaDoc/[]
+* AsciiDoc: link:/EJournal/asciiDoc/[]
 
 Сервер:
 Находится в /project/server
@@ -27,8 +27,8 @@ Java, Spring, REST + Server Sent Events
 
 Клиент:
 Находится в /project/client
-http://localhost:3000/DipvLom
-Github Pages: https://ddudde.github.io/DipvLom/
+http://localhost:3000/EJournal
+Github Pages: https://ddudde.github.io/EJournal/
 JS, React, Redux
 ====
 
@@ -72,8 +72,8 @@ NOTE: WebStorm в качестве IDE
 == Использование
 ====
 Запускаем сервер
-И запускаем клиент по одному из адресов: http://localhost:3000/DipvLom
-, https://ddudde.github.io/DipvLom/
+И запускаем клиент по одному из адресов: http://localhost:3000/EJournal
+, https://ddudde.github.io/EJournal/
 Выбираем роль, допустим администратора
 И авторизируемся
 Логин: nm12
