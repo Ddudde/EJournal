@@ -9,11 +9,13 @@
     "search.exclude": {
         "**/.idea": true,
         "**/.vscode": true,
+        "**/build": true,
         "**/node_modules": true
     },
     "files.watcherExclude": {
         "**/.idea": true,
         "**/.vscode": true,
+        "**/build": true,
         "**/node_modules": true
     },
     "files.exclude": {

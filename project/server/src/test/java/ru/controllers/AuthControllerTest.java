@@ -10,17 +10,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.slf4j.Logger;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,6 +34,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.configs.SecurityConfig;
 import ru.data.SSE.Subscriber;
 import ru.data.models.auth.User;
+import ru.security.ControllerExceptionHandler;
+import ru.security.CustomAccessDenied;
 import ru.security.user.CustomToken;
 import ru.services.EmailService;
 import ru.services.MainService;
@@ -51,22 +59,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static utils.RandomUtils.defaultDescription;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@Import({AuthControllerConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AuthControllerTest {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private IniDBService iniDBService;
-
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Autowired
     private DBService dbService;
 
-    @Mock
-    private EmailService emailService;
-
-    @Mock
-    private PushService pushService;
-
-    @InjectMocks
+    @Autowired
     private MainService mainService;
+
+    @Autowired
+    private AuthController authController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
@@ -74,27 +78,22 @@ public class AuthControllerTest {
     @Captor
     private ArgumentCaptor<Object> obj;
 
-    private final AuthController authController = spy(new AuthController());
-
     private MockMvc mockMvc;
-
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final RandomUtils randomUtils = new RandomUtils();
-
     private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
 
     @BeforeAll
     static void beforeAll() throws ServletException {
-        LoggingSystem.get(ClassLoader.getSystemClassLoader()).setLogLevel(Logger.ROOT_LOGGER_NAME, LogLevel.INFO);
         authInjector.afterPropertiesSet();
     }
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
-        mainService.postConstruct();
         mockMvc = MockMvcBuilders.standaloneSetup(authController)
             .setMessageConverters(converter)
+            .setControllerAdvice(controllerExceptionHandler)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
@@ -115,7 +114,7 @@ public class AuthControllerTest {
     }
 
     private RestDocumentationResultHandler start_Docs(String methodName) {
-        ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
+        final ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary("[start#1] Открытие Server Sent Events для нового клиента или сохранение подписки для старого пользователя")
             .description(defaultDescription + """
             Подписка сохраняется в течении одного запуска сервера.
@@ -147,6 +146,7 @@ public class AuthControllerTest {
         final Subscriber sub = mock(Subscriber.class, Answers.RETURNS_DEEP_STUBS);
         when(sub.getLogin()).thenReturn("nm12");
         mainService.subscriptions.put(UUID.fromString(uuid), sub);
+
         mockMvc.perform(get("/auth/start/{uuidAuth}", uuid))
             .andExpect(status().isOk())
             .andDo(start_Docs("start_whenGood_AdminUser"));
@@ -183,8 +183,9 @@ public class AuthControllerTest {
     @Test @Tag("remCon")
     @CustomUser
     void remCon_whenGood_AdminUser() throws Exception {
-        SseEmitter sseEmitter = mock(SseEmitter.class);
+        final SseEmitter sseEmitter = mock(SseEmitter.class);
         getSub().setSSE(sseEmitter);
+
         mockMvc.perform(patch("/auth/remCon/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
@@ -197,9 +198,10 @@ public class AuthControllerTest {
     @Test @Tag("auth")
     @CustomUser
     void auth_whenWrong_AdminUser() throws Exception {
-        User user = getSub().getUser();
+        final User user = getSub().getUser();
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getPassword()).thenReturn("passTest1");
+
         mockMvc.perform(post("/auth/auth/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -219,8 +221,9 @@ public class AuthControllerTest {
     @Test @Tag("auth")
     @CustomUser(password = "passTest")
     void auth_whenGood_AdminUser() throws Exception {
-        String uuid = ((CustomToken) SecurityContextHolder.getContext()
+        final String uuid = ((CustomToken) SecurityContextHolder.getContext()
             .getAuthentication()).getUUID();
+
         mockMvc.perform(post("/auth/auth/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -242,8 +245,9 @@ public class AuthControllerTest {
     @Test @Tag("reg")
     @CustomUser
     void reg_whenWrongLogin_Anonim() throws Exception {
-        User user = getSub().getUser();
+        final User user = getSub().getUser();
         when(dbService.userByCode("uuidTest")).thenReturn(user);
+
         mockMvc.perform(post("/auth/reg/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -265,6 +269,7 @@ public class AuthControllerTest {
     void reg_whenWrong_Anonim() throws Exception {
         when(dbService.userByCode("uuidTest")).thenReturn(null);
         when(dbService.userByLogin("nm")).thenReturn(null);
+
         mockMvc.perform(post("/auth/reg/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -286,9 +291,10 @@ public class AuthControllerTest {
     @Test @Tag("reg")
     @CustomUser
     void reg_whenGood_Anonim() throws Exception {
-        User user = getSub().getUser();
+        final User user = getSub().getUser();
         when(dbService.userByCode("uuidTest")).thenReturn(user);
         when(dbService.userByLogin("nm")).thenReturn(null);
+
         mockMvc.perform(post("/auth/reg/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -313,6 +319,7 @@ public class AuthControllerTest {
     @CustomUser
     void checkInvCode_whenWrong_AdminUser() throws Exception {
         when(dbService.userByCode(null)).thenReturn(null);
+
         mockMvc.perform(post("/auth/checkInvCode/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -326,8 +333,9 @@ public class AuthControllerTest {
     @Test @Tag("checkInvCode")
     @CustomUser
     void checkInvCode_whenGood_AdminUser() throws Exception {
-        User user = getSub().getUser();
+        final User user = getSub().getUser();
         when(dbService.userByCode("uuidTest")).thenReturn(user);
+
         mockMvc.perform(post("/auth/checkInvCode/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -347,6 +355,7 @@ public class AuthControllerTest {
     @CustomUser
     void setCodePep_whenEmpty_AdminUser() throws Exception {
         when(dbService.userByLogin(null)).thenReturn(null);
+
         mockMvc.perform(patch("/auth/setCodePep/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -361,7 +370,8 @@ public class AuthControllerTest {
     @Test @Tag("setCodePep")
     @CustomUser
     void setCodePep_whenGood_AdminUser() throws Exception {
-        User user = getSub().getUser();
+        final User user = getSub().getUser();
+
         mockMvc.perform(patch("/auth/setCodePep/")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -375,5 +385,42 @@ public class AuthControllerTest {
         verify(authController, times(2)).sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"code\":\"%s\",\"id1\":0}".formatted(obj.getValue().toString()),
             answer.getValue().toString());
+    }
+}
+
+@TestConfiguration
+@Import({CustomAccessDenied.class})
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
+class AuthControllerConfig {
+
+    @Bean
+    public DBService dbService() {
+        return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public EmailService emailService() {
+        return mock(EmailService.class);
+    }
+
+    @Bean
+    public PushService pushService() {
+        return mock(PushService.class);
+    }
+
+    @Bean(initMethod = "postConstruct")
+    public MainService mainService(DBService dbService, EmailService emailService, PushService pushService) {
+        return new MainService(pushService, dbService, emailService);
+    }
+
+    @Bean
+    public IniDBService iniDBService(MainService mainService) {
+        return mock(IniDBService.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public AuthController authController() {
+        return spy(new AuthController());
     }
 }

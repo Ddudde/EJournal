@@ -45,7 +45,7 @@ import refreshCl from "../../../media/refreshCl.png";
 import copyd from "../../../media/copyd.png";
 import copyl from "../../../media/copyl.png";
 import {eventSource, sendToServer} from "../../main/Main";
-import {cParents} from "../../other/Controllers";
+import {cParents, cAuth} from "../../other/Controllers";
 
 let dispatch, parentsInfo, groupsInfo, selGr, classmatesInfo, errText, inps, themeState, cState;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -235,12 +235,11 @@ function codPepL1C(e) {
 export function codPar (id, title, text) {
     console.log("codPar");
     sendToServer({
-        uuid: cState.uuid,
         id: id
-    }, 'POST', cParents+"setCodePep")
+    }, 'PATCH', cAuth+"setCodePep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
                 // dispatch(changePeople(CHANGE_PARENTS_L1, undefined, data.id, undefined, data.body));
             }
@@ -255,13 +254,12 @@ function addKidC(e) {
 export function addKid (bod, id, par) {
     console.log("addKid");
     sendToServer({
-        uuid: cState.uuid,
         bod: bod,
         id: id
-    }, 'POST', cParents+"addKid")
+    }, 'POST', cParents+"addPar")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 201){
                 // dispatch(changePeople(CHANGE_PARENTS_L1, undefined, data.id, undefined, data.body));
                 id = undefined;
                 dispatch(changePeople(CHANGE_PARENTS_DEL_L1, "nw", "par"));
@@ -276,10 +274,7 @@ function onCon(e) {
 
 function setParents(firstG, bodyG) {
     selGr = firstG != undefined ? firstG : groupsInfo.els.group;
-    sendToServer({
-        uuid: cState.uuid,
-        group: selGr
-    }, 'POST', cParents+"getParents")
+    sendToServer(0, 'GET', cParents+"getParents/" + selGr)
         .then(data => {
             console.log(data);
             dispatch(changePeople(CHANGE_PARENTS_GL, undefined, undefined, undefined, data.bodyP));
@@ -287,7 +282,7 @@ function setParents(firstG, bodyG) {
                 dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, bodyG));
                 dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, firstG));
             }
-            if(data.error == false) {
+            if(data.status == 200){
                 dispatch(changePeople(CHANGE_CLASSMATES_GL, undefined, undefined, undefined, data.bodyC));
                 inps.lpI = Object.getOwnPropertyNames(data.bodyC);
                 for(let i = 0; i < inps.lpI.length; i++){
@@ -305,15 +300,15 @@ function setParents(firstG, bodyG) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cParents+"getInfo")
+    var url = "getInfo";
+    if(cState.role == 3) url = "getInfoFH";
+    sendToServer(0, 'GET', cParents + url)
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 if(cState.role == 3) {
                     setEvGr(cState, dispatch);
-                    setParents(parseInt(data.firstG), data.bodyG);
+                    setParents(parseInt(data.body.firstG), data.body.bodyG);
                 } else {
                     setParents();
                 }

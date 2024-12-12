@@ -152,7 +152,7 @@ import static java.util.Arrays.asList;
             ), selRole, Main.df.format(dateAfter), uuid));
         } else {
             return datas.getDbService().getUserRepository()
-                .saveAndFlush(new User(fakerEn.internet().slug(), fakerEn.internet().password(),
+                .saveAndFlush(new User(MainService.getRandomUsername(fakerEn), fakerEn.internet().password(),
                     fio, Map.of(
                     selRole, role
                 ), selRole, settingUser));

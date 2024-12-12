@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела авторизации и управлением Server Sent Events
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/AuthController">http://localhost:9001/swagger/htmlSwag/#/AuthController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AuthController">http://localhost:9001/swagger/htmlSwag/#/AuthController</a>
  * beenDo: Сделано
  *  + Javadoc
  *  + Security
@@ -54,7 +55,7 @@ import static ru.Main.datas;
     @GetMapping(value = {"/start/{uuidAuth}", "/start"}, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter start(@PathVariable(required = false) String uuidAuth) throws IOException {
         System.out.println("YT3 " + SecurityContextHolder.getContext().getAuthentication());
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        final SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         UUID uuid;
         Subscriber subscriber;
         if (uuidAuth != null && !uuidAuth.equals("null")) {
@@ -123,77 +124,71 @@ import static ru.Main.datas;
     /** RU: изменение подписки
      * Все параметры, являются свойствами подписки*/
     public void infCon(String uuid, String login, TypesConnect type, String lvlSch, String lvlGr, String lvlMore1, String lvlMore2){
-        if(uuid != null) {
-            Subscriber sub = datas.subscriptions.get(UUID.fromString(uuid));
-            if(sub == null) return;
-            if(login != null) {
-                sub.setLogin(login);
-                System.out.println("setLog " + login + " subscription for " + uuid);
-            }
-            if(type != null) {
-                sub.setType(type);
-                System.out.println("setType " + type + " subscription for " + uuid);
-            }
-            if(lvlSch != null) {
-                sub.setLvlSch(lvlSch);
-                System.out.println("setLvlSch " + lvlSch + " subscription for " + uuid);
-            }
-            if(lvlGr != null) {
-                sub.setLvlGr(lvlGr);
-                System.out.println("setLvlGr " + lvlGr + " subscription for " + uuid);
-            }
-            if(lvlMore1 != null) {
-                sub.setLvlMore1(lvlMore1);
-                System.out.println("setLvlMore1 " + lvlMore1 + " subscription for " + uuid);
-            }
-            if(lvlMore2 != null) {
-                sub.setLvlMore2(lvlMore2);
-                System.out.println("setLvlMore2 " + lvlMore2 + " subscription for " + uuid);
-            }
+        if(uuid == null) return;
+        final Subscriber sub = datas.subscriptions.get(UUID.fromString(uuid));
+        if(sub == null) return;
+        if(login != null) {
+            sub.setLogin(login);
+            System.out.println("setLog " + login + " subscription for " + uuid);
+        }
+        if(type != null) {
+            sub.setType(type);
+            System.out.println("setType " + type + " subscription for " + uuid);
+        }
+        if(lvlSch != null) {
+            sub.setLvlSch(lvlSch);
+            System.out.println("setLvlSch " + lvlSch + " subscription for " + uuid);
+        }
+        if(lvlGr != null) {
+            sub.setLvlGr(lvlGr);
+            System.out.println("setLvlGr " + lvlGr + " subscription for " + uuid);
+        }
+        if(lvlMore1 != null) {
+            sub.setLvlMore1(lvlMore1);
+            System.out.println("setLvlMore1 " + lvlMore1 + " subscription for " + uuid);
+        }
+        if(lvlMore2 != null) {
+            sub.setLvlMore2(lvlMore2);
+            System.out.println("setLvlMore2 " + lvlMore2 + " subscription for " + uuid);
         }
     }
 
     /** RU: [start#2] изменение подписки
-     * @param body Данные с клиента, задействуются свойства: type, notifToken, permis, login
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Объект и код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
     @PatchMapping("/infCon")
     public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, CustomToken auth) throws Exception {
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /infCon");
-        User user = auth.getSub().getUser();
-        if(user != null) {
-            if (!ObjectUtils.isEmpty(body.notifToken)) {
-                SettingUser settingUser = user.getSettings();
-                if(body.permis && !settingUser.getTokens().contains(body.notifToken)) {
-                    datas.getPushService().addToken(settingUser, body.notifToken);
-                    datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
-                }
-                if(!body.permis && settingUser.getTokens().contains(body.notifToken)){
-                    datas.getPushService().remToken(settingUser, body.notifToken);
-                    datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /infCon");
+        final User user = auth.getSub().getUser();
+        if (!ObjectUtils.isEmpty(body.notifToken)) {
+            final SettingUser settingUser = user.getSettings();
+            if(body.permis && !settingUser.getTokens().contains(body.notifToken)) {
+                datas.getPushService().addToken(settingUser, body.notifToken);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+            }
+            if(!body.permis && settingUser.getTokens().contains(body.notifToken)){
+                datas.getPushService().remToken(settingUser, body.notifToken);
+                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+            }
+        }
+        wrtr.name("role").value(user.getSelRole().i);
+        if (user.getSelRole() == Roles.PARENT) {
+            final Role role = user.getRoles().get(Roles.PARENT);
+            wrtr.name("kid").value(user.getSelKid())
+                .name("kids").beginObject();
+            if (!ObjectUtils.isEmpty(role.getKids())) {
+                for (User kid : role.getKids()) {
+                    wrtr.name(kid.getId() + "").value(kid.getFio());
                 }
             }
-            wrtr.name("role").value(user.getSelRole().i);
-            if (user.getSelRole() == Roles.PARENT) {
-                Role role = user.getRoles().get(Roles.PARENT);
-                wrtr.name("kid").value(user.getSelKid())
-                    .name("kids").beginObject();
-                if (!ObjectUtils.isEmpty(role.getKids())) {
-                    for (User kid : role.getKids()) {
-                        wrtr.name(kid.getId() + "").value(kid.getFio());
-                    }
-                }
-                wrtr.endObject();
-            }
+            wrtr.endObject();
         }
         infCon(auth.getUUID(), body.login, body.type, null, null, null, null);
         return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: завершение сеанса
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @return Код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/remCon")
     public ResponseEntity<Void> remCon(CustomToken auth) {
         System.out.println("[PATCH] /remCon");
@@ -204,64 +199,57 @@ import static ru.Main.datas;
             System.out.println("subscription remCon " + auth.getUUID() + " was closed");
         }
         auth.getSub().getSSE().complete();
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /** RU: авторизация пользователя
-     * @param body Данные с клиента, задействуются свойства: notifToken, permis, login, password
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Объект и код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/auth")
     public ResponseEntity<JsonObject> auth(@RequestBody DataAuth body, CustomToken auth) throws Exception {
-        User user = datas.getDbService().userByLogin(body.login);
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /auth");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user != null && Objects.equals(user.getPassword(), body.password)) {
-            if(!ObjectUtils.isEmpty(body.notifToken)) {
-                SettingUser settingUser = user.getSettings();
-                if(body.permis) {
-                    datas.getPushService().addToken(settingUser, body.notifToken);
-                } else {
-                    datas.getPushService().remToken(settingUser, body.notifToken);
-                }
-                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
-            }
-
-            wrtr.name("auth").value(true)
-                .name("login").value(user.getUsername())
-                .name("role").value(user.getSelRole().i)
-                .name("uuidS").value(auth.getUUID())
-                .name("ico").value(user.getSettings().getIco())
-                .name("roles").value(!ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1)
-                .name("secFr").value(!ObjectUtils.isEmpty(user.getSettings().getSecFr()))
-                .name("email").value(!ObjectUtils.isEmpty(user.getSettings().getEmail()));
-            if(user.getSelRole() == Roles.PARENT) {
-                Role role = user.getRoles().get(Roles.PARENT);
-                wrtr.name("kid").value(user.getSelKid())
-                    .name("kids").beginObject();
-                if (!ObjectUtils.isEmpty(role.getKids())) {
-                    for (User kid : role.getKids()) {
-                        wrtr.name(kid.getId() + "").value(kid.getFio());
-                    }
-                }
-                wrtr.endObject();
-            }
-            infCon(auth.getUUID(), body.login, null, null, null, null, null);
-            stat = HttpStatus.OK;
+        final User user = datas.getDbService().userByLogin(body.login);
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /auth");
+        if(user == null || !Objects.equals(user.getPassword(), body.password)) {
+            return ResponseEntity.notFound().build();
         }
-        return datas.getObjR(ans -> {}, wrtr, stat, false);
+        if(!ObjectUtils.isEmpty(body.notifToken)) {
+            final SettingUser settingUser = user.getSettings();
+            if(body.permis) {
+                datas.getPushService().addToken(settingUser, body.notifToken);
+            } else {
+                datas.getPushService().remToken(settingUser, body.notifToken);
+            }
+            datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        }
+        wrtr.name("auth").value(true)
+            .name("login").value(user.getUsername())
+            .name("role").value(user.getSelRole().i)
+            .name("uuidS").value(auth.getUUID())
+            .name("ico").value(user.getSettings().getIco())
+            .name("roles").value(!ObjectUtils.isEmpty(user.getRoles()) && user.getRoles().size() > 1)
+            .name("secFr").value(!ObjectUtils.isEmpty(user.getSettings().getSecFr()))
+            .name("email").value(!ObjectUtils.isEmpty(user.getSettings().getEmail()));
+        if(user.getSelRole() == Roles.PARENT) {
+            final Role role = user.getRoles().get(Roles.PARENT);
+            wrtr.name("kid").value(user.getSelKid())
+                .name("kids").beginObject();
+            if (!ObjectUtils.isEmpty(role.getKids())) {
+                for (User kid : role.getKids()) {
+                    wrtr.name(kid.getId() + "").value(kid.getFio());
+                }
+            }
+            wrtr.endObject();
+        }
+        infCon(auth.getUUID(), body.login, null, null, null, null, null);
+        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: регистрация пользователя
-     * @param body Данные с клиента, задействуются свойства: secFr, ico, par, mod, login, code
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Объект и код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/reg")
     public ResponseEntity<JsonObject> reg(@RequestBody DataAuth body) throws Exception {
-        User user = datas.getDbService().userByLogin(body.login),
+        final User user = datas.getDbService().userByLogin(body.login),
             user1 = datas.getDbService().userByCode(body.code);
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /reg");
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /reg");
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if(user1 == null){
             wrtr.name("error").value("noInv");
@@ -284,7 +272,7 @@ import static ru.Main.datas;
             user1.getSettings().setIco(body.ico);
             datas.getDbService().getUserRepository().saveAndFlush(user1);
             if(user1.getSettings() != null) {
-                School school = datas.getDbService().getFirstRole(user1.getRoles()).getYO();
+                final School school = datas.getDbService().getFirstRole(user1.getRoles()).getYO();
                 if (school != null) {
                     datas.getPushService().addTopic(user1.getSettings(), school.getId() + "News");
                 }
@@ -300,60 +288,50 @@ import static ru.Main.datas;
     }
 
     /** RU: проверка инвайта для регистрации/регистрации новой роли
-     * @param body Данные с клиента, задействуются свойства: code
-     * @return Код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/checkInvCode")
     public ResponseEntity<Void> checkInvCode(@RequestBody DataAuth body) {
-        User user = datas.getDbService().userByCode(body.code);
+        final User user = datas.getDbService().userByCode(body.code);
         System.out.println("[POST] /checkInvCode ! " + body);
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user != null) stat = HttpStatus.OK;
-        return ResponseEntity.status(stat).build();
+        if(user == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
     }
 
     /** RU: установка/обновление инвайта для регистрации + Server Sent Events
-     * @param body Данные с клиента, задействуются свойства: id
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Объект и код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @PatchMapping("/setCodePep")
     public ResponseEntity<JsonObject> setCodePep(@RequestBody DataAuth body, CustomToken auth) throws Exception {
-        User user = auth.getSub().getUser();
-        User user1 = datas.getDbService().userByLogin(body.id);
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /setCodePep");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        final var ref = new Object() {
-            Long schId = null;
-        };
-        if(user != null && user1 != null
-                && (user.getSelRole() == Roles.HTEACHER && user.getRoles().containsKey(Roles.HTEACHER)
-                || user.getSelRole() == Roles.ADMIN && user.getRoles().containsKey(Roles.ADMIN))) {
-            UUID uuid = UUID.randomUUID();
-            Instant after = Instant.now().plus(Duration.ofDays(30));
-            Date dateAfter = Date.from(after);
-            user1.setCode(uuid.toString());
-            user1.setExpDate(Main.df.format(dateAfter));
-            datas.getDbService().getUserRepository().saveAndFlush(user1);
-            ref.schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
+        final User user1 = datas.getDbService().userByLogin(body.id);
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /setCodePep");
+        if(user1 == null) return ResponseEntity.notFound().build();
 
-            wrtr.name("id").value(user1.getId());
-            System.out.println("setCode " + uuid);
+        final UUID uuid = UUID.randomUUID();
+        final Instant after = Instant.now().plus(Duration.ofDays(30));
+        final Date dateAfter = Date.from(after);
+        user1.setCode(uuid.toString());
+        user1.setExpDate(Main.df.format(dateAfter));
+        datas.getDbService().getUserRepository().saveAndFlush(user1);
+        final Long schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
 
-            wrtr.name("code").value(uuid.toString())
-                .name("id1").value(ref.schId);
-            stat = HttpStatus.OK;
-        }
+        wrtr.name("id").value(user1.getId());
+        System.out.println("setCode " + uuid);
+
+        wrtr.name("code").value(uuid.toString())
+            .name("id1").value(schId);
         return datas.getObjR(ans -> {
             sendEventFor("codPepL2C", ans, auth.getSub().getType(), "null", auth.getSub().getLvlGr(), "adm", "main");
-            sendEventFor("codPepL1C", ans, auth.getSub().getType(), ref.schId +"", auth.getSub().getLvlGr(), "ht", "main");
-        }, wrtr, stat, false);
+            sendEventFor("codPepL1C", ans, auth.getSub().getType(), schId +"", auth.getSub().getLvlGr(), "ht", "main");
+        }, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: Данные клиента используемые AuthController в методах
      * @see AuthController */
     @ToString
     @RequiredArgsConstructor
-    static class DataAuth {
+    static final class DataAuth {
         public final TypesConnect type;
         public final String code, notifToken, login, secFr, par, mod,
             password, id;

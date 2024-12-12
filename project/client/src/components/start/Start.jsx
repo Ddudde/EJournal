@@ -247,7 +247,7 @@ function inpchr(e){
                 }
             }
         } else if(warns.pat == undefined) {
-            warns.pat = addEvent("Допустимы только латиница, цифры или нижнее подчёркивание");
+            warns.pat = addEvent("Допустимы только латиница, цифры или дефис/нижнее подчёркивание");
             if(warns.empt != undefined) {
                 remEvent(warns.empt);
                 warns.empt = undefined;
@@ -553,7 +553,7 @@ export function Start(props) {
                         <div className={start.vxo}>
                             <input className={start.inps} type="login" onChange={chStatVb}
                                    ref={el => elem.logv = el} placeholder="Логин" id="logv" autoComplete="username"
-                                   required pattern="^[a-zA-Z0-9_]+$"/>
+                                   required pattern="^[a-zA-Z0-9\-]+$"/>
                             <div className={start.dinp}>
                                 <input className={start.inps} type="password" onChange={chStatVb}
                                        ref={el => elem.pasv = el} placeholder="Пароль" id="pasv"
@@ -578,7 +578,7 @@ export function Start(props) {
                         <div className={start.zab}>
                             <input className={start.inps} ref={el => elem.logz = el} type="text"
                                    onChange={chStatZb} placeholder="Логин" id="logz" autoComplete="username"
-                                   required pattern="^[a-zA-Z0-9_]+$"/>
+                                   required pattern="^[a-zA-Z0-9\-]+$"/>
                             <div className={start.blockRec} data-selemail={+selEmailZ} ref={el=>elem.blockRecZ=el}>
                                 <div className={start.email}>
                                     <div className={start.dinp}>
@@ -654,7 +654,7 @@ export function Start(props) {
                             <span style={{color: "#F00"}}> *</span>
                         </div>
                         <input className={start.inps} type="text" placeholder="Логин" onChange={chStatRb} id="logr"
-                               autoComplete="username" required pattern="^[a-zA-Z0-9_]+$"/>
+                               autoComplete="username" required pattern="^[a-zA-Z0-9\-]+$"/>
                         <div className={start.raz}>
                             Пароль:
                             <span style={{color: "#F00"}}> *</span>

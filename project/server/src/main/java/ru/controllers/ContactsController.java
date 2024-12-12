@@ -22,7 +22,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела контактов + Server Sent Events
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/ContactsController">http://localhost:9001/swagger/htmlSwag/#/ContactsController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ContactsController">http://localhost:9001/swagger/htmlSwag/#/ContactsController</a>
  * beenDo: Сделано
  *  + Javadoc
  *  + Security

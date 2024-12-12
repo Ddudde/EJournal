@@ -10,17 +10,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.slf4j.Logger;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,9 +34,10 @@ import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
 import ru.data.SSE.Subscriber;
 import ru.data.models.auth.User;
+import ru.security.ControllerExceptionHandler;
+import ru.security.CustomAccessDenied;
 import ru.security.user.CustomToken;
 import ru.services.MainService;
-import ru.services.PushService;
 import ru.services.db.DBService;
 import utils.RandomUtils;
 
@@ -51,45 +58,39 @@ import static utils.RandomUtils.defaultDescription;
 import static utils.RandomUtils.usersTest;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@Import({AdminsControllerConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class AdminsControllerTest {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Autowired
     private DBService dbService;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private PushService pushService;
-
-    @InjectMocks
-    private MainService mainService;
-
-    @Mock
+    @Autowired
     private AuthController authController;
 
-    @InjectMocks
+    @Autowired
     private AdminsController adminsController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
     private MockMvc mockMvc;
-
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final RandomUtils randomUtils = new RandomUtils();
-
     private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
 
     @BeforeAll
     static void beforeAll() throws ServletException {
-        LoggingSystem.get(ClassLoader.getSystemClassLoader()).setLogLevel(Logger.ROOT_LOGGER_NAME, LogLevel.INFO);
         authInjector.afterPropertiesSet();
     }
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
-        mainService.postConstruct();
         mockMvc = MockMvcBuilders.standaloneSetup(adminsController)
             .setMessageConverters(converter)
+            .setControllerAdvice(controllerExceptionHandler)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
@@ -112,7 +113,7 @@ public class AdminsControllerTest {
     private final String remPep_Summary = "Удаляет у пользователя роль администратора + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("remPep")
     @CustomAuth
     void remPep_whenEmpty_Anonim() throws Exception {
@@ -120,7 +121,7 @@ public class AdminsControllerTest {
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(remPep_Summary, "remPep_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
@@ -150,7 +151,7 @@ public class AdminsControllerTest {
     private final String chPep_Summary = "Изменяет фамилию пользователя + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("chPep")
     @CustomAuth
     void chPep_whenEmpty_Anonim() throws Exception {
@@ -158,7 +159,7 @@ public class AdminsControllerTest {
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(chPep_Summary, "chPep_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
@@ -189,7 +190,7 @@ public class AdminsControllerTest {
     private final String addPep_Summary = "Cоздаёт пользователя-администратора + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("addPep")
     @CustomAuth
     void addPep_whenEmpty_Anonim() throws Exception {
@@ -197,7 +198,7 @@ public class AdminsControllerTest {
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(addPep_Summary, "addPep_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
@@ -217,7 +218,7 @@ public class AdminsControllerTest {
             "name": "Дрыздов А.А."
         }
             """))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(default_Docs(addPep_Summary, "addPep_whenGood_Admin"));
         verify(authController).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":null,\"body\":{\"name\":\"Дрыздов А.А.\"}}",
@@ -251,4 +252,31 @@ public class AdminsControllerTest {
             .andDo(default_Docs(getAdmins_Summary, "getAdmins_whenGood_Admin"));
     }
 
+}
+
+@TestConfiguration
+@Import({CustomAccessDenied.class})
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
+class AdminsControllerConfig {
+
+    @Bean
+    public DBService dbService() {
+        return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean(initMethod = "postConstruct")
+    public MainService mainService(DBService dbService) {
+        return new MainService(null, dbService, null);
+    }
+
+    @Bean
+    public AuthController authController() {
+        return mock(AuthController.class);
+    }
+
+    @Bean
+    public AdminsController adminsController(AuthController authController) {
+        return spy(new AdminsController(authController));
+    }
 }

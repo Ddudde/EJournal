@@ -32,7 +32,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для просмотра дневника ученика
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/DnevnikController">http://localhost:9001/swagger/htmlSwag/#/DnevnikController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/DnevnikController">http://localhost:9001/swagger/htmlSwag/#/DnevnikController</a>
  *
  * beenDo: Сделано
  *  + Javadoc
@@ -54,9 +54,8 @@ import static ru.Main.datas;
     @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
     @GetMapping("/getDnevnik")
     public ResponseEntity<JsonObject> getDnevnik(CustomToken auth) throws Exception {
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getDnevnik");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
         final User user = auth.getSub().getUser();
+        final JsonTreeWriter wrtr = datas.init("", "[GET] /getDnevnik");
         Group group = null;
         if(user.getSelRole() == Roles.KID) {
             group = user.getRoles().get(Roles.KID).getGrp();
@@ -66,35 +65,34 @@ import static ru.Main.datas;
                 group = kidU.getRoles().get(Roles.KID).getGrp();
             }
         }
-        if (group != null) {
-            final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
-            datas.getShedule("body", user, wrtr, group.getId());
+        if (group == null) return ResponseEntity.notFound().build();
 
-            final Period actPeriod = datas.getActualPeriodBySchool(school);
-            final List<Object[]> marks = datas.getDbService()
-                .getDayRepository().uniqNameSubjectAndDatAndMarksByParams(school.getId(), group.getId(), actPeriod.getId());
-            final Map<String, Map<String, List<Mark>>> mapD = marks.stream().collect(Collectors.groupingBy(
-                obj -> (String) obj[0],
-                Collectors.groupingBy(
-                    obj1 -> (String) obj1[1],
-                    Collector.of(
-                        ArrayList<Mark>::new,
-                        (list, item) -> list.add((Mark) item[2]),
-                        (left, right) -> right
-                    ))));
-            System.out.println("mapD " + mapD);
-            wrtr.name("min").value(actPeriod.getDateN());
-            wrtr.name("max").value(actPeriod.getDateK());
-            final List<Object[]> homeworks = datas.getDbService().getDayRepository().uniqNameSubAndDatAndHomeworkByParams(school.getId(), group.getId());
-            final Map<String, Map<String, String>> mapH = homeworks.stream().collect(Collectors.groupingBy(
-                obj -> (String) obj[0],
-                Collectors.toMap(obj -> (String) obj[1], obj -> (String) obj[2])
-            ));
+        final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
+        datas.getShedule("body", user, wrtr, group.getId());
 
-            getJournal(wrtr, mapD, mapH);
-            stat = HttpStatus.OK;
-        }
-        return datas.getObjR(ans -> {}, wrtr, stat, false);
+        final Period actPeriod = datas.getActualPeriodBySchool(school);
+        final List<Object[]> marks = datas.getDbService()
+            .getDayRepository().uniqNameSubjectAndDatAndMarksByParams(school.getId(), group.getId(), actPeriod.getId());
+        final Map<String, Map<String, List<Mark>>> mapD = marks.stream().collect(Collectors.groupingBy(
+            obj -> (String) obj[0],
+            Collectors.groupingBy(
+                obj1 -> (String) obj1[1],
+                Collector.of(
+                    ArrayList<Mark>::new,
+                    (list, item) -> list.add((Mark) item[2]),
+                    (left, right) -> right
+                ))));
+        System.out.println("mapD " + mapD);
+        wrtr.name("min").value(actPeriod.getDateN());
+        wrtr.name("max").value(actPeriod.getDateK());
+        final List<Object[]> homeworks = datas.getDbService().getDayRepository().uniqNameSubAndDatAndHomeworkByParams(school.getId(), group.getId());
+        final Map<String, Map<String, String>> mapH = homeworks.stream().collect(Collectors.groupingBy(
+            obj -> (String) obj[0],
+            Collectors.toMap(obj -> (String) obj[1], obj -> (String) obj[2])
+        ));
+
+        getJournal(wrtr, mapD, mapH);
+        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: Заполняет JSON.
@@ -165,7 +163,7 @@ import static ru.Main.datas;
         wrtr.endObject();
     }
 
-    /** RU: [start] запускает клиента в раздел дневника и подтверждает клиенту права
+    /** RU: [start] запускает клиента в раздел Дневник и подтверждает клиенту права
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
         @code401.check(#auth.getSub().getUser() != null)

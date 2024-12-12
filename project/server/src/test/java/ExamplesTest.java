@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import ru.data.SSE.TypesConnect;
 import ru.security.user.Roles;
+import ru.services.MainService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,7 +79,7 @@ class ExamplesTest {
 
         String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
         System.out.println(fio);
-        System.out.println(fakerEn.internet().slug());
+        System.out.println(MainService.getRandomUsername(fakerEn));
         System.out.println(fakerEn.bool().bool());
         System.out.println(fakerEn.internet().emailAddress());
         System.out.println(fakerEn.internet().password());

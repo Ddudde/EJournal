@@ -1,5 +1,6 @@
 package ru.services;
 
+import com.github.javafaker.Faker;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import com.google.gson.stream.JsonWriter;
@@ -336,5 +337,10 @@ import static ru.Main.datas;
             Main.excp(e);
         }
         return null;
+    }
+
+    /** @return В оригинале рандомится с нижним подчёркиванием, заменяем на дефис*/
+    public static String getRandomUsername(Faker faker){
+        return faker.internet().slug().replace('_', '-');
     }
 }

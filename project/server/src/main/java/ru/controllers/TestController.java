@@ -17,7 +17,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела тестирования
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/TestController">http://localhost:9001/swagger/htmlSwag/#/TestController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TestController">http://localhost:9001/swagger/htmlSwag/#/TestController</a>
  * beenDo: Сделано
  *  + Javadoc
  *  + Security
@@ -35,7 +35,9 @@ import static ru.Main.datas;
 
     /** RU: изменяет параметры тестирования
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null) and hasAuthority('ADMIN')")
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('ADMIN')""")
     @PutMapping("/chTests")
     public ResponseEntity<JsonObject> chTests(@RequestBody DataTest body, CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chTests");
@@ -57,7 +59,9 @@ import static ru.Main.datas;
 
     /** RU: [start] отправка инфы для тестов
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null) and hasAuthority('ADMIN')")
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('ADMIN')""")
     @GetMapping("/getInfo")
     public ResponseEntity<JsonObject> getInfo(CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");

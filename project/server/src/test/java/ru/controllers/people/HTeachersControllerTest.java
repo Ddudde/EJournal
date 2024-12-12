@@ -117,7 +117,7 @@ public class HTeachersControllerTest {
     private final String remGroup_Summary = "Удаляет группу + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("remGroup")
     @CustomAuth
     void remGroup_whenEmpty_Anonim() throws Exception {
@@ -162,7 +162,7 @@ public class HTeachersControllerTest {
     private final String addGroup_Summary = "Создаёт группу + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("addGroup")
     @CustomAuth
     void addGroup_whenEmpty_Anonim() throws Exception {
@@ -204,7 +204,7 @@ public class HTeachersControllerTest {
     private final String chGroup_Summary = "Изменяет название группы + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("chGroup")
     @CustomAuth
     void chGroup_whenEmpty_Anonim() throws Exception {
@@ -250,7 +250,7 @@ public class HTeachersControllerTest {
     private final String chPep_Summary = "Изменяет фамилию пользователя + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("chPep")
     @CustomAuth
     void chPep_whenEmpty_Anonim() throws Exception {
@@ -296,7 +296,7 @@ public class HTeachersControllerTest {
     private final String remPep_Summary = "Удаляет у пользователя роль завуча + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("remPep")
     @CustomAuth
     void remPep_whenEmpty_Anonim() throws Exception {
@@ -341,7 +341,7 @@ public class HTeachersControllerTest {
     private final String addPep_Summary = "Создаёт пользователя-завуча + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("addPep")
     @CustomAuth
     void addPep_whenEmpty_Anonim() throws Exception {
@@ -385,7 +385,7 @@ public class HTeachersControllerTest {
     private final String chSch_Summary = "Изменение имени учебного центра администратором портала";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("chSch")
     @CustomAuth
     void chSch_whenEmpty_Anonim() throws Exception {
@@ -427,7 +427,7 @@ public class HTeachersControllerTest {
     private final String addSch_Summary = "Добавление учебного центра администратором портала";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("addSch")
     @CustomAuth
     void addSch_whenEmpty_Anonim() throws Exception {
@@ -465,7 +465,7 @@ public class HTeachersControllerTest {
     private final String remSch_Summary = "Удаление учебного центра администратором портала";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("remSch")
     @CustomAuth
     void remSch_whenEmpty_Anonim() throws Exception {
@@ -507,7 +507,7 @@ public class HTeachersControllerTest {
     private final String getInfoForAdmins_Summary = "[start] отправка список завучей учебного центра для администраторов";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("getInfo")
     @CustomAuth
     void getInfo_whenEmpty_Anonim() throws Exception {
@@ -537,7 +537,7 @@ public class HTeachersControllerTest {
     }
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("getInfoForAdmins")
     @CustomAuth
     void getInfoForAdmins_whenEmpty_Anonim() throws Exception {

@@ -199,7 +199,7 @@ export function Profile() {
                                 {profilesInfo.login}
                             </div>
                             {(!log || log == cState.login) && <>
-                                <input className={profileCSS.inp} id="loginp" placeholder="nickname" onInput={inpchr} defaultValue={profilesInfo.login} type="text" pattern="^[a-zA-Z0-9]+$"/>
+                                <input className={profileCSS.inp} id="loginp" placeholder="nickname" onInput={inpchr} defaultValue={profilesInfo.login} type="text" pattern="^[a-zA-Z0-9\-]+$"/>
                                 <img className={profileCSS.imginp+" yes"} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
                                 <img className={profileCSS.imginp} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                                 <img className={profileCSS.imgfield} src={ed} onClick={onEdit} title="Редактировать" alt=""/>

@@ -196,7 +196,7 @@ function addInv (type, inp, par) {
     }, 'POST', cAdmins+"addPep")
         .then(data => {
             console.log(data);
-            if(data.status == 200){
+            if(data.status == 201){
                 par.setAttribute('data-st', '0');
             }
         });

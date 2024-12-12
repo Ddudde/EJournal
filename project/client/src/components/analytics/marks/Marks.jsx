@@ -19,15 +19,13 @@ function onCon(e) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cJournal + "getInfoPers")
+    sendToServer(0, 'GET', cJournal + "getInfoPers")
         .then(data => {
             console.log(data);
-            if (data.error == false) {
+            if(data.status == 200){
                 if(cState.role == 1 && cState.kid) selKid = cState.kid;
-                dispatch(changeMarks("namePers", data.bodyPers));
-                dispatch(changeMarks("jur", data.bodyM));
+                dispatch(changeMarks("namePers", data.body.bodyPers));
+                dispatch(changeMarks("jur", data.body.bodyM));
             }
         });
 }

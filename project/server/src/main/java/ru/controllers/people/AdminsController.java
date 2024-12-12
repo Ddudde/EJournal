@@ -2,15 +2,15 @@ package ru.controllers.people;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
 import ru.controllers.AuthController;
+import ru.controllers.DocsHelpController;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.data.models.Syst;
@@ -28,7 +28,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела управления/просмотра администраторов + Server Sent Events
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/AdminsController">http://localhost:9001/swagger/htmlSwag/#/AdminsController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AdminsController">http://localhost:9001/swagger/htmlSwag/#/AdminsController</a>
  * beenDo: Сделано
  *  + Javadoc
  *  + Security
@@ -45,101 +45,90 @@ import static ru.Main.datas;
     private final AuthController authController;
 
     /** RU: удаляет у пользователя роль администратора + Server Sent Events
-     * @param body Данные с клиента, задействуются свойства: name, id
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('ADMIN')""")
     @DeleteMapping("/remPep")
     public ResponseEntity<Void> remPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
-        User user = auth.getSub().getUser();
-        User user1 = datas.getDbService().userById(body.id);
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /remPep");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        Syst syst = datas.getDbService().getSyst();
-        if (user != null && user.getRoles().containsKey(Roles.ADMIN) && syst != null && user1 != null) {
-            user1.getRoles().remove(Roles.ADMIN);
-            datas.getDbService().getUserRepository().saveAndFlush(user1);
-            syst.getAdmins().remove(user1);
-            datas.getDbService().getSystRepository().saveAndFlush(syst);
-
-            wrtr.name("id").value(user1.getId());
-            stat = HttpStatus.OK;
+        final User user1 = datas.getDbService().userById(body.id);
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /remPep");
+        final Syst syst = datas.getDbService().getSyst();
+        if (syst == null || user1 == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        user1.getRoles().remove(Roles.ADMIN);
+        datas.getDbService().getUserRepository().saveAndFlush(user1);
+        syst.getAdmins().remove(user1);
+        datas.getDbService().getSystRepository().saveAndFlush(syst);
+
+        wrtr.name("id").value(user1.getId());
         return datas.getObjR(ans -> {
             authController.sendEventFor("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
-        }, wrtr, stat);
+        }, wrtr, HttpStatus.OK);
     }
 
     /** RU: изменяет фамилию пользователя + Server Sent Events
-     * @param body Данные с клиента, задействуются свойства: name, id
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('ADMIN')""")
     @PatchMapping("/chPep")
     public ResponseEntity<Void> chPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
-        User user = auth.getSub().getUser();
-        User user1 = datas.getDbService().userById(body.id);
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chPep");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        if (user != null && user.getRoles().containsKey(Roles.ADMIN) && user1 != null) {
-            user1.setFio(body.name);
-            datas.getDbService().getUserRepository().saveAndFlush(user1);
+        final User user1 = datas.getDbService().userById(body.id);
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chPep");
+        if (user1 == null) return ResponseEntity.notFound().build();
 
-            wrtr.name("id").value(user1.getId())
-                .name("name").value(body.name);
-            stat = HttpStatus.OK;
-        }
+        user1.setFio(body.name);
+        datas.getDbService().getUserRepository().saveAndFlush(user1);
+
+        wrtr.name("id").value(user1.getId())
+            .name("name").value(body.name);
         return datas.getObjR(ans -> {
             authController.sendEventFor("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
-        }, wrtr, stat);
+        }, wrtr, HttpStatus.OK);
     }
 
     /** RU: создаёт пользователя-администратора + Server Sent Events
-     * @param body Данные с клиента, задействуются свойства: name
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('ADMIN')""")
     @PostMapping("/addPep")
     public ResponseEntity<Void> addPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
-        User user = auth.getSub().getUser();
-        Syst syst = datas.getDbService().getSyst();
-        JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addPep");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        if (user != null && user.getRoles().containsKey(Roles.ADMIN) && syst != null) {
-            Instant after = Instant.now().plus(Duration.ofDays(30));
-            Date dateAfter = Date.from(after);
-            Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role());
-            User inv = new User(body.name, Map.of(
-                Roles.ADMIN, role
-                ), Main.df.format(dateAfter));
-            datas.getDbService().getUserRepository().saveAndFlush(inv);
-            syst.getAdmins().add(inv);
-            datas.getDbService().getSystRepository().saveAndFlush(syst);
+        final Syst syst = datas.getDbService().getSyst();
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addPep");
+        if (syst == null) return ResponseEntity.notFound().build();
 
-            wrtr.name("id").value(inv.getId())
-                .name("body").beginObject()
-                .name("name").value(body.name)
-                .endObject();
-            stat = HttpStatus.OK;
-        }
+        final Instant after = Instant.now().plus(Duration.ofDays(30));
+        final Date dateAfter = Date.from(after);
+        final Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role());
+        final User inv = new User(body.name, Map.of(
+            Roles.ADMIN, role
+            ), Main.df.format(dateAfter));
+        datas.getDbService().getUserRepository().saveAndFlush(inv);
+        syst.getAdmins().add(inv);
+        datas.getDbService().getSystRepository().saveAndFlush(syst);
+
+        wrtr.name("id").value(inv.getId())
+            .name("body").beginObject()
+            .name("name").value(body.name)
+            .endObject();
         return datas.getObjR(ans -> {
             authController.sendEventFor("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
-        }, wrtr, stat);
+        }, wrtr, HttpStatus.CREATED);
     }
 
     /** RU: [start] отправляет список администраторов
-     * @param auth Авторизация, в ней подписка и пользователь
-     * @exception Exception Исключение вызывается при ошибках с Json
-     * @return Объект и код статуса */
+     * @see DocsHelpController#point(Object, Object) Описание */
     @GetMapping("/getAdmins")
     public ResponseEntity<JsonObject> getAdmins(CustomToken auth) throws Exception {
-        Syst syst = datas.getDbService().getSyst();
-        JsonTreeWriter wrtr = datas.init("", "[GET] /getAdmins");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        if (syst != null) {
-            datas.usersByList(syst.getAdmins(), true, wrtr);
-            stat = HttpStatus.OK;
-        }
+        final Syst syst = datas.getDbService().getSyst();
+        final JsonTreeWriter wrtr = datas.init("", "[GET] /getAdmins");
+        if (syst == null) return ResponseEntity.notFound().build();
+
+        datas.usersByList(syst.getAdmins(), true, wrtr);
         return datas.getObjR(ans -> {
             final User user = auth.getSub().getUser();
             String role = "main";
@@ -147,15 +136,15 @@ import static ru.Main.datas;
                 role = "adm";
             }
             authController.infCon(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
-        }, wrtr, stat, false);
+        }, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: Данные клиента используемые AdminsController в методах
      * @see AdminsController */
     @ToString
-    @NoArgsConstructor @AllArgsConstructor
-    static class DataAdmins {
-        public String name;
-        public Long id;
+    @RequiredArgsConstructor
+    static final class DataAdmins {
+        public final String name;
+        public final Long id;
     }
 }

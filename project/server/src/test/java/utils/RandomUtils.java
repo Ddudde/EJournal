@@ -63,16 +63,28 @@ public class RandomUtils {
     ));
 
     public final List<Period> periods = new ArrayList<>(asList(
-        new Period("I четверть", "01.09.23", "03.11.23"),
-        new Period("II четверть", "12.11.23", "29.12.23"),
-        new Period("III четверть", "12.01.24", "29.03.24"),
-        new Period("IV четверть", "01.04.24", "30.08.24")
+        getPeriod(352L, "I четверть", "01.09.23", "03.11.23"),
+        getPeriod(3872L, "II четверть", "12.11.23", "29.12.23"),
+        getPeriod(9764L, "III четверть", "12.01.24", "29.03.24"),
+        getPeriod(3456L, "IV четверть", "01.04.24", "30.08.24")
+    ));
+
+    public final List<Group> groups = new ArrayList<>(asList(
+        getGroup(2323L, namesGroup[0]),
+        getGroup(3456L, namesGroup[1]),
+        getGroup(4354L, namesGroup[2])
     ));
 
     private Request getRequest(long id, String email, String date, String fio) {
-        Request request = new Request(email, date, fio);
+        final Request request = new Request(email, date, fio);
         request.setId(id);
         return request;
+    }
+
+    private Period getPeriod(long id, String name, String dateN, String dateK) {
+        final Period period = new Period(name, dateN, dateK);
+        period.setId(id);
+        return period;
     }
 
     public static Contacts getCloneContacts(Contacts contacts) {
@@ -83,18 +95,18 @@ public class RandomUtils {
         return (User) getClone(user, User.class);
     }
 
-    public static Object getClone(Object object, Class className) {
+    private static Object getClone(Object object, Class className) {
         return gson.fromJson(gson.toJson(object),className);
     }
 
     private Contacts getContacts(long id, String contact, String text, String imgUrl) {
-        Contacts contacts = new Contacts(contact, text, imgUrl);
+        final Contacts contacts = new Contacts(contact, text, imgUrl);
         contacts.setId(id);
         return contacts;
     }
 
     private News getNews(long id, String title, String date, String img_url, String text) {
-        News news = new News(title, date, img_url, text);
+        final News news = new News(title, date, img_url, text);
         news.setId(id);
         return news;
     }
@@ -107,10 +119,10 @@ public class RandomUtils {
             if(fakerEn.bool().bool()) continue;
             for(les = 0; les < 6; les++) {
                 if(fakerEn.bool().bool()) continue;
-                String kab = ((int) Math.round(Math.random() * 2000) + 1) + "",
+                final String kab = ((int) Math.round(Math.random() * 2000) + 1) + "",
                     nameSubj = namesSubj[(int) Math.round(Math.random() * 4)],
                     nameGroup = namesGroup[(int) Math.round(Math.random() * 2)];
-                User teaU = tea.get((int) Math.round(Math.random() * (tea.size() - 1)));
+                final User teaU = tea.get((int) Math.round(Math.random() * (tea.size() - 1)));
                 lessons.add(new Lesson(null, new Group(nameGroup), day, les, kab, nameSubj, teaU));
             }
         }
@@ -118,7 +130,7 @@ public class RandomUtils {
     }
 
     public Group getGroup(long id, String nameGrp) {
-        Group group = new Group(nameGrp);
+        final Group group = new Group(nameGrp);
         group.getKids().addAll(usersTest);
         group.setId(id);
 //        group.setId(Math.round(Math.random() * 10000));
@@ -128,29 +140,25 @@ public class RandomUtils {
     public School getSchool(long id, String nameSch, long... ids) {
 //        final String[] namesSch = {"Гимназия №", "Школа №", "Лицей №"};
 //        String nameSch = namesSch[(int) Math.round(Math.random() * 2)] + (Math.round(Math.random() * 5000) + 1);
-        List list = List.of();
-        School school = new School(nameSch, list, null, list);
+        final List list = List.of();
+        final School school = new School(nameSch, list, null, list);
         school.getHteachers().addAll(usersTest);
-        school.getGroups().addAll(asList(
-            getGroup(ids[0], "1A"),
-            getGroup(ids[1], "1Б"),
-            getGroup(ids[2], "1В")
-        ));
+        school.getGroups().addAll(groups);
         school.setId(id);
 //        school.setId(Math.round(Math.random() * 10000));
         return school;
     }
 
     private static User getUser(long id, String lastName, String firstName, String middleName, String slug, String password, boolean existsParents) {
-        String fio = lastName + " " + firstName.charAt(0) + "." + middleName.charAt(0) + ".";
-        User user = new User(slug, password, fio, mock(Map.class), null, null);
+        final String fio = lastName + " " + firstName.charAt(0) + "." + middleName.charAt(0) + ".";
+        final User user = new User(slug, password, fio, mock(Map.class), null, null);
         user.setId(id);
+        final Role role = new Role();
+        role.setEmail("example@mail.com");
         if(existsParents) {
-            Role role = new Role();
-            role.setEmail("example@mail.com");
             role.getParents().add(parentTest);
-            user.getRoles().put(Roles.KID, role);
         }
+        user.getRoles().put(Roles.KID, role);
         user.setSelRole(Roles.KID);
         return user;
     }

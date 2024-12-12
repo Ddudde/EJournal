@@ -10,21 +10,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.slf4j.Logger;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
+import ru.security.ControllerExceptionHandler;
+import ru.security.CustomAccessDenied;
 import ru.services.MainService;
 import ru.services.db.DBService;
 import ru.services.db.IniDBService;
@@ -46,45 +54,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static utils.RandomUtils.defaultDescription;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@Import({RequestControllerConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RequestControllerTest {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private IniDBService iniDBService;
-
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Autowired
     private DBService dbService;
 
-    @InjectMocks
-    private MainService mainService;
-
-    @Mock
+    @Autowired
     private AuthController authController;
 
-    @InjectMocks
+    @Autowired
     private RequestController requestController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
     private MockMvc mockMvc;
-
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final RandomUtils randomUtils = new RandomUtils();
-
     private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
 
     @BeforeAll
     static void beforeAll() throws ServletException {
-        LoggingSystem.get(ClassLoader.getSystemClassLoader()).setLogLevel(Logger.ROOT_LOGGER_NAME, LogLevel.INFO);
         authInjector.afterPropertiesSet();
     }
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
-        mainService.postConstruct();
         mockMvc = MockMvcBuilders.standaloneSetup(requestController)
             .setMessageConverters(converter)
+            .setControllerAdvice(controllerExceptionHandler)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
@@ -124,11 +125,11 @@ public class RequestControllerTest {
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "email": "mail@mail.com",
-            "date": "11.11.1111",
-            "fio": "Дрыздов А.А."
-        }
+            {
+                "email": "mail@mail.com",
+                "date": "11.11.1111",
+                "fio": "Дрыздов А.А."
+            }
             """))
             .andExpect(status().isOk())
             .andDo(default_Docs(addReq_Summary, "addReq_whenGood_Admin"));
@@ -140,16 +141,17 @@ public class RequestControllerTest {
     private final String delReq_Summary = "Удаление заявки + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("delReq")
     @CustomAuth
     void delReq_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
+
         mockMvc.perform(delete("/requests/delReq")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(delReq_Summary, "delReq_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
     }
@@ -160,13 +162,14 @@ public class RequestControllerTest {
     @CustomUser
     void delReq_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+
         mockMvc.perform(delete("/requests/delReq")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "id": 20
-        }
+            {
+                "id": 20
+            }
             """))
             .andExpect(status().isOk())
             .andDo(default_Docs(delReq_Summary, "delReq_whenGood_Admin"));
@@ -178,16 +181,17 @@ public class RequestControllerTest {
     private final String chTitle_Summary = "Изменение заголовка заявки + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("chTitle")
     @CustomAuth
     void chTitle_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
+
         mockMvc.perform(patch("/requests/chTitle")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(chTitle_Summary, "chTitle_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
     }
@@ -198,14 +202,15 @@ public class RequestControllerTest {
     @CustomUser
     void chTitle_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+
         mockMvc.perform(patch("/requests/chTitle")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "title": "example@pepl.qq",
-            "id": 20
-        }
+            {
+                "title": "example@pepl.qq",
+                "id": 20
+            }
             """))
             .andExpect(status().isOk())
             .andDo(default_Docs(chTitle_Summary, "chTitle_whenGood_Admin"));
@@ -217,16 +222,17 @@ public class RequestControllerTest {
     private final String chDate_Summary = "Изменение даты заявки + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("chDate")
     @CustomAuth
     void chDate_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
+
         mockMvc.perform(patch("/requests/chDate")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(chDate_Summary, "chDate_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
     }
@@ -237,14 +243,15 @@ public class RequestControllerTest {
     @CustomUser
     void chDate_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+
         mockMvc.perform(patch("/requests/chDate")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "date": "01.01.2001",
-            "id": 20
-        }
+            {
+                "date": "01.01.2001",
+                "id": 20
+            }
             """))
             .andExpect(status().isOk())
             .andDo(default_Docs(chDate_Summary, "chDate_whenGood_Admin"));
@@ -257,16 +264,17 @@ public class RequestControllerTest {
     private final String chText_Summary = "Изменение текста заявки + Server Sent Events";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("chText")
     @CustomAuth
     void chText_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
+
         mockMvc.perform(patch("/requests/chText")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(chText_Summary, "chText_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any());
     }
@@ -277,14 +285,15 @@ public class RequestControllerTest {
     @CustomUser
     void chText_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+
         mockMvc.perform(patch("/requests/chText")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "text": "Дроздич Г.Г.",
-            "id": 20
-        }
+            {
+                "text": "Дроздич Г.Г.",
+                "id": 20
+            }
             """))
             .andExpect(status().isOk())
             .andDo(default_Docs(chText_Summary, "chText_whenGood_Admin"));
@@ -296,14 +305,15 @@ public class RequestControllerTest {
     private final String getRequests_Summary = "[start] Отправляет инфу о заявках";
 
     /** RU: аноним
-     * отправляет 404 код-ответ */
+     * отправляет 401 код-ответ */
     @Test @Tag("getRequests")
     @CustomAuth
     void getRequests_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
+
         mockMvc.perform(get("/requests/getRequests")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getRequests_Summary, "getRequests_whenEmpty_Anonim"));
     }
 
@@ -313,10 +323,43 @@ public class RequestControllerTest {
     @CustomUser
     void getRequests_whenGood_Admin() throws Exception {
         when(dbService.getRequests()).thenReturn(randomUtils.requestTest);
+
         mockMvc.perform(get("/requests/getRequests")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"352\":{\"title\":\"mail1@mail.com\",\"date\":\"11.11.2011\",\"text\":\"Дроздов А.А.\"},\"3872\":{\"title\":\"mail10@mail.com\",\"date\":\"11.01.2011\",\"text\":\"Силин А.К.\"},\"9764\":{\"title\":\"mail11@mail.com\",\"date\":\"01.11.2011\",\"text\":\"Пестов Л.А.\"}}"))
             .andDo(default_Docs(getRequests_Summary, "getRequests_whenGood_Admin"));
+    }
+}
+
+@TestConfiguration
+@Import({CustomAccessDenied.class})
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
+class RequestControllerConfig {
+
+    @Bean
+    public DBService dbService() {
+        return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean(initMethod = "postConstruct")
+    public MainService mainService(DBService dbService) {
+        return new MainService(null, dbService, null);
+    }
+
+    @Bean
+    public IniDBService iniDBService() {
+        return mock(IniDBService.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public AuthController authController() {
+        return mock(AuthController.class);
+    }
+
+    @Bean
+    public RequestController requestController(AuthController authController) {
+        return spy(new RequestController(authController));
     }
 }

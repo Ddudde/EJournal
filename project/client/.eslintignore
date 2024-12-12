@@ -2,6 +2,7 @@
 *.md
 *.svg
 /.idea
+/build
 /.vscode
 /node_modules
 package.json

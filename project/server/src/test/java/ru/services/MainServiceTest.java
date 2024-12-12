@@ -1,7 +1,6 @@
 package ru.services;
 
 import com.google.gson.internal.bind.JsonTreeWriter;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +24,8 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
-import static utils.RandomUtils.*;
+import static utils.RandomUtils.namesSubj;
+import static utils.RandomUtils.usersTest;
 
 @ExtendWith(MockitoExtension.class)
 public class MainServiceTest {
@@ -39,12 +39,7 @@ public class MainServiceTest {
     @InjectMocks
     private MainService mainService;
 
-    private static RandomUtils randomUtils;
-
-    @BeforeAll
-    static void beforeAll() {
-        randomUtils = new RandomUtils();
-    }
+    private final RandomUtils randomUtils = new RandomUtils();
 
     /** RU: подаёт пустой список и должен получить условно пустой JSON */
     @Test @Tag("groupsBySchoolOfUser")
@@ -59,13 +54,8 @@ public class MainServiceTest {
     /** RU: подаёт список из случайных групп должен вернуть заполненный JSON */
     @Test @Tag("groupsBySchoolOfUser")
     void groupsBySchoolOfUser_whenGood(@Mock User user, @Mock(answer = Answers.RETURNS_DEEP_STUBS) School school) throws Exception {
-        List<Group> groups = new ArrayList<>(asList(
-            randomUtils.getGroup(2323L, namesGroup[0]),
-            randomUtils.getGroup(3456L, namesGroup[1]),
-            randomUtils.getGroup(4354L, namesGroup[2])
-        ));
         when(dbService.getFirstRole(anyMap()).getYO()).thenReturn(school);
-        when(school.getGroups()).thenReturn(groups);
+        when(school.getGroups()).thenReturn(randomUtils.groups);
 
         JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();

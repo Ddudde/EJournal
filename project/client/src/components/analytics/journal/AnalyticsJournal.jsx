@@ -52,31 +52,29 @@ function onCon(e) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cJournal + "getInfo")
+    sendToServer(0, 'GET', cJournal + "getInfo")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 let weight, sum, mar, wei;
-                for(let predm in data.bodyJ) {
+                for(let predm in data.body.bodyJ) {
                     weight = 0;
                     sum = 0;
-                    for(let day in data.bodyJ[predm].days) {
-                        mar = parseInt(data.bodyJ[predm].days[day].mark);
+                    for(let day in data.body.bodyJ[predm].days) {
+                        mar = parseInt(data.body.bodyJ[predm].days[day].mark);
                         if(!mar || isNaN(mar)) continue;
-                        wei = parseInt(data.bodyJ[predm].days[day].weight);
+                        wei = parseInt(data.body.bodyJ[predm].days[day].weight);
                         if(!wei) wei = 1;
                         sum += mar*wei;
                         weight += wei;
                     }
                     if (sum && weight) {
-                        if(!data.bodyJ[predm].avg) data.bodyJ[predm].avg = {};
-                        data.bodyJ[predm].avg.mark = (sum/weight).toFixed(2);
+                        if(!data.body.bodyJ[predm].avg) data.body.bodyJ[predm].avg = {};
+                        data.body.bodyJ[predm].avg.mark = (sum/weight).toFixed(2);
                     }
                 }
                 if(cState.role == 1 && cState.kid) selKid = cState.kid;
-                dispatch(changeJournal(CHANGE_JOURNAL_GL, 0, data.bodyJ));
+                dispatch(changeJournal(CHANGE_JOURNAL_GL, 0, data.body.bodyJ));
             }
         });
 }

@@ -23,7 +23,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела профиля и частично управлением аккаунтом + Server Sent Events
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/ProfileController">http://localhost:9001/swagger/htmlSwag/#/ProfileController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ProfileController">http://localhost:9001/swagger/htmlSwag/#/ProfileController</a>
  * beenDo: Сделано
  *  + Javadoc
  *  + Security

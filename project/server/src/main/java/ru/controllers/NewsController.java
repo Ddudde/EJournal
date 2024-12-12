@@ -25,7 +25,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела новостей + Server Sent Events
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/NewsController">http://localhost:9001/swagger/htmlSwag/#/NewsController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/NewsController">http://localhost:9001/swagger/htmlSwag/#/NewsController</a>
  * beenDo: Сделано
  *  + Javadoc
  *  + Security

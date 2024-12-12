@@ -26,7 +26,7 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела настроек
  * <pre>
- * Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/SettingsController">http://localhost:9001/swagger/htmlSwag/#/SettingsController</a>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/SettingsController">http://localhost:9001/swagger/htmlSwag/#/SettingsController</a>
  * beenDo: Сделано
  *  + Javadoc
  *  + Security
