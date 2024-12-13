@@ -95,7 +95,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">RU: Контроллер для раздела управления/просмотра администраторов + Server Sent Events
  <pre>
- Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/AdminsController">http://localhost:9001/swagger/htmlSwag/#/AdminsController</a>
+ Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AdminsController">http://localhost:9001/swagger/htmlSwag/#/AdminsController</a>
  beenDo: Сделано
   + Javadoc
   + Security
@@ -124,7 +124,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>(package private) static class&nbsp;</code></div>
+<div class="col-first even-row-color"><code>(package private) static final class&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="AdminsController.DataAdmins.html" class="type-name-link" title="class in ru.controllers.people">AdminsController.DataAdmins</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">RU: Данные клиента используемые AdminsController в методах</div>
@@ -213,60 +213,66 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="remPep(ru.controllers.people.AdminsController.DataAdmins,ru.security.user.CustomToken)">
 <h3>remPep</h3>
-<div class="member-signature"><span class="annotations">@DeleteMapping("/remPep")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+@DeleteMapping("/remPep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remPep</span><wbr><span class="parameters">(@RequestBody
  <a href="AdminsController.DataAdmins.html" title="class in ru.controllers.people">AdminsController.DataAdmins</a>&nbsp;body,
  <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: удаляет у пользователя роль администратора + Server Sent Events</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: name, id</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
 <section class="detail" id="chPep(ru.controllers.people.AdminsController.DataAdmins,ru.security.user.CustomToken)">
 <h3>chPep</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chPep")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+@PatchMapping("/chPep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chPep</span><wbr><span class="parameters">(@RequestBody
  <a href="AdminsController.DataAdmins.html" title="class in ru.controllers.people">AdminsController.DataAdmins</a>&nbsp;body,
  <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменяет фамилию пользователя + Server Sent Events</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: name, id</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
 <section class="detail" id="addPep(ru.controllers.people.AdminsController.DataAdmins,ru.security.user.CustomToken)">
 <h3>addPep</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/addPep")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+@PostMapping("/addPep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">addPep</span><wbr><span class="parameters">(@RequestBody
  <a href="AdminsController.DataAdmins.html" title="class in ru.controllers.people">AdminsController.DataAdmins</a>&nbsp;body,
  <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: создаёт пользователя-администратора + Server Sent Events</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: name</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
@@ -278,12 +284,14 @@ loadScripts(document, 'script');</script>
                                                                               throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: [start] отправляет список администраторов</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>

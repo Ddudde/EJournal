@@ -32,6 +32,18 @@
   }, {
     "name" : "ContactsController",
     "description" : "Контроллер для раздела контактов + Server Sent Events"
+  }, {
+    "name" : "HTeachersController",
+    "description" : "Контроллер для раздела управления/просмотра завучей учебных центров + Server Sent Events"
+  }, {
+    "name" : "DnevnikController",
+    "description" : "Контроллер для просмотра дневника ученика"
+  }, {
+    "name" : "ParentsController",
+    "description" : "Контроллер для раздела управления/просмотра родителей группы учебного центра + Server Sent Events"
+  }, {
+    "name" : "JournalController",
+    "description" : "Контроллер для раздела просмотра оценок + Server Sent Events"
   } ],
   "paths" : {
     "/admins/addPep" : {
@@ -68,11 +80,11 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404"
+          "401" : {
+            "description" : "401"
           },
-          "200" : {
-            "description" : "200"
+          "201" : {
+            "description" : "201"
           }
         }
       }
@@ -111,8 +123,8 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404"
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200"
@@ -138,19 +150,7 @@
         } ],
         "responses" : {
           "404" : {
-            "description" : "404",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/requests-chTitle486549215"
-                },
-                "examples" : {
-                  "AdminsController/getAdmins_whenEmpty_Anonim" : {
-                    "value" : "{\"error\":true}"
-                  }
-                }
-              }
-            }
+            "description" : "404"
           },
           "200" : {
             "description" : "200",
@@ -204,8 +204,8 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404"
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200"
@@ -229,7 +229,7 @@
                 },
                 "examples" : {
                   "AuthController/start_whenGoodNext_Anonim" : {
-                    "value" : "event:chck\ndata:\"7433ad58-bcdd-42ad-8b7e-279333840958\"\n\n"
+                    "value" : "event:chck\ndata:\"709fdc5c-5c8e-4422-992c-27092c0bc2dc\"\n\n"
                   }
                 }
               }
@@ -281,26 +281,14 @@
                 },
                 "examples" : {
                   "AuthController/auth_whenGood_AdminUser" : {
-                    "value" : "{\"auth\":true,\"login\":\"nm12\",\"role\":4,\"uuidS\":\"5d05c779-c7ac-42a3-9e29-2e509dd5c608\",\"roles\":true,\"secFr\":false,\"email\":false}"
+                    "value" : "{\"auth\":true,\"login\":\"nm12\",\"role\":4,\"uuidS\":\"7549834f-d920-49be-adfd-31ddbe4ac9cc\",\"roles\":true,\"secFr\":false,\"email\":false}"
                   }
                 }
               }
             }
           },
           "404" : {
-            "description" : "404",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/requests-chTitle486549215"
-                },
-                "examples" : {
-                  "AuthController/auth_whenWrong_AdminUser" : {
-                    "value" : "{\"error\":true}"
-                  }
-                }
-              }
-            }
+            "description" : "404"
           }
         }
       }
@@ -540,19 +528,7 @@
         },
         "responses" : {
           "404" : {
-            "description" : "404",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/requests-chTitle486549215"
-                },
-                "examples" : {
-                  "AuthController/setCodePep_whenEmpty_AdminUser" : {
-                    "value" : "{\"error\":true}"
-                  }
-                }
-              }
-            }
+            "description" : "404"
           },
           "200" : {
             "description" : "200",
@@ -563,7 +539,7 @@
                 },
                 "examples" : {
                   "AuthController/setCodePep_whenGood_AdminUser" : {
-                    "value" : "{\"id\":9764,\"code\":\"36247412-3fb5-4c98-b842-af02429b1541\",\"id1\":0}"
+                    "value" : "{\"id\":9764,\"code\":\"288435af-61ab-40f7-b9b7-9291a6148558\",\"id1\":0}"
                   }
                 }
               }
@@ -597,7 +573,7 @@
                 },
                 "examples" : {
                   "AuthController/start_whenGood_AdminUser" : {
-                    "value" : "event:chck\ndata:\"6b61eda7-e4c6-4a6f-a60c-527962a90db7\"\n\n"
+                    "value" : "event:chck\ndata:\"1c52f41f-a4bd-4432-8496-a9d7a81931b5\"\n\n"
                   }
                 }
               }
@@ -1246,6 +1222,82 @@
         }
       }
     },
+    "/journal/getInfo" : {
+      "get" : {
+        "tags" : [ "JournalController" ],
+        "summary" : "[start] отправляет данные о оценках",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "JournalController/getInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "JournalController/getInfo_whenGood_KID" : {
+                    "value" : "{\"bodyJ\":{\"Химия\":{\"days\":{\"10.06.22\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Англ. Яз\":{\"days\":{\"12.06.22\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Математика\":{\"days\":{\"10.06.22\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"}}}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/journal/getInfoPers" : {
+      "get" : {
+        "tags" : [ "JournalController" ],
+        "summary" : "Отправляет данные о итоговых оценках",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "JournalController/getInfoPers_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "JournalController/getInfoPers_whenGood_KID" : {
+                    "value" : "{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"9764\":\"III четверть\",\"3456\":\"IV четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"9764\":\"1\",\"352\":\"Н\"},\"Математика\":{\"9764\":\"2\",\"352\":\"5\",\"3872\":\"5\"}}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/news/addNewsPor/" : {
       "post" : {
         "tags" : [ "NewsController" ],
@@ -1465,6 +1517,245 @@
                   },
                   "NewsController/getNews_whenGood_YO_HTeacher" : {
                     "value" : "{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parents/addPar" : {
+      "post" : {
+        "tags" : [ "ParentsController" ],
+        "summary" : "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ParentsController/addPar_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ParentsController/addPar_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ParentsController/addPar_whenGood_HTEACHER" : {
+                  "value" : "{\n    \"id\": 20,\n    \"bod\": {\n        name : \"Петров П.А.\",\n        par : {\n            \"id1\": {\n                name : \"Петров А.А.\"\n            },\n            \"id2\": {\n                name : \"Петрова А.Б.\"\n            }\n        }\n    }\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/parents/chPep" : {
+      "patch" : {
+        "tags" : [ "ParentsController" ],
+        "summary" : "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ParentsController/chPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ParentsController/chPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ParentsController/chPep_whenGood_HTEACHER" : {
+                  "value" : "{\n    \"id\": 20,\n    name : \"Петров П.А.\"\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/parents/getInfo" : {
+      "get" : {
+        "tags" : [ "ParentsController" ],
+        "summary" : "[start] запускает клиента в раздел Родители и подтверждает клиенту права",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ParentsController/getInfo_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/parents/getInfoFH" : {
+      "get" : {
+        "tags" : [ "ParentsController" ],
+        "summary" : "[start] отправляет список групп учебного центра и подтверждает клиенту права",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ParentsController/getInfoForHTeacher_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ParentsController/getInfoForHTeacher_whenGood_HTEACHER" : {
+                    "value" : "{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parents/remPep" : {
+      "delete" : {
+        "tags" : [ "ParentsController" ],
+        "summary" : "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ParentsController/remPep_when",
+        "parameters" : [ {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/requests-chTitle486549215"
+              },
+              "examples" : {
+                "ParentsController/remPep_whenEmpty_Anonim" : {
+                  "value" : "{}"
+                },
+                "ParentsController/remPep_whenGood_HTEACHER" : {
+                  "value" : "{\n    \"id\": 20\n}\n"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/parents/getParents/{grId}" : {
+      "get" : {
+        "tags" : [ "ParentsController" ],
+        "summary" : "отправляет список ребёнок-родители группы",
+        "description" : "Также возможны 401, 403 и 500 коды ответов",
+        "operationId" : "ParentsController/getParents_when",
+        "parameters" : [ {
+          "name" : "grId",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "x-access-token",
+          "in" : "header",
+          "description" : "UUID-токен, авторизация, в ней подписка и пользователь",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
+        } ],
+        "responses" : {
+          "401" : {
+            "description" : "401"
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/requests-chTitle486549215"
+                },
+                "examples" : {
+                  "ParentsController/getParents_whenGood_HTEACHER" : {
+                    "value" : "{\"bodyP\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\",\"par\":{}},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"par\":{}},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"par\":{}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"par\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\",\"par\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}},\"bodyC\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}"
                   }
                 }
               }
@@ -1914,8 +2205,8 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404"
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200"
@@ -1957,8 +2248,8 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404"
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200"
@@ -2000,8 +2291,8 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404"
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200"
@@ -2043,8 +2334,8 @@
           }
         },
         "responses" : {
-          "404" : {
-            "description" : "404"
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200"
@@ -2069,20 +2360,8 @@
           "example" : "9693b2a1-77bb-4426-8045-9f9b4395d454"
         } ],
         "responses" : {
-          "404" : {
-            "description" : "404",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/requests-chTitle486549215"
-                },
-                "examples" : {
-                  "RequestController/getRequests_whenEmpty_Anonim" : {
-                    "value" : "{\"error\":true}"
-                  }
-                }
-              }
-            }
+          "401" : {
+            "description" : "401"
           },
           "200" : {
             "description" : "200",
@@ -2570,7 +2849,7 @@
                     "value" : "{\"bodyS\":{\"checkbox_debug\":true,\"checkbox_test\":true},\"bodyT\":{\"admins\":{},\"schools\":{}}}"
                   },
                   "TestController/getInfo_whenGood_TestModeOn_AdminUser" : {
-                    "value" : "{\"bodyS\":{\"checkbox_debug\":true,\"checkbox_test\":true},\"bodyT\":{\"admins\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"schools\":{\"9600\":{\"name\":\"Лицей №3293\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"2616\":{\"name\":\"1A\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4866\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4117\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}},\"1137\":{\"name\":\"Гимназия №2246\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"3146\":{\"name\":\"1A\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4701\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"5506\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}},\"2903\":{\"name\":\"Школа №217\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"1973\":{\"name\":\"1A\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"5375\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"7100\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}}}}}"
+                    "value" : "{\"bodyS\":{\"checkbox_debug\":true,\"checkbox_test\":true},\"bodyT\":{\"admins\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"schools\":{\"9600\":{\"name\":\"Лицей №3293\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"2323\":{\"name\":\"1А\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"3456\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4354\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}},\"1137\":{\"name\":\"Гимназия №2246\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"2323\":{\"name\":\"1А\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"3456\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4354\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}},\"2903\":{\"name\":\"Школа №217\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"groups\":{\"2323\":{\"name\":\"1А\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"3456\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}},\"4354\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"pass\":\"9an3e5ykj8\"},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"pass\":\"zjitnc71x\"},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"pass\":\"hx45205la\"},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"pass\":\"2qiasp5nsk4mq7\"}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"pass\":\"k02o9ezp8tacrfp\"}}}}}}}}"
                   }
                 }
               }

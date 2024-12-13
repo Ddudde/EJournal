@@ -67,8 +67,6 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="ru/controllers/school/PJournalController.html#addHomework(ru.controllers.school.DataPJournal)" class="member-name-link">addHomework(DataPJournal)</a> - Method in class ru.controllers.school.<a href="ru/controllers/school/PJournalController.html" title="class in ru.controllers.school">PJournalController</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/ParentsController.html#addKid(ru.controllers.people.DataParents)" class="member-name-link">addKid(DataParents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/ScheduleController.html#addLesson(ru.controllers.school.analytics.DataSchedule)" class="member-name-link">addLesson(DataSchedule)</a> - Method in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/ScheduleController.html" title="class in ru.controllers.school.analytics">ScheduleController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/PJournalController.html#addMark(ru.controllers.school.DataPJournal)" class="member-name-link">addMark(DataPJournal)</a> - Method in class ru.controllers.school.<a href="ru/controllers/school/PJournalController.html" title="class in ru.controllers.school">PJournalController</a></dt>
@@ -84,6 +82,11 @@ loadScripts(document, 'script');</script>
 <dt><a href="ru/controllers/main/SettingsController.html#addNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">addNotifToken(SettingsController.DataSettings, CustomToken)</a> - Method in class ru.controllers.main.<a href="ru/controllers/main/SettingsController.html" title="class in ru.controllers.main">SettingsController</a></dt>
 <dd>
 <div class="block">RU: установка токена уведомлений</div>
+</dd>
+<dt><a href="ru/controllers/people/ParentsController.html#addPar(ru.controllers.people.ParentsController.DataParents,ru.security.user.CustomToken)" class="member-name-link">addPar(ParentsController.DataParents, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
+<dd>
+<div class="block">RU: создаёт пользователя(лей)-родителя(лей)
+ и сразу прикрепляет к существующему ребёнку без родителей + Server Sent Events</div>
 </dd>
 <dt><a href="ru/controllers/people/AdminsController.html#addPep(ru.controllers.people.AdminsController.DataAdmins,ru.security.user.CustomToken)" class="member-name-link">addPep(AdminsController.DataAdmins, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/AdminsController.html" title="class in ru.controllers.people">AdminsController</a></dt>
 <dd>
@@ -162,15 +165,11 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:B">B</h2>
 <dl class="index">
-<dt><a href="ru/controllers/people/DataParents.html#bod" class="member-name-link">bod</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html#bol" class="member-name-link">bol</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
+<dt><a href="ru/controllers/people/ParentsController.DataParents.html#bod" class="member-name-link">bod</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.DataParents.html" title="class in ru.controllers.people">ParentsController.DataParents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataStudents.html#bol" class="member-name-link">bol</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataStudents.html" title="class in ru.controllers.people">DataStudents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataTeachers.html#bol" class="member-name-link">bol</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="ru/controllers/school/analytics/DataJournal.html#bol" class="member-name-link">bol</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataJournal.html" title="class in ru.controllers.school.analytics">DataJournal</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/DataPeriods.html#bol" class="member-name-link">bol</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a></dt>
 <dd>&nbsp;</dd>
@@ -239,8 +238,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">RU: изменяет фамилию пользователя + Server Sent Events</div>
 </dd>
-<dt><a href="ru/controllers/people/ParentsController.html#chPep(ru.controllers.people.DataParents)" class="member-name-link">chPep(DataParents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/StudentsController.html#chPep(ru.controllers.people.DataStudents)" class="member-name-link">chPep(DataStudents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/StudentsController.html" title="class in ru.controllers.people">StudentsController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/TeachersController.html#chPep(ru.controllers.people.DataTeachers)" class="member-name-link">chPep(DataTeachers)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/TeachersController.html" title="class in ru.controllers.people">TeachersController</a></dt>
@@ -248,6 +245,11 @@ loadScripts(document, 'script');</script>
 <dt><a href="ru/controllers/people/HTeachersController.html#chPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">chPep(HTeachersController.DataHTeachers, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/HTeachersController.html" title="class in ru.controllers.people">HTeachersController</a></dt>
 <dd>
 <div class="block">RU: изменяет фамилию пользователя + Server Sent Events</div>
+</dd>
+<dt><a href="ru/controllers/people/ParentsController.html#chPep(ru.controllers.people.ParentsController.DataParents,ru.security.user.CustomToken)" class="member-name-link">chPep(ParentsController.DataParents, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
+<dd>
+<div class="block">RU: изменяет ФИО родителю + Server Sent Events
+ Не реализовано в клиенте</div>
 </dd>
 <dt><a href="ru/controllers/main/ProfileController.html#chRole(ru.security.user.CustomToken)" class="member-name-link">chRole(CustomToken)</a> - Method in class ru.controllers.main.<a href="ru/controllers/main/ProfileController.html" title="class in ru.controllers.main">ProfileController</a></dt>
 <dd>
@@ -342,15 +344,9 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/HTeachersController.DataHTeachers.html#%3Cinit%3E()" class="member-name-link">DataHTeachers()</a> - Constructor for class ru.controllers.people.<a href="ru/controllers/people/HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/school/analytics/DataJournal.html" class="type-name-link" title="class in ru.controllers.school.analytics">DataJournal</a> - Class in <a href="ru/controllers/school/analytics/package-summary.html">ru.controllers.school.analytics</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="ru/controllers/school/analytics/DataJournal.html#%3Cinit%3E()" class="member-name-link">DataJournal()</a> - Constructor for class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataJournal.html" title="class in ru.controllers.school.analytics">DataJournal</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/NewsController.DataNews.html#%3Cinit%3E()" class="member-name-link">DataNews()</a> - Constructor for class ru.controllers.<a href="ru/controllers/NewsController.DataNews.html" title="class in ru.controllers">NewsController.DataNews</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html" class="type-name-link" title="class in ru.controllers.people">DataParents</a> - Class in <a href="ru/controllers/people/package-summary.html">ru.controllers.people</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html#%3Cinit%3E()" class="member-name-link">DataParents()</a> - Constructor for class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
+<dt><a href="ru/controllers/people/ParentsController.DataParents.html#%3Cinit%3E()" class="member-name-link">DataParents()</a> - Constructor for class ru.controllers.people.<a href="ru/controllers/people/ParentsController.DataParents.html" title="class in ru.controllers.people">ParentsController.DataParents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/DataPeriods.html" class="type-name-link" title="class in ru.controllers.school.analytics">DataPeriods</a> - Class in <a href="ru/controllers/school/analytics/package-summary.html">ru.controllers.school.analytics</a></dt>
 <dd>&nbsp;</dd>
@@ -530,11 +526,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="ru/data/models/school/School.html#getHteachers()" class="member-name-link">getHteachers()</a> - Method in class ru.data.models.school.<a href="ru/data/models/school/School.html" title="class in ru.data.models.school">School</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/ParentsController.html#getInfo(ru.controllers.people.DataParents)" class="member-name-link">getInfo(DataParents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/StudentsController.html#getInfo(ru.controllers.people.DataStudents)" class="member-name-link">getInfo(DataStudents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/StudentsController.html" title="class in ru.controllers.people">StudentsController</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="ru/controllers/school/analytics/JournalController.html#getInfo(ru.controllers.school.analytics.DataJournal)" class="member-name-link">getInfo(DataJournal)</a> - Method in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/JournalController.html" title="class in ru.controllers.school.analytics">JournalController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/PeriodsController.html#getInfo(ru.controllers.school.analytics.DataPeriods)" class="member-name-link">getInfo(DataPeriods)</a> - Method in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/PeriodsController.html" title="class in ru.controllers.school.analytics">PeriodsController</a></dt>
 <dd>&nbsp;</dd>
@@ -544,9 +536,17 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">RU: отправка списка завучей учебного центра</div>
 </dd>
+<dt><a href="ru/controllers/people/ParentsController.html#getInfo(ru.security.user.CustomToken)" class="member-name-link">getInfo(CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
+<dd>
+<div class="block">RU: [start] запускает клиента в раздел Родители и подтверждает клиенту права</div>
+</dd>
+<dt><a href="ru/controllers/school/analytics/JournalController.html#getInfo(ru.security.user.CustomToken)" class="member-name-link">getInfo(CustomToken)</a> - Method in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/JournalController.html" title="class in ru.controllers.school.analytics">JournalController</a></dt>
+<dd>
+<div class="block">RU: [start] отправляет данные о оценках</div>
+</dd>
 <dt><a href="ru/controllers/school/DnevnikController.html#getInfo(ru.security.user.CustomToken)" class="member-name-link">getInfo(CustomToken)</a> - Method in class ru.controllers.school.<a href="ru/controllers/school/DnevnikController.html" title="class in ru.controllers.school">DnevnikController</a></dt>
 <dd>
-<div class="block">RU: [start] запускает клиента в раздел дневника и подтверждает клиенту права</div>
+<div class="block">RU: [start] запускает клиента в раздел Дневник и подтверждает клиенту права</div>
 </dd>
 <dt><a href="ru/controllers/TestController.html#getInfo(ru.security.user.CustomToken)" class="member-name-link">getInfo(CustomToken)</a> - Method in class ru.controllers.<a href="ru/controllers/TestController.html" title="class in ru.controllers">TestController</a></dt>
 <dd>
@@ -556,14 +556,20 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">RU: [start] отправка списка завучей учебного центра для администраторов</div>
 </dd>
+<dt><a href="ru/controllers/people/ParentsController.html#getInfoForHTeacher(ru.security.user.CustomToken)" class="member-name-link">getInfoForHTeacher(CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
+<dd>
+<div class="block">RU: [start] отправляет список групп учебного центра и подтверждает клиенту права</div>
+</dd>
 <dt><a href="ru/controllers/school/PJournalController.html#getInfoP1(ru.controllers.school.DataPJournal)" class="member-name-link">getInfoP1(DataPJournal)</a> - Method in class ru.controllers.school.<a href="ru/controllers/school/PJournalController.html" title="class in ru.controllers.school">PJournalController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/PJournalController.html#getInfoP2(ru.controllers.school.DataPJournal)" class="member-name-link">getInfoP2(DataPJournal)</a> - Method in class ru.controllers.school.<a href="ru/controllers/school/PJournalController.html" title="class in ru.controllers.school">PJournalController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/PJournalController.html#getInfoP3(ru.controllers.school.DataPJournal)" class="member-name-link">getInfoP3(DataPJournal)</a> - Method in class ru.controllers.school.<a href="ru/controllers/school/PJournalController.html" title="class in ru.controllers.school">PJournalController</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/school/analytics/JournalController.html#getInfoPers(ru.controllers.school.analytics.DataJournal)" class="member-name-link">getInfoPers(DataJournal)</a> - Method in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/JournalController.html" title="class in ru.controllers.school.analytics">JournalController</a></dt>
-<dd>&nbsp;</dd>
+<dt><a href="ru/controllers/school/analytics/JournalController.html#getInfoPers(ru.security.user.CustomToken)" class="member-name-link">getInfoPers(CustomToken)</a> - Method in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/JournalController.html" title="class in ru.controllers.school.analytics">JournalController</a></dt>
+<dd>
+<div class="block">RU: отправляет данные о итоговых оценках</div>
+</dd>
 <dt><a href="ru/data/models/auth/Role.html#getKids()" class="member-name-link">getKids()</a> - Method in class ru.data.models.auth.<a href="ru/data/models/auth/Role.html" title="class in ru.data.models.auth">Role</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/data/models/school/Group.html#getKids()" class="member-name-link">getKids()</a> - Method in class ru.data.models.school.<a href="ru/data/models/school/Group.html" title="class in ru.data.models.school">Group</a></dt>
@@ -595,14 +601,18 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="ru/data/models/auth/Role.html#getParents()" class="member-name-link">getParents()</a> - Method in class ru.data.models.auth.<a href="ru/data/models/auth/Role.html" title="class in ru.data.models.auth">Role</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/ParentsController.html#getParents(ru.controllers.people.DataParents)" class="member-name-link">getParents(DataParents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
-<dd>&nbsp;</dd>
+<dt><a href="ru/controllers/people/ParentsController.html#getParents(java.lang.Long,ru.security.user.CustomToken)" class="member-name-link">getParents(Long, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
+<dd>
+<div class="block">RU: отправляет список ребёнок-родители группы</div>
+</dd>
 <dt><a href="ru/data/models/school/School.html#getPeriods()" class="member-name-link">getPeriods()</a> - Method in class ru.data.models.school.<a href="ru/data/models/school/School.html" title="class in ru.data.models.school">School</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/main/ProfileController.html#getProfile(java.lang.String,ru.security.user.CustomToken)" class="member-name-link">getProfile(String, CustomToken)</a> - Method in class ru.controllers.main.<a href="ru/controllers/main/ProfileController.html" title="class in ru.controllers.main">ProfileController</a></dt>
 <dd>
 <div class="block">RU: [start] отправляет инфу профиля либо другого пользователя либо личную</div>
 </dd>
+<dt><a href="ru/services/MainService.html#getRandomUsername(com.github.javafaker.Faker)" class="member-name-link">getRandomUsername(Faker)</a> - Static method in class ru.services.<a href="ru/services/MainService.html" title="class in ru.services">MainService</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="ru/services/db/DBService.html#getRequests()" class="member-name-link">getRequests()</a> - Method in class ru.services.db.<a href="ru/services/db/DBService.html" title="class in ru.services.db">DBService</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/RequestController.html#getRequests(ru.security.user.CustomToken)" class="member-name-link">getRequests(CustomToken)</a> - Method in class ru.controllers.school.<a href="ru/controllers/school/RequestController.html" title="class in ru.controllers.school">RequestController</a></dt>
@@ -657,9 +667,9 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/HTeachersController.DataHTeachers.html#grId" class="member-name-link">grId</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html#group" class="member-name-link">group</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataStudents.html#group" class="member-name-link">group</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataStudents.html" title="class in ru.controllers.people">DataStudents</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="ru/controllers/people/ParentsController.DataParents.html#group" class="member-name-link">group</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.DataParents.html" title="class in ru.controllers.people">ParentsController.DataParents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/DataSchedule.html#group" class="member-name-link">group</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataSchedule.html" title="class in ru.controllers.school.analytics">DataSchedule</a></dt>
 <dd>&nbsp;</dd>
@@ -711,13 +721,13 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/AdminsController.DataAdmins.html#id" class="member-name-link">id</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/AdminsController.DataAdmins.html" title="class in ru.controllers.people">AdminsController.DataAdmins</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html#id" class="member-name-link">id</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataStudents.html#id" class="member-name-link">id</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataStudents.html" title="class in ru.controllers.people">DataStudents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataTeachers.html#id" class="member-name-link">id</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/HTeachersController.DataHTeachers.html#id" class="member-name-link">id</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="ru/controllers/people/ParentsController.DataParents.html#id" class="member-name-link">id</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.DataParents.html" title="class in ru.controllers.people">ParentsController.DataParents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/RequestController.DataRequest.html#id" class="member-name-link">id</a> - Variable in class ru.controllers.school.<a href="ru/controllers/school/RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a></dt>
 <dd>&nbsp;</dd>
@@ -772,7 +782,9 @@ loadScripts(document, 'script');</script>
 <dt><a href="ru/data/SSE/TypesConnect.html#JOURNAL" class="member-name-link">JOURNAL</a> - Enum constant in enum class ru.data.SSE.<a href="ru/data/SSE/TypesConnect.html" title="enum class in ru.data.SSE">TypesConnect</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/JournalController.html" class="type-name-link" title="class in ru.controllers.school.analytics">JournalController</a> - Class in <a href="ru/controllers/school/analytics/package-summary.html">ru.controllers.school.analytics</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">RU: Контроллер для раздела просмотра оценок + Server Sent Events</div>
+</dd>
 <dt><a href="ru/controllers/school/analytics/JournalController.html#%3Cinit%3E()" class="member-name-link">JournalController()</a> - Constructor for class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/JournalController.html" title="class in ru.controllers.school.analytics">JournalController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/security/JWT/JwtAuthenticationFilter.html" class="type-name-link" title="class in ru.security.JWT">JwtAuthenticationFilter</a> - Class in <a href="ru/security/JWT/package-summary.html">ru.security.JWT</a></dt>
@@ -843,13 +855,13 @@ loadScripts(document, 'script');</script>
 <dl class="index">
 <dt><a href="ru/controllers/people/AdminsController.DataAdmins.html#name" class="member-name-link">name</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/AdminsController.DataAdmins.html" title="class in ru.controllers.people">AdminsController.DataAdmins</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html#name" class="member-name-link">name</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataStudents.html#name" class="member-name-link">name</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataStudents.html" title="class in ru.controllers.people">DataStudents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataTeachers.html#name" class="member-name-link">name</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/HTeachersController.DataHTeachers.html#name" class="member-name-link">name</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="ru/controllers/people/ParentsController.DataParents.html#name" class="member-name-link">name</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.DataParents.html" title="class in ru.controllers.people">ParentsController.DataParents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/DataPeriods.html#name" class="member-name-link">name</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a></dt>
 <dd>&nbsp;</dd>
@@ -904,9 +916,15 @@ loadScripts(document, 'script');</script>
 <dt><a href="ru/data/SSE/TypesConnect.html#PARENTS" class="member-name-link">PARENTS</a> - Enum constant in enum class ru.data.SSE.<a href="ru/data/SSE/TypesConnect.html" title="enum class in ru.data.SSE">TypesConnect</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/ParentsController.html" class="type-name-link" title="class in ru.controllers.people">ParentsController</a> - Class in <a href="ru/controllers/people/package-summary.html">ru.controllers.people</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">RU: Контроллер для раздела управления/просмотра родителей группы учебного центра + Server Sent Events</div>
+</dd>
 <dt><a href="ru/controllers/people/ParentsController.html#%3Cinit%3E()" class="member-name-link">ParentsController()</a> - Constructor for class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="ru/controllers/people/ParentsController.DataParents.html" class="type-name-link" title="class in ru.controllers.people">ParentsController.DataParents</a> - Class in <a href="ru/controllers/people/package-summary.html">ru.controllers.people</a></dt>
+<dd>
+<div class="block">RU: Данные клиента используемые ParentsController в методах</div>
+</dd>
 <dt><a href="ru/controllers/AuthController.DataAuth.html#password" class="member-name-link">password</a> - Variable in class ru.controllers.<a href="ru/controllers/AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/configs/SecurityConfig.html#passwordEncoder()" class="member-name-link">passwordEncoder()</a> - Method in class ru.configs.<a href="ru/configs/SecurityConfig.html" title="class in ru.configs">SecurityConfig</a></dt>
@@ -992,8 +1010,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">RU: удаляет у пользователя роль администратора + Server Sent Events</div>
 </dd>
-<dt><a href="ru/controllers/people/ParentsController.html#remPep(ru.controllers.people.DataParents)" class="member-name-link">remPep(DataParents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/StudentsController.html#remPep(ru.controllers.people.DataStudents)" class="member-name-link">remPep(DataStudents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/StudentsController.html" title="class in ru.controllers.people">StudentsController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/TeachersController.html#remPep(ru.controllers.people.DataTeachers)" class="member-name-link">remPep(DataTeachers)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/TeachersController.html" title="class in ru.controllers.people">TeachersController</a></dt>
@@ -1001,6 +1017,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="ru/controllers/people/HTeachersController.html#remPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">remPep(HTeachersController.DataHTeachers, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/HTeachersController.html" title="class in ru.controllers.people">HTeachersController</a></dt>
 <dd>
 <div class="block">RU: удаляет у пользователя роль завуча + Server Sent Events</div>
+</dd>
+<dt><a href="ru/controllers/people/ParentsController.html#remPep(ru.controllers.people.ParentsController.DataParents,ru.security.user.CustomToken)" class="member-name-link">remPep(ParentsController.DataParents, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
+<dd>
+<div class="block">RU: удаляет роль родителя + Server Sent Events</div>
 </dd>
 <dt><a href="ru/controllers/people/HTeachersController.html#remSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">remSch(HTeachersController.DataHTeachers, CustomToken)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/HTeachersController.html" title="class in ru.controllers.people">HTeachersController</a></dt>
 <dd>
@@ -1149,8 +1169,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">RU: установка/обновление инвайта для регистрации + Server Sent Events</div>
 </dd>
-<dt><a href="ru/controllers/people/ParentsController.html#setCodePep(ru.controllers.people.DataParents)" class="member-name-link">setCodePep(DataParents)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/TeachersController.html#setCodePep(ru.controllers.people.DataTeachers)" class="member-name-link">setCodePep(DataTeachers)</a> - Method in class ru.controllers.people.<a href="ru/controllers/people/TeachersController.html" title="class in ru.controllers.people">TeachersController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/data/models/auth/SettingUser.html#setNNewNewsPor(java.lang.Boolean)" class="member-name-link">setNNewNewsPor(Boolean)</a> - Method in class ru.data.models.auth.<a href="ru/data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a></dt>
@@ -1351,13 +1369,9 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="ru/security/user/UserService.html#%3Cinit%3E()" class="member-name-link">UserService()</a> - Constructor for class ru.security.user.<a href="ru/security/user/UserService.html" title="class in ru.security.user">UserService</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html#uuid" class="member-name-link">uuid</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataStudents.html#uuid" class="member-name-link">uuid</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataStudents.html" title="class in ru.controllers.people">DataStudents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataTeachers.html#uuid" class="member-name-link">uuid</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="ru/controllers/school/analytics/DataJournal.html#uuid" class="member-name-link">uuid</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataJournal.html" title="class in ru.controllers.school.analytics">DataJournal</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/DataPeriods.html#uuid" class="member-name-link">uuid</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a></dt>
 <dd>&nbsp;</dd>
@@ -1411,13 +1425,9 @@ the order they are declared.</div>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/DataPJournal.html#weight" class="member-name-link">weight</a> - Variable in class ru.controllers.school.<a href="ru/controllers/school/DataPJournal.html" title="class in ru.controllers.school">DataPJournal</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="ru/controllers/people/DataParents.html#wrtr" class="member-name-link">wrtr</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataParents.html" title="class in ru.controllers.people">DataParents</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataStudents.html#wrtr" class="member-name-link">wrtr</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataStudents.html" title="class in ru.controllers.people">DataStudents</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/people/DataTeachers.html#wrtr" class="member-name-link">wrtr</a> - Variable in class ru.controllers.people.<a href="ru/controllers/people/DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="ru/controllers/school/analytics/DataJournal.html#wrtr" class="member-name-link">wrtr</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataJournal.html" title="class in ru.controllers.school.analytics">DataJournal</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="ru/controllers/school/analytics/DataPeriods.html#wrtr" class="member-name-link">wrtr</a> - Variable in class ru.controllers.school.analytics.<a href="ru/controllers/school/analytics/DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a></dt>
 <dd>&nbsp;</dd>

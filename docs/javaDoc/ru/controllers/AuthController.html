@@ -95,7 +95,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">RU: Контроллер для раздела авторизации и управлением Server Sent Events
  <pre>
- Swagger: <a href="http://localhost:9001/swagger/htmlSwag/#/AuthController">http://localhost:9001/swagger/htmlSwag/#/AuthController</a>
+ Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AuthController">http://localhost:9001/swagger/htmlSwag/#/AuthController</a>
  beenDo: Сделано
   + Javadoc
   + Security
@@ -124,7 +124,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>(package private) static class&nbsp;</code></div>
+<div class="col-first even-row-color"><code>(package private) static final class&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="AuthController.DataAuth.html" class="type-name-link" title="class in ru.controllers">AuthController.DataAuth</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">RU: Данные клиента используемые AuthController в методах</div>
@@ -319,20 +319,22 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="infCon(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)">
 <h3>infCon</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/infCon")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+@PatchMapping("/infCon")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">infCon</span><wbr><span class="parameters">(@RequestBody
  <a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
  <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                                            throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: [start#2] изменение подписки</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: type, notifToken, permis, login</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
@@ -343,10 +345,12 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remCon</span><wbr><span class="parameters">(<a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span></div>
 <div class="block">RU: завершение сеанса</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
@@ -360,13 +364,14 @@ loadScripts(document, 'script');</script>
                                                                          throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: авторизация пользователя</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: notifToken, permis, login, password</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
@@ -379,12 +384,14 @@ loadScripts(document, 'script');</script>
                                                                         throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: регистрация пользователя</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: secFr, ico, par, mod, login, code</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
@@ -396,30 +403,34 @@ loadScripts(document, 'script');</script>
  <a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body)</span></div>
 <div class="block">RU: проверка инвайта для регистрации/регистрации новой роли</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: code</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
 <section class="detail" id="setCodePep(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)">
 <h3>setCodePep</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/setCodePep")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
+@PatchMapping("/setCodePep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">setCodePep</span><wbr><span class="parameters">(@RequestBody
  <a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
  <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                                                throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: установка/обновление инвайта для регистрации + Server Sent Events</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: id</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
