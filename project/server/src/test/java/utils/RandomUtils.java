@@ -75,6 +75,18 @@ public class RandomUtils {
         getGroup(4354L, namesGroup[2])
     ));
 
+    public final List<Lesson> lessons = new ArrayList<>(asList(
+        new Lesson(null, null, 1, 0, "1283", "Русский Яз.", usersTest.get(0)),
+        new Lesson(null, null, 1, 3, "1977", "Англ. Яз.", usersTest.get(1)),
+        new Lesson(null, null, 1, 4, "1870", "Математика", usersTest.get(2)),
+        new Lesson(null, null, 1, 5, "640", "Англ. Яз.", usersTest.get(3)),
+        new Lesson(null, null, 3, 0, "1098", "Англ. Яз.", usersTest.get(4)),
+        new Lesson(null, null, 3, 2, "1660", "Русский Яз.", usersTest.get(0)),
+        new Lesson(null, null, 3, 4, "1837", "Физика", usersTest.get(1)),
+        new Lesson(null, null, 4, 3, "482", "Русский Яз.", usersTest.get(2)),
+        new Lesson(null, null, 4, 4, "394", "Физика", usersTest.get(3))
+    ));
+
     private Request getRequest(long id, String email, String date, String fio) {
         final Request request = new Request(email, date, fio);
         request.setId(id);

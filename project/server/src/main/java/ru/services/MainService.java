@@ -186,9 +186,7 @@ import static ru.Main.datas;
                 wrtr.name(i + "").beginObject()
                     .name("name").value(subName)
                     .name("tea").beginObject();
-                if (mapU.containsKey(subName)) {
-                    usersByList(mapU.get(subName), wrtr, true);
-                }
+                usersByList(mapU.get(subName), wrtr, true);
                 wrtr.endObject().endObject();
                 i++;
             }

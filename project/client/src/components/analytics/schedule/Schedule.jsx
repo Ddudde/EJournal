@@ -54,8 +54,7 @@ function onFin(e, type, info) {
     if(par.classList.contains(analyticsCSS.edbl)){
         if(type == CHANGE_SCHEDULE){
             let inpm = ["sinpnpt_", "sinpnkt_"];
-            if(inps.sinpnpt_ && inps.sinpnkt_ && inps.nyid)
-            {
+            if(inps.sinpnpt_ && inps.sinpnkt_ && inps.nyid) {
                 addLesson(info.id, {
                     name: inps.sinpnpt_,
                     cabinet: inps.sinpnkt_,
@@ -339,7 +338,6 @@ function addLessonC(e) {
 
 function addLesson(day, obj) {
     sendToServer({
-        uuid: cState.uuid,
         group: groupsInfo.els.group,
         day: day,
         obj: obj
@@ -347,20 +345,20 @@ function addLesson(day, obj) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cSchedule+"getInfo")
+    var url = "getInfo";
+    if(cState.role == 3 || cState.role == 2) url = "getInfoToHT";
+    sendToServer(0, 'GET', cSchedule + url)
         .then(data => {
             console.log(data);
-            if(data.error == false){
-                if(!data.yes) {
+            if(data.status == 200){
+                if(cState.role == 3 || cState.role == 2) {
                     setEvGr(cState, dispatch);
-                    dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
-                    if (!data.bodyG[groupsInfo.els.group]) {
-                        selGr = data.firstG;
-                        dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
+                    dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.body.bodyG));
+                    if (!data.body.bodyG[groupsInfo.els.group]) {
+                        selGr = data.body.firstG;
+                        dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.body.firstG)));
                     }
-                    dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.bodyT));
+                    dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.body.bodyT));
                 }
                 setSchedule();
             }
@@ -368,15 +366,14 @@ function setInfo() {
 }
 
 function setSchedule() {
-    sendToServer({
-        uuid: cState.uuid,
-        group: groupsInfo.els.group
-    }, 'POST', cSchedule+"getSchedule")
+    sendToServer(0, 'GET', cSchedule+"getSchedule/"+groupsInfo.els.group)
         .then(data => {
             console.log(data);
-            selGr = groupsInfo.els.group;
-            if(cState.role == 1 && cState.kid) selKid = cState.kid;
-            dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body));
+            if(data.status == 200) {
+                selGr = groupsInfo.els.group;
+                if(cState.role == 1 && cState.kid) selKid = cState.kid;
+                dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body.body));
+            }
         });
 }
 

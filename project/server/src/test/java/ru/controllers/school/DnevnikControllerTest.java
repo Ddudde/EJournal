@@ -34,7 +34,6 @@ import ru.controllers.AuthController;
 import ru.data.SSE.Subscriber;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
-import ru.data.models.school.Lesson;
 import ru.data.models.school.Mark;
 import ru.data.models.school.School;
 import ru.security.ControllerExceptionHandler;
@@ -46,12 +45,10 @@ import ru.services.db.DBService;
 import utils.RandomUtils;
 
 import javax.servlet.ServletException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -235,18 +232,8 @@ public class DnevnikControllerTest {
 
     /** RU: создаём уроки для учеников */
     private void prepareLessons() {
-        final List<Lesson> lessons = new ArrayList<>(asList(
-            new Lesson(null, null, 1, 0, "1283", "Русский Яз.", usersTest.get(0)),
-            new Lesson(null, null, 1, 3, "1977", "Англ. Яз.", usersTest.get(1)),
-            new Lesson(null, null, 1, 4, "1870", "Математика", usersTest.get(2)),
-            new Lesson(null, null, 1, 5, "640", "Англ. Яз.", usersTest.get(3)),
-            new Lesson(null, null, 3, 0, "1098", "Англ. Яз.", usersTest.get(4)),
-            new Lesson(null, null, 3, 2, "1660", "Русский Яз.", usersTest.get(0)),
-            new Lesson(null, null, 3, 4, "1837", "Физика", usersTest.get(1)),
-            new Lesson(null, null, 4, 3, "482", "Русский Яз.", usersTest.get(2)),
-            new Lesson(null, null, 4, 4, "394", "Физика", usersTest.get(3))
-        ));
-        when(dbService.getLessonRepository().findBySchoolIdAndGrpId(20L, 20L)).thenReturn(lessons);
+        when(dbService.getLessonRepository()
+            .findBySchoolIdAndGrpId(20L, 20L)).thenReturn(randomUtils.lessons);
     }
 
     private final String getInfo_Summary = "[start] запускает клиента в раздел дневника и подтверждает клиенту права";

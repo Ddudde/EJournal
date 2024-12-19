@@ -169,21 +169,19 @@ function addPepC(e) {
 function remInv (type, id) {
     console.log("remInv");
     sendToServer({
-        uuid: cState.uuid,
         id: id
-    }, 'POST', cStudents+"remPep")
+    }, 'DELETE', cStudents+"remPep")
 }
 
 function changeInv (type, id, inp, par) {
     console.log("changeInv");
     sendToServer({
-        uuid: cState.uuid,
         id: id,
         name: inp
-    }, 'POST', cStudents+"chPep")
+    }, 'PATCH', cStudents+"chPep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -192,12 +190,11 @@ function changeInv (type, id, inp, par) {
 function addInv (type, inp, par) {
     console.log("addInv");
     sendToServer({
-        uuid: cState.uuid,
         name: inp
     }, 'POST', cStudents+"addPep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 201){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -209,10 +206,7 @@ function onCon(e) {
 
 function setStud(firstG, bodyG) {
     selGr = firstG != undefined ? firstG : groupsInfo.els.group;
-    sendToServer({
-        uuid: cState.uuid,
-        group: selGr
-    }, 'POST', cStudents+"getStud")
+    sendToServer(0, 'GET', cStudents+"getStud/"+selGr)
         .then(data => {
             console.log(data);
             dispatch(changePeople(tps.gl, undefined, undefined, undefined, data.body));
@@ -220,22 +214,24 @@ function setStud(firstG, bodyG) {
                 dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, bodyG));
                 dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, firstG));
             }
-            for(let el of document.querySelectorAll("." + peopleCSS.ed + " > *[id^='inpn']")){
-                chStatB({target: el});
+            if(data.status == 200){
+                for(let el of document.querySelectorAll("." + peopleCSS.ed + " > *[id^='inpn']")){
+                    chStatB({target: el});
+                }
             }
         });
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cStudents+"getInfo")
+    var url = "getInfo";
+    if(cState.role == 3) url = "getInfoFH";
+    sendToServer(0, 'GET', cStudents + url)
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 if(cState.role == 3) {
                     setEvGr(cState, dispatch);
-                    setStud(parseInt(data.firstG), data.bodyG);
+                    setStud(parseInt(data.body.firstG), data.body.bodyG);
                 } else {
                     setStud();
                 }

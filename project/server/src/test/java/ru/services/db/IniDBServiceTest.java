@@ -136,7 +136,8 @@ public class IniDBServiceTest {
         getTestInfo_run("{\"bodyT\":{\"admins\":{},\"schools\":{}}}");
     }
 
-    /** RU: подаёт список из случайных школ и должен вернуть заполненный JSON */
+    /** RU: подаёт список из случайных школ и должен вернуть заполненный JSON
+     * toDo: исправить тест, после всеобщего теста руинится */
     @Test @Tag("getTestInfo")
     void getTestInfo_whenGood() throws Exception {
         List<School> schools = new ArrayList<>(asList(

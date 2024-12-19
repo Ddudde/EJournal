@@ -283,17 +283,17 @@ function setParents(firstG, bodyG) {
                 dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, firstG));
             }
             if(data.status == 200){
-                dispatch(changePeople(CHANGE_CLASSMATES_GL, undefined, undefined, undefined, data.bodyC));
-                inps.lpI = Object.getOwnPropertyNames(data.bodyC);
+                dispatch(changePeople(CHANGE_CLASSMATES_GL, undefined, undefined, undefined, data.body.bodyC));
+                inps.lpI = Object.getOwnPropertyNames(data.body.bodyC);
                 for(let i = 0; i < inps.lpI.length; i++){
-                    if(data.bodyP[inps.lpI[i]]) {
+                    if(data.body.bodyP[inps.lpI[i]]) {
                         inps.lpI.splice(i, 1);
                         i--;
                     }
                 }
-                if(inps.lpI.length > 0 && !data.bodyC[inps.nyid]) {
+                if(inps.lpI.length > 0 && !data.body.bodyC[inps.nyid]) {
                     inps.nyid = inps.lpI[0];
-                    dispatch(changePeople(CHANGE_PARENTS_L1_PARAM, undefined, "nw", undefined, data.bodyC[inps.nyid].name));
+                    dispatch(changePeople(CHANGE_PARENTS_L1_PARAM, undefined, "nw", undefined, data.body.bodyC[inps.nyid].name));
                 }
             }
         });
