@@ -21,7 +21,6 @@ import java.util.UUID;
 import static ru.Main.datas;
 
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-
     private final UUID rU = UUID.randomUUID();
 
     public AuthenticationFilter(RequestMatcher req, AuthenticationManager authenticationManager) {
@@ -42,7 +41,7 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
             if(sub.getUser() == null) {
                 requestAuthentication = new CustomToken(sub, tok);
             } else {
-                requestAuthentication = new CustomToken(sub.getUser().getUsername(), sub.getUser().getPassword(), sub.getUser().getAuthorities(), sub, tok);
+                requestAuthentication = new CustomToken(sub.getUser().getPassword(), sub.getUser().getAuthorities(), sub, tok);
             }
         } else {
             requestAuthentication = new CustomToken();

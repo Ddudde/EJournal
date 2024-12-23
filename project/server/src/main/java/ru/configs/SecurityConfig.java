@@ -27,22 +27,24 @@ import ru.security.AuthenticationFilter;
 import ru.security.CustomProvider;
 import ru.security.user.Roles;
 
+/** RU: Начало описания security.
+ * Без шифрования в БД(NoOpPasswordEncoder).
+ * Авторизация Token(UUID) в header "x-access-token".
+ * Анонимные пользователи тоже наделяются токеном.
+ * При авторизации в системе используются логин/пароль.
+ * Они передаются без шифрования в POST auth/auth
+ * И хранится токен в клиенте LocalStorage */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 @EnableWebSecurity public class SecurityConfig {
-
     private final CustomProvider provider;
-
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
         new AntPathRequestMatcher("/console_db"),
         new AntPathRequestMatcher("/console_db/*")
     );
-
     private static final RequestMatcher PROTECTED_URLS = new NegatedRequestMatcher(PUBLIC_URLS);
-
     public static final String authHeader = "x-access-token";
-
     private final AuthenticationConfiguration authConfig;
 
     private AuthenticationEntryPoint forbiddenEntryPoint() {
@@ -53,19 +55,27 @@ import ru.security.user.Roles;
         return new AuthenticationFilter(PROTECTED_URLS, authConfig.getAuthenticationManager());
     }
 
+//    private DigestAuthenticationFilter getDigestAuthFilter() throws Exception {
+//        DigestAuthenticationFilter digestFilter = new DigestAuthenticationFilter();
+//        digestFilter.setUserDetailsService(userDetailsServiceBean());
+//        digestFilter.setAuthenticationEntryPoint(getDigestEntryPoint());
+//        return digestFilter;
+//    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(provider);
-        http.cors().and().sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        http.cors().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().exceptionHandling()
-            .defaultAuthenticationEntryPointFor(forbiddenEntryPoint(), PROTECTED_URLS)
-            .and().headers().frameOptions().disable()
-            .and().csrf().disable()
-            .formLogin().disable()
-            .httpBasic().disable()
-            .logout().disable()
-            .rememberMe().disable()
+                .defaultAuthenticationEntryPointFor(forbiddenEntryPoint(), PROTECTED_URLS)
+            .and().headers()
+                .frameOptions().disable()
+            .and()
+                .csrf().disable()
+                .formLogin().disable()
+                .httpBasic().disable()
+                .logout().disable()
+                .rememberMe().disable()
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             .requestMatchers(PUBLIC_URLS).permitAll()
@@ -86,10 +96,10 @@ import ru.security.user.Roles;
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         UserDetails user = User.withDefaultPasswordEncoder()
-                .username("anonymousUser")
-                .password("")
-                .roles(Roles.ANONYMOUS.toString())
-                .build();
+            .username("anonymousUser")
+            .password("")
+            .roles(Roles.ANONYMOUS.toString())
+            .build();
         return new InMemoryUserDetailsManager(user);
     }
 }

@@ -7,7 +7,7 @@ import ru.security.user.Roles;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-/** RU: по умолчанию админ */
+/** RU: замена @WithMockUser, по умолчанию админ */
 @Retention(RetentionPolicy.RUNTIME)
 @WithSecurityContext(factory = UserSecurityContext.class, setupBefore = TestExecutionEvent.TEST_EXECUTION)
 public @interface CustomUser {

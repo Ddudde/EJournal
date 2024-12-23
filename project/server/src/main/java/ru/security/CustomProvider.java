@@ -44,15 +44,13 @@ public class CustomProvider implements AuthenticationProvider {
     }
 
     @Override
-    public Authentication authenticate(final Authentication authentication)
-            throws AuthenticationException {
+    public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         System.out.println("authenticate! " + authentication);
         return authentication;
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(Set<String> roles) {
         return roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+            .map(SimpleGrantedAuthority::new).toList();
     }
 }

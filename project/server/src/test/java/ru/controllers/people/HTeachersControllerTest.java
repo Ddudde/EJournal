@@ -5,7 +5,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -32,18 +31,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
-import ru.data.SSE.Subscriber;
 import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
 
 import javax.servlet.ServletException;
 import java.util.List;
@@ -59,13 +55,17 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.usersTest;
+import static utils.RandomUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({HTeachersControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class HTeachersControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
 
     @Autowired
     private DBService dbService;
@@ -79,32 +79,22 @@ public class HTeachersControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
-    }
-
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(hTeachersController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -116,8 +106,6 @@ public class HTeachersControllerTest {
 
     private final String remGroup_Summary = "Удаляет группу + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("remGroup")
     @CustomAuth
     void remGroup_whenEmpty_Anonim() throws Exception {
@@ -128,11 +116,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(remGroup_Summary, "remGroup_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(remGroup_Summary, "remGroup_whenEmpty_Anonim"));
     }
 
-    /** RU: завуч
-     * удаляет группу и отправляет всем клиентам инфу */
     @Test @Tag("remGroup")
     @CustomUser(roles = Roles.HTEACHER)
     void remGroup_whenGood_Hteacher() throws Exception {
@@ -152,7 +138,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isOk())
-            .andDo(default_Docs(remGroup_Summary, "remGroup_whenGood_Hteacher"));
+            .andDo(defaultSwaggerDocs(remGroup_Summary, "remGroup_whenGood_Hteacher"));
 
         verify(authController).sendEventFor(eq("remGroupC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20}",
@@ -161,8 +147,6 @@ public class HTeachersControllerTest {
 
     private final String addGroup_Summary = "Создаёт группу + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("addGroup")
     @CustomAuth
     void addGroup_whenEmpty_Anonim() throws Exception {
@@ -173,11 +157,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(addGroup_Summary, "addGroup_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(addGroup_Summary, "addGroup_whenEmpty_Anonim"));
     }
 
-    /** RU: завуч
-     * создаёт группу и отправляет всем клиентам инфу */
     @Test @Tag("addGroup")
     @CustomUser(roles = Roles.HTEACHER)
     void addGroup_whenGood_Hteacher() throws Exception {
@@ -194,7 +176,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isOk())
-            .andDo(default_Docs(addGroup_Summary, "addGroup_whenGood_Hteacher"));
+            .andDo(defaultSwaggerDocs(addGroup_Summary, "addGroup_whenGood_Hteacher"));
 
         verify(authController).sendEventFor(eq("addGroupC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":null,\"name\":\"31В\"}",
@@ -203,8 +185,6 @@ public class HTeachersControllerTest {
 
     private final String chGroup_Summary = "Изменяет название группы + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chGroup")
     @CustomAuth
     void chGroup_whenEmpty_Anonim() throws Exception {
@@ -215,11 +195,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chGroup_Summary, "chGroup_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(chGroup_Summary, "chGroup_whenEmpty_Anonim"));
     }
 
-    /** RU: завуч
-     * изменяет название группы и отправляет всем клиентам инфу */
     @Test @Tag("chGroup")
     @CustomUser(roles = Roles.HTEACHER)
     void chGroup_whenGood_Hteacher() throws Exception {
@@ -240,7 +218,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isOk())
-            .andDo(default_Docs(chGroup_Summary, "chGroup_whenGood_Hteacher"));
+            .andDo(defaultSwaggerDocs(chGroup_Summary, "chGroup_whenGood_Hteacher"));
 
         verify(authController).sendEventFor(eq("chGroupC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20,\"name\":\"31В\"}",
@@ -249,8 +227,6 @@ public class HTeachersControllerTest {
 
     private final String chPep_Summary = "Изменяет фамилию пользователя + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chPep")
     @CustomAuth
     void chPep_whenEmpty_Anonim() throws Exception {
@@ -260,11 +236,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chPep_Summary, "chPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * изменяет фамилию пользователя и отправляет всем клиентам инфу */
     @Test @Tag("chPep")
     @CustomUser
     void chPep_whenGood_Admin() throws Exception {
@@ -286,7 +260,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isOk())
-            .andDo(default_Docs(chPep_Summary, "chPep_whenGood_Admin"));
+            .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_Admin"));
 
         verify(authController).sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"id1\":20,\"name\":\"Дрыздов А.А.\"}",
@@ -295,8 +269,6 @@ public class HTeachersControllerTest {
 
     private final String remPep_Summary = "Удаляет у пользователя роль завуча + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("remPep")
     @CustomAuth
     void remPep_whenEmpty_Anonim() throws Exception {
@@ -306,11 +278,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(remPep_Summary, "remPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * удаляет у пользователя роль завуча и отправляет всем клиентам инфу */
     @Test @Tag("remPep")
     @CustomUser
     void remPep_whenGood_Admin() throws Exception {
@@ -331,7 +301,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isOk())
-            .andDo(default_Docs(remPep_Summary, "remPep_whenGood_Admin"));
+            .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_Admin"));
 
         verify(authController).sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"id1\":20}",
@@ -340,8 +310,6 @@ public class HTeachersControllerTest {
 
     private final String addPep_Summary = "Создаёт пользователя-завуча + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("addPep")
     @CustomAuth
     void addPep_whenEmpty_Anonim() throws Exception {
@@ -352,11 +320,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(addPep_Summary, "addPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * добавляет нового пользователя-завуча и отправляет JSON'ом инфу */
     @Test @Tag("addPep")
     @CustomUser
     void addPep_whenGood_Admin() throws Exception {
@@ -374,7 +340,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isCreated())
-            .andDo(default_Docs(addPep_Summary, "addPep_whenGood_Admin"));
+            .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_Admin"));
 
         verify(authController).sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         verify(authController).sendEventFor(eq("addInfoL2C"), any(), any(), any(), any(), any(), any());
@@ -384,8 +350,6 @@ public class HTeachersControllerTest {
 
     private final String chSch_Summary = "Изменение имени учебного центра администратором портала";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chSch")
     @CustomAuth
     void chSch_whenEmpty_Anonim() throws Exception {
@@ -396,11 +360,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chSch_Summary, "chSch_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(chSch_Summary, "chSch_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * изменяет название школы и отправляет всем клиентам инфу */
     @Test @Tag("chSch")
     @CustomUser
     void chSch_whenGood_Admin() throws Exception {
@@ -417,7 +379,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isOk())
-            .andDo(default_Docs(chSch_Summary, "chSch_whenGood_Admin"));
+            .andDo(defaultSwaggerDocs(chSch_Summary, "chSch_whenGood_Admin"));
 
         verify(authController).sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20,\"name\":\"Гимназия ? 4\"}",
@@ -426,8 +388,6 @@ public class HTeachersControllerTest {
 
     private final String addSch_Summary = "Добавление учебного центра администратором портала";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("addSch")
     @CustomAuth
     void addSch_whenEmpty_Anonim() throws Exception {
@@ -438,11 +398,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(addSch_Summary, "addSch_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(addSch_Summary, "addSch_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * добавляет в систему школу и отправляет всем клиентам инфу */
     @Test @Tag("addSch")
     @CustomUser
     void addSch_whenGood_Admin() throws Exception {
@@ -455,7 +413,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isCreated())
-            .andDo(default_Docs(addSch_Summary, "addSch_whenGood_Admin"));
+            .andDo(defaultSwaggerDocs(addSch_Summary, "addSch_whenGood_Admin"));
 
         verify(authController).sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":null,\"body\":{\"name\":\"Гимназия ? 4\"}}",
@@ -464,8 +422,6 @@ public class HTeachersControllerTest {
 
     private final String remSch_Summary = "Удаление учебного центра администратором портала";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("remSch")
     @CustomAuth
     void remSch_whenEmpty_Anonim() throws Exception {
@@ -476,11 +432,9 @@ public class HTeachersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(remSch_Summary, "remSch_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(remSch_Summary, "remSch_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * удаляет из системы школу и отправляет всем клиентам инфу */
     @Test @Tag("remSch")
     @CustomUser
     void remSch_whenGood_Admin() throws Exception {
@@ -496,7 +450,7 @@ public class HTeachersControllerTest {
         }
             """))
             .andExpect(status().isOk())
-            .andDo(default_Docs(remSch_Summary, "remSch_whenGood_Admin"));
+            .andDo(defaultSwaggerDocs(remSch_Summary, "remSch_whenGood_Admin"));
 
         verify(authController).sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20}",
@@ -506,8 +460,6 @@ public class HTeachersControllerTest {
     private final String getInfo_Summary = "[start] отправка список завучей учебного центра";
     private final String getInfoForAdmins_Summary = "[start] отправка список завучей учебного центра для администраторов";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("getInfo")
     @CustomAuth
     void getInfo_whenEmpty_Anonim() throws Exception {
@@ -516,11 +468,9 @@ public class HTeachersControllerTest {
         mockMvc.perform(get("/hteachers/getInfo")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
 
-    /** RU: завуч
-     * отправляет JSON'ом информацию о завучах учебного центра */
     @Test @Tag("getInfo")
     @CustomUser(roles = Roles.HTEACHER)
     void getInfo_whenGood_HTEACHER() throws Exception {
@@ -533,11 +483,9 @@ public class HTeachersControllerTest {
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_HTEACHER"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_HTEACHER"));
     }
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("getInfoForAdmins")
     @CustomAuth
     void getInfoForAdmins_whenEmpty_Anonim() throws Exception {
@@ -546,11 +494,9 @@ public class HTeachersControllerTest {
         mockMvc.perform(get("/hteachers/getInfoFA")
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfoForAdmins_Summary, "getInfoForAdmins_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfoForAdmins_Summary, "getInfoForAdmins_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * отправляет JSON'ом информацию о завучах учебного центра */
     @Test @Tag("getInfoForAdmins")
     @CustomUser
     void getInfoForAdmins_whenGood_Admin() throws Exception {
@@ -564,7 +510,7 @@ public class HTeachersControllerTest {
                 .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"0\":{\"pep\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}}"))
-            .andDo(default_Docs(getInfoForAdmins_Summary, "getInfoForAdmins_whenGood_Admin"));
+            .andDo(defaultSwaggerDocs(getInfoForAdmins_Summary, "getInfoForAdmins_whenGood_Admin"));
     }
 }
 

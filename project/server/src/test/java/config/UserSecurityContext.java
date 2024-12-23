@@ -16,21 +16,24 @@ import static ru.Main.datas;
 import static utils.RandomUtils.getCloneUsers;
 import static utils.RandomUtils.usersTest;
 
-//toDo: обязательно прописать javaDoc!!!!!!!
+/** RU: создаёт SecurityContext для SpringTest c @CustomUser
+ * @see CustomUser */
 public class UserSecurityContext implements WithSecurityContextFactory<CustomUser> {
     @Override
     public SecurityContext createSecurityContext(CustomUser customUser) {
         final SecurityContext context = SecurityContextHolder.getContext();
         final User user = spy(getCloneUsers(usersTest.get(5)));
+        final Subscriber sub = new Subscriber(customUser.username());
+        final CustomToken auth = new CustomToken(customUser.password(), user.getAuthorities(), sub, UUID.randomUUID().toString());
         user.setUsername(customUser.username());
         user.setPassword(customUser.password());
+
         if(!ObjectUtils.isEmpty(customUser.roles())) {
             user.getRoles().put(customUser.roles()[0], user.getSelecRole());
             user.setSelRole(customUser.roles()[0]);
         }
+
         when(datas.getDbService().userByLogin(customUser.username())).thenReturn(user);
-        final Subscriber sub = new Subscriber(customUser.username());
-        final CustomToken auth = new CustomToken(customUser.username(), customUser.password(), user.getAuthorities(), sub, UUID.randomUUID().toString());
         context.setAuthentication(auth);
         return context;
     }

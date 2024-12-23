@@ -3,11 +3,14 @@ package utils;
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import ru.data.SSE.Subscriber;
 import ru.data.models.Contacts;
 import ru.data.models.News;
 import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
 import ru.data.models.school.*;
+import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
 import java.util.ArrayList;
@@ -87,16 +90,9 @@ public class RandomUtils {
         new Lesson(null, null, 4, 4, "394", "Физика", usersTest.get(3))
     ));
 
-    private Request getRequest(long id, String email, String date, String fio) {
-        final Request request = new Request(email, date, fio);
-        request.setId(id);
-        return request;
-    }
-
-    private Period getPeriod(long id, String name, String dateN, String dateK) {
-        final Period period = new Period(name, dateN, dateK);
-        period.setId(id);
-        return period;
+    public static Subscriber getSub(){
+        return ((CustomToken) SecurityContextHolder.getContext()
+            .getAuthentication()).getSub();
     }
 
     public static Contacts getCloneContacts(Contacts contacts) {
@@ -109,6 +105,18 @@ public class RandomUtils {
 
     private static Object getClone(Object object, Class className) {
         return gson.fromJson(gson.toJson(object),className);
+    }
+
+    private Request getRequest(long id, String email, String date, String fio) {
+        final Request request = new Request(email, date, fio);
+        request.setId(id);
+        return request;
+    }
+
+    private Period getPeriod(long id, String name, String dateN, String dateK) {
+        final Period period = new Period(name, dateN, dateK);
+        period.setId(id);
+        return period;
     }
 
     private Contacts getContacts(long id, String contact, String text, String imgUrl) {

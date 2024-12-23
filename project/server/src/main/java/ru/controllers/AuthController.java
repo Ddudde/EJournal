@@ -155,11 +155,13 @@ import static ru.Main.datas;
 
     /** RU: [start#2] изменение подписки
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
     @PatchMapping("/infCon")
     public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /infCon");
         final User user = auth.getSub().getUser();
+        infCon(auth.getUUID(), body.login, body.type, null, null, null, null);
+        if(user == null) return ResponseEntity.ok().build();
+
         if (!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();
             if(body.permis && !settingUser.getTokens().contains(body.notifToken)) {
@@ -183,7 +185,6 @@ import static ru.Main.datas;
             }
             wrtr.endObject();
         }
-        infCon(auth.getUUID(), body.login, body.type, null, null, null, null);
         return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
