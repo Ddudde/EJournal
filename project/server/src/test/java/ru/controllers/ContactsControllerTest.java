@@ -106,7 +106,7 @@ public class ContactsControllerTest {
             .summary("Изменение контакта + Server Sent Events")
             .description(defaultDescription)
             .tag("ContactsController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("ContactsController/" + methodName, resource(snip.build()));
     }
@@ -117,7 +117,7 @@ public class ContactsControllerTest {
     @CustomUser
     void chContact_whenEmpty_Portal_AdminUser() throws Exception {
         mockMvc.perform(put("/contacts/chContact/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -139,7 +139,7 @@ public class ContactsControllerTest {
         when(school.getContacts())
             .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
         mockMvc.perform(put("/contacts/chContact/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -163,7 +163,7 @@ public class ContactsControllerTest {
         when(dbService.getSyst().getContacts())
             .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
         mockMvc.perform(put("/contacts/chContact/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -186,7 +186,7 @@ public class ContactsControllerTest {
             .pathParameters(parameterWithName("type")
                 .type(SimpleType.STRING)
                 .description("Нужный тип: Por - портал, Yo - школы")
-            ).requestHeaders(headerWithName(SecurityConfig.authHeader)
+            ).requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         if(!emptyResponse) {
             snip.responseFields(fieldWithPath("contact").description(""),
@@ -205,7 +205,7 @@ public class ContactsControllerTest {
     void getContacts_whenEmpty_Portal_AdminUser() throws Exception {
         when(dbService.getSyst()).thenReturn(null);
         mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isNotFound())
             .andDo(getContacts_Docs("getContacts_whenEmpty_Portal_AdminUser", true));
     }
@@ -221,7 +221,7 @@ public class ContactsControllerTest {
         when(school.getContacts())
             .thenReturn(randomUtils.contactsTest.get(0));
         mockMvc.perform(get("/contacts/getContacts/{type}", "Yo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))
             .andDo(getContacts_Docs("getContacts_whenGood_YO_HTeacher", false));
@@ -235,7 +235,7 @@ public class ContactsControllerTest {
         when(dbService.getSyst().getContacts())
             .thenReturn(randomUtils.contactsTest.get(0));
         mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))
             .andDo(getContacts_Docs("getContacts_whenGood_Portal_AdminUser", false));

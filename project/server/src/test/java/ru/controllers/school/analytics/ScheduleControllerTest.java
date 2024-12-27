@@ -108,7 +108,7 @@ public class ScheduleControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("ScheduleController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("ScheduleController/" + methodName, resource(snip.build()));
     }
@@ -121,7 +121,7 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/schedule/addLesson")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -142,7 +142,7 @@ public class ScheduleControllerTest {
         prepareTeachersByLessons();
 
         mockMvc.perform(post("/schedule/addLesson")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -174,7 +174,7 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/schedule/getSchedule/{grId}", 20L)
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getSchedule_Summary, "getSchedule_whenEmpty_Anonim"));
     }
@@ -191,7 +191,7 @@ public class ScheduleControllerTest {
         prepareLessons();
 
         mockMvc.perform(get("/schedule/getSchedule/{grId}", 20L)
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}}}"))
             .andDo(default_Docs(getSchedule_Summary, "getSchedule_whenGood_HTEACHER"));
@@ -212,7 +212,7 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/schedule/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -226,7 +226,7 @@ public class ScheduleControllerTest {
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(get("/schedule/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
@@ -237,7 +237,7 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/schedule/getInfoToHT")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getInfoForHTeacherOrTEACHER_Summary, "getInfoForHTeacherOrTEACHER_whenEmpty_Anonim"));
     }
@@ -253,7 +253,7 @@ public class ScheduleControllerTest {
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch1);
 
         mockMvc.perform(get("/schedule/getInfoToHT")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323,\"bodyT\":{\"nt\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}},\"0\":{\"name\":\"Англ. Яз\",\"tea\":{\"22\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"23\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"24\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"}}},\"1\":{\"name\":\"Математика\",\"tea\":{\"25\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}}}}"))
             .andDo(default_Docs(getInfoForHTeacherOrTEACHER_Summary, "getInfoForHTeacherOrTEACHER_whenGood_HTEACHER"));

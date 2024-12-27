@@ -95,7 +95,7 @@ public class RequestControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("RequestController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("RequestController/" + methodName, resource(snip.build()));
     }
@@ -108,7 +108,7 @@ public class RequestControllerTest {
     @CustomAuth
     void addReq_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(post("/requests/addReq")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -122,7 +122,7 @@ public class RequestControllerTest {
     @CustomUser
     void addReq_whenGood_Admin() throws Exception {
         mockMvc.perform(post("/requests/addReq")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -148,7 +148,7 @@ public class RequestControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/requests/delReq")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -164,7 +164,7 @@ public class RequestControllerTest {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
 
         mockMvc.perform(delete("/requests/delReq")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -188,7 +188,7 @@ public class RequestControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/requests/chTitle")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -204,7 +204,7 @@ public class RequestControllerTest {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
 
         mockMvc.perform(patch("/requests/chTitle")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -229,7 +229,7 @@ public class RequestControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/requests/chDate")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -245,7 +245,7 @@ public class RequestControllerTest {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
 
         mockMvc.perform(patch("/requests/chDate")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -271,7 +271,7 @@ public class RequestControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/requests/chText")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -287,7 +287,7 @@ public class RequestControllerTest {
         when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
 
         mockMvc.perform(patch("/requests/chText")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -312,7 +312,7 @@ public class RequestControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/requests/getRequests")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getRequests_Summary, "getRequests_whenEmpty_Anonim"));
     }
@@ -325,7 +325,7 @@ public class RequestControllerTest {
         when(dbService.getRequests()).thenReturn(randomUtils.requestTest);
 
         mockMvc.perform(get("/requests/getRequests")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"352\":{\"title\":\"mail1@mail.com\",\"date\":\"11.11.2011\",\"text\":\"Дроздов А.А.\"},\"3872\":{\"title\":\"mail10@mail.com\",\"date\":\"11.01.2011\",\"text\":\"Силин А.К.\"},\"9764\":{\"title\":\"mail11@mail.com\",\"date\":\"01.11.2011\",\"text\":\"Пестов Л.А.\"}}"))
             .andDo(default_Docs(getRequests_Summary, "getRequests_whenGood_Admin"));

@@ -190,6 +190,7 @@ import static ru.Main.datas;
 
     /** RU: завершение сеанса
      * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("@code401.check(#auth.getSub() != null)")
     @PatchMapping("/remCon")
     public ResponseEntity<Void> remCon(CustomToken auth) {
         System.out.println("[PATCH] /remCon");
@@ -205,13 +206,11 @@ import static ru.Main.datas;
 
     /** RU: авторизация пользователя
      * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
     @PostMapping("/auth")
     public ResponseEntity<JsonObject> auth(@RequestBody DataAuth body, CustomToken auth) throws Exception {
-        final User user = datas.getDbService().userByLogin(body.login);
+        final User user = auth.getSub().getUser();
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /auth");
-        if(user == null || !Objects.equals(user.getPassword(), body.password)) {
-            return ResponseEntity.notFound().build();
-        }
         if(!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();
             if(body.permis) {
@@ -240,7 +239,6 @@ import static ru.Main.datas;
             }
             wrtr.endObject();
         }
-        infCon(auth.getUUID(), body.login, null, null, null, null, null);
         return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 

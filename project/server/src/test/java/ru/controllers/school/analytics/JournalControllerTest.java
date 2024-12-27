@@ -106,7 +106,7 @@ public class JournalControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("JournalController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("JournalController/" + methodName, resource(snip.build()));
     }
@@ -121,7 +121,7 @@ public class JournalControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/journal/getInfoPers")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getInfoPers_Summary, "getInfoPers_whenEmpty_Anonim"));
     }
@@ -142,7 +142,7 @@ public class JournalControllerTest {
         prepareListLessons();
 
         mockMvc.perform(get("/journal/getInfoPers")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"9764\":\"III четверть\",\"3456\":\"IV четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"9764\":\"1\",\"352\":\"Н\"},\"Математика\":{\"9764\":\"2\",\"352\":\"5\",\"3872\":\"5\"}}}"))
             .andDo(default_Docs(getInfoPers_Summary, "getInfoPers_whenGood_KID"));
@@ -172,7 +172,7 @@ public class JournalControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/journal/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -193,7 +193,7 @@ public class JournalControllerTest {
         prepareListLessons();
 
         mockMvc.perform(get("/journal/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyJ\":{\"Химия\":{\"days\":{\"10.06.22\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Англ. Яз\":{\"days\":{\"12.06.22\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Математика\":{\"days\":{\"10.06.22\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"}}}}}"))
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));

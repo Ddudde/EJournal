@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -57,6 +58,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static utils.RandomUtils.defaultDescription;
+import static utils.RandomUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({AuthControllerConfig.class})
@@ -98,9 +100,8 @@ public class AuthControllerTest {
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
+    private CustomToken getAuth() {
+        return (CustomToken) SecurityContextHolder.getContext().getAuthentication();
     }
 
     private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
@@ -108,7 +109,7 @@ public class AuthControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("AuthController").requestFields()
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("AuthController/" + methodName, resource(snip.build()));
     }
@@ -161,7 +162,7 @@ public class AuthControllerTest {
     @CustomUser
     void infCon_whenGood_AdminUser() throws Exception {
         mockMvc.perform(patch("/auth/infCon/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -187,51 +188,57 @@ public class AuthControllerTest {
         getSub().setSSE(sseEmitter);
 
         mockMvc.perform(patch("/auth/remCon/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andDo(default_Docs(remCon_Summary, "remCon_whenGood_AdminUser"));
     }
 
     private final String auth_Summary = "Авторизация пользователя";
 
-    /** RU: не успешная авторизация пользователя */
+    /** RU: аноним
+     * не успешная авторизация пользователя, муляжный тест, показывает общую логику работы API
+     * toDo: перенести в тест Security */
     @Test @Tag("auth")
     @CustomUser
     void auth_whenWrong_AdminUser() throws Exception {
         final User user = getSub().getUser();
         when(dbService.userByLogin("nm12")).thenReturn(user);
+        when(dbService.userByLogin(any())).thenReturn(null);
         when(user.getPassword()).thenReturn("passTest1");
+        SecurityContextHolder.getContext()
+            .setAuthentication(new CustomToken(new Subscriber(), UUID.randomUUID().toString()));
+
+        System.out.println(getAuth());
 
         mockMvc.perform(post("/auth/auth/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(HttpHeaders.AUTHORIZATION, "Basic bm0xMjpwYXNzVGVzdA==")// Basic Auth
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
-            "login": "nm12",
             "notifToken": "uuidTest",
-            "password": "passTest",
             "permis": true
         }
-            """)).andExpect(status().isNotFound())
+            """)).andExpect(status().isUnauthorized())
             .andDo(default_Docs(auth_Summary, "auth_whenWrong_AdminUser"));
     }
 
     /** RU: админ
-     * авторизация пользователя */
+     * авторизация пользователя, муляжный тест, показывает общую логику работы API
+     * toDo: перенести в тест Security */
     @Test @Tag("auth")
     @CustomUser(password = "passTest")
     void auth_whenGood_AdminUser() throws Exception {
-        final String uuid = ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getUUID();
+        final String uuid = getAuth().getUUID();
+//        SecurityContextHolder.getContext().setAuthentication(new CustomToken());
 
         mockMvc.perform(post("/auth/auth/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(HttpHeaders.AUTHORIZATION, "Basic bm0xMjpwYXNzVGVzdA==")// Basic Auth
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
-            "login": "nm12",
             "notifToken": "uuidTest",
-            "password": "passTest",
             "permis": true
         }
             """)).andExpect(status().isOk())
@@ -249,7 +256,7 @@ public class AuthControllerTest {
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
         mockMvc.perform(post("/auth/reg/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -271,7 +278,7 @@ public class AuthControllerTest {
         when(dbService.userByLogin("nm")).thenReturn(null);
 
         mockMvc.perform(post("/auth/reg/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -296,7 +303,7 @@ public class AuthControllerTest {
         when(dbService.userByLogin("nm")).thenReturn(null);
 
         mockMvc.perform(post("/auth/reg/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -321,7 +328,7 @@ public class AuthControllerTest {
         when(dbService.userByCode(null)).thenReturn(null);
 
         mockMvc.perform(post("/auth/checkInvCode/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -337,7 +344,7 @@ public class AuthControllerTest {
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
         mockMvc.perform(post("/auth/checkInvCode/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -357,7 +364,7 @@ public class AuthControllerTest {
         when(dbService.userByLogin(null)).thenReturn(null);
 
         mockMvc.perform(patch("/auth/setCodePep/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -373,7 +380,7 @@ public class AuthControllerTest {
         final User user = getSub().getUser();
 
         mockMvc.perform(patch("/auth/setCodePep/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {

@@ -99,7 +99,7 @@ public class HTeachersControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("HTeachersController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("HTeachersController/" + methodName, resource(snip.build()));
     }
@@ -112,7 +112,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/hteachers/remGroup")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -130,7 +130,7 @@ public class HTeachersControllerTest {
         when(group.getId()).thenReturn(20L);
 
         mockMvc.perform(delete("/hteachers/remGroup")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -153,7 +153,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/hteachers/addGroup")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -168,7 +168,7 @@ public class HTeachersControllerTest {
         user.getRoles().get(Roles.HTEACHER).setYO(school);
 
         mockMvc.perform(post("/hteachers/addGroup")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -191,7 +191,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/hteachers/chGroup")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -209,7 +209,7 @@ public class HTeachersControllerTest {
         when(group.getId()).thenReturn(20L);
 
         mockMvc.perform(patch("/hteachers/chGroup")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -232,7 +232,7 @@ public class HTeachersControllerTest {
     void chPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
         mockMvc.perform(patch("/hteachers/chPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -251,7 +251,7 @@ public class HTeachersControllerTest {
         when(role.getYO()).thenReturn(school);
 
         mockMvc.perform(patch("/hteachers/chPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -274,7 +274,7 @@ public class HTeachersControllerTest {
     void remPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
         mockMvc.perform(delete("/hteachers/remPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -293,7 +293,7 @@ public class HTeachersControllerTest {
         when(role.getYO()).thenReturn(school);
 
         mockMvc.perform(delete("/hteachers/remPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -316,7 +316,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/hteachers/addPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -331,7 +331,7 @@ public class HTeachersControllerTest {
         when(dbService.schoolById(any()).getId()).thenReturn(20L);
 
         mockMvc.perform(post("/hteachers/addPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -356,7 +356,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/hteachers/chSch")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -370,7 +370,7 @@ public class HTeachersControllerTest {
         when(dbService.schoolById(20L)).thenReturn(school);
 
         mockMvc.perform(patch("/hteachers/chSch")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -394,7 +394,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/hteachers/addSch")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -405,7 +405,7 @@ public class HTeachersControllerTest {
     @CustomUser
     void addSch_whenGood_Admin() throws Exception {
         mockMvc.perform(post("/hteachers/addSch")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -428,7 +428,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/hteachers/remSch")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -442,7 +442,7 @@ public class HTeachersControllerTest {
         when(dbService.schoolById(20L)).thenReturn(school);
 
         mockMvc.perform(delete("/hteachers/remSch")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -466,7 +466,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/hteachers/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -480,7 +480,7 @@ public class HTeachersControllerTest {
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(get("/hteachers/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_HTEACHER"));
@@ -492,7 +492,7 @@ public class HTeachersControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/hteachers/getInfoFA")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoForAdmins_Summary, "getInfoForAdmins_whenEmpty_Anonim"));
     }
@@ -507,7 +507,7 @@ public class HTeachersControllerTest {
         when(datas.getDbService().getSchools()).thenReturn(List.of(sch1, sch2));
 
         mockMvc.perform(get("/hteachers/getInfoFA")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"0\":{\"pep\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}}"))
             .andDo(defaultSwaggerDocs(getInfoForAdmins_Summary, "getInfoForAdmins_whenGood_Admin"));

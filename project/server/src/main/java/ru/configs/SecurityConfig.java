@@ -10,11 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -25,7 +21,6 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.security.AuthenticationFilter;
 import ru.security.CustomProvider;
-import ru.security.user.Roles;
 
 /** RU: Начало описания security.
  * Без шифрования в БД(NoOpPasswordEncoder).
@@ -44,7 +39,7 @@ import ru.security.user.Roles;
         new AntPathRequestMatcher("/console_db/*")
     );
     private static final RequestMatcher PROTECTED_URLS = new NegatedRequestMatcher(PUBLIC_URLS);
-    public static final String authHeader = "x-access-token";
+    public static final String authTokenHeader = "x-access-token";
     private final AuthenticationConfiguration authConfig;
 
     private AuthenticationEntryPoint forbiddenEntryPoint() {
@@ -54,13 +49,6 @@ import ru.security.user.Roles;
     private AuthenticationFilter authenticationFilter() throws Exception {
         return new AuthenticationFilter(PROTECTED_URLS, authConfig.getAuthenticationManager());
     }
-
-//    private DigestAuthenticationFilter getDigestAuthFilter() throws Exception {
-//        DigestAuthenticationFilter digestFilter = new DigestAuthenticationFilter();
-//        digestFilter.setUserDetailsService(userDetailsServiceBean());
-//        digestFilter.setAuthenticationEntryPoint(getDigestEntryPoint());
-//        return digestFilter;
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -73,7 +61,7 @@ import ru.security.user.Roles;
             .and()
                 .csrf().disable()
                 .formLogin().disable()
-                .httpBasic().disable()
+                .httpBasic().disable()// В AuthenticationFilter функционал
                 .logout().disable()
                 .rememberMe().disable()
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -89,17 +77,7 @@ import ru.security.user.Roles;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-            .username("anonymousUser")
-            .password("")
-            .roles(Roles.ANONYMOUS.toString())
-            .build();
-        return new InMemoryUserDetailsManager(user);
+    public NoOpPasswordEncoder passwordEncoder() {
+        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
     }
 }

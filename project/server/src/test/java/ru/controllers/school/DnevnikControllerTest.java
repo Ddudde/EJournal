@@ -107,7 +107,7 @@ public class DnevnikControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("DnevnikController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("DnevnikController/" + methodName, resource(snip.build()));
     }
@@ -122,7 +122,7 @@ public class DnevnikControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/dnevnik/getDnevnik")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getDnevnik_Summary, "getDnevnik_whenEmpty_Anonim"));
     }
@@ -144,7 +144,7 @@ public class DnevnikControllerTest {
         prepareHomework();
 
         mockMvc.perform(get("/dnevnik/getDnevnik")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"homework\":\"Стр. 62-63 пересказ\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"homework\":\"Упр. 5Стр. 103\"},\"i\":0},\"10.06.22\":{\"0\":{\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"homework\":\"Упр. 6Стр. 103\"},\"i\":0},\"11.06.22\":{\"0\":{\"homework\":\"Упр. 7Стр. 103\"},\"i\":0}}}}"))
             .andDo(default_Docs(getDnevnik_Summary, "getDnevnik_whenGood_KID_onlyHomework"));
@@ -168,7 +168,7 @@ public class DnevnikControllerTest {
         prepareHomework();
 
         mockMvc.perform(get("/dnevnik/getDnevnik")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Стр. 62-63 пересказ\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"mark\":\"Н\",\"weight\":1,\"homework\":\"Упр. 5Стр. 103\"},\"i\":0},\"10.06.22\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 6Стр. 103\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0},\"11.06.22\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 7Стр. 103\"},\"i\":0}}}}"))
             .andDo(default_Docs(getDnevnik_Summary, "getDnevnik_whenGood_KID_withHomework"));
@@ -191,7 +191,7 @@ public class DnevnikControllerTest {
         prepareMarks();
 
         mockMvc.perform(get("/dnevnik/getDnevnik")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"0\":{\"mark\":\"Н\",\"weight\":1},\"i\":0},\"10.06.22\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}},\"Математика\":{\"10.06.22\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0},\"11.06.22\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"i\":0}}}}"))
             .andDo(default_Docs(getDnevnik_Summary, "getDnevnik_whenGood_KID"));
@@ -246,7 +246,7 @@ public class DnevnikControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/dnevnik/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -262,7 +262,7 @@ public class DnevnikControllerTest {
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(get("/dnevnik/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));
     }

@@ -216,11 +216,9 @@ function rego(){
 
 function vxo(){
     sendToServer({
-        login: elem.logv.value,
-        password: elem.pasv.value,
         notifToken: localStorage.getItem("notifToken"),
         permis: Notification.permission == "granted"
-    }, 'POST', cAuth+"auth")
+    }, 'POST', cAuth+"auth", elem.logv.value + ":" + elem.pasv.value)
         .then(data => {
             if(data.status == 200){
             // if(data.error == false && data.body.auth){

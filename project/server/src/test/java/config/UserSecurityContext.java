@@ -23,15 +23,14 @@ public class UserSecurityContext implements WithSecurityContextFactory<CustomUse
     public SecurityContext createSecurityContext(CustomUser customUser) {
         final SecurityContext context = SecurityContextHolder.getContext();
         final User user = spy(getCloneUsers(usersTest.get(5)));
-        final Subscriber sub = new Subscriber(customUser.username());
-        final CustomToken auth = new CustomToken(customUser.password(), user.getAuthorities(), sub, UUID.randomUUID().toString());
-        user.setUsername(customUser.username());
-        user.setPassword(customUser.password());
-
         if(!ObjectUtils.isEmpty(customUser.roles())) {
             user.getRoles().put(customUser.roles()[0], user.getSelecRole());
             user.setSelRole(customUser.roles()[0]);
         }
+        final Subscriber sub = new Subscriber(customUser.username());
+        final CustomToken auth = new CustomToken(customUser.password(), user.getAuthorities(), sub, UUID.randomUUID().toString());
+        user.setUsername(customUser.username());
+        user.setPassword(customUser.password());
 
         when(datas.getDbService().userByLogin(customUser.username())).thenReturn(user);
         context.setAuthentication(auth);

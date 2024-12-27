@@ -107,7 +107,7 @@ public class StudentsControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("StudentsController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("StudentsController/" + methodName, resource(snip.build()));
     }
@@ -120,7 +120,7 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/students/remPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -138,7 +138,7 @@ public class StudentsControllerTest {
         when(group.getKids()).thenReturn(users);
 
         mockMvc.perform(delete("/students/remPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -161,7 +161,7 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/students/chPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -175,7 +175,7 @@ public class StudentsControllerTest {
         when(dbService.userById(20L)).thenReturn(user);
 
         mockMvc.perform(patch("/students/chPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -199,7 +199,7 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/students/addPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -220,7 +220,7 @@ public class StudentsControllerTest {
 
 
         mockMvc.perform(post("/students/addPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -243,7 +243,7 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getStud/{grId}", 20L)
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getStud_Summary, "getStud_whenEmpty_Anonim"));
     }
@@ -259,7 +259,7 @@ public class StudentsControllerTest {
         when(sch.getGroups()).thenReturn(randomUtils.groups);
 
         mockMvc.perform(get("/students/getStud/{grId}", 20L)
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
             .andDo(default_Docs(getStud_Summary, "getStud_whenGood_KID"));
@@ -274,7 +274,7 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -283,7 +283,7 @@ public class StudentsControllerTest {
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
         mockMvc.perform(get("/students/getInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
@@ -294,7 +294,7 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getInfoFH")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(default_Docs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
     }
@@ -307,7 +307,7 @@ public class StudentsControllerTest {
         when(sch.getGroups()).thenReturn(randomUtils.groups);
 
         mockMvc.perform(get("/students/getInfoFH")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323}"))
             .andDo(default_Docs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));

@@ -14,30 +14,6 @@ import java.util.Set;
 @Component
 public class CustomProvider implements AuthenticationProvider {
 
-//    @Autowired
-//    private UserService userService;
-//
-//    @Autowired
-//    private MainService main;
-
-//    @Override
-//    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
-//        //
-//        System.out.println("additionalAuthenticationChecks " + userDetails);
-//    }
-
-//    @Override
-//    protected User retrieveUser(String userName, UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
-//        Object token = usernamePasswordAuthenticationToken.getCredentials();
-//        System.out.println("retrieveUser " + userName);
-//        return Optional.ofNullable(token)
-//            .map(String::valueOf)
-//            .map(UUID::fromString)
-//            .map(tok -> main.subscriptions.get(tok).getLogin())
-//            .map(userService::loadUserByUsername)
-//            .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with authentication token = " + token));
-//    }
-
     @Override
     public boolean supports(final Class<?> authentication) {
         return authentication.isAssignableFrom(CustomToken.class);
@@ -45,7 +21,11 @@ public class CustomProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
-        System.out.println("authenticate! " + authentication);
+        if(authentication.isAuthenticated()) {
+            System.out.println("authenticate! " + authentication);
+            return authentication;
+        }
+
         return authentication;
     }
 

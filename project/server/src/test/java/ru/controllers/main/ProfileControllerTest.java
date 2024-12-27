@@ -108,7 +108,7 @@ public class ProfileControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("ProfileController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("ProfileController/" + methodName, resource(snip.build()));
     }
@@ -123,7 +123,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chKid")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -136,7 +136,7 @@ public class ProfileControllerTest {
     @CustomUser(roles = Roles.PARENT)
     void chKid_whenGood_Parent() throws Exception {
         mockMvc.perform(patch("/profiles/chKid")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -158,7 +158,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chRole")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -173,7 +173,7 @@ public class ProfileControllerTest {
         getSub().getUser().setSelRole(Roles.KID);
 
         mockMvc.perform(patch("/profiles/chRole")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"role\":4}"))
             .andDo(default_Docs(chRole_Summary, "chRole_whenGood_Kid"));
@@ -189,7 +189,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/exit")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -202,7 +202,7 @@ public class ProfileControllerTest {
     @CustomUser
     void exit_whenGood_Admin() throws Exception {
         mockMvc.perform(patch("/profiles/exit")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -224,7 +224,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chEmail")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -238,7 +238,7 @@ public class ProfileControllerTest {
     @CustomUser
     void chEmail_whenGood_Admin() throws Exception {
         mockMvc.perform(patch("/profiles/chEmail")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -262,7 +262,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -276,7 +276,7 @@ public class ProfileControllerTest {
     @CustomUser
     void chInfo_whenGood_Admin() throws Exception {
         mockMvc.perform(patch("/profiles/chInfo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -298,7 +298,7 @@ public class ProfileControllerTest {
     @CustomAuth
     void chLogin_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(patch("/profiles/chLogin")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -315,7 +315,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin("nm")).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chLogin")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -338,7 +338,7 @@ public class ProfileControllerTest {
                 .description("Логин пользователя")
             )
             .tag("ProfileController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("ProfileController/" + methodName, resource(snip.build()));
     }
@@ -351,7 +351,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isUnauthorized())
             .andDo(getProfile_Docs("getProfile_whenEmpty_Anonim"));
     }
@@ -362,7 +362,7 @@ public class ProfileControllerTest {
     @CustomUser
     void getProfile_whenGood_AuthLogin_Admin() throws Exception {
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"login\":\"nm12\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}},\"4\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))
             .andDo(getProfile_Docs("getProfile_whenGood_AuthLogin_Admin"));
@@ -376,7 +376,7 @@ public class ProfileControllerTest {
         when(dbService.userByLogin("nm12")).thenReturn(randomUtils.usersTest.get(4));
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"login\":\"facere_a\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))
             .andDo(getProfile_Docs("getProfile_whenGood_CustomLogin_Anonim"));
