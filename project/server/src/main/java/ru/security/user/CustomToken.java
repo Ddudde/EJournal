@@ -12,13 +12,11 @@ import java.util.Set;
 
 @Getter @Setter
 public class CustomToken extends UsernamePasswordAuthenticationToken {
-
     private Subscriber sub;
-
     private String UUID;
 
-    public CustomToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities, Subscriber sub, String UUID) {
-        super(principal, credentials, authorities);
+    public CustomToken(Object credentials, Collection<? extends GrantedAuthority> authorities, Subscriber sub, String UUID) {
+        super(sub, credentials, authorities);
         this.sub = sub;
         this.UUID = UUID;
     }
@@ -28,7 +26,7 @@ public class CustomToken extends UsernamePasswordAuthenticationToken {
     }
 
     public CustomToken(Subscriber sub, String UUID) {
-        super("anonymousUser", "", CustomProvider.getAuthorities(Set.of("ANONYMOUS")));
+        super(sub, "", CustomProvider.getAuthorities(Set.of("ANONYMOUS")));
         this.sub = sub;
         this.UUID = UUID;
     }

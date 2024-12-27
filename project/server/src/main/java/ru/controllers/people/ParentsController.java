@@ -215,7 +215,7 @@ import static ru.Main.datas;
     @RequiredArgsConstructor
     static final class DataParents {
         public final String name;
-        public final Long group, id;
+        public final Long id;
         public final JsonObject bod;
     }
 }

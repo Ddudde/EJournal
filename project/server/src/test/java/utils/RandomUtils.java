@@ -3,11 +3,14 @@ package utils;
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import ru.data.SSE.Subscriber;
 import ru.data.models.Contacts;
 import ru.data.models.News;
 import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
 import ru.data.models.school.*;
+import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
 import java.util.ArrayList;
@@ -75,16 +78,21 @@ public class RandomUtils {
         getGroup(4354L, namesGroup[2])
     ));
 
-    private Request getRequest(long id, String email, String date, String fio) {
-        final Request request = new Request(email, date, fio);
-        request.setId(id);
-        return request;
-    }
+    public final List<Lesson> lessons = new ArrayList<>(asList(
+        new Lesson(null, null, 1, 0, "1283", "Русский Яз.", usersTest.get(0)),
+        new Lesson(null, null, 1, 3, "1977", "Англ. Яз.", usersTest.get(1)),
+        new Lesson(null, null, 1, 4, "1870", "Математика", usersTest.get(2)),
+        new Lesson(null, null, 1, 5, "640", "Англ. Яз.", usersTest.get(3)),
+        new Lesson(null, null, 3, 0, "1098", "Англ. Яз.", usersTest.get(4)),
+        new Lesson(null, null, 3, 2, "1660", "Русский Яз.", usersTest.get(0)),
+        new Lesson(null, null, 3, 4, "1837", "Физика", usersTest.get(1)),
+        new Lesson(null, null, 4, 3, "482", "Русский Яз.", usersTest.get(2)),
+        new Lesson(null, null, 4, 4, "394", "Физика", usersTest.get(3))
+    ));
 
-    private Period getPeriod(long id, String name, String dateN, String dateK) {
-        final Period period = new Period(name, dateN, dateK);
-        period.setId(id);
-        return period;
+    public static Subscriber getSub(){
+        return ((CustomToken) SecurityContextHolder.getContext()
+            .getAuthentication()).getSub();
     }
 
     public static Contacts getCloneContacts(Contacts contacts) {
@@ -97,6 +105,18 @@ public class RandomUtils {
 
     private static Object getClone(Object object, Class className) {
         return gson.fromJson(gson.toJson(object),className);
+    }
+
+    private Request getRequest(long id, String email, String date, String fio) {
+        final Request request = new Request(email, date, fio);
+        request.setId(id);
+        return request;
+    }
+
+    private Period getPeriod(long id, String name, String dateN, String dateK) {
+        final Period period = new Period(name, dateN, dateK);
+        period.setId(id);
+        return period;
     }
 
     private Contacts getContacts(long id, String contact, String text, String imgUrl) {

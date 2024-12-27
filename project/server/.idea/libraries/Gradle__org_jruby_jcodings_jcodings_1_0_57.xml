@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jruby.jcodings:jcodings:1.0.57" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jruby.jcodings" artifactId="jcodings" version="1.0.57" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jruby.jcodings/jcodings/1.0.57/603a9ceac39cbf7f6f27fe18b2fded4714319b0a/jcodings-1.0.57.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

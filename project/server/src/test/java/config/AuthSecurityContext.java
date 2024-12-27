@@ -12,7 +12,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static ru.Main.datas;
 
-//toDo: обязательно прописать javaDoc!!!!!!!
+/** RU: создаёт SecurityContext для SpringTest c @CustomAuth
+ * @see CustomAuth */
 public class AuthSecurityContext implements WithSecurityContextFactory<CustomAuth> {
     @Override
     public SecurityContext createSecurityContext(CustomAuth customUser) {

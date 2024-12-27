@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: me.qmx.jitescript:jitescript:0.4.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="me.qmx.jitescript" artifactId="jitescript" version="0.4.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.qmx.jitescript/jitescript/0.4.1/f1efcb28cb13d26faf789264d54251faf58f0b63/jitescript-0.4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

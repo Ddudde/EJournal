@@ -12,7 +12,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        User myUser = datas.getDbService().userByLogin(username);
+        final User myUser = datas.getDbService().userByLogin(username);
 //        if (myUser == null) {
 //            throw new UsernameNotFoundException("Unknown user: " + username);
 //        }

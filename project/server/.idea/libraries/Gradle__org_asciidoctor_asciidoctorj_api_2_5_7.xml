@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.asciidoctor:asciidoctorj-api:2.5.7" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.asciidoctor" artifactId="asciidoctorj-api" version="2.5.7" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.asciidoctor/asciidoctorj-api/2.5.7/37ea651d5f1ba2ad3d1c09eb2356b17f35c15bb5/asciidoctorj-api-2.5.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

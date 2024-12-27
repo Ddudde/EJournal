@@ -108,11 +108,14 @@ function addNotifToken(token) {
     localStorage.setItem("notifToken", token);
 }
 
-function sendToServerApp(bod, typeC, url) {
+function sendToServerApp(bod, typeC, url, auth) {
     let sed = {
         method: typeC,
         headers: {'Content-Type': 'application/json'}
     };
+    if(auth) {
+        sed.headers["Authorization"] = "Basic " + btoa(auth);
+    }
     if(localStorage.getItem("sec")) {
         sed.headers["x-access-token"] = localStorage.getItem("sec");
         console.log("yyes send", localStorage.getItem("sec"));
@@ -121,9 +124,9 @@ function sendToServerApp(bod, typeC, url) {
     if(!url) url = "";
     return fetch(servLink + "/" + url, sed)
         .then(res => {
-            if(res.status == 401 && localStorage.getItem("sec")) {
-                localStorage.removeItem("sec");
-            }
+            // if(res.status == 401 && localStorage.getItem("sec")) {
+            //     localStorage.removeItem("sec");
+            // }
             if (!res.ok) {
                 throw new Error(`This is an HTTP error: The status is ${res.status}`);
             }

@@ -123,6 +123,7 @@ class ExamplesTest {
     void stringTest1() {
         System.out.println(Objects.equals("_news", "_news"));
         System.out.println("234_news".contains("_news"));
+        System.out.println("234_news".length());
     }
 
     @Test

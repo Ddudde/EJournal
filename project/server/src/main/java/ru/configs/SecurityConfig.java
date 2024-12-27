@@ -10,11 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -25,24 +21,25 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.security.AuthenticationFilter;
 import ru.security.CustomProvider;
-import ru.security.user.Roles;
 
+/** RU: Начало описания security.
+ * Без шифрования в БД(NoOpPasswordEncoder).
+ * Авторизация Token(UUID) в header "x-access-token".
+ * Анонимные пользователи тоже наделяются токеном.
+ * При авторизации в системе используются логин/пароль.
+ * Они передаются без шифрования в POST auth/auth
+ * И хранится токен в клиенте LocalStorage */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 @EnableWebSecurity public class SecurityConfig {
-
     private final CustomProvider provider;
-
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
         new AntPathRequestMatcher("/console_db"),
         new AntPathRequestMatcher("/console_db/*")
     );
-
     private static final RequestMatcher PROTECTED_URLS = new NegatedRequestMatcher(PUBLIC_URLS);
-
-    public static final String authHeader = "x-access-token";
-
+    public static final String authTokenHeader = "x-access-token";
     private final AuthenticationConfiguration authConfig;
 
     private AuthenticationEntryPoint forbiddenEntryPoint() {
@@ -56,16 +53,17 @@ import ru.security.user.Roles;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(provider);
-        http.cors().and().sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        http.cors().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().exceptionHandling()
-            .defaultAuthenticationEntryPointFor(forbiddenEntryPoint(), PROTECTED_URLS)
-            .and().headers().frameOptions().disable()
-            .and().csrf().disable()
-            .formLogin().disable()
-            .httpBasic().disable()
-            .logout().disable()
-            .rememberMe().disable()
+                .defaultAuthenticationEntryPointFor(forbiddenEntryPoint(), PROTECTED_URLS)
+            .and().headers()
+                .frameOptions().disable()
+            .and()
+                .csrf().disable()
+                .formLogin().disable()
+                .httpBasic().disable()// В AuthenticationFilter функционал
+                .logout().disable()
+                .rememberMe().disable()
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             .requestMatchers(PUBLIC_URLS).permitAll()
@@ -79,17 +77,7 @@ import ru.security.user.Roles;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("anonymousUser")
-                .password("")
-                .roles(Roles.ANONYMOUS.toString())
-                .build();
-        return new InMemoryUserDetailsManager(user);
+    public NoOpPasswordEncoder passwordEncoder() {
+        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
     }
 }

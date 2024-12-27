@@ -19,7 +19,6 @@ import static ru.Main.datas;
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @ToString public class Subscriber {
-
     private String login;
 
     /** RU: Тип подключения, где находится клиент */

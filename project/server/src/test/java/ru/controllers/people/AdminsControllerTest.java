@@ -105,7 +105,7 @@ public class AdminsControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("AdminsController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("AdminsController/" + methodName, resource(snip.build()));
     }
@@ -118,7 +118,7 @@ public class AdminsControllerTest {
     @CustomAuth
     void remPep_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(delete("/admins/remPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -134,7 +134,7 @@ public class AdminsControllerTest {
         User user = getSub().getUser();
         when(dbService.userById(20L)).thenReturn(user);
         mockMvc.perform(delete("/admins/remPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -156,7 +156,7 @@ public class AdminsControllerTest {
     @CustomAuth
     void chPep_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(patch("/admins/chPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -172,7 +172,7 @@ public class AdminsControllerTest {
         User user = getSub().getUser();
         when(dbService.userById(20L)).thenReturn(user);
         mockMvc.perform(patch("/admins/chPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -195,7 +195,7 @@ public class AdminsControllerTest {
     @CustomAuth
     void addPep_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(post("/admins/addPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -211,7 +211,7 @@ public class AdminsControllerTest {
         when(dbService.getRoleRepository().saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         mockMvc.perform(post("/admins/addPep")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -234,7 +234,7 @@ public class AdminsControllerTest {
     void getAdmins_whenEmpty_Anonim() throws Exception {
         when(dbService.getSyst()).thenReturn(null);
         mockMvc.perform(get("/admins/getAdmins")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isNotFound())
             .andDo(default_Docs(getAdmins_Summary, "getAdmins_whenEmpty_Anonim"));
     }
@@ -246,7 +246,7 @@ public class AdminsControllerTest {
     void getAdmins_whenGood_Admin() throws Exception {
         when(dbService.getSyst().getAdmins()).thenReturn(usersTest);
         mockMvc.perform(get("/admins/getAdmins")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
             .andDo(default_Docs(getAdmins_Summary, "getAdmins_whenGood_Admin"));

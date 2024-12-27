@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.asciidoctor:asciidoctorj:2.5.7" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.asciidoctor" artifactId="asciidoctorj" version="2.5.7" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.asciidoctor/asciidoctorj/2.5.7/8667fe77c2ffb5270a17389e6fe76ea89b1087e4/asciidoctorj-2.5.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -2,172 +2,184 @@ package ru.controllers.people;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.Main;
 import ru.controllers.AuthController;
+import ru.controllers.DocsHelpController;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.data.models.auth.Role;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
+import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.MainService;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
+import static ru.Main.datas;
+
+/** RU: Контроллер для раздела управления/просмотра учеников группы учебного центра + Server Sent Events
+ * <pre>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/StudentsController">http://localhost:9001/swagger/htmlSwag/#/StudentsController</a>
+ *
+ * beenDo: Сделано
+ *  + Javadoc
+ *  + Security
+ *  + Переписка
+ *  + Переписка2
+ *  + Тестирование
+ *  + Swagger
+ *
+ * </pre>
+ * @see Subscriber */
 @RequestMapping("/students")
-@NoArgsConstructor
+@RequiredArgsConstructor
 @RestController public class StudentsController {
 
-    @Autowired
-    private MainService datas;
+    private final AuthController authController;
 
-    @Autowired
-    private AuthController authController;
+    /** RU: удаляет роль ученика у пользователя + Server Sent Events
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('HTEACHER')""")
+    @DeleteMapping("/remPep")
+    public ResponseEntity<Void> remPep(@RequestBody DataStudents body, CustomToken auth) throws Exception {
+        final JsonTreeWriter wrtr = datas.init("", "[DELETE] /remPep");
+        final User user1 = datas.getDbService().userById(body.id);
+        final Group group = datas.getDbService().groupById(Long.parseLong(auth.getSub().getLvlGr()));
+        if (user1 == null || group == null) {
+            return ResponseEntity.notFound().build();
+        }
+        user1.getRoles().remove(Roles.HTEACHER);
+        datas.getDbService().getUserRepository().saveAndFlush(user1);
+        if (!ObjectUtils.isEmpty(group.getKids())) {
+            group.getKids().remove(user1);
+        }
+        datas.getDbService().getGroupRepository().saveAndFlush(group);
 
-    @PostMapping(value = "/remPep")
-    public JsonObject remPep(@RequestBody DataStudents body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
-        User user1 = datas.getDbService().userById(body.id);
-        try {
-            body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(Roles.HTEACHER) && user1 != null) {
-                Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
-                if (group != null) {
-                    user1.getRoles().remove(Roles.HTEACHER);
-                    datas.getDbService().getUserRepository().saveAndFlush(user1);
-                    if (!ObjectUtils.isEmpty(group.getKids())) {
-                        group.getKids().remove(user1);
-                    }
-                    datas.getDbService().getGroupRepository().saveAndFlush(group);
-
-                    body.wrtr.name("id").value(user1.getId());
-                }
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.sendEventFor("remPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-        }, body.wrtr, body.bol);
+        wrtr.name("id").value(user1.getId());
+        return datas.getObjR(ans -> {
+            authController.sendEventFor("remPepC", ans, TypesConnect.STUDENTS, auth.getSub().getLvlSch(), auth.getSub().getLvlGr(), "main", "main");
+        }, wrtr, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/chPep")
-    public JsonObject chPep(@RequestBody DataStudents body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
-        User user1 = datas.getDbService().userById(body.id);
-        try {
-            body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(Roles.HTEACHER) && user1 != null) {
-                user1.setFio(body.name);
-                datas.getDbService().getUserRepository().saveAndFlush(user1);
+    /** RU: изменяет ФИО ученика + Server Sent Events
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('HTEACHER')""")
+    @PatchMapping("/chPep")
+    public ResponseEntity<Void> chPep(@RequestBody DataStudents body, CustomToken auth) throws Exception {
+        final JsonTreeWriter wrtr = datas.init("", "[PATCH] /chPep");
+        final User user1 = datas.getDbService().userById(body.id);
+        if (user1 == null) return ResponseEntity.notFound().build();
 
-                body.wrtr.name("id").value(user1.getId())
-                    .name("name").value(body.name);
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.sendEventFor("chPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-        }, body.wrtr, body.bol);
+        user1.setFio(body.name);
+        datas.getDbService().getUserRepository().saveAndFlush(user1);
+
+        wrtr.name("id").value(user1.getId())
+            .name("name").value(body.name);
+        return datas.getObjR(ans -> {
+            authController.sendEventFor("chPepC", ans, TypesConnect.STUDENTS, auth.getSub().getLvlSch(), auth.getSub().getLvlGr(), "main", "main");
+        }, wrtr, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/addPep")
-    public JsonObject addPep(@RequestBody DataStudents body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
-        try {
-            body.wrtr = datas.init(body.toString());
-            if (user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
-                Group group = datas.getDbService().groupById(Long.parseLong(subscriber.getLvlGr()));
-                if (group != null) {
-                    Instant after = Instant.now().plus(Duration.ofDays(30));
-                    Date dateAfter = Date.from(after);
-                    Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, datas.getDbService().schoolById(Long.parseLong(subscriber.getLvlSch())), group));
-                    User inv = new User(body.name, Map.of(
-                        Roles.KID, role
-                        ), Main.df.format(dateAfter));
-                    datas.getDbService().getUserRepository().saveAndFlush(inv);
-                    group.getKids().add(inv);
-                    datas.getDbService().getGroupRepository().saveAndFlush(group);
+    /** RU: создаёт пользователя-ученика и отправляет информацию + Server Sent Events
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('HTEACHER')""")
+    @PostMapping("/addPep")
+    public ResponseEntity<Void> addPep(@RequestBody DataStudents body, CustomToken auth) throws Exception {
+        final JsonTreeWriter wrtr = datas.init("", "[POST] /addPep");
+        final Group group = datas.getDbService().groupById(Long.parseLong(auth.getSub().getLvlGr()));
+        if (group == null) return ResponseEntity.notFound().build();
 
-                    body.wrtr.name("id").value(inv.getId())
-                        .name("body").beginObject()
-                        .name("name").value(body.name).endObject();
-                }
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.sendEventFor("addPepC", ans, TypesConnect.STUDENTS, subscriber.getLvlSch(), subscriber.getLvlGr(), "main", "main");
-        }, body.wrtr, body.bol);
+        final Instant after = Instant.now().plus(Duration.ofDays(30));
+        final Date dateAfter = Date.from(after);
+        final School school = datas.getDbService().schoolById(Long.parseLong(auth.getSub().getLvlSch()));
+        final Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, school, group));
+        final User inv = new User(body.name, Map.of(
+            Roles.KID, role
+            ), Main.df.format(dateAfter));
+        datas.getDbService().getUserRepository().saveAndFlush(inv);
+        group.getKids().add(inv);
+        datas.getDbService().getGroupRepository().saveAndFlush(group);
+
+        wrtr.name("id").value(inv.getId())
+            .name("body").beginObject()
+            .name("name").value(body.name).endObject();
+        return datas.getObjR(ans -> {
+            authController.sendEventFor("addPepC", ans, TypesConnect.STUDENTS, auth.getSub().getLvlSch(), auth.getSub().getLvlGr(), "main", "main");
+        }, wrtr, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/getStud")
-    public JsonObject getStud(@RequestBody DataStudents body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
-        final var ref = new Object() {
-            Long schId = null, grId = body.group;
-        };
-        try {
-            body.wrtr = datas.init(body.toString());
-            if (user != null) {
-                School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
-                ref.schId = school.getId();
-                if (!user.getRoles().containsKey(Roles.HTEACHER)) {
-                    ref.grId = datas.getDbService().getFirstRole(user.getRoles()).getGrp().getId();
-                }
-                Group group = datas.getDbService().groupById(ref.grId);
-                if (group != null && school != null && school.getGroups().contains(group.getId())) {
-                    body.wrtr.name("body").beginObject();
-                    datas.usersByList(group.getKids(), true, body.wrtr);
-                    body.wrtr.endObject();
-                }
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.infCon(body.uuid, null, null, ref.schId + "", ref.grId + "", null, null);
-        }, body.wrtr, body.bol);
+    /** RU: отправляет список учеников группы
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @GetMapping("/getStud/{grId}")
+    public ResponseEntity<JsonObject> getStud(@PathVariable Long grId, CustomToken auth) throws Exception {
+        final User user = auth.getSub().getUser();
+        final JsonTreeWriter wrtr = datas.init("", "[GET] /getStud");
+        final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
+        if (!user.getRoles().containsKey(Roles.HTEACHER)) {
+            grId = datas.getDbService().getFirstRole(user.getRoles()).getGrp().getId();
+        }
+        final Group group = datas.getDbService().groupById(grId);
+        if (group != null && school != null && school.getGroups().contains(group)) {
+            datas.usersByList(group.getKids(), true, wrtr);
+        }
+        return datas.getObjR(ans -> {
+            authController.infCon(auth.getUUID(), null, null, school.getId() + "", group.getId() + "", null, null);
+        }, wrtr, HttpStatus.OK, false);
     }
 
-    @PostMapping(value = "/getInfo")
-    public JsonObject getInfo(@RequestBody DataStudents body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
-        try {
-            body.wrtr = datas.init(body.toString());
-            if (user != null) {
-                if(user.getSelRole() == Roles.HTEACHER) {
-                    body.wrtr.name("bodyG").beginObject();
-                    Long firstG = datas.groupsBySchoolOfUser(user, body.wrtr);
-                    body.wrtr.name("firstG").value(firstG);
-                } else {
-                    body.wrtr.name("yes").value(true);
-                }
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.infCon(body.uuid, null, TypesConnect.STUDENTS, "main", "main", user.getRoles().containsKey(Roles.HTEACHER) ? "ht" : "main", "main");
-        }, body.wrtr, body.bol);
+    /** RU: [start] запускает клиента в раздел Одноклассники и подтверждает клиенту права
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and !hasAuthority('ADMIN')""")
+    @GetMapping("/getInfo")
+    public ResponseEntity<Void> getInfo(CustomToken auth) throws Exception {
+        System.out.println("[GET] /getInfo");
+        authController.infCon(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
-}
 
-@ToString
-@NoArgsConstructor @AllArgsConstructor
-class DataStudents {
-    public String uuid, name;
-    public Long group, id;
-    public transient boolean bol = true;
-    public transient JsonTreeWriter wrtr;
+    /** RU: [start] отправляет список групп учебного центра и подтверждает клиенту права
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#auth.getSub().getUser() != null)
+        and hasAuthority('HTEACHER')""")
+    @GetMapping("/getInfoFH")
+    public ResponseEntity<JsonObject> getInfoForHTeacher(CustomToken auth) throws Exception {
+        final User user = auth.getSub().getUser();
+        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfoFH");
+        wrtr.name("bodyG").beginObject();
+        final Long firstG = datas.groupsBySchoolOfUser(user, wrtr);
+        wrtr.name("firstG").value(firstG);
+        return datas.getObjR(ans -> {
+            authController.infCon(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "ht", "main");
+        }, wrtr, HttpStatus.OK, false);
+    }
+
+    /** RU: Данные клиента используемые StudentsController в методах
+     * @see StudentsController */
+    @ToString
+    @RequiredArgsConstructor
+    static final class DataStudents {
+        public final String name;
+        public final Long id;
+    }
 }

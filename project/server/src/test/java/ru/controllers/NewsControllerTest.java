@@ -104,7 +104,7 @@ public class NewsControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("NewsController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("NewsController/" + methodName, resource(snip.build()));
     }
@@ -119,7 +119,7 @@ public class NewsControllerTest {
         when(dbService.newsById(any())).thenReturn(null);
         getSub().setLvlMore2("Por");
         mockMvc.perform(delete("/news/delNews/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -135,7 +135,7 @@ public class NewsControllerTest {
         when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
         getSub().setLvlMore2("Yo");
         mockMvc.perform(delete("/news/delNews/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -156,7 +156,7 @@ public class NewsControllerTest {
         when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
         getSub().setLvlMore2("Por");
         mockMvc.perform(delete("/news/delNews/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -178,7 +178,7 @@ public class NewsControllerTest {
     void chNews_whenEmpty_Portal_AdminUser() throws Exception {
         getSub().setLvlMore2("Por");
         mockMvc.perform(put("/news/chNews/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -194,7 +194,7 @@ public class NewsControllerTest {
         when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
         getSub().setLvlMore2("Yo");
         mockMvc.perform(put("/news/chNews/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -218,7 +218,7 @@ public class NewsControllerTest {
         when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
         getSub().setLvlMore2("Por");
         mockMvc.perform(put("/news/chNews/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -242,7 +242,7 @@ public class NewsControllerTest {
             .then(invocation -> invocation.getArguments()[0]);
         getSub().setLvlMore2(type);
         mockMvc.perform(post("/news/addNews" + type + "/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
             .andExpect(status)
@@ -309,7 +309,7 @@ public class NewsControllerTest {
                 .description("Нужный тип: Por - портал, Yo - школы")
             )
             .tag("NewsController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("NewsController/" + methodName, resource(snip.build()));
     }
@@ -320,7 +320,7 @@ public class NewsControllerTest {
     @CustomUser
     void getNews_whenEmpty_Portal_Admin() throws Exception {
         mockMvc.perform(get("/news/getNews/{type}", "Por")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{}"))
             .andDo(getNews_Docs("getNews_whenEmpty_Portal_Admin"));
@@ -336,7 +336,7 @@ public class NewsControllerTest {
         when(user.getSelecRole().getYO().getNews())
             .thenReturn(randomUtils.newsTest);
         mockMvc.perform(get("/news/getNews/{type}", "Yo")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
             .andDo(getNews_Docs("getNews_whenGood_YO_HTeacher"));
@@ -350,7 +350,7 @@ public class NewsControllerTest {
         when(datas.getDbService().getSyst().getNews())
             .thenReturn(randomUtils.newsTest);
         mockMvc.perform(get("/news/getNews/{type}", "Por")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
             .andDo(getNews_Docs("getNews_whenGood_Portal_AdminUser"));

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.epages:restdocs-api-spec:0.16.4" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.epages" artifactId="restdocs-api-spec" version="0.16.4" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.epages/restdocs-api-spec/0.16.4/5ce55c9468b2086438f8614cdacc3439b60bea1d/restdocs-api-spec-0.16.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

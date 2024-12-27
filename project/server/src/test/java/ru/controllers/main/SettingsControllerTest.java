@@ -2,6 +2,7 @@ package ru.controllers.main;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
+import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,18 +10,20 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.slf4j.Logger;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,6 +32,8 @@ import ru.controllers.AuthController;
 import ru.data.SSE.Subscriber;
 import ru.data.models.auth.SettingUser;
 import ru.data.models.auth.User;
+import ru.security.ControllerExceptionHandler;
+import ru.security.CustomAccessDenied;
 import ru.security.user.CustomToken;
 import ru.services.EmailService;
 import ru.services.MainService;
@@ -52,48 +57,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static utils.RandomUtils.defaultDescription;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@Import({SettingsControllerConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SettingsControllerTest {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private IniDBService iniDBService;
-
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Autowired
     private DBService dbService;
 
-    @Mock
+    @Autowired
     private EmailService emailService;
 
-    @Mock
+    @Autowired
     private PushService pushService;
 
-    @InjectMocks
-    private MainService mainService;
-
-    @Mock
-    private AuthController authController;
-
-    @InjectMocks
+    @Autowired
     private SettingsController settingsController;
 
     private MockMvc mockMvc;
-
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final RandomUtils randomUtils = new RandomUtils();
-
     private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
 
     @BeforeAll
     static void beforeAll() throws ServletException {
-        LoggingSystem.get(ClassLoader.getSystemClassLoader()).setLogLevel(Logger.ROOT_LOGGER_NAME, LogLevel.INFO);
         authInjector.afterPropertiesSet();
     }
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
-        mainService.postConstruct();
         mockMvc = MockMvcBuilders.standaloneSetup(settingsController)
             .setMessageConverters(converter)
+            .setControllerAdvice(controllerExceptionHandler)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
@@ -108,24 +103,23 @@ public class SettingsControllerTest {
             .summary(summary)
             .description(defaultDescription)
             .tag("SettingsController")
-            .requestHeaders(headerWithName(SecurityConfig.authHeader)
+            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("SettingsController/" + methodName, resource(snip.build()));
     }
 
     private final String checkCodeEmail_Summary = "Подтверждение емэйла";
 
-    /** RU: админ
-     * клиент не отправляет данные и получает 404 код */
+    /** RU: аноним
+     * клиент не отправляет данные и получает 401 код */
     @Test @Tag("checkCodeEmail")
-    @CustomUser
+    @CustomAuth
     void checkCodeEmail_whenEmpty_AdminUser() throws Exception {
-        getSub().getUser().getSettings().setEmailCode("code");
         mockMvc.perform(patch("/settings/checkCodeEmail/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(checkCodeEmail_Summary, "checkCodeEmail_whenEmpty_AdminUser"));
     }
 
@@ -137,8 +131,9 @@ public class SettingsControllerTest {
         User user = getSub().getUser();
         when(dbService.userByCode("uuid")).thenReturn(user);
         user.getSettings().setEmailCode("code");
+
         mockMvc.perform(patch("/settings/checkCodeEmail/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -152,16 +147,16 @@ public class SettingsControllerTest {
 
     private final String startEmail_Summary = "Изменение электронной почты пользователя или добавление при регистрации";
 
-    /** RU: админ
-     * клиент не отправляет данных и получает 404 код */
+    /** RU: аноним
+     * клиент не отправляет данных и получает 401 код */
     @Test @Tag("startEmail")
-    @CustomUser
+    @CustomAuth
     void startEmail_whenEmpty_AdminUser() throws Exception {
         mockMvc.perform(patch("/settings/startEmail/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isUnauthorized())
             .andDo(default_Docs(startEmail_Summary, "startEmail_whenEmpty_AdminUser"));
     }
 
@@ -172,8 +167,9 @@ public class SettingsControllerTest {
     void startEmail_whenGood_AdminUser() throws Exception {
         User user = getSub().getUser();
         when(dbService.userByCode("uuid")).thenReturn(user);
+
         mockMvc.perform(patch("/settings/startEmail/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -193,7 +189,7 @@ public class SettingsControllerTest {
     @CustomUser
     void remNotifToken_whenEmpty_AdminUser() throws Exception {
         mockMvc.perform(post("/settings/remNotifToken/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -206,7 +202,7 @@ public class SettingsControllerTest {
     @CustomUser
     void remNotifToken_whenGood_AdminUser() throws Exception {
         mockMvc.perform(post("/settings/remNotifToken/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -225,7 +221,7 @@ public class SettingsControllerTest {
     @CustomUser
     void addNotifToken_whenEmpty_AdminUser() throws Exception {
         mockMvc.perform(post("/settings/addNotifToken/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -238,7 +234,7 @@ public class SettingsControllerTest {
     @CustomUser
     void addNotifToken_whenGood_AdminUser() throws Exception {
         mockMvc.perform(post("/settings/addNotifToken/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -257,7 +253,7 @@ public class SettingsControllerTest {
     @CustomUser
     void chSettings_whenEmpty_AdminUser() throws Exception {
         mockMvc.perform(patch("/settings/chSettings/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
@@ -272,8 +268,9 @@ public class SettingsControllerTest {
         SettingUser settingUser = mock(SettingUser.class);
         User user = getSub().getUser();
         when(user.getSettings()).thenReturn(settingUser);
+
         mockMvc.perform(patch("/settings/chSettings/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -296,8 +293,9 @@ public class SettingsControllerTest {
         settingUser.setEmailCode("11112");
         User user = getSub().getUser();
         when(user.getSettings()).thenReturn(settingUser);
+
         mockMvc.perform(patch("/settings/checkPasCodeEmail/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -319,8 +317,9 @@ public class SettingsControllerTest {
         User user = getSub().getUser();
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
+
         mockMvc.perform(patch("/settings/checkPasCodeEmail/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -344,8 +343,9 @@ public class SettingsControllerTest {
         settingUser.setSecFr("victoria_secret1");
         User user = getSub().getUser();
         when(user.getSettings()).thenReturn(settingUser);
+
         mockMvc.perform(patch("/settings/chPass/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -367,8 +367,9 @@ public class SettingsControllerTest {
         User user = getSub().getUser();
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
+
         mockMvc.perform(patch("/settings/chPass/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -393,8 +394,9 @@ public class SettingsControllerTest {
         User user = getSub().getUser();
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
+
         mockMvc.perform(patch("/settings/chPass/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
         {
@@ -416,8 +418,9 @@ public class SettingsControllerTest {
     @CustomUser
     void getSettings_whenEmpty_AdminUser() throws Exception {
         when(getSub().getUser().getSettings()).thenReturn(null);
+
         mockMvc.perform(get("/settings/getSettings/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isNotFound())
             .andDo(default_Docs(getSettings_Summary, "getSettings_whenEmpty_AdminUser"));
     }
@@ -430,10 +433,53 @@ public class SettingsControllerTest {
         SettingUser settingUser = new SettingUser();
         settingUser.setNNewReqSch(true);
         when(getSub().getUser().getSettings()).thenReturn(settingUser);
+
         mockMvc.perform(get("/settings/getSettings/")
-                .header(SecurityConfig.authHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"checkbox_hints\":true,\"checkbox_notify\":false,\"checkbox_notify_sched\":false,\"checkbox_notify_marks\":false,\"checkbox_notify_yo\":false,\"checkbox_notify_por\":false,\"checkbox_notify_new_sch\":true}"))
             .andDo(default_Docs(getSettings_Summary, "getSettings_whenGood_AdminUser"));
+    }
+}
+
+@TestConfiguration
+@Import({CustomAccessDenied.class})
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
+class SettingsControllerConfig {
+
+    @Bean
+    public EmailService emailService() {
+        return mock(EmailService.class);
+    }
+
+    @Bean
+    public PushService pushService() {
+        return mock(PushService.class);
+    }
+
+    @Bean
+    public DBService dbService() {
+        return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean(initMethod = "postConstruct")
+    public MainService mainService(DBService dbService, EmailService emailService, PushService pushService) {
+        return spy(new MainService(pushService, dbService, emailService));
+    }
+
+    @Bean
+    public IniDBService iniDBService() {
+        return mock(IniDBService.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public AuthController authController() {
+        return mock(AuthController.class);
+    }
+
+    @Bean
+    public SettingsController settingsController(AuthController authController) {
+        return spy(new SettingsController(authController));
     }
 }

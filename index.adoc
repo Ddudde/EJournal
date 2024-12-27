@@ -58,7 +58,7 @@ http://localhost:8080/console_db
 ====
 == Зависимости клиента
 ====
-NOTE: WebStorm в качестве IDE
+NOTE: Vs Code в качестве IDE
 
 . Github Pages
 . Single Page Application
@@ -91,6 +91,7 @@ gradle openapi3
 toDo - что нужно доделать
 beenDo - что уже сделано
 
+Для генерирования Swagger из тестов, нужно предварительно запустить gradle test.
 ====
 == API
 === HTTP методы

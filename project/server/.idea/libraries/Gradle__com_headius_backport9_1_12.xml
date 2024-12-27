@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.headius:backport9:1.12" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.headius" artifactId="backport9" version="1.12" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.headius/backport9/1.12/48995f1910bb87a5b53d8720092879fce54e04b8/backport9-1.12.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
