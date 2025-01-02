@@ -5,7 +5,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -32,14 +31,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
-import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
@@ -65,7 +62,14 @@ import static utils.RandomUtils.*;
 @Import({ParentsControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ParentsControllerTest {
-
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final RandomUtils randomUtils = new RandomUtils();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    
     @Autowired
     private DBService dbService;
 
@@ -77,33 +81,23 @@ public class ParentsControllerTest {
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
-
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
-    }
-
+    
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(parentsController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -115,19 +109,17 @@ public class ParentsControllerTest {
 
     private final String remPep_Summary = "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("remPep")
     @CustomAuth
     void remPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/parents/remPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(remPep_Summary, "remPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenEmpty_Anonim"));
     }
 
     /** RU: завуч
@@ -143,15 +135,14 @@ public class ParentsControllerTest {
         when(group.getKids()).thenReturn(users);
 
         mockMvc.perform(delete("/parents/remPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
                 "id": 20
             }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(remPep_Summary, "remPep_whenGood_HTEACHER"));
+            """)).andExpect(status().isOk())
+            .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
         verify(authController).sendEventFor(eq("remPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872}",
@@ -161,39 +152,34 @@ public class ParentsControllerTest {
 
     private final String chPep_Summary = "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chPep")
     @CustomAuth
     void chPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/parents/chPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chPep_Summary, "chPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenEmpty_Anonim"));
     }
 
-    /** RU: завуч
-     * изменяет ФИО родителю и отправляет JSON'ом инфу */
     @Test @Tag("chPep")
     @CustomUser(roles = Roles.HTEACHER)
     void chPep_whenGood_HTEACHER() throws Exception {
         when(dbService.userById(20L)).thenReturn(getCloneUsers(usersTest.get(0)));
 
         mockMvc.perform(patch("/parents/chPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
                 "id": 20,
                 name : "Петров П.А."
             }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(chPep_Summary, "chPep_whenGood_HTEACHER"));
+            """)).andExpect(status().isOk())
+            .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
         verify(authController).sendEventFor(eq("chPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872,\"name\":\"Петров П.А.\"}",
@@ -202,19 +188,17 @@ public class ParentsControllerTest {
 
     private final String addPar_Summary = "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("addPar")
     @CustomAuth
     void addPar_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/parents/addPar")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(addPar_Summary, "addPar_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(addPar_Summary, "addPar_whenEmpty_Anonim"));
     }
 
     /** RU: завуч
@@ -230,7 +214,7 @@ public class ParentsControllerTest {
         when(dbService.schoolById(20L)).thenReturn(sch1);
 
         mockMvc.perform(post("/parents/addPar")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -247,9 +231,8 @@ public class ParentsControllerTest {
                     }
                 }
             }
-            """))
-            .andExpect(status().isCreated())
-            .andDo(default_Docs(addPar_Summary, "addPar_whenGood_HTEACHER"));
+            """)).andExpect(status().isCreated())
+            .andDo(defaultSwaggerDocs(addPar_Summary, "addPar_whenGood_HTEACHER"));
 
         verify(authController).sendEventFor(eq("addParC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872,\"body\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\",\"par\":{\"null\":{\"name\":\"Петрова А.Б.\"}}}}",
@@ -258,21 +241,17 @@ public class ParentsControllerTest {
 
     private final String getParents_Summary = "отправляет список ребёнок-родители группы";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("getParents")
     @CustomAuth
     void getParents_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/parents/getParents/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getParents_Summary, "getParents_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getParents_Summary, "getParents_whenEmpty_Anonim"));
     }
 
-    /** RU: завуч
-     * отправляет JSON'ом список */
     @Test @Tag("getParents")
     @CustomUser(roles = Roles.HTEACHER)
     void getParents_whenGood_HTEACHER() throws Exception {
@@ -284,26 +263,24 @@ public class ParentsControllerTest {
         when(group.getKids()).thenReturn(usersTest);
 
         mockMvc.perform(get("/parents/getParents/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyP\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\",\"par\":{}},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"par\":{}},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"par\":{}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"par\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\",\"par\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}},\"bodyC\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}"))
-            .andDo(default_Docs(getParents_Summary, "getParents_whenGood_HTEACHER"));
+            .andDo(defaultSwaggerDocs(getParents_Summary, "getParents_whenGood_HTEACHER"));
     }
 
     private final String getInfo_Summary = "[start] запускает клиента в раздел Родители и подтверждает клиенту права";
     private final String getInfoForHTeacher_Summary = "[start] отправляет список групп учебного центра и подтверждает клиенту права";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("getInfo")
     @CustomAuth
     void getInfo_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/parents/getInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
 
     /** RU: ученик
@@ -312,22 +289,20 @@ public class ParentsControllerTest {
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
         mockMvc.perform(get("/parents/getInfo")
-            .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+            .header(SecurityConfig.authTokenHeader, bearerToken))
         .andExpect(status().isOk())
-        .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));
+        .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("getInfoForHTeacher")
     @CustomAuth
     void getInfoForHTeacher_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/parents/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
     }
 
     /** RU: завуч
@@ -340,10 +315,10 @@ public class ParentsControllerTest {
         when(sch1.getGroups()).thenReturn(randomUtils.groups);
 
         mockMvc.perform(get("/parents/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323}"))
-            .andDo(default_Docs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));
+            .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));
     }
 }
 

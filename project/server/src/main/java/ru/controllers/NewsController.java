@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.data.SSE.Subscriber;
@@ -44,17 +45,17 @@ import static ru.Main.datas;
     /** RU: удаление новости + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
-        and ((#auth.getSub().getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
-        or (#auth.getSub().getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
+        @code401.check(#sub.getUser() != null)
+        and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
+        or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
     @DeleteMapping("/delNews")
-    public ResponseEntity<Void> delNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> delNews(@RequestBody DataNews body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /delNews");
         final News news = datas.getDbService().newsById(body.id);
         final Syst syst = datas.getDbService().getSyst();
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if (news != null) {
-            if (Objects.equals(auth.getSub().getLvlMore2(), "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
+            if (Objects.equals(sub.getLvlMore2(), "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
                 syst.getNews().remove(news);
                 datas.getDbService().getSystRepository().saveAndFlush(syst);
             }
@@ -63,19 +64,19 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.sendEventFor("delNewsC", ans, TypesConnect.NEWS, auth.getSub().getLvlSch(),
-                auth.getSub().getLvlGr(), auth.getSub().getLvlMore1(), auth.getSub().getLvlMore2());
+            authController.sendEventFor("delNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+                sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
 
     /** RU: изменение новости + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
-        and ((#auth.getSub().getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
-        or (#auth.getSub().getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
+        @code401.check(#sub.getUser() != null)
+        and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
+        or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
     @PutMapping("/chNews")
-    public ResponseEntity<Void> chNews(@RequestBody DataNews body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chNews(@RequestBody DataNews body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT]  /chNews");
         final News news = datas.getDbService().newsById(body.id);
         HttpStatus stat = HttpStatus.NOT_FOUND;
@@ -94,8 +95,8 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chNewsC", ans, TypesConnect.NEWS, auth.getSub().getLvlSch(),
-                auth.getSub().getLvlGr(), auth.getSub().getLvlMore1(), auth.getSub().getLvlMore2());
+            authController.sendEventFor("chNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+                sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
 
@@ -111,12 +112,12 @@ import static ru.Main.datas;
     /** RU: добавление новой новости учебного центра + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
-        and #auth.getSub().getLvlMore2() == 'Yo' and hasAuthority('HTEACHER')""")
+        @code401.check(#sub.getUser() != null)
+        and #sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER')""")
     @PostMapping("/addNewsYo")
-    public ResponseEntity<Void> addNewsYO(@RequestBody DataNews body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addNewsYO(@RequestBody DataNews body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addNewsYo");
-        final User user = auth.getSub().getUser();
+        final User user = sub.getUser();
         final School school = user.getSelecRole().getYO();
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if (school != null && !ObjectUtils.isEmpty(body.date)) {
@@ -132,18 +133,18 @@ import static ru.Main.datas;
             datas.getPushService().send(school.getId()+"News", "Новые объявления!",
                 "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
                 "/DipvLom/static/media/info.jpg");
-            authController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, auth.getSub().getLvlSch(),
-                auth.getSub().getLvlGr(), auth.getSub().getLvlMore1(), auth.getSub().getLvlMore2());
+            authController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+                sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
 
     /** RU: добавление новой новости портала + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
-        and #auth.getSub().getLvlMore2() == 'Por' and hasAuthority('ADMIN')""")
+        @code401.check(#sub.getUser() != null)
+        and #sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')""")
     @PostMapping("/addNewsPor")
-    public ResponseEntity<Void> addNewsPortal(@RequestBody DataNews body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addNewsPortal(@RequestBody DataNews body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addNewsPor");
         final Syst syst = datas.getDbService().getSyst();
         HttpStatus stat = HttpStatus.NOT_FOUND;
@@ -160,8 +161,8 @@ import static ru.Main.datas;
             datas.getPushService().send("news", "Новые объявления!",
                 "На портале появилось новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
                 "/DipvLom/static/media/info.jpg");
-            authController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, auth.getSub().getLvlSch(),
-                auth.getSub().getLvlGr(), auth.getSub().getLvlMore1(), auth.getSub().getLvlMore2());
+            authController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+                sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
 
@@ -169,8 +170,8 @@ import static ru.Main.datas;
      * @param type Нужный тип: Por - портал, Yo - школы
      * @see DocsHelpController#point(Object, Object) Описание */
     @GetMapping("/getNews/{type}")
-    public ResponseEntity<JsonObject> getNews(@PathVariable String type, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getNews(@PathVariable String type, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("type= "+type, "[GET] /getNews");
         List<News> list = null;
         final Syst syst = datas.getDbService().getSyst();

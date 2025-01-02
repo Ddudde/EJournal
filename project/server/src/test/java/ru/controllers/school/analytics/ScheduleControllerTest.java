@@ -5,7 +5,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -32,13 +31,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
-import ru.data.SSE.Subscriber;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
 import ru.data.models.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
@@ -58,13 +55,19 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.usersTest;
+import static utils.RandomUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({ScheduleControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ScheduleControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final RandomUtils randomUtils = new RandomUtils();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
 
     @Autowired
     private DBService dbService;
@@ -78,32 +81,22 @@ public class ScheduleControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
-    }
-
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(scheduleController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -121,11 +114,11 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/schedule/addLesson")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(addLesson_Summary, "addLesson_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(addLesson_Summary, "addLesson_whenEmpty_Anonim"));
     }
 
     @Test @Tag("addLesson")
@@ -142,7 +135,7 @@ public class ScheduleControllerTest {
         prepareTeachersByLessons();
 
         mockMvc.perform(post("/schedule/addLesson")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -157,9 +150,8 @@ public class ScheduleControllerTest {
                    }
                }
             }
-            """))
-            .andExpect(status().isCreated())
-            .andDo(default_Docs(addLesson_Summary, "addLesson_whenGood_HTEACHER"));
+            """)).andExpect(status().isCreated())
+            .andDo(defaultSwaggerDocs(addLesson_Summary, "addLesson_whenGood_HTEACHER"));
 
         verify(authController, times(3)).sendEventFor(eq("addLessonC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"bodyT\":{\"nt\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}},\"0\":{\"name\":\"Англ. Яз\",\"tea\":{\"22\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"23\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"24\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"}}},\"1\":{\"name\":\"Математика\",\"tea\":{\"25\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}}},\"day\":1,\"les\":1,\"body\":{\"name\":\"Химия\",\"cabinet\":\"504Б\",\"prepod\":{\"name\":\"Дрыздов А.А.\",\"id\":21},\"group\":null}}",
@@ -174,9 +166,9 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/schedule/getSchedule/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getSchedule_Summary, "getSchedule_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getSchedule_Summary, "getSchedule_whenEmpty_Anonim"));
     }
 
     @Test @Tag("getSchedule")
@@ -191,10 +183,10 @@ public class ScheduleControllerTest {
         prepareLessons();
 
         mockMvc.perform(get("/schedule/getSchedule/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}}}"))
-            .andDo(default_Docs(getSchedule_Summary, "getSchedule_whenGood_HTEACHER"));
+            .andDo(defaultSwaggerDocs(getSchedule_Summary, "getSchedule_whenGood_HTEACHER"));
     }
 
     /** RU: создаём уроки для учеников */
@@ -212,9 +204,9 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/schedule/getInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
 
     @Test @Tag("getInfo")
@@ -226,9 +218,9 @@ public class ScheduleControllerTest {
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(get("/schedule/getInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
 
     @Test @Tag("getInfoForHTeacherOrTEACHER")
@@ -237,9 +229,9 @@ public class ScheduleControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/schedule/getInfoToHT")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfoForHTeacherOrTEACHER_Summary, "getInfoForHTeacherOrTEACHER_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfoForHTeacherOrTEACHER_Summary, "getInfoForHTeacherOrTEACHER_whenEmpty_Anonim"));
     }
 
     @Test @Tag("getInfoForHTeacherOrTEACHER")
@@ -253,10 +245,10 @@ public class ScheduleControllerTest {
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch1);
 
         mockMvc.perform(get("/schedule/getInfoToHT")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323,\"bodyT\":{\"nt\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}},\"0\":{\"name\":\"Англ. Яз\",\"tea\":{\"22\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"23\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"24\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"}}},\"1\":{\"name\":\"Математика\",\"tea\":{\"25\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}}}}"))
-            .andDo(default_Docs(getInfoForHTeacherOrTEACHER_Summary, "getInfoForHTeacherOrTEACHER_whenGood_HTEACHER"));
+            .andDo(defaultSwaggerDocs(getInfoForHTeacherOrTEACHER_Summary, "getInfoForHTeacherOrTEACHER_whenGood_HTEACHER"));
     }
 
     /** RU: создаём данные для списка дисциплина-учителя */

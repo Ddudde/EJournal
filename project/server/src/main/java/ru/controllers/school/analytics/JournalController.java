@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,17 +48,16 @@ import static ru.Main.datas;
 @RequestMapping("/journal")
 @RequiredArgsConstructor
 @RestController public class JournalController {
-
     private final AuthController authController;
 
     /** RU: отправляет данные о итоговых оценках
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfoPers")
-    public ResponseEntity<JsonObject> getInfoPers(CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getInfoPers(@AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfoPers");
         final School sch = datas.getDbService().getFirstRole(user.getRoles()).getYO();
         final Group group = datas.getDbService().getFirstRole(user.getRoles()).getGrp();
@@ -101,11 +101,11 @@ import static ru.Main.datas;
     /** RU: [start] отправляет данные о оценках
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfo")
-    public ResponseEntity<JsonObject> getInfo(CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
         final School sch = datas.getDbService().getFirstRole(user.getRoles()).getYO();
         final Group group = datas.getDbService().getFirstRole(user.getRoles()).getGrp();

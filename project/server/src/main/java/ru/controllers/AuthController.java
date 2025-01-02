@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -156,9 +157,9 @@ import static ru.Main.datas;
     /** RU: [start#2] изменение подписки
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/infCon")
-    public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /infCon");
-        final User user = auth.getSub().getUser();
+        final User user = sub.getUser();
         infCon(auth.getUUID(), body.login, body.type, null, null, null, null);
         if(user == null) return ResponseEntity.ok().build();
 
@@ -190,26 +191,26 @@ import static ru.Main.datas;
 
     /** RU: завершение сеанса
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub() != null)")
+    @PreAuthorize("@code401.check(#sub != null)")
     @PatchMapping("/remCon")
-    public ResponseEntity<Void> remCon(CustomToken auth) {
+    public ResponseEntity<Void> remCon(@AuthenticationPrincipal Subscriber sub, CustomToken auth) {
         System.out.println("[PATCH] /remCon");
-        if(auth.getSub().getLogin() != null) {
-            System.out.println("subscription remCon " + auth.getUUID() + " was noclosed " + auth.getSub().getLogin());
+        if(sub.getLogin() != null) {
+            System.out.println("subscription remCon " + auth.getUUID() + " was noclosed " + sub.getLogin());
         } else {
             datas.subscriptions.remove(UUID.fromString(auth.getUUID()));
             System.out.println("subscription remCon " + auth.getUUID() + " was closed");
         }
-        auth.getSub().getSSE().complete();
+        sub.getSSE().complete();
         return ResponseEntity.ok().build();
     }
 
     /** RU: авторизация пользователя
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PostMapping("/auth")
-    public ResponseEntity<JsonObject> auth(@RequestBody DataAuth body, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> auth(@RequestBody DataAuth body, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /auth");
         if(!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();
@@ -299,10 +300,10 @@ import static ru.Main.datas;
     /** RU: установка/обновление инвайта для регистрации + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @PatchMapping("/setCodePep")
-    public ResponseEntity<JsonObject> setCodePep(@RequestBody DataAuth body, CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> setCodePep(@RequestBody DataAuth body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user1 = datas.getDbService().userByLogin(body.id);
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /setCodePep");
         if(user1 == null) return ResponseEntity.notFound().build();
@@ -321,8 +322,8 @@ import static ru.Main.datas;
         wrtr.name("code").value(uuid.toString())
             .name("id1").value(schId);
         return datas.getObjR(ans -> {
-            sendEventFor("codPepL2C", ans, auth.getSub().getType(), "null", auth.getSub().getLvlGr(), "adm", "main");
-            sendEventFor("codPepL1C", ans, auth.getSub().getType(), schId +"", auth.getSub().getLvlGr(), "ht", "main");
+            sendEventFor("codPepL2C", ans, sub.getType(), "null", sub.getLvlGr(), "adm", "main");
+            sendEventFor("codPepL1C", ans, sub.getType(), schId +"", sub.getLvlGr(), "ht", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

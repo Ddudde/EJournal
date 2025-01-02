@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.data.models.auth.User;
 import ru.data.models.school.Group;
@@ -46,15 +48,14 @@ import static ru.Main.datas;
 @RequestMapping("/dnevnik")
 @RequiredArgsConstructor
 @RestController public class DnevnikController {
-
     private final AuthController authController;
 
     /** RU: отправляет данные о расписании, оценках, домашних заданиях
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @GetMapping("/getDnevnik")
-    public ResponseEntity<JsonObject> getDnevnik(CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getDnevnik(@AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getDnevnik");
         Group group = null;
         if(user.getSelRole() == Roles.KID) {
@@ -166,11 +167,11 @@ import static ru.Main.datas;
     /** RU: [start] запускает клиента в раздел Дневник и подтверждает клиенту права
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         AND (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfo")
-    public ResponseEntity<Void> getInfo(CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<Void> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final Long schId = user.getSelecRole().getYO().getId();
         authController.infCon(auth.getUUID(), null, TypesConnect.DNEVNIK, schId +"", "main", "main", "main");
         return ResponseEntity.ok().build();

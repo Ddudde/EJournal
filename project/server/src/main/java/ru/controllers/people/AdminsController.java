@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
 import ru.controllers.AuthController;
@@ -47,10 +48,10 @@ import static ru.Main.datas;
     /** RU: удаляет у пользователя роль администратора + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody DataAdmins body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user1 = datas.getDbService().userById(body.id);
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /remPep");
         final Syst syst = datas.getDbService().getSyst();
@@ -72,10 +73,10 @@ import static ru.Main.datas;
     /** RU: изменяет фамилию пользователя + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody DataAdmins body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user1 = datas.getDbService().userById(body.id);
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chPep");
         if (user1 == null) return ResponseEntity.notFound().build();
@@ -93,10 +94,10 @@ import static ru.Main.datas;
     /** RU: создаёт пользователя-администратора + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PostMapping("/addPep")
-    public ResponseEntity<Void> addPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addPep(@RequestBody DataAdmins body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final Syst syst = datas.getDbService().getSyst();
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addPep");
         if (syst == null) return ResponseEntity.notFound().build();
@@ -123,14 +124,14 @@ import static ru.Main.datas;
     /** RU: [start] отправляет список администраторов
      * @see DocsHelpController#point(Object, Object) Описание */
     @GetMapping("/getAdmins")
-    public ResponseEntity<JsonObject> getAdmins(CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> getAdmins(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         final Syst syst = datas.getDbService().getSyst();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getAdmins");
         if (syst == null) return ResponseEntity.notFound().build();
 
         datas.usersByList(syst.getAdmins(), true, wrtr);
         return datas.getObjR(ans -> {
-            final User user = auth.getSub().getUser();
+            final User user = sub.getUser();
             String role = "main";
             if (user.getRoles().containsKey(Roles.ADMIN)) {
                 role = "adm";

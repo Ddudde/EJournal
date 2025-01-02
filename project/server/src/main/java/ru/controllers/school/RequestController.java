@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.AuthController;
@@ -33,7 +34,6 @@ import static ru.Main.datas;
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 @RestController public class RequestController {
-    
     private final AuthController authController;
 
     /** RU: добавляет заявку + Server Sent Events
@@ -61,10 +61,10 @@ import static ru.Main.datas;
     /** RU: удаление заявки + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/delReq")
-    public ResponseEntity<Void> delReq(@RequestBody DataRequest body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> delReq(@RequestBody DataRequest body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /delReq");
         final Request request = datas.getDbService().requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -80,10 +80,10 @@ import static ru.Main.datas;
     /** RU: изменение заголовка заявки + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chTitle")
-    public ResponseEntity<Void> chTitle(@RequestBody DataRequest body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chTitle(@RequestBody DataRequest body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chTitle");
         final Request request = datas.getDbService().requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -101,10 +101,10 @@ import static ru.Main.datas;
     /** RU: изменение даты заявки + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chDate")
-    public ResponseEntity<Void> chDate(@RequestBody DataRequest body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chDate(@RequestBody DataRequest body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chDate");
         final Request request = datas.getDbService().requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -122,10 +122,10 @@ import static ru.Main.datas;
     /** RU: изменение текста заявки + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chText")
-    public ResponseEntity<Void> chText(@RequestBody DataRequest body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chText(@RequestBody DataRequest body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chText");
         final Request request = datas.getDbService().requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -143,10 +143,10 @@ import static ru.Main.datas;
     /** RU: [start] отправляет инфу о заявках
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @GetMapping("/getRequests")
-    public ResponseEntity<JsonObject> getRequests(CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> getRequests(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getRequests");
         for(Request reqR : datas.getDbService().getRequests()){
             wrtr.name(reqR.getId()+"").beginObject()

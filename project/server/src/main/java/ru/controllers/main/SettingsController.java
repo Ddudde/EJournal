@@ -7,14 +7,15 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
 import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.data.SSE.Subscriber;
 import ru.data.models.auth.SettingUser;
 import ru.data.models.auth.User;
-import ru.security.user.CustomToken;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -45,13 +46,13 @@ import static ru.Main.datas;
     /** RU: подтверждение емэйла
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/checkCodeEmail")
-    public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         System.out.println("[PATCH] /checkCodeEmail ! " + body.toString());
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
             user = datas.getDbService().userByCode(body.invCod);
         } else {
-            user = auth.getSub().getUser();
+            user = sub.getUser();
         }
         if(user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         final SettingUser settingUser = user.getSettings();
@@ -68,13 +69,13 @@ import static ru.Main.datas;
     /** RU: изменение электронной почты пользователя или добавление при регистрации
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/startEmail")
-    public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         System.out.println("[PATCH] /startEmail ! " + body.toString());
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
             user = datas.getDbService().userByCode(body.invCod);
         } else {
-            user = auth.getSub().getUser();
+            user = sub.getUser();
         }
         if(user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(ObjectUtils.isEmpty(body.email)) return ResponseEntity.notFound().build();
@@ -92,12 +93,11 @@ import static ru.Main.datas;
 
     /** RU: удаление токена уведомлений
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PostMapping("/remNotifToken")
-    public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
-        System.out.println("[POST] /remNotifToken ! " + body.toString());
-        if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
+        System.out.println("[POST] /remNotifToken ! " + body.toString());        if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
         datas.getPushService().remToken(settingUser, body.notifToken);
@@ -107,10 +107,10 @@ import static ru.Main.datas;
 
     /** RU: установка токена уведомлений
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PostMapping("/addNotifToken")
-    public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
         System.out.println("[POST] /addNotifToken ! " + body.toString());
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
@@ -122,10 +122,10 @@ import static ru.Main.datas;
 
     /** RU: Вкл/выкл подсказки или ряд уведомлений
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PatchMapping("/chSettings")
-    public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
         System.out.println("[PATCH] /chBool ! " + body.toString());
         if(ObjectUtils.isEmpty(body.id)) return ResponseEntity.notFound().build();
 
@@ -148,12 +148,12 @@ import static ru.Main.datas;
 
     /** RU: изменяет пароль пользователя при помощи емэйла
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PatchMapping("/checkPasCodeEmail")
-    public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
         System.out.println("[PATCH] /checkPasCodeEmail ! " + body.toString());
-        final User user = empLogin ? auth.getSub().getUser() : datas.getDbService().userByLogin(body.login);
+        final User user = empLogin ? sub.getUser() : datas.getDbService().userByLogin(body.login);
         if(!Objects.equals(user.getSettings().getEmailCode(), body.emailCode)) {
             return ResponseEntity.notFound().build();
         }
@@ -167,11 +167,11 @@ import static ru.Main.datas;
 
     /** RU: изменяет пароль пользователя при помощи емэйла/секретной фразы
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PatchMapping("/chPass")
-    public ResponseEntity<JsonObject> chPass(@RequestBody DataSettings body, CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> chPass(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
-        final User user = empLogin ? auth.getSub().getUser() : datas.getDbService().userByLogin(body.login);
+        final User user = empLogin ? sub.getUser() : datas.getDbService().userByLogin(body.login);
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chPass");
         HttpStatus stat = HttpStatus.ACCEPTED;
         final SettingUser settingUser = user.getSettings();
@@ -199,10 +199,10 @@ import static ru.Main.datas;
 
     /** RU: отправляет настройки клиенту
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @GetMapping("/getSettings")
-    public ResponseEntity<JsonObject> getSettings(CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getSettings(@AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getSettings");
         final SettingUser settingUser = user.getSettings();
         if(settingUser == null) return ResponseEntity.notFound().build();

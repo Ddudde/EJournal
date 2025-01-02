@@ -6,7 +6,7 @@ import com.epages.restdocs.apispec.SimpleType;
 import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -25,18 +25,16 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
-import ru.data.SSE.Subscriber;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.PushService;
@@ -57,11 +55,18 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static utils.RandomUtils.defaultDescription;
+import static utils.RandomUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({ProfileControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ProfileControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
 
     @Autowired
     private DBService dbService;
@@ -78,32 +83,22 @@ public class ProfileControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
-    }
-
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(profileController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -115,54 +110,51 @@ public class ProfileControllerTest {
 
     private final String chKid_Summary = "Изменение контроллируемого ученика у родителя";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chKid")
     @CustomAuth
     void chKid_whenEmpty_Anonim() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chKid")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chKid_Summary, "chKid_whenEmpty_Anonim"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chKid_Summary, "chKid_whenEmpty_Anonim"));
     }
 
-    /** RU: родитель
-     * отправляет 200 код-ответ и меняет наблюдаемого ребёнка */
     @Test @Tag("chKid")
     @CustomUser(roles = Roles.PARENT)
     void chKid_whenGood_Parent() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
+
         mockMvc.perform(patch("/profiles/chKid")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "idL": "123"
-        }
-                """))
-            .andExpect(status().isOk())
+            {
+                "idL": "123"
+            }
+            """)).andExpect(statusCode)
             .andExpect(content().json("{\"kid\":123}"))
-            .andDo(default_Docs(chKid_Summary, "chKid_whenGood_Parent"));
+            .andDo(defaultSwaggerDocs(chKid_Summary, "chKid_whenGood_Parent"));
     }
 
     private final String chRole_Summary = "Изменение роли на следующую по иерархии из имеющихся у пользователя";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chRole")
     @CustomAuth
     void chRole_whenEmpty_Anonim() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chRole")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chRole_Summary, "chRole_whenEmpty_Anonim"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chRole_Summary, "chRole_whenEmpty_Anonim"));
     }
 
     /** RU: ученик-администратор, с активной ролью ученика
@@ -170,83 +162,80 @@ public class ProfileControllerTest {
     @Test @Tag("chRole")
     @CustomUser
     void chRole_whenGood_Kid() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         getSub().getUser().setSelRole(Roles.KID);
 
         mockMvc.perform(patch("/profiles/chRole")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
-            .andExpect(status().isOk())
+                .header(SecurityConfig.authTokenHeader, bearerToken))
+            .andExpect(statusCode)
             .andExpect(content().json("{\"role\":4}"))
-            .andDo(default_Docs(chRole_Summary, "chRole_whenGood_Kid"));
+            .andDo(defaultSwaggerDocs(chRole_Summary, "chRole_whenGood_Kid"));
     }
 
     private final String exit_Summary = "Выход с аккаунта";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("exit")
     @CustomAuth
     void exit_whenEmpty_Anonim() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/exit")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(exit_Summary, "exit_whenEmpty_Anonim"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(exit_Summary, "exit_whenEmpty_Anonim"));
     }
 
-    /** RU: админ
-     * отправляет 200 код-ответ */
     @Test @Tag("exit")
     @CustomUser
     void exit_whenGood_Admin() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
+
         mockMvc.perform(patch("/profiles/exit")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "notifToken": "notifTest"
-        }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(exit_Summary, "exit_whenGood_Admin"));
+            {
+                "notifToken": "notifTest"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(exit_Summary, "exit_whenGood_Admin"));
         verify(pushService).remToken(any(), eq("notifTest"));
     }
 
     private final String chEmail_Summary = "Изменение/добавление электронной почты определённой роли пользователя + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chEmail")
     @CustomAuth
     void chEmail_whenEmpty_Anonim() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chEmail")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chEmail_Summary, "chEmail_whenEmpty_Anonim"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
     }
 
-    /** RU: админ
-     * отправляет JSON'ом инфу о электронной почте */
     @Test @Tag("chEmail")
     @CustomUser
     void chEmail_whenGood_Admin() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
+
         mockMvc.perform(patch("/profiles/chEmail")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "email": "mail1@example.com"
-        }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(chEmail_Summary, "chEmail_whenGood_Admin"));
+            {
+                "email": "mail1@example.com"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenGood_Admin"));
         verify(authController).sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"email\":\"mail1@example.com\",\"role\":4}}",
             answer.getValue().toString());
@@ -254,37 +243,35 @@ public class ProfileControllerTest {
 
     private final String chInfo_Summary = "Изменение/добавление дополнительной информации о пользователе + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chInfo")
     @CustomAuth
     void chInfo_whenEmpty_Anonim() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chInfo_Summary, "chInfo_whenEmpty_Anonim"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
     }
 
-    /** RU: админ
-     * отправляет JSON'ом инфу о дополнительной инфе */
     @Test @Tag("chInfo")
     @CustomUser
     void chInfo_whenGood_Admin() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
+
         mockMvc.perform(patch("/profiles/chInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "info": "testInfo"
-        }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(chInfo_Summary, "chInfo_whenGood_Admin"));
+            {
+                "info": "testInfo"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenGood_Admin"));
         verify(authController).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"more\":\"testInfo\"}}",
             answer.getValue().toString());
@@ -292,17 +279,17 @@ public class ProfileControllerTest {
 
     private final String chLogin_Summary = "Изменение логина пользователя + Server Sent Events";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("chLogin")
     @CustomAuth
     void chLogin_whenEmpty_Anonim() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
+
         mockMvc.perform(patch("/profiles/chLogin")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chLogin_Summary, "chLogin_whenEmpty_Anonim"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenEmpty_Anonim"));
         verify(authController, times(0)).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
     }
 
@@ -311,19 +298,19 @@ public class ProfileControllerTest {
     @Test @Tag("chLogin")
     @CustomUser
     void chLogin_whenGood_Admin() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         getSub().setLvlMore2("nm12");
         when(dbService.userByLogin("nm")).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chLogin")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "nLogin": nm
-        }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(chLogin_Summary, "chLogin_whenGood_Admin"));
+            {
+                "nLogin": nm
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenGood_Admin"));
         verify(authController).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"oLogin\":\"nm12\",\"nLogin\":\"nm\"}}",
             answer.getValue().toString());
@@ -348,11 +335,12 @@ public class ProfileControllerTest {
     @Test @Tag("getProfile")
     @CustomAuth
     void getProfile_whenEmpty_Anonim() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
-            .andExpect(status().isUnauthorized())
+                .header(SecurityConfig.authTokenHeader, bearerToken))
+            .andExpect(statusCode)
             .andDo(getProfile_Docs("getProfile_whenEmpty_Anonim"));
     }
 
@@ -361,9 +349,11 @@ public class ProfileControllerTest {
     @Test @Tag("getProfile")
     @CustomUser
     void getProfile_whenGood_AuthLogin_Admin() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
+
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
-            .andExpect(status().isOk())
+                .header(SecurityConfig.authTokenHeader, bearerToken))
+            .andExpect(statusCode)
             .andExpect(content().json("{\"login\":\"nm12\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}},\"4\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))
             .andDo(getProfile_Docs("getProfile_whenGood_AuthLogin_Admin"));
     }
@@ -373,11 +363,12 @@ public class ProfileControllerTest {
     @Test @Tag("getProfile")
     @CustomAuth
     void getProfile_whenGood_CustomLogin_Anonim() throws Exception {
-        when(dbService.userByLogin("nm12")).thenReturn(randomUtils.usersTest.get(4));
+        final ResultMatcher statusCode = status().isOk();
+        when(dbService.userByLogin("nm12")).thenReturn(RandomUtils.usersTest.get(4));
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
-            .andExpect(status().isOk())
+                .header(SecurityConfig.authTokenHeader, bearerToken))
+            .andExpect(statusCode)
             .andExpect(content().json("{\"login\":\"facere_a\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))
             .andDo(getProfile_Docs("getProfile_whenGood_CustomLogin_Anonim"));
     }

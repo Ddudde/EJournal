@@ -2,17 +2,14 @@ package ru.controllers.school.analytics;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +20,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -31,13 +27,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
-import ru.data.SSE.Subscriber;
 import ru.data.models.school.Group;
 import ru.data.models.school.Mark;
 import ru.data.models.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
@@ -63,45 +57,36 @@ import static utils.RandomUtils.usersTest;
 @Import({JournalControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JournalControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final RandomUtils randomUtils = new RandomUtils();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
 
     @Autowired
     private DBService dbService;
 
     @Autowired
-    private AuthController authController;
-
-    @Autowired
     private JournalController journalController;
 
-    @Captor
-    private ArgumentCaptor<JsonObject> answer;
-
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
-    }
-
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(journalController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -113,17 +98,15 @@ public class JournalControllerTest {
 
     private final String getInfoPers_Summary = "Отправляет данные о итоговых оценках";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("getInfoPers")
     @CustomAuth
     void getInfoPers_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/journal/getInfoPers")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfoPers_Summary, "getInfoPers_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfoPers_Summary, "getInfoPers_whenEmpty_Anonim"));
     }
 
     /** RU: ученик
@@ -142,10 +125,10 @@ public class JournalControllerTest {
         prepareListLessons();
 
         mockMvc.perform(get("/journal/getInfoPers")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"9764\":\"III четверть\",\"3456\":\"IV четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"9764\":\"1\",\"352\":\"Н\"},\"Математика\":{\"9764\":\"2\",\"352\":\"5\",\"3872\":\"5\"}}}"))
-            .andDo(default_Docs(getInfoPers_Summary, "getInfoPers_whenGood_KID"));
+            .andDo(defaultSwaggerDocs(getInfoPers_Summary, "getInfoPers_whenGood_KID"));
     }
 
     /** RU: создаём случайные оценки периодов */
@@ -164,17 +147,15 @@ public class JournalControllerTest {
 
     private final String getInfo_Summary = "[start] отправляет данные о оценках";
 
-    /** RU: аноним
-     * отправляет 401 код-ответ */
     @Test @Tag("getInfo")
     @CustomAuth
     void getInfo_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/journal/getInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
 
     /** RU: ученик
@@ -193,10 +174,10 @@ public class JournalControllerTest {
         prepareListLessons();
 
         mockMvc.perform(get("/journal/getInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyJ\":{\"Химия\":{\"days\":{\"10.06.22\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Англ. Яз\":{\"days\":{\"12.06.22\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Математика\":{\"days\":{\"10.06.22\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"}}}}}"))
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
 
     /** RU: создаём обычные случайные оценки */

@@ -7,7 +7,9 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.data.models.Contacts;
 import ru.data.models.Syst;
@@ -34,23 +36,22 @@ import static ru.Main.datas;
 @RequestMapping("/contacts")
 @RequiredArgsConstructor
 @RestController public class ContactsController {
-
     private final AuthController authController;
 
     /** RU: изменение контакта + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PutMapping("/chContact")
-    public ResponseEntity<Void> chContact(@RequestBody DataContacts body, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<Void> chContact(@RequestBody DataContacts body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
         final Syst syst = datas.getDbService().getSyst();
         Contacts contacts = null;
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chContact");
         HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user.getRoles().containsKey(Roles.ADMIN) && Objects.equals(auth.getSub().getLvlMore2(), "Por")){
+        if(user.getRoles().containsKey(Roles.ADMIN) && Objects.equals(sub.getLvlMore2(), "Por")){
             contacts = syst.getContacts();
         }
-        if(user.getRoles().containsKey(Roles.HTEACHER) && Objects.equals(auth.getSub().getLvlMore2(), "Yo")){
+        if(user.getRoles().containsKey(Roles.HTEACHER) && Objects.equals(sub.getLvlMore2(), "Yo")){
             final School school = user.getSelecRole().getYO();
             if(school != null) contacts = school.getContacts();
         }
@@ -73,7 +74,7 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chContactC", ans, TypesConnect.CONTACTS, auth.getSub().getLvlSch(), "main", "main", auth.getSub().getLvlMore2());
+            authController.sendEventFor("chContactC", ans, TypesConnect.CONTACTS, sub.getLvlSch(), "main", "main", sub.getLvlMore2());
         }, wrtr, stat);
     }
 
@@ -81,8 +82,8 @@ import static ru.Main.datas;
      * @param type Нужный тип: Por - портал, Yo - школы
      * @see DocsHelpController#point(Object, Object) Описание */
     @GetMapping("/getContacts/{type}")
-    public ResponseEntity<JsonObject> getContacts(@PathVariable String type, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getContacts(@PathVariable String type, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("type= "+type, "[GET] /getContacts");
         final Syst syst = datas.getDbService().getSyst();
         Contacts contacts = null;
@@ -107,7 +108,7 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), auth.getSub().getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", type);
+            authController.infCon(auth.getUUID(), sub.getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", type);
         }, wrtr, stat, false);
     }
 

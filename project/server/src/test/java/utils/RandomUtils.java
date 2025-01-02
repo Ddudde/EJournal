@@ -72,10 +72,16 @@ public class RandomUtils {
         getPeriod(3456L, "IV четверть", "01.04.24", "30.08.24")
     ));
 
-    public final List<Group> groups = new ArrayList<>(asList(
+    public static final List<Group> groups = new ArrayList<>(asList(
         getGroup(2323L, namesGroup[0]),
         getGroup(3456L, namesGroup[1]),
         getGroup(4354L, namesGroup[2])
+    ));
+
+    public static final List<School> schools = new ArrayList<>(asList(
+        getSchool(9600, "Лицей №3293", 2616, 4866, 4117),
+        getSchool(1137, "Гимназия №2246", 3146, 4701, 5506),
+        getSchool(2903, "Школа №217", 1973, 5375, 7100)
     ));
 
     public final List<Lesson> lessons = new ArrayList<>(asList(
@@ -149,7 +155,7 @@ public class RandomUtils {
         return lessons;
     }
 
-    public Group getGroup(long id, String nameGrp) {
+    private static Group getGroup(long id, String nameGrp) {
         final Group group = new Group(nameGrp);
         group.getKids().addAll(usersTest);
         group.setId(id);
@@ -157,7 +163,7 @@ public class RandomUtils {
         return group;
     }
 
-    public School getSchool(long id, String nameSch, long... ids) {
+    public static School getSchool(long id, String nameSch, long... ids) {
 //        final String[] namesSch = {"Гимназия №", "Школа №", "Лицей №"};
 //        String nameSch = namesSch[(int) Math.round(Math.random() * 2)] + (Math.round(Math.random() * 5000) + 1);
         final List list = List.of();

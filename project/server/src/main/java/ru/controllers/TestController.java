@@ -7,8 +7,10 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
+import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.security.user.CustomToken;
 import ru.services.db.IniDBService;
@@ -29,17 +31,16 @@ import static ru.Main.datas;
 @RequestMapping("/test")
 @RequiredArgsConstructor
 @RestController public class TestController {
-
     private final AuthController authController;
     private final IniDBService iniDBService;
 
     /** RU: изменяет параметры тестирования
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PutMapping("/chTests")
-    public ResponseEntity<JsonObject> chTests(@RequestBody DataTest body, CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> chTests(@RequestBody DataTest body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chTests");
         switch (body.id) {
             case "checkbox_debug" -> Main.debug = body.val;
@@ -60,10 +61,10 @@ import static ru.Main.datas;
     /** RU: [start] отправка инфы для тестов
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @GetMapping("/getInfo")
-    public ResponseEntity<JsonObject> getInfo(CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
         wrtr.name("bodyS").beginObject()
             .name("checkbox_debug").value(Main.debug)
