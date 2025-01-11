@@ -70,7 +70,8 @@ import static ru.Main.datas;
             wrtr.name(p.getId()+"").value(p.getName());
         }
         wrtr.endObject();
-        final List<Object[]> marks = datas.getDbService().getMarkRepository().uniqNameSubjectAndMarksByParams(user.getId(), "per", periods);
+        final List<Object[]> marks = datas.getDbService().getMarkRepository()
+            .uniqNameSubjectAndMarksByParams(user.getId(), "per", periods);
         final Map<String, List<Mark>> mapM = marks.stream().collect(Collectors.groupingBy(
             obj -> (String) obj[0],
             Collector.of(
@@ -80,7 +81,8 @@ import static ru.Main.datas;
             )));
         System.out.println(mapM);
         if(!ObjectUtils.isEmpty(mapM)) {
-            final List<String> lessonsByKid = datas.getDbService().getLessonRepository().uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
+            final List<String> lessonsByKid = datas.getDbService().getLessonRepository()
+                .uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
             for(String les : lessonsByKid) {
                 if(mapM.containsKey(les)) continue;
                 mapM.put(les, null);
@@ -112,7 +114,8 @@ import static ru.Main.datas;
         if(group == null) return ResponseEntity.notFound().build();
 
         final Period actPeriod = datas.getActualPeriodBySchool(sch);
-        final List<Object[]> marks = datas.getDbService().getDayRepository().uniqNameSubjectAndDatAndMarksByParams(sch.getId(), group.getId(), actPeriod.getId());
+        final List<Object[]> marks = datas.getDbService().getDayRepository()
+            .uniqNameSubjectAndDatAndMarksByParams(sch.getId(), group.getId(), actPeriod.getId());
         final Map<String, Map<String, List<Mark>>> mapD = marks.stream().collect(Collectors.groupingBy(
             obj -> (String) obj[0],
             Collectors.groupingBy(
@@ -123,7 +126,8 @@ import static ru.Main.datas;
                     (left, right) -> right
                 ))));
         System.out.println("mapD " + mapD);
-        final List<String> lessonsByKid = datas.getDbService().getLessonRepository().uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
+        final List<String> lessonsByKid = datas.getDbService().getLessonRepository()
+            .uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
         for(String les : lessonsByKid) {
             if(mapD.containsKey(les)) continue;
             mapD.put(les, null);

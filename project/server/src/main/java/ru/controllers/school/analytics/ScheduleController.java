@@ -79,6 +79,7 @@ import static ru.Main.datas;
         datas.getDbService().getSchoolRepository().saveAndFlush(school);
         wrtr.name("bodyT").beginObject();
         datas.teachersBySchool(school, wrtr);
+        wrtr.endObject();
         body.obj.addProperty("group", group.getName());
         wrtr.name("day").value(body.day)
             .name("les").value(lesson.getNumLesson());
@@ -164,6 +165,7 @@ import static ru.Main.datas;
         wrtr.name("firstG").value(firstG)
             .name("bodyT").beginObject();
         datas.teachersBySchool(school, wrtr);
+        wrtr.endObject();
         return datas.getObjR(ans -> {
             String role = "main", teacherId = "main";
             if(user.getSelRole() == Roles.HTEACHER) role = "ht";

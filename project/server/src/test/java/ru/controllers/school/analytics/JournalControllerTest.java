@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.AuthController;
 import ru.data.models.school.Group;
-import ru.data.models.school.Mark;
 import ru.data.models.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
@@ -51,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
 import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.usersTest;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({JournalControllerConfig.class})
@@ -134,12 +132,12 @@ public class JournalControllerTest {
     /** RU: создаём случайные оценки периодов */
     private void prepareMarksPers() {
         final List<Object[]> marksPers = List.of(
-            new Object[]{"Англ. Яз", new Mark(usersTest.get(1), randomUtils.periods.get(2), "1", 1, "per", null)},
-            new Object[]{"Математика", new Mark(usersTest.get(1), randomUtils.periods.get(2), "2", 1, "per", null)},
-            new Object[]{"Химия", new Mark(usersTest.get(1), randomUtils.periods.get(2), "4", 1, "per", null)},
-            new Object[]{"Математика", new Mark(usersTest.get(1), randomUtils.periods.get(0), "5", 1, "per", null)},
-            new Object[]{"Математика", new Mark(usersTest.get(1), randomUtils.periods.get(1), "5", 1, "per", null)},
-            new Object[]{"Англ. Яз", new Mark(usersTest.get(1), randomUtils.periods.get(0), "Н", 1, "per", null)}
+            new Object[]{"Англ. Яз", randomUtils.marksPeriod.get(0)},
+            new Object[]{"Математика", randomUtils.marksPeriod.get(1)},
+            new Object[]{"Химия", randomUtils.marksPeriod.get(2)},
+            new Object[]{"Математика", randomUtils.marksPeriod.get(3)},
+            new Object[]{"Математика", randomUtils.marksPeriod.get(4)},
+            new Object[]{"Англ. Яз", randomUtils.marksPeriod.get(5)}
         );
         when(dbService.getMarkRepository()
             .uniqNameSubjectAndMarksByParams(any(), eq("per"), any())).thenReturn(marksPers);
@@ -190,12 +188,12 @@ public class JournalControllerTest {
     /** RU: создаём обычные случайные оценки */
     private void prepareMarks() {
         final List<Object[]> marks = List.of(
-            new Object[]{"Англ. Яз", "10.06.22", new Mark(usersTest.get(1), randomUtils.periods.get(2), "1", 1, "norm", "Ответ на уроке")},
-            new Object[]{"Математика", "10.06.22", new Mark(usersTest.get(1), randomUtils.periods.get(2), "2", 1, "norm", "Ответ на уроке")},
-            new Object[]{"Химия", "10.06.22", new Mark(usersTest.get(1), randomUtils.periods.get(2), "4", 1, "norm", "Ответ на уроке")},
-            new Object[]{"Математика", "10.06.22", new Mark(usersTest.get(1), randomUtils.periods.get(2), "5", 1, "norm", "Ответ на уроке")},
-            new Object[]{"Математика", "11.06.22", new Mark(usersTest.get(1), randomUtils.periods.get(2), "5", 1, "norm", "Ответ на уроке")},
-            new Object[]{"Англ. Яз", "12.06.22", new Mark(usersTest.get(1), randomUtils.periods.get(2), "Н", 1, "norm", null)}
+            new Object[]{"Англ. Яз", "10.06.22", randomUtils.marks.get(0)},
+            new Object[]{"Математика", "10.06.22", randomUtils.marks.get(1)},
+            new Object[]{"Химия", "10.06.22", randomUtils.marks.get(2)},
+            new Object[]{"Математика", "10.06.22", randomUtils.marks.get(3)},
+            new Object[]{"Математика", "11.06.22", randomUtils.marks.get(4)},
+            new Object[]{"Англ. Яз", "12.06.22", randomUtils.marks.get(5)}
         );
         when(dbService.getDayRepository()
             .uniqNameSubjectAndDatAndMarksByParams(eq(20L), eq(20L), any())).thenReturn(marks);

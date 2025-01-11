@@ -191,7 +191,6 @@ import static ru.Main.datas;
                 i++;
             }
         }
-        wrtr.endObject();
     }
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>

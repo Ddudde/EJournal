@@ -1,13 +1,13 @@
 package utils;
 
+import org.junit.platform.suite.api.IncludeTags;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
-import ru.controllers.main.ProfileControllerTest;
-import ru.controllers.people.HTeachersControllerTest;
+import ru.controllers.school.PJournalControllerTest;
 
 /** RU: Запускает тесты при помощи junit-platform-suite */
 @Suite
-@SelectClasses({ProfileControllerTest.class, HTeachersControllerTest.class})
+@SelectClasses({PJournalControllerTest.class})
 //@SelectPackages("ru")
-//@IncludeTags({"auth"})
+@IncludeTags({"addHomework"})
 public class RunTestSuite {}

@@ -36,7 +36,7 @@ import yes from "../../media/yes.png";
 import no from "../../media/no.png";
 import ErrFound from "../other/error/ErrFound";
 import {eventSource, sendToServer} from "../main/Main";
-import {cHteachers, cTeachers} from "../other/Controllers";
+import {cHteachers, cTeachers, cAuth} from "../other/Controllers";
 
 let dispatch, teachersInfo, cState, themeState, inps, errText, selKid;
 errText = "К сожалению, информация не найдена... Можете попробовать попросить завуча заполнить информацию.";
@@ -161,12 +161,11 @@ function codPepL1C(e) {
 export function codTea (id, title, text) {
     console.log("codPar");
     sendToServer({
-        uuid: cState.uuid,
         id: id
-    }, 'POST', cTeachers+"setCodePep")
+    }, 'PATCH', cAuth+"setCodePep")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 dispatch(changeEvents(CHANGE_EVENT, undefined, undefined, title, text, 10));
             }
         });
@@ -175,12 +174,11 @@ export function codTea (id, title, text) {
 export function addTea(inp, par) {
     console.log("addTea");
     sendToServer({
-        uuid: cState.uuid,
         name: inp
     }, 'POST', cTeachers+"addTea")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 201){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -191,12 +189,10 @@ function onCon(e) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cTeachers+"getTeachers")
+    sendToServer(0, 'GET', cTeachers+"getTeachers")
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 if(cState.role == 1 && cState.kid) selKid = cState.kid;
                 dispatch(changePeople(CHANGE_TEACHERS_GL, 0, 0, 0, data.body));
             }

@@ -70,6 +70,7 @@ public class MainServiceTest {
         JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();
         mainService.teachersBySchool(school, wrtr);
+        wrtr.endObject();
         assertEquals(expected, wrtr.get().getAsJsonObject().toString());
     }
 

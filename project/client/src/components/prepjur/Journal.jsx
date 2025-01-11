@@ -393,22 +393,20 @@ function onCon(e) {
 
 function setInfoP1() {
     let scr, e, marks;
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cPjournal+"getInfoP1")
+    sendToServer(0, 'GET', cPjournal+"getInfoP1")
         .then(data => {
             console.log(data);
-            if(data.error == false) {
-                dispatch(changePjournal(CHANGE_PJOURNAL, "pers", data.bodyPers));
-                dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.bodyS));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "predms", data.bodyPred));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "min", data.min));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "max", data.max));
-                if (!data.bodyPred[jourInfo.predm]) {
+            if(data.status == 200){
+                dispatch(changePjournal(CHANGE_PJOURNAL, "pers", data.body.bodyPers));
+                dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body.bodyS));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "predms", data.body.bodyPred));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "min", data.body.min));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "max", data.body.max));
+                if (!data.body.bodyPred[jourInfo.predm]) {
                     dispatch(changePjournal(CHANGE_PJOURNAL, "predm", 0));
-                    setInfoP2(data.bodyPred[0]);
+                    setInfoP2(data.body.bodyPred[0]);
                 } else {
-                    setInfoP2(data.bodyPred[jourInfo.predm]);
+                    setInfoP2(data.body.bodyPred[jourInfo.predm]);
                 }
                 scr = document.querySelector("." + journalCSS.days);
                 if(!scr) return;
@@ -433,18 +431,15 @@ function setInfoP1() {
 
 function setInfoP2(predm) {
     if(!predm) return;
-    sendToServer({
-        uuid: cState.uuid,
-        predm: predm
-    }, 'POST', cPjournal+"getInfoP2")
+    sendToServer(0, 'GET', cPjournal+"getInfoP2/"+predm)
         .then(data => {
             console.log(data);
-            if(data.error == false){
-                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
-                if (!data.bodyG[groupsInfo.els.group]) {
-                    selGr = data.firstG;
-                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
-                    setInfoP3(data.firstG);
+            if(data.status == 200){
+                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.body.bodyG));
+                if (!data.body.bodyG[groupsInfo.els.group]) {
+                    selGr = data.body.firstG;
+                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.body.firstG)));
+                    setInfoP3(data.body.firstG);
                 } else {
                     selGr = groupsInfo.els.group;
                     setInfoP3(groupsInfo.els.group);
@@ -455,31 +450,28 @@ function setInfoP2(predm) {
 
 function setInfoP3(group) {
     if(!group) return;
-    sendToServer({
-        uuid: cState.uuid,
-        group: group
-    }, 'POST', cPjournal+"getInfoP3")
+    sendToServer(0, 'GET', cPjournal+"getInfoP3/"+group)
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 let weight, sum, mar, wei;
-                for(let kid in data.bodyK) {
+                for(let kid in data.body.bodyK) {
                     weight = 0;
                     sum = 0;
-                    for(let day in data.bodyK[kid].days) {
-                        mar = parseInt(data.bodyK[kid].days[day].mark);
+                    for(let day in data.body.bodyK[kid].days) {
+                        mar = parseInt(data.body.bodyK[kid].days[day].mark);
                         if(!mar || isNaN(mar)) continue;
-                        wei = parseInt(data.bodyK[kid].days[day].weight);
+                        wei = parseInt(data.body.bodyK[kid].days[day].weight);
                         if(!wei) wei = 1;
                         sum += mar*wei;
                         weight += wei;
                     }
                     if (sum && weight) {
-                        data.bodyK[kid].avg.mark = (sum/weight).toFixed(2);
+                        data.body.bodyK[kid].avg.mark = (sum/weight).toFixed(2);
                     }
                 }
-                dispatch(changePjournal(CHANGE_PJOURNAL_GL, 0, data.bodyK));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "dz", data.bodyD));
+                dispatch(changePjournal(CHANGE_PJOURNAL_GL, 0, data.body.bodyK));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "dz", data.body.bodyD));
             }
         });
 }
@@ -517,7 +509,6 @@ function addMarkC(e) {
 function addMark (weight, kid, day, per) {
     console.log("addMark");
     sendToServer({
-        uuid: cState.uuid,
         weight: weight,
         kid: kid,
         day: day,
@@ -531,13 +522,12 @@ function addMark (weight, kid, day, per) {
 function addHomework (day, homework, par) {
     console.log("addHomework");
     sendToServer({
-        uuid: cState.uuid,
         day: day,
         group: groupsInfo.els.group,
         homework: homework
     }, 'POST', cPjournal+"addHomework")
         .then(data => {
-            if(data.error == false) {
+            if(data.status == 201){
                 par.setAttribute('data-st', '0');
             }
         });

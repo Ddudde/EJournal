@@ -96,6 +96,24 @@ public class RandomUtils {
         new Lesson(null, null, 4, 4, "394", "Физика", usersTest.get(3))
     ));
 
+    public final List<Mark> marks = new ArrayList<>(asList(
+        new Mark(usersTest.get(1), periods.get(2), "1", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "2", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "4", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "5", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "5", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "Н", 1, "norm", null)
+    ));
+
+    public final List<Mark> marksPeriod = new ArrayList<>(asList(
+        new Mark(usersTest.get(1), periods.get(2), "1", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(2), "2", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(2), "4", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(2), "5", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(2), "5", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(2), "Н", 1, "per", null)
+    ));
+
     public static Subscriber getSub(){
         return ((CustomToken) SecurityContextHolder.getContext()
             .getAuthentication()).getSub();

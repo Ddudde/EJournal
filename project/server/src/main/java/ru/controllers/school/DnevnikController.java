@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
 
 import static ru.Main.datas;
 
-/** RU: Контроллер для просмотра дневника ученика
+/** RU: Контроллер для просмотра дневника ученика.
+ * Оценки могут быть на нескольких уроках одной дисциплины, а домашние задания выдаются на целый день.
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/DnevnikController">http://localhost:9001/swagger/htmlSwag/#/DnevnikController</a>
  *
@@ -72,8 +73,8 @@ import static ru.Main.datas;
         datas.getShedule("body", user, wrtr, group.getId());
 
         final Period actPeriod = datas.getActualPeriodBySchool(school);
-        final List<Object[]> marks = datas.getDbService()
-            .getDayRepository().uniqNameSubjectAndDatAndMarksByParams(school.getId(), group.getId(), actPeriod.getId());
+        final List<Object[]> marks = datas.getDbService().getDayRepository()
+            .uniqNameSubjectAndDatAndMarksByParams(school.getId(), group.getId(), actPeriod.getId());
         final Map<String, Map<String, List<Mark>>> mapD = marks.stream().collect(Collectors.groupingBy(
             obj -> (String) obj[0],
             Collectors.groupingBy(
@@ -86,7 +87,8 @@ import static ru.Main.datas;
         System.out.println("mapD " + mapD);
         wrtr.name("min").value(actPeriod.getDateN());
         wrtr.name("max").value(actPeriod.getDateK());
-        final List<Object[]> homeworks = datas.getDbService().getDayRepository().uniqNameSubAndDatAndHomeworkByParams(school.getId(), group.getId());
+        final List<Object[]> homeworks = datas.getDbService().getDayRepository()
+            .uniqNameSubAndDatAndHomeworkByParams(school.getId(), group.getId());
         final Map<String, Map<String, String>> mapH = homeworks.stream().collect(Collectors.groupingBy(
             obj -> (String) obj[0],
             Collectors.toMap(obj -> (String) obj[1], obj -> (String) obj[2])

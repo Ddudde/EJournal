@@ -34,7 +34,6 @@ function addPerC(e) {
 export function addPer (name, perN, perK) {
     console.log("addPer");
     sendToServer({
-        uuid: cState.uuid,
         name: name,
         perN: perN,
         perK: perK
@@ -46,13 +45,11 @@ function onCon(e) {
 }
 
 function setInfo() {
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cPeriods + "getInfo")
+    sendToServer(0, 'GET', cPeriods + "getInfo")
         .then(data => {
             console.log(data);
-            if(data.error == false){
-                dispatch(changeAnalytics(CHANGE_PERIODS_GL, 0, 0, 0, data.bodyP));
+            if(data.status == 200){
+                dispatch(changeAnalytics(CHANGE_PERIODS_GL, 0, 0, 0, data.body.bodyP));
                 for(let el of document.querySelectorAll(" *[id^='inpn']")){
                     chStatB({target: el}, inps, forceUpdate);
                 }
