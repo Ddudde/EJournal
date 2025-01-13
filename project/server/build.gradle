@@ -157,10 +157,10 @@ gradle.taskGraph.whenReady { graph ->
 
 sonar {
     properties {
-        property "sonar.host.url", "http://192.168.111.150:9000"
+        property "sonar.host.url", "http://192.168.241.129:9000"
         property "sonar.projectKey", "EJournal"
         property "sonar.projectName", "EJournal"
-        property "sonar.token", "sqp_2de0acfa3e7d9552ac072fc5d6ccc9ab3821a233"
+        property "sonar.token", "sqp_357b6c189bab0cd681ae2df163e8b63c9284021d"
         property "sonar.scm.disabled", "True"
         property "sonar.coverage.jacoco.xmlReportPath", "${layout.buildDirectory}/reports/jacoco.xml"
     }

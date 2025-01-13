@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,7 @@ import static ru.Main.datas;
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/SettingsController">http://localhost:9001/swagger/htmlSwag/#/SettingsController</a>
  * </pre> */
+@Slf4j
 @RequestMapping("/settings")
 @RequiredArgsConstructor
 @RestController public class SettingsController {
@@ -36,7 +38,7 @@ import static ru.Main.datas;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/checkCodeEmail")
     public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        System.out.println("[PATCH] /checkCodeEmail ! " + body.toString());
+        log.info("[PATCH] /checkCodeEmail ! " + body.toString());
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
             user = datas.getDbService().userByCode(body.invCod);
@@ -59,7 +61,7 @@ import static ru.Main.datas;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/startEmail")
     public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        System.out.println("[PATCH] /startEmail ! " + body.toString());
+        log.info("[PATCH] /startEmail ! " + body.toString());
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
             user = datas.getDbService().userByCode(body.invCod);
@@ -86,7 +88,7 @@ import static ru.Main.datas;
     @PostMapping("/remNotifToken")
     public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        System.out.println("[POST] /remNotifToken ! " + body.toString());        if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
+        log.info("[POST] /remNotifToken ! " + body.toString());        if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
         datas.getPushService().remToken(settingUser, body.notifToken);
@@ -100,7 +102,7 @@ import static ru.Main.datas;
     @PostMapping("/addNotifToken")
     public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        System.out.println("[POST] /addNotifToken ! " + body.toString());
+        log.info("[POST] /addNotifToken ! " + body.toString());
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
@@ -115,7 +117,7 @@ import static ru.Main.datas;
     @PatchMapping("/chSettings")
     public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        System.out.println("[PATCH] /chBool ! " + body.toString());
+        log.info("[PATCH] /chBool ! " + body.toString());
         if(ObjectUtils.isEmpty(body.id)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
@@ -141,7 +143,7 @@ import static ru.Main.datas;
     @PatchMapping("/checkPasCodeEmail")
     public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
-        System.out.println("[PATCH] /checkPasCodeEmail ! " + body.toString());
+        log.info("[PATCH] /checkPasCodeEmail ! " + body.toString());
         final User user = empLogin ? sub.getUser() : datas.getDbService().userByLogin(body.login);
         if(!Objects.equals(user.getSettings().getEmailCode(), body.emailCode)) {
             return ResponseEntity.notFound().build();

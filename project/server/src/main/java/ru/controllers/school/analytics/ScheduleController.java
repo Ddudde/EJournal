@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +32,7 @@ import static ru.Main.datas;
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ScheduleController">http://localhost:9001/swagger/htmlSwag/#/ScheduleController</a>
  * </pre>
  * @see Subscriber */
+@Slf4j
 @RequestMapping("/schedule")
 @RequiredArgsConstructor
 @RestController public class ScheduleController {
@@ -132,7 +134,7 @@ import static ru.Main.datas;
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfo")
     public ResponseEntity<Void> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
-        System.out.println("[GET] /getInfo");
+        log.info("[GET] /getInfo");
         final User user = sub.getUser();
         final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
         SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", "main", "main");

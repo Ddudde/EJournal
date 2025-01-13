@@ -212,7 +212,7 @@ import static ru.Main.datas;
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Старая версия
      * @see SettingsController#getSettings(CustomToken) Пример использования */
-    public JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, boolean bol) {
+    private JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, boolean bol) {
         JsonObject ans = null;
         try {
             wrtr.endObject();
@@ -228,14 +228,6 @@ import static ru.Main.datas;
             ans = errObj;
         }
         return ans;
-    }
-
-    /** RU: инициализация JSON для метода.<br>
-     * Старая версия */
-    public JsonTreeWriter init(String data) throws Exception {
-        JsonTreeWriter wrtr = init(data, "Post");
-        wrtr.name("error").value(false);
-        return wrtr;
     }
 
     /** RU: инициализация JSON для метода.<br>

@@ -2,6 +2,7 @@ package ru.services.db;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.data.DAO.News;
 import ru.data.DAO.Syst;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /** RU: сервис с различными геттерами к БД */
+@Slf4j
 @Getter
 @AllArgsConstructor
 @Service public class DBService {
@@ -57,7 +59,7 @@ import java.util.Map;
 
     public SettingUser createSettingUser(SettingUser settingUser) {
         SettingUser savedSettingUser = settingUserRepository.saveAndFlush(settingUser);
-        System.out.println(savedSettingUser);
+        log.trace(savedSettingUser + "");
         return savedSettingUser;
     }
 
@@ -100,7 +102,7 @@ import java.util.Map;
 
     public Syst createSyst(Syst syst) {
         Syst savedSyst = systRepository.saveAndFlush(syst);
-        System.out.println(savedSyst);
+        log.trace(savedSyst + "");
         return savedSyst;
     }
 

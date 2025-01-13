@@ -3,6 +3,7 @@
     <logger name="org.springframework" level="info"/>
     <logger name="org.hibernate" level="info"/>
     <logger name="ru" level="trace"/>
+    <logger name="example" level="trace"/>
     <logger name="ch.qos.logback" level="error"/>
     <property name="LOGS" value="./logs" />
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +33,7 @@ import static ru.Main.datas;
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TeacherJournalController">http://localhost:9001/swagger/htmlSwag/#/TeacherJournalController</a>
  * </pre> */
+@Slf4j
 @RequestMapping("/pjournal")
 @RequiredArgsConstructor
 @RestController public class TeacherJournalController {
@@ -158,7 +160,7 @@ import static ru.Main.datas;
 
         final List<Mark> marksOfKidAndDay = datas.getDbService().getMarkRepository()
             .findByIdInAndUsrId(marksIdByDay.get(dayAndNumOfMark[0]), body.kid);
-        System.out.println(marksOfKidAndDay);
+        log.trace(marksOfKidAndDay.toString());
         if (!ObjectUtils.isEmpty(marksOfKidAndDay)) {
             prepareMarkDTO.mark = marksOfKidAndDay.get(numLes);
             prepareMarkDTO.day = days.get(numLes);
@@ -181,7 +183,7 @@ import static ru.Main.datas;
         if (group == null) return ResponseEntity.notFound().build();
 
         final Map<String, List<Long>> marksByDay = getMarksByDay(school.getId(), user.getId(), group.getId(), sub.getLvlMore2());
-        System.out.println(marksByDay);
+        log.trace(marksByDay.toString());
         wrtr.name("bodyD").beginObject();
         final List<Object[]> homeworks = datas.getDbService().getDayRepository()
             .uniqDatAndHomeworkByParams(school.getId(), group.getId(), sub.getLvlMore2());
@@ -233,8 +235,8 @@ import static ru.Main.datas;
                 //Уточняет по отдельному ученику и периоду обучения из оценок всей группы
                 final List<Mark> marksOfKid = datas.getDbService().getMarkRepository()
                     .findByIdInAndUsrIdAndPeriodId(marksByDay.get(dat), kid.getId(), actPeriod.getId());
-                System.out.println(dat);
-                System.out.println(marksOfKid);
+                log.trace(dat);
+                log.trace(marksOfKid.toString());
 
                 int i1 = -1;
                 for (Mark marksM : marksOfKid) {
@@ -251,7 +253,7 @@ import static ru.Main.datas;
                 .name("avg").beginObject();
             final List<Mark> periodMarksOfKid = datas.getDbService().getMarkRepository()
                 .findByPeriodInAndTypeAndStyleAndUsrId(school.getPeriods(), "per", nameSubject, kid.getId());
-            System.out.println("perU " + periodMarksOfKid);
+            log.trace("perU " + periodMarksOfKid);
             for (Mark marksM : periodMarksOfKid) {
                 wrtr.name(marksM.getPeriod().getId()+"").value(marksM.getMark());
             }
@@ -292,7 +294,7 @@ import static ru.Main.datas;
         if (ObjectUtils.isEmpty(groupsL)) {
             return ResponseEntity.notFound().build();
         }
-        System.out.println(groupsL);
+        log.trace(groupsL.toString());
         wrtr.name("bodyG").beginObject();
         for (Long i : groupsL) {
             final Group gr = datas.getDbService().groupById(i);
@@ -318,7 +320,7 @@ import static ru.Main.datas;
         final List<String> subjs = datas.getDbService().getLessonRepository()
             .uniqSubNameBySchoolAndTeacher(school.getId(), user.getId());
         if (!ObjectUtils.isEmpty(subjs)){
-            System.out.println(subjs);
+            log.trace(String.valueOf(subjs));
             wrtr.name("bodyPred").beginObject();
             int i = 0;
             for (String name : subjs) {

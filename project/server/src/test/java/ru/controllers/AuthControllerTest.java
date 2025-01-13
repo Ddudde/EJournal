@@ -5,6 +5,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.google.gson.JsonObject;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -58,6 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static utils.TestUtils.defaultDescription;
 import static utils.TestUtils.getSub;
 
+@Slf4j
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({AuthControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -170,7 +172,7 @@ public class AuthControllerTest {
         when(user.getPassword()).thenReturn("passTest1");
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        System.out.println(getAuth());
+        log.trace(getAuth() + "");
 
         mockMvc.perform(post("/auth/auth/")
                 .header(HttpHeaders.AUTHORIZATION, "Basic bm0xMjpwYXNzVGVzdA==")// Basic Auth

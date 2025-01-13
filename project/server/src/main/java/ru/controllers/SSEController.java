@@ -1,6 +1,7 @@
 package ru.controllers;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import static ru.Main.datas;
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/SSEController">http://localhost:9001/swagger/htmlSwag/#/SSEController</a>
  * </pre>
  * @see Subscriber */
+@Slf4j
 @RequestMapping("/sse")
 @NoArgsConstructor
 @RestController
@@ -34,7 +36,7 @@ public class SSEController {
      * @exception IOException Исключение вызывается при ошибках с Json */
     @GetMapping(value = {"/start/{uuidAuth}", "/start"}, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter start(@PathVariable(required = false) String uuidAuth) throws IOException {
-        System.out.println("YT3 " + SecurityContextHolder.getContext().getAuthentication());
+        log.trace("YT3 " + SecurityContextHolder.getContext().getAuthentication());
         final SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         final GetSubscriberDTO getSubscriberDTO = getSubscriber(uuidAuth, emitter);
         getSubscriberDTO.subscriber.setSSE(emitter, getSubscriberDTO.uuid);
@@ -50,13 +52,13 @@ public class SSEController {
             uuid = UUID.randomUUID();
             subscriber = new Subscriber(emitter);
             datas.subscriptions.put(uuid, subscriber);
-            System.out.println("create subscription for " + uuid);
+            log.debug("create subscription for " + uuid);
             return new GetSubscriberDTO(uuid, subscriber);
         }
         uuid = UUID.fromString(uuidAuth);
         subscriber = datas.subscriptions.get(uuid);
         if (subscriber != null && subscriber.getLogin() != null) {
-            System.out.println("subscriptionL save " + uuidAuth);
+            log.debug("subscriptionL save " + uuidAuth);
             return new GetSubscriberDTO(uuid, subscriber);
         }
         if (subscriber != null) {
@@ -65,7 +67,7 @@ public class SSEController {
         uuid = UUID.randomUUID();
         subscriber = new Subscriber(emitter);
         datas.subscriptions.put(uuid, subscriber);
-        System.out.println("subscriptionNL change to " + uuid);
+        log.debug("subscriptionNL change to " + uuid);
         return new GetSubscriberDTO(uuid, subscriber);
     }
 
@@ -89,9 +91,9 @@ public class SSEController {
                 } catch (IOException e) {
                     if(subscriber.getLogin() == null) {
                         datas.subscriptions.remove(uuid);
-                        System.out.println("subscription " + uuid + " was closed from Ping or Error");
+                        log.debug("subscription " + uuid + " was closed from Ping or Error");
                     } else {
-                        System.out.println("subscription " + uuid + " was noclosed from Ping or Error " + subscriber.getLogin());
+                        log.debug("subscription " + uuid + " was noclosed from Ping or Error " + subscriber.getLogin());
                     }
                     subscriber.getSSE().complete();
                 }
@@ -107,27 +109,27 @@ public class SSEController {
         if(sub == null) return;
         if(login != null) {
             sub.setLogin(login);
-            System.out.println("setLog " + login + " subscription for " + uuid);
+            log.trace("setLog " + login + " subscription for " + uuid);
         }
         if(type != null) {
             sub.setType(type);
-            System.out.println("setType " + type + " subscription for " + uuid);
+            log.trace("setType " + type + " subscription for " + uuid);
         }
         if(lvlSch != null) {
             sub.setLvlSch(lvlSch);
-            System.out.println("setLvlSch " + lvlSch + " subscription for " + uuid);
+            log.trace("setLvlSch " + lvlSch + " subscription for " + uuid);
         }
         if(lvlGr != null) {
             sub.setLvlGr(lvlGr);
-            System.out.println("setLvlGr " + lvlGr + " subscription for " + uuid);
+            log.trace("setLvlGr " + lvlGr + " subscription for " + uuid);
         }
         if(lvlMore1 != null) {
             sub.setLvlMore1(lvlMore1);
-            System.out.println("setLvlMore1 " + lvlMore1 + " subscription for " + uuid);
+            log.trace("setLvlMore1 " + lvlMore1 + " subscription for " + uuid);
         }
         if(lvlMore2 != null) {
             sub.setLvlMore2(lvlMore2);
-            System.out.println("setLvlMore2 " + lvlMore2 + " subscription for " + uuid);
+            log.trace("setLvlMore2 " + lvlMore2 + " subscription for " + uuid);
         }
     }
 }

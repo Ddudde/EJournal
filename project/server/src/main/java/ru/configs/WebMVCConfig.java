@@ -37,6 +37,7 @@ public class WebMVCConfig implements WebMvcConfigurer {
     }
 
     /** RU: для поддержки Flux */
+    @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
         configurer.setTaskExecutor(taskExecutor());
     }

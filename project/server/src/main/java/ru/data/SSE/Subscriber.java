@@ -1,6 +1,7 @@
 package ru.data.SSE;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.controllers.AuthController;
 import ru.data.DAO.auth.User;
@@ -12,6 +13,7 @@ import static ru.Main.datas;
 /** RU: Подписка, используется для Server Sent Events и иногда в других местах
  * <pre>
  * </pre> */
+@Slf4j
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @ToString public class Subscriber {
@@ -54,20 +56,20 @@ import static ru.Main.datas;
         SSE.onCompletion(() -> {
             if(login == null) {
                 datas.subscriptions.remove(uuid);
-                System.out.println("subscription " + uuid + " was closed from onCompletion");
+                log.debug("subscription " + uuid + " was closed from onCompletion");
             } else {
                 SSEComplete = true;
-                System.out.println("subscription " + uuid + " was noclosed from onCompletion " + login);
+                log.debug("subscription " + uuid + " was noclosed from onCompletion " + login);
             }
         });
         SSE.onTimeout(() -> {
             SSE.complete();
             if(login == null) {
                 datas.subscriptions.remove(uuid);
-                System.out.println("subscription " + uuid + " was closed from onTimeout");
+                log.debug("subscription " + uuid + " was closed from onTimeout");
             } else {
                 SSEComplete = true;
-                System.out.println("subscription " + uuid + " was noclosed from onTimeout " + login);
+                log.debug("subscription " + uuid + " was noclosed from onTimeout " + login);
             }
         });
     }

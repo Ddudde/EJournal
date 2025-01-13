@@ -5,6 +5,7 @@ import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +35,7 @@ import static ru.Main.datas;
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AuthController">http://localhost:9001/swagger/htmlSwag/#/AuthController</a>
  * </pre>
  * @see Subscriber */
+@Slf4j
 @RequestMapping("/auth")
 @NoArgsConstructor
 @RestController public class AuthController {
@@ -78,12 +80,12 @@ import static ru.Main.datas;
     @PreAuthorize("@code401.check(#sub != null)")
     @PatchMapping("/remCon")
     public ResponseEntity<Void> remCon(@AuthenticationPrincipal Subscriber sub, CustomToken auth) {
-        System.out.println("[PATCH] /remCon");
+        log.info("[PATCH] /remCon");
         if(sub.getLogin() != null) {
-            System.out.println("subscription remCon " + auth.getUUID() + " was noclosed " + sub.getLogin());
+            log.debug("subscription remCon " + auth.getUUID() + " was noclosed " + sub.getLogin());
         } else {
             datas.subscriptions.remove(UUID.fromString(auth.getUUID()));
-            System.out.println("subscription remCon " + auth.getUUID() + " was closed");
+            log.debug("subscription remCon " + auth.getUUID() + " was closed");
         }
         sub.getSSE().complete();
         return ResponseEntity.ok().build();
@@ -176,7 +178,7 @@ import static ru.Main.datas;
     @PostMapping("/checkInvCode")
     public ResponseEntity<Void> checkInvCode(@RequestBody DataAuth body) {
         final User user = datas.getDbService().userByCode(body.code);
-        System.out.println("[POST] /checkInvCode ! " + body);
+        log.info("[POST] /checkInvCode ! " + body);
         if(user == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().build();
     }
@@ -201,7 +203,7 @@ import static ru.Main.datas;
         final Long schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
 
         wrtr.name("id").value(user1.getId());
-        System.out.println("setCode " + uuid);
+        log.debug("setCode " + uuid);
 
         wrtr.name("code").value(uuid.toString())
             .name("id1").value(schId);

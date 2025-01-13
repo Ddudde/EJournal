@@ -3,6 +3,7 @@ package ru.controllers.school;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,6 +38,7 @@ import static ru.Main.datas;
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/DnevnikController">http://localhost:9001/swagger/htmlSwag/#/DnevnikController</a>
  * </pre> */
+@Slf4j
 @RequestMapping("/dnevnik")
 @RequiredArgsConstructor
 @RestController public class DnevnikController {
@@ -74,7 +76,7 @@ import static ru.Main.datas;
                     (list, item) -> list.add((Mark) item[2]),
                     (left, right) -> right
                 ))));
-        System.out.println("mapD " + mapD);
+        log.trace("mapD " + mapD);
         wrtr.name("min").value(actPeriod.getDateN());
         wrtr.name("max").value(actPeriod.getDateK());
         final List<Object[]> homeworks = datas.getDbService().getDayRepository()

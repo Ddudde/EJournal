@@ -4,6 +4,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.data.DAO.auth.SettingUser;
 
@@ -19,6 +20,7 @@ import static java.util.Arrays.asList;
  * toDo: Доделать
  *  Протестировать работоспособность
  * </pre> */
+@Slf4j
 @Service public class PushService {
 
     /** RU: обращение к Firebase */
@@ -32,7 +34,7 @@ import static java.util.Arrays.asList;
         if (!FirebaseApp.getApps().isEmpty()) return;
         FirebaseApp.initializeApp(options);
         firebase = FirebaseMessaging.getInstance();
-        System.out.println("Firebase application has been initialized");
+        log.info("Firebase application has been initialized");
     }
 
     /** RU: отправка уведомлений пользователям определённой темы */
@@ -49,7 +51,7 @@ import static java.util.Arrays.asList;
                     .build()
             );
             firebase.sendAll(messages);
-            System.out.println("Successfully sent message: ");
+            log.debug("Successfully sent message: ");
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
@@ -68,7 +70,7 @@ import static java.util.Arrays.asList;
                 .addAllTokens(registrationTokens)
                 .build();
             response = firebase.sendMulticast(message);
-            System.out.println("Successfully sent message: ");
+            log.debug("Successfully sent message: ");
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
@@ -80,7 +82,7 @@ import static java.util.Arrays.asList;
                     failedTokens.add(registrationTokens.get(i));
                 }
             }
-            System.out.println("List of tokens that caused failures: " + failedTokens);
+            log.debug("List of tokens that caused failures: " + failedTokens);
         }
     }
 
@@ -88,9 +90,9 @@ import static java.util.Arrays.asList;
     public int subscribe(List<String> registrationTokens, String topic) {
         try {
             TopicManagementResponse response = firebase.subscribeToTopic(registrationTokens, topic);
-            System.out.println(response.getSuccessCount() + " request were subscribed successfully");
+            log.debug(response.getSuccessCount() + " request were subscribed successfully");
             if (response != null && response.getFailureCount() > 0) {
-                System.out.println("List of tokens that caused failures: " + response.getErrors());
+                log.debug("List of tokens that caused failures: " + response.getErrors());
             }
             return response.getFailureCount();
         } catch (FirebaseMessagingException e) {
@@ -103,9 +105,9 @@ import static java.util.Arrays.asList;
     public int unsubscribe(List<String> registrationTokens, String topic) {
         try {
             TopicManagementResponse response = firebase.unsubscribeFromTopic(registrationTokens, topic);
-            System.out.println(response.getSuccessCount() + " request were unsubscribed successfully");
+            log.debug(response.getSuccessCount() + " request were unsubscribed successfully");
             if (response != null && response.getFailureCount() > 0) {
-                System.out.println("List of tokens that caused failures: " + response.getErrors());
+                log.debug("List of tokens that caused failures: " + response.getErrors());
             }
             return response.getFailureCount();
         } catch (FirebaseMessagingException e) {

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,7 @@ import static ru.Main.datas;
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/PeriodsController">http://localhost:9001/swagger/htmlSwag/#/PeriodsController</a>
  * </pre> */
+@Slf4j
 @RequestMapping("/periods")
 @RequiredArgsConstructor
 @RestController public class PeriodsController {
@@ -70,7 +72,7 @@ import static ru.Main.datas;
         if (ObjectUtils.isEmpty(school.getPeriods())) {
             return ResponseEntity.notFound().build();
         }
-        System.out.println(school.getPeriods());
+        log.trace(school.getPeriods() + "");
         wrtr.name("bodyP").beginObject();
         int i = 0;
         for (Period period : school.getPeriods()) {

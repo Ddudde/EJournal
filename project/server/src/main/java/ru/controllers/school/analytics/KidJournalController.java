@@ -3,6 +3,7 @@ package ru.controllers.school.analytics;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +37,7 @@ import static ru.Main.datas;
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/KidJournalController">http://localhost:9001/swagger/htmlSwag/#/KidJournalController</a>
  * </pre>
  * @see Subscriber */
+@Slf4j
 @RequestMapping("/journal")
 @RequiredArgsConstructor
 @RestController public class KidJournalController {
@@ -69,7 +71,7 @@ import static ru.Main.datas;
                 (list, item) -> list.add((Mark) item[1]),
                 (left, right) -> right
             )));
-        System.out.println(mapM);
+        log.trace(mapM.toString());
         if(!ObjectUtils.isEmpty(mapM)) {
             final List<String> lessonsByKid = datas.getDbService().getLessonRepository()
                 .uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
@@ -115,7 +117,7 @@ import static ru.Main.datas;
                     (list, item) -> list.add((Mark) item[2]),
                     (left, right) -> right
                 ))));
-        System.out.println("mapD " + mapD);
+        log.trace("mapD " + mapD);
         final List<String> lessonsByKid = datas.getDbService().getLessonRepository()
             .uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
         for(String les : lessonsByKid) {

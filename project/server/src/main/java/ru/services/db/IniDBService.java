@@ -5,6 +5,7 @@ import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.Main;
@@ -27,6 +28,7 @@ import java.util.*;
 import static java.util.Arrays.asList;
 
 /** RU: Класс для рандомизация данных, тестовые данные для БД */
+@Slf4j
 @Getter @Setter
 @RequiredArgsConstructor
 @Service public class IniDBService {
@@ -108,7 +110,7 @@ import static java.util.Arrays.asList;
             long now = Main.df.parse(Main.df.format(new Date())).getTime();
             for(User user : getUsers()){
                 if(!ObjectUtils.isEmpty(user.getExpDate()) && now >= Main.df.parse(user.getExpDate()).getTime()){
-                    System.out.println("Удалён код " + user.getCode() + " по истечению срока действия");
+                    log.debug("Удалён код " + user.getCode() + " по истечению срока действия");
                     if(user.getUsername() == null) {
                         delInv(user);
                     } else {
@@ -117,7 +119,7 @@ import static java.util.Arrays.asList;
                 }
                 SettingUser settingUser = user.getSettings();
                 if(settingUser != null && !ObjectUtils.isEmpty(settingUser.getExpDateEC()) && now >= Main.df.parse(settingUser.getExpDateEC()).getTime()){
-                    System.out.println("Удалён код email" + settingUser.getEmailCode() + " по истечению срока действия");
+                    log.debug("Удалён код email" + settingUser.getEmailCode() + " по истечению срока действия");
                     settingUser.setEmailCode(null);
                     settingUser.setExpDateEC(null);
                     datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
@@ -170,7 +172,7 @@ import static java.util.Arrays.asList;
                 "/static/media/map.jpg")
         ));
         syst = datas.getDbService().createSyst(new Syst(newsList, contactsList.get(0)));
-        System.out.println(getSyst());
+        log.trace(getSyst() + "");
 
         users.clear();
         setts.clear();
@@ -306,7 +308,7 @@ import static java.util.Arrays.asList;
                 if(userL.getUsername() != null) user = userL;
             }
             if (user != null) {
-                System.out.println("htea " + user.getUsername() + " " + user.getPassword());
+                log.trace("htea " + user.getUsername() + " " + user.getPassword());
                 user = null;
             }
 
@@ -318,7 +320,7 @@ import static java.util.Arrays.asList;
                 if(userL.getUsername() != null) user = userL;
             }
             if (user != null) {
-                System.out.println("tea " + user.getUsername() + " " + user.getPassword());
+                log.trace("tea " + user.getUsername() + " " + user.getPassword());
             }
 
             school.setGroups(getRandGroups(school, new ArrayList<>(school.getTeachers())));

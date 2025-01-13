@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +30,7 @@ import static ru.Main.datas;
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ProfileController">http://localhost:9001/swagger/htmlSwag/#/ProfileController</a>
  * </pre>
  * @see Subscriber */
+@Slf4j
 @RequestMapping("/profiles")
 @RequiredArgsConstructor
 @RestController public class ProfileController {
@@ -91,7 +93,7 @@ import static ru.Main.datas;
     @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PatchMapping("/exit")
     public ResponseEntity<Void> exit(@RequestBody DataProfile body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        System.out.println("[PATCH] /exit ! " + body.toString());
+        log.info("[PATCH] /exit ! " + body.toString());
         final User user = sub.getUser();
         if (!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();
