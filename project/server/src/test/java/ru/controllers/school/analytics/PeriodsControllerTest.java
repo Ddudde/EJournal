@@ -6,13 +6,12 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -30,15 +29,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.models.auth.User;
-import ru.data.models.school.School;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 import java.util.ArrayList;
@@ -54,8 +53,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({PeriodsControllerConfig.class})
@@ -64,16 +63,14 @@ public class PeriodsControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private PeriodsController periodsController;
@@ -81,8 +78,14 @@ public class PeriodsControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(periodsController)
             .setMessageConverters(converter)
@@ -126,7 +129,7 @@ public class PeriodsControllerTest {
     void addPer_whenGood_HTEACHER() throws Exception {
         final User user = getSub().getUser();
         final School sch1 = mock(School.class);
-        when(sch1.getPeriods()).thenReturn(new ArrayList<>(randomUtils.periods));
+        when(sch1.getPeriods()).thenReturn(new ArrayList<>(testUtils.periods));
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(post("/periods/addPer")
@@ -141,7 +144,7 @@ public class PeriodsControllerTest {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPer_Summary, "addPer_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("addPerC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addPerC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":null,\"body\":{\"name\":\"II четверть\",\"perN\":\"12.11.23\",\"perK\":\"29.12.23\"}}",
             answer.getValue().toString());
     }
@@ -164,7 +167,7 @@ public class PeriodsControllerTest {
     void getInfo_whenGood_HTEACHER() throws Exception {
         final User user = getSub().getUser();
         final School sch1 = mock(School.class);
-        when(sch1.getPeriods()).thenReturn(randomUtils.periods);
+        when(sch1.getPeriods()).thenReturn(testUtils.periods);
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(get("/periods/getInfo")
@@ -192,12 +195,7 @@ class PeriodsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public PeriodsController periodsController(AuthController authController) {
-        return spy(new PeriodsController(authController));
+    public PeriodsController periodsController() {
+        return spy(new PeriodsController());
     }
 }

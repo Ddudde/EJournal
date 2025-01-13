@@ -1,7 +1,7 @@
-package ru.data.models.school;
+package ru.data.DAO.school;
 
 import lombok.*;
-import ru.data.models.auth.User;
+import ru.data.DAO.auth.User;
 
 import javax.persistence.*;
 

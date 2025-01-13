@@ -6,13 +6,12 @@ import com.epages.restdocs.apispec.SimpleType;
 import com.google.gson.JsonObject;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -31,15 +30,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.data.models.auth.User;
-import ru.data.models.school.School;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 
@@ -52,8 +51,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({NewsControllerConfig.class})
@@ -62,25 +61,29 @@ public class NewsControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private NewsController newsController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
+
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
     
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(newsController)
             .setMessageConverters(converter)
@@ -121,7 +124,8 @@ public class NewsControllerTest {
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenEmpty_Portal_AdminUser"));
 
-        verify(authController, times(0)).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: завуч для школьных новостей
@@ -129,7 +133,7 @@ public class NewsControllerTest {
     @Test @Tag("delNews")
     @CustomUser(roles = Roles.HTEACHER)
     void delNews_whenGood_YO_HTeacher() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Yo");
 
         mockMvc.perform(delete("/news/delNews/")
@@ -142,7 +146,7 @@ public class NewsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_YO_HTeacher"));
 
-        verify(authController).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1}",
             answer.getValue().toString());
     }
@@ -152,7 +156,7 @@ public class NewsControllerTest {
     @Test @Tag("delNews")
     @CustomUser
     void delNews_whenGood_Portal_AdminUser() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Por");
 
         mockMvc.perform(delete("/news/delNews/")
@@ -165,7 +169,7 @@ public class NewsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_Portal_AdminUser"));
 
-        verify(authController).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1}",
             answer.getValue().toString());
     }
@@ -186,7 +190,8 @@ public class NewsControllerTest {
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenEmpty_Portal_AdminUser"));
 
-        verify(authController, times(0)).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: завуч для школьных новостей
@@ -194,7 +199,7 @@ public class NewsControllerTest {
     @Test @Tag("chNews")
     @CustomUser(roles = Roles.HTEACHER)
     void chNews_whenGood_YO_HTeacher() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Yo");
 
         mockMvc.perform(put("/news/chNews/")
@@ -209,7 +214,7 @@ public class NewsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_YO_HTeacher"));
 
-        verify(authController).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
             answer.getValue().toString());
     }
@@ -219,7 +224,7 @@ public class NewsControllerTest {
     @Test @Tag("chNews")
     @CustomUser
     void chNews_whenGood_Portal_AdminUser() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Por");
 
         mockMvc.perform(put("/news/chNews/")
@@ -234,7 +239,7 @@ public class NewsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_Portal_AdminUser"));
 
-        verify(authController).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
             answer.getValue().toString());
     }
@@ -255,7 +260,8 @@ public class NewsControllerTest {
             .andExpect(status)
             .andDo(defaultSwaggerDocs(type.equals("YO") ? addNewsYO_Summary : addNewsPortal_Summary, methodName));
 
-        verify(authController, times(timesSSE)).sendEventFor(eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(timesSSE));
     }
 
     /** RU: завуч для школьных новостей
@@ -344,7 +350,7 @@ public class NewsControllerTest {
         User user = getSub().getUser();
         user.getSelecRole().setYO(mock(School.class));
         when(user.getSelecRole().getYO().getNews())
-            .thenReturn(randomUtils.newsTest);
+            .thenReturn(testUtils.newsTest);
 
         mockMvc.perform(get("/news/getNews/{type}", "Yo")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -359,7 +365,7 @@ public class NewsControllerTest {
     @CustomUser
     void getNews_whenGood_Portal_AdminUser() throws Exception {
         when(datas.getDbService().getSyst().getNews())
-            .thenReturn(randomUtils.newsTest);
+            .thenReturn(testUtils.newsTest);
 
         mockMvc.perform(get("/news/getNews/{type}", "Por")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -391,12 +397,7 @@ class NewsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public NewsController newsController(AuthController authController) {
-        return spy(new NewsController(authController));
+    public NewsController newsController() {
+        return spy(new NewsController());
     }
 }

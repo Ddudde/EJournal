@@ -10,15 +10,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.SettingUser;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.SettingUser;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -27,19 +27,11 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела профиля и частично управлением аккаунтом + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ProfileController">http://localhost:9001/swagger/htmlSwag/#/ProfileController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre>
  * @see Subscriber */
 @RequestMapping("/profiles")
 @RequiredArgsConstructor
 @RestController public class ProfileController {
-    private final AuthController authController;
 
     /** RU: изменение контроллируемого ученика у родителя
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -126,7 +118,7 @@ import static ru.Main.datas;
             .name("role").value(user.getSelRole().i)
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
+            SSEController.sendEventFor("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, wrtr, HttpStatus.OK);
     }
 
@@ -144,7 +136,7 @@ import static ru.Main.datas;
             .name("more").value(settingUser.getInfo())
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
+            SSEController.sendEventFor("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, wrtr, HttpStatus.OK);
     }
 
@@ -167,7 +159,7 @@ import static ru.Main.datas;
             .endObject();
         sub.setLvlMore2(body.nLogin);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chLogin", ans, TypesConnect.PROFILES, "main", "main", "main", body.nLogin);
+            SSEController.sendEventFor("chLogin", ans, TypesConnect.PROFILES, "main", "main", "main", body.nLogin);
         }, wrtr, HttpStatus.OK);
     }
 
@@ -236,7 +228,7 @@ import static ru.Main.datas;
         }
         wrtr.endObject();
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), sub.getLogin(), TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
+            SSEController.changeSubscriber(auth.getUUID(), sub.getLogin(), TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, wrtr, HttpStatus.OK, false);
     }
 

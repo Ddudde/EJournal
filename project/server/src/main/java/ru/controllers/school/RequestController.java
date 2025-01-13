@@ -10,11 +10,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.school.Request;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.school.Request;
 import ru.security.user.CustomToken;
 
 import static ru.Main.datas;
@@ -22,19 +22,11 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела заявок на подключение к системе учебных учреждений + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/RequestController">http://localhost:9001/swagger/htmlSwag/#/RequestController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre>
  * @see Subscriber */
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 @RestController public class RequestController {
-    private final AuthController authController;
 
     /** RU: добавляет заявку + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -54,7 +46,7 @@ import static ru.Main.datas;
             .name("text").value(request.getFio())
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            SSEController.sendEventFor("addReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -73,7 +65,7 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(request.getId());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("delReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            SSEController.sendEventFor("delReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -94,7 +86,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(request.getId())
             .name("title").value(request.getEmail());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chTitle", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            SSEController.sendEventFor("chTitle", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -115,7 +107,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(request.getId())
             .name("date").value(request.getDate());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chDate", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            SSEController.sendEventFor("chDate", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -136,7 +128,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(request.getId())
             .name("text").value(request.getFio());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chText", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            SSEController.sendEventFor("chText", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -156,7 +148,7 @@ import static ru.Main.datas;
                 .endObject();
         }
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.REQUESTS, "main", "main", "main", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.REQUESTS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

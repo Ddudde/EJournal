@@ -10,13 +10,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.*;
 import ru.data.DTO.PrepareMarkDTO;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.*;
 import ru.security.user.CustomToken;
 
 import java.io.IOException;
@@ -30,21 +30,11 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для просмотра и редактирования журнала(оценки и домашние задания) группы
  * <pre>
- * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/PJournalController">http://localhost:9001/swagger/htmlSwag/#/PJournalController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TeacherJournalController">http://localhost:9001/swagger/htmlSwag/#/TeacherJournalController</a>
  * </pre> */
 @RequestMapping("/pjournal")
 @RequiredArgsConstructor
-@RestController public class PJournalController {
-    private final AuthController authController;
+@RestController public class TeacherJournalController {
 
     /** RU: создаёт домашнее задание на определённое занятие дня группе
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -75,7 +65,7 @@ import static ru.Main.datas;
         wrtr.name("day").value(body.day)
             .name("homework").value(body.homework);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addHomeworkC", ans, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
+            SSEController.sendEventFor("addHomeworkC", ans, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -118,7 +108,7 @@ import static ru.Main.datas;
             .name("per").value(body.per)
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addMarkC", ans, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
+            SSEController.sendEventFor("addMarkC", ans, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -311,7 +301,7 @@ import static ru.Main.datas;
         wrtr.endObject()
             .name("firstG").value(groupsL.get(0));
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.PJOURNAL, null, null, null, nameSubject);
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PJOURNAL, null, null, null, nameSubject);
         }, wrtr, HttpStatus.OK, false);
     }
 
@@ -350,12 +340,12 @@ import static ru.Main.datas;
         wrtr.name("max").value(actPeriod.getDateK());
         datas.getShedule("bodyS", user, wrtr, null);
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: Данные клиента используемые PJournalController в методах
-     * @see PJournalController */
+     * @see TeacherJournalController */
     @ToString
     @RequiredArgsConstructor
     static final class DataPJournal {

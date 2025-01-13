@@ -3,7 +3,7 @@ package ru.data.SSE;
 import lombok.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.controllers.AuthController;
-import ru.data.models.auth.User;
+import ru.data.DAO.auth.User;
 
 import java.util.UUID;
 
@@ -11,10 +11,6 @@ import static ru.Main.datas;
 
 /** RU: Подписка, используется для Server Sent Events и иногда в других местах
  * <pre>
- * beenDo: Сделано
- *  + Javadoc
- *  + Переписка
- *  # Тестирование
  * </pre> */
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor

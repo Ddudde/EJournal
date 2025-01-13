@@ -9,8 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.configs.SecurityConfig;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
 import ru.security.user.CustomToken;
 
 import javax.servlet.FilterChain;

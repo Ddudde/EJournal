@@ -11,14 +11,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -33,20 +33,11 @@ import static ru.Main.datas;
 /** RU: Контроллер для управления/просмотра преподавателей учебных центров + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TeachersController">http://localhost:9001/swagger/htmlSwag/#/TeachersController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre>
  * @see Subscriber */
 @RequestMapping("/teachers")
 @RequiredArgsConstructor
 @RestController public class TeachersController {
-    private final AuthController authController;
 
     /** RU: удаление роли преподавателя
      * Не реализовано в клиенте.
@@ -72,7 +63,7 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(user1.getId());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("remPepC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+            SSEController.sendEventFor("remPepC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -94,7 +85,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(user1.getId())
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chPepC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+            SSEController.sendEventFor("chPepC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -123,7 +114,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(inv.getId());
         wrtr.name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addTeaC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), "main", "ht", "main");
+            SSEController.sendEventFor("addTeaC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), "main", "ht", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -143,7 +134,7 @@ import static ru.Main.datas;
             if(user.getRoles().containsKey(Roles.HTEACHER)) {
                 role = "ht";
             }
-            authController.infCon(auth.getUUID(), null, TypesConnect.TEACHERS, school.getId()+"", "main", role, "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.TEACHERS, school.getId()+"", "main", role, "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

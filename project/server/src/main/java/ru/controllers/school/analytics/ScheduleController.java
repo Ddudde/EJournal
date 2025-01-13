@@ -10,14 +10,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Lesson;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Lesson;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -29,22 +29,11 @@ import static ru.Main.datas;
 /** RU: Контроллер для управления/просмотра расписания + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ScheduleController">http://localhost:9001/swagger/htmlSwag/#/ScheduleController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
  * </pre>
  * @see Subscriber */
 @RequestMapping("/schedule")
 @RequiredArgsConstructor
 @RestController public class ScheduleController {
-
-    private final AuthController authController;
 
     /** RU: добавление урока + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -86,10 +75,10 @@ import static ru.Main.datas;
         return datas.getObjR(ans -> {
             ans.add("body", body.obj);
             if(teaU != null) {
-                authController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), "main", "tea", teaU.getId()+"");
+                SSEController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), "main", "tea", teaU.getId()+"");
             }
-            authController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), "main", "ht", "main");
-            authController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), group.getId()+"", "main", "main");
+            SSEController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), "main", "ht", "main");
+            SSEController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), group.getId()+"", "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -132,7 +121,7 @@ import static ru.Main.datas;
             if(user.getSelRole() == Roles.KID || user.getSelRole() == Roles.PARENT) {
                 group = ref.group.getId()+"";
             }
-            authController.infCon(auth.getUUID(), null, null, null, group, null, null);
+            SSEController.changeSubscriber(auth.getUUID(), null, null, null, group, null, null);
         }, wrtr, HttpStatus.OK, false);
     }
 
@@ -146,7 +135,7 @@ import static ru.Main.datas;
         System.out.println("[GET] /getInfo");
         final User user = sub.getUser();
         final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
-        authController.infCon(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", "main", "main");
+        SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", "main", "main");
         return ResponseEntity.ok().build();
     }
 
@@ -173,7 +162,7 @@ import static ru.Main.datas;
                 role = "tea";
                 teacherId = user.getId()+"";
             }
-            authController.infCon(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", role, teacherId);
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", role, teacherId);
         }, wrtr, HttpStatus.OK, false);
     }
 

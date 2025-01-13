@@ -1,7 +1,7 @@
 package ru.data.reps.school;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.data.models.school.Group;
+import ru.data.DAO.school.Group;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
 }

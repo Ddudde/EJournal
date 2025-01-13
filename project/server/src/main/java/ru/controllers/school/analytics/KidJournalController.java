@@ -11,15 +11,15 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Mark;
+import ru.data.DAO.school.Period;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Mark;
-import ru.data.models.school.Period;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 
 import java.io.IOException;
@@ -33,22 +33,12 @@ import static ru.Main.datas;
 
 /** RU: Контроллер для раздела просмотра оценок + Server Sent Events
  * <pre>
- * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/JournalController">http://localhost:9001/swagger/htmlSwag/#/JournalController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/KidJournalController">http://localhost:9001/swagger/htmlSwag/#/KidJournalController</a>
  * </pre>
  * @see Subscriber */
 @RequestMapping("/journal")
 @RequiredArgsConstructor
-@RestController public class JournalController {
-    private final AuthController authController;
+@RestController public class KidJournalController {
 
     /** RU: отправляет данные о итоговых оценках
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -134,7 +124,7 @@ import static ru.Main.datas;
         }
         getJournal(wrtr, mapD);
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.JOURNAL, sch.getId() +"", "main", "main", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.JOURNAL, sch.getId() +"", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

@@ -3,8 +3,8 @@ package ru.data.reps.school;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.data.models.school.Mark;
-import ru.data.models.school.Period;
+import ru.data.DAO.school.Mark;
+import ru.data.DAO.school.Period;
 
 import java.util.List;
 

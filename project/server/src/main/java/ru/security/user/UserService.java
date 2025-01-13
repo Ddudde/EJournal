@@ -3,7 +3,7 @@ package ru.security.user;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.data.models.auth.User;
+import ru.data.DAO.auth.User;
 
 import static ru.Main.datas;
 

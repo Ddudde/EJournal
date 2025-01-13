@@ -10,13 +10,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Period;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.Period;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 
 import static ru.Main.datas;
@@ -24,20 +24,10 @@ import static ru.Main.datas;
 /** RU: Контроллер для просмотра и редактирования периодов обучения учебного центра
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/PeriodsController">http://localhost:9001/swagger/htmlSwag/#/PeriodsController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
  * </pre> */
 @RequestMapping("/periods")
 @RequiredArgsConstructor
 @RestController public class PeriodsController {
-    private final AuthController authController;
 
     /** RU: создаёт новый период обучения учебного центра
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -63,7 +53,7 @@ import static ru.Main.datas;
             .name("perK").value(period.getDateK())
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addPerC", ans, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
+            SSEController.sendEventFor("addPerC", ans, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -94,7 +84,7 @@ import static ru.Main.datas;
         }
         wrtr.endObject();
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

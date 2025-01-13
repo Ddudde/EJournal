@@ -6,13 +6,12 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -30,18 +29,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.models.auth.User;
-import ru.data.models.school.Day;
-import ru.data.models.school.Group;
-import ru.data.models.school.Mark;
-import ru.data.models.school.School;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Day;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Mark;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 import java.util.List;
@@ -58,36 +57,40 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
-import static utils.RandomUtils.*;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@Import({PJournalControllerConfig.class})
+@Import({TeacherJournalControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class PJournalControllerTest {
+public class TeacherJournalControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
 
     @Autowired
-    private AuthController authController;
-
-    @Autowired
-    private PJournalController pJournalController;
+    private TeacherJournalController teacherJournalController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
-        mockMvc = MockMvcBuilders.standaloneSetup(pJournalController)
+        mockMvc = MockMvcBuilders.standaloneSetup(teacherJournalController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
             .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
@@ -103,10 +106,10 @@ public class PJournalControllerTest {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
-            .tag("PJournalController")
+            .tag("TeacherJournalController")
             .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
-        return document("PJournalController/" + methodName, resource(snip.build()));
+        return document("TeacherJournalController/" + methodName, resource(snip.build()));
     }
 
     private final String addHomework_Summary = "Создаёт домашнее задание на определённое занятие дня группе";
@@ -149,7 +152,7 @@ public class PJournalControllerTest {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addHomework_Summary, "addHomework_whenGood_TEACHER"));
 
-        verify(authController).sendEventFor(eq("addHomeworkC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addHomeworkC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"day\":\"10.06.22\",\"homework\":\"Упр. 6Стр. 103\"}",
             answer.getValue().toString());
     }
@@ -200,7 +203,7 @@ public class PJournalControllerTest {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenPeriodMark_TEACHER"));
 
-        verify(authController).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"kid\":20,\"day\":\"10.06.22\",\"body\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Химия\",\"per\":20}}",
             answer.getValue().toString());
     }
@@ -242,7 +245,7 @@ public class PJournalControllerTest {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenExistMark_TEACHER"));
 
-        verify(authController).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"kid\":20,\"day\":\"10.06.22,1\",\"body\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"per\":null}}",
             answer.getValue().toString());
     }
@@ -288,7 +291,7 @@ public class PJournalControllerTest {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenGood_TEACHER"));
 
-        verify(authController).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"kid\":20,\"day\":\"10.06.22\",\"body\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"per\":null}}",
             answer.getValue().toString());
     }
@@ -327,19 +330,19 @@ public class PJournalControllerTest {
         mockMvc.perform(get("/pjournal/getInfoP3/{groupId}", 20L)
                 .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"bodyD\":{\"12.06.22\":\"Упр. 5Стр. 103\",\"10.06.22\":\"Упр. 6Стр. 103\",\"11.06.22\":\"Упр. 7Стр. 103\"},\"bodyK\":{\"3872\":{\"name\":\"Якушева А.О.\",\"days\":{\"12.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1}},\"avg\":{\"9764\":\"Н\"}},\"1705\":{\"name\":\"Дроздов А.А.\",\"days\":{\"12.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1}},\"avg\":{\"9764\":\"Н\"}},\"1840\":{\"name\":\"Пестов Л.А.\",\"days\":{},\"avg\":{}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"days\":{},\"avg\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"days\":{},\"avg\":{}}}}"))
+            .andExpect(content().string("{\"bodyD\":{\"12.06.22\":\"Упр. 5Стр. 103\",\"10.06.22\":\"Упр. 6Стр. 103\",\"11.06.22\":\"Упр. 7Стр. 103\"},\"bodyK\":{\"3872\":{\"name\":\"Якушева А.О.\",\"days\":{\"12.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1}},\"avg\":{\"9764\":\"4\",\"352\":\"Н\",\"3872\":\"5\"}},\"1705\":{\"name\":\"Дроздов А.А.\",\"days\":{\"12.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1}},\"avg\":{\"9764\":\"4\",\"352\":\"Н\",\"3872\":\"5\"}},\"1840\":{\"name\":\"Пестов Л.А.\",\"days\":{},\"avg\":{}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"days\":{},\"avg\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"days\":{},\"avg\":{}}}}"))
             .andDo(defaultSwaggerDocs(getInfoPart3_Summary, "getInfoPart3_whenGood_TEACHER"));
     }
 
     /** RU: создаёт обычные оценки и за период, нескольким ученикам */
     private void prepareMarksByKid() {
-        when(dbService.getMarkRepository().findByIdInAndUsrIdAndPeriodId(any(), eq(3872L), eq(9764L))).thenReturn(randomUtils.marks);
+        when(dbService.getMarkRepository().findByIdInAndUsrIdAndPeriodId(any(), eq(3872L), eq(9764L))).thenReturn(testUtils.marks);
         when(dbService.getMarkRepository()
-            .findByIdInAndUsrIdAndPeriodId(any(), eq(1705L), eq(9764L))).thenReturn(randomUtils.marks);
+            .findByIdInAndUsrIdAndPeriodId(any(), eq(1705L), eq(9764L))).thenReturn(testUtils.marks);
         when(dbService.getMarkRepository()
-            .findByPeriodInAndTypeAndStyleAndUsrId(randomUtils.periods, "per", "Химия", 3872L)).thenReturn(randomUtils.marksPeriod);
+            .findByPeriodInAndTypeAndStyleAndUsrId(testUtils.periods, "per", "Химия", 3872L)).thenReturn(testUtils.marksPeriod);
         when(dbService.getMarkRepository()
-            .findByPeriodInAndTypeAndStyleAndUsrId(randomUtils.periods, "per", "Химия", 1705L)).thenReturn(randomUtils.marksPeriod);
+            .findByPeriodInAndTypeAndStyleAndUsrId(testUtils.periods, "per", "Химия", 1705L)).thenReturn(testUtils.marksPeriod);
     }
 
     private void prepareListMarksId() {
@@ -439,13 +442,13 @@ public class PJournalControllerTest {
     /** RU: создаём уроки для учеников */
     private void prepareLessons() {
         when(dbService.getLessonRepository()
-            .findBySchoolIdAndTeacherId(20L, 20L)).thenReturn(randomUtils.lessons);
+            .findBySchoolIdAndTeacherId(20L, 20L)).thenReturn(testUtils.lessons);
     }
 
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void preparePeriods(School school) {
-        when(school.getPeriods()).thenReturn(randomUtils.periods);
-        doReturn(randomUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
+        when(school.getPeriods()).thenReturn(testUtils.periods);
+        doReturn(testUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
     }
 
     private void prepareUniqSubjectsName() {
@@ -459,7 +462,7 @@ public class PJournalControllerTest {
 @Import({CustomAccessDenied.class})
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
-class PJournalControllerConfig {
+class TeacherJournalControllerConfig {
 
     @Bean
     public DBService dbService() {
@@ -472,12 +475,7 @@ class PJournalControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public PJournalController pJournalController(AuthController authController) {
-        return spy(new PJournalController(authController));
+    public TeacherJournalController teacherJournalController() {
+        return spy(new TeacherJournalController());
     }
 }

@@ -15,14 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-/** RU: конфиг MVC
- * <pre>
- * beenDo: Сделано
- *  + Javadoc
- *  + Переписка
- *  # Swagger
- *  # Тестирование
- * </pre> */
 @Configuration
 @EnableWebMvc
 @EnableAsync

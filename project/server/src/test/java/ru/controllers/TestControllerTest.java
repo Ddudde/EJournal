@@ -28,14 +28,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.data.models.Syst;
-import ru.data.models.school.School;
+import ru.data.DAO.Syst;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.services.MainService;
 import ru.services.db.DBService;
 import ru.services.db.IniDBService;
-import utils.RandomUtils;
 
 import javax.servlet.ServletException;
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.*;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({TestControllerConfig.class})
@@ -61,7 +60,6 @@ public class TestControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
@@ -211,12 +209,7 @@ class TestControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public TestController testController(AuthController authController, IniDBService iniDBService) {
-        return spy(new TestController(authController, iniDBService));
+    public TestController testController(IniDBService iniDBService) {
+        return spy(new TestController(iniDBService));
     }
 }

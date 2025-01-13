@@ -11,15 +11,15 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Mark;
+import ru.data.DAO.school.Period;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Mark;
-import ru.data.models.school.Period;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -36,20 +36,10 @@ import static ru.Main.datas;
  * Оценки могут быть на нескольких уроках одной дисциплины, а домашние задания выдаются на целый день.
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/DnevnikController">http://localhost:9001/swagger/htmlSwag/#/DnevnikController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
  * </pre> */
 @RequestMapping("/dnevnik")
 @RequiredArgsConstructor
 @RestController public class DnevnikController {
-    private final AuthController authController;
 
     /** RU: отправляет данные о расписании, оценках, домашних заданиях
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -175,7 +165,7 @@ import static ru.Main.datas;
     public ResponseEntity<Void> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         final User user = sub.getUser();
         final Long schId = user.getSelecRole().getYO().getId();
-        authController.infCon(auth.getUUID(), null, TypesConnect.DNEVNIK, schId +"", "main", "main", "main");
+        SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.DNEVNIK, schId +"", "main", "main", "main");
         return ResponseEntity.ok().build();
     }
 }

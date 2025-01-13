@@ -11,14 +11,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -32,22 +32,11 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела управления/просмотра учеников группы учебного центра + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/StudentsController">http://localhost:9001/swagger/htmlSwag/#/StudentsController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
  * </pre>
  * @see Subscriber */
 @RequestMapping("/students")
 @RequiredArgsConstructor
 @RestController public class StudentsController {
-
-    private final AuthController authController;
 
     /** RU: удаляет роль ученика у пользователя + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -71,7 +60,7 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(user1.getId());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("remPepC", ans, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+            SSEController.sendEventFor("remPepC", ans, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -92,7 +81,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(user1.getId())
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chPepC", ans, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+            SSEController.sendEventFor("chPepC", ans, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -122,7 +111,7 @@ import static ru.Main.datas;
             .name("body").beginObject()
             .name("name").value(body.name).endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addPepC", ans, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+            SSEController.sendEventFor("addPepC", ans, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -142,7 +131,7 @@ import static ru.Main.datas;
             datas.usersByList(group.getKids(), true, wrtr);
         }
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, null, school.getId() + "", group.getId() + "", null, null);
+            SSEController.changeSubscriber(auth.getUUID(), null, null, school.getId() + "", group.getId() + "", null, null);
         }, wrtr, HttpStatus.OK, false);
     }
 
@@ -154,7 +143,7 @@ import static ru.Main.datas;
     @GetMapping("/getInfo")
     public ResponseEntity<Void> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         System.out.println("[GET] /getInfo");
-        authController.infCon(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "main", "main");
+        SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "main", "main");
         return ResponseEntity.ok().build();
     }
 
@@ -171,7 +160,7 @@ import static ru.Main.datas;
         final Long firstG = datas.groupsBySchoolOfUser(user, wrtr);
         wrtr.name("firstG").value(firstG);
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "ht", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "ht", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

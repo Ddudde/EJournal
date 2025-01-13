@@ -10,12 +10,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.data.DAO.News;
+import ru.data.DAO.Syst;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.News;
-import ru.data.models.Syst;
-import ru.data.models.auth.User;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 
 import java.io.IOException;
@@ -27,20 +27,11 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела новостей + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/NewsController">http://localhost:9001/swagger/htmlSwag/#/NewsController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Тестирование
- *  + Переписка2
- *  + Swagger
  * </pre>
  * @see Subscriber */
 @RequestMapping("/news")
 @RequiredArgsConstructor
 @RestController public class NewsController {
-
-    private final AuthController authController;
 
     /** RU: удаление новости + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -64,7 +55,7 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.sendEventFor("delNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+            SSEController.sendEventFor("delNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
                 sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
@@ -95,7 +86,7 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+            SSEController.sendEventFor("chNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
                 sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
@@ -133,7 +124,7 @@ import static ru.Main.datas;
             datas.getPushService().send(school.getId()+"News", "Новые объявления!",
                 "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
                 "/DipvLom/static/media/info.jpg");
-            authController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+            SSEController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
                 sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
@@ -161,7 +152,7 @@ import static ru.Main.datas;
             datas.getPushService().send("news", "Новые объявления!",
                 "На портале появилось новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
                 "/DipvLom/static/media/info.jpg");
-            authController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
+            SSEController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
                 sub.getLvlGr(), sub.getLvlMore1(), sub.getLvlMore2());
         }, wrtr, stat);
     }
@@ -203,7 +194,7 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), ref.log, TypesConnect.NEWS, ref.schId + "", "main", "main", type);
+            SSEController.changeSubscriber(auth.getUUID(), ref.log, TypesConnect.NEWS, ref.schId + "", "main", "main", type);
         }, wrtr, stat, false);
     }
 

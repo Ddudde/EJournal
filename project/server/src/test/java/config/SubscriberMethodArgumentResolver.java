@@ -7,7 +7,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import ru.data.SSE.Subscriber;
 
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.getSub;
 
 /** RU: Для поддержки в Мок тестировании @AuthenticationPrincipal.
  * В данном случае класса Subscriber.

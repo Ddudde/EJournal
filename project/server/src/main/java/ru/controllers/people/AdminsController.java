@@ -10,13 +10,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.Syst;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.Syst;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -30,20 +30,11 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела управления/просмотра администраторов + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AdminsController">http://localhost:9001/swagger/htmlSwag/#/AdminsController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre>
  * @see Subscriber */
 @RequestMapping("/admins")
 @RequiredArgsConstructor
 @RestController public class AdminsController {
-
-    private final AuthController authController;
 
     /** RU: удаляет у пользователя роль администратора + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -66,7 +57,7 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(user1.getId());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            SSEController.sendEventFor("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -87,7 +78,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(user1.getId())
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            SSEController.sendEventFor("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -117,7 +108,7 @@ import static ru.Main.datas;
             .name("name").value(body.name)
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            SSEController.sendEventFor("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -136,7 +127,7 @@ import static ru.Main.datas;
             if (user.getRoles().containsKey(Roles.ADMIN)) {
                 role = "adm";
             }
-            authController.infCon(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

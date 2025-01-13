@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.Main;
 import ru.controllers.TestController;
-import ru.data.models.Contacts;
-import ru.data.models.News;
-import ru.data.models.Syst;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.SettingUser;
-import ru.data.models.auth.User;
-import ru.data.models.school.*;
+import ru.data.DAO.Contacts;
+import ru.data.DAO.News;
+import ru.data.DAO.Syst;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.SettingUser;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.*;
 import ru.security.user.Roles;
 import ru.services.MainService;
 
@@ -26,13 +26,7 @@ import java.util.*;
 
 import static java.util.Arrays.asList;
 
-/** RU: Класс для рандомизация данных, тестовые данные для БД
- * <pre>
- * beenDo: Сделано
- *  + Переписка
- *  + Javadoc
- *  + Тестирование
- * </pre> */
+/** RU: Класс для рандомизация данных, тестовые данные для БД */
 @Getter @Setter
 @RequiredArgsConstructor
 @Service public class IniDBService {

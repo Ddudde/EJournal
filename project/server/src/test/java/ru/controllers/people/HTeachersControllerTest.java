@@ -6,13 +6,12 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -31,11 +30,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -56,7 +55,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
-import static utils.RandomUtils.*;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({HTeachersControllerConfig.class})
@@ -68,12 +67,10 @@ public class HTeachersControllerTest {
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private HTeachersController hTeachersController;
@@ -81,8 +78,14 @@ public class HTeachersControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(hTeachersController)
             .setMessageConverters(converter)
@@ -143,7 +146,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(remGroup_Summary, "remGroup_whenGood_Hteacher"));
 
-        verify(authController).sendEventFor(eq("remGroupC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("remGroupC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":20}",
             answer.getValue().toString());
     }
@@ -182,7 +185,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(addGroup_Summary, "addGroup_whenGood_Hteacher"));
 
-        verify(authController).sendEventFor(eq("addGroupC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addGroupC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":null,\"name\":\"31В\"}",
             answer.getValue().toString());
     }
@@ -225,7 +228,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chGroup_Summary, "chGroup_whenGood_Hteacher"));
 
-        verify(authController).sendEventFor(eq("chGroupC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chGroupC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":20,\"name\":\"31В\"}",
             answer.getValue().toString());
     }
@@ -269,7 +272,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_Admin"));
 
-        verify(authController).sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":9764,\"id1\":20,\"name\":\"Дрыздов А.А.\"}",
             answer.getValue().toString());
     }
@@ -312,7 +315,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_Admin"));
 
-        verify(authController).sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":9764,\"id1\":20}",
             answer.getValue().toString());
     }
@@ -352,8 +355,8 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_Admin"));
 
-        verify(authController).sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
-        verify(authController).sendEventFor(eq("addInfoL2C"), any(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
+        theMock.verify(() -> SSEController.sendEventFor(eq("addInfoL2C"), any(), any(), any(), any(), any(), any()));
         assertEquals("{\"id1\":20,\"id\":null,\"body\":{\"name\":\"Дрыздов А.А.\"}}",
             answer.getValue().toString());
     }
@@ -392,7 +395,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chSch_Summary, "chSch_whenGood_Admin"));
 
-        verify(authController).sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":20,\"name\":\"Гимназия ? 4\"}",
             answer.getValue().toString());
     }
@@ -428,7 +431,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(addSch_Summary, "addSch_whenGood_Admin"));
 
-        verify(authController).sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":null,\"body\":{\"name\":\"Гимназия ? 4\"}}",
             answer.getValue().toString());
     }
@@ -466,7 +469,7 @@ public class HTeachersControllerTest {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(remSch_Summary, "remSch_whenGood_Admin"));
 
-        verify(authController).sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":20}",
             answer.getValue().toString());
     }
@@ -549,12 +552,7 @@ class HTeachersControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public HTeachersController hTeachersController(AuthController authController) {
-        return spy(new HTeachersController(authController));
+    public HTeachersController hTeachersController() {
+        return spy(new HTeachersController());
     }
 }

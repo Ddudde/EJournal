@@ -26,16 +26,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 import java.util.List;
@@ -50,8 +49,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({DnevnikControllerConfig.class})
@@ -60,7 +59,7 @@ public class DnevnikControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
@@ -195,12 +194,12 @@ public class DnevnikControllerTest {
     /** RU: создаём обычные случайные оценки */
     private void prepareMarks() {
         final List<Object[]> marks = List.of(
-            new Object[]{"Англ. Яз", "10.06.22", randomUtils.marks.get(0)},
-            new Object[]{"Математика", "10.06.22", randomUtils.marks.get(1)},
-            new Object[]{"Химия", "10.06.22", randomUtils.marks.get(2)},
-            new Object[]{"Математика", "10.06.22", randomUtils.marks.get(3)},
-            new Object[]{"Математика", "11.06.22", randomUtils.marks.get(4)},
-            new Object[]{"Англ. Яз", "12.06.22", randomUtils.marks.get(5)}
+            new Object[]{"Англ. Яз", "10.06.22", testUtils.marks.get(0)},
+            new Object[]{"Математика", "10.06.22", testUtils.marks.get(1)},
+            new Object[]{"Химия", "10.06.22", testUtils.marks.get(2)},
+            new Object[]{"Математика", "10.06.22", testUtils.marks.get(3)},
+            new Object[]{"Математика", "11.06.22", testUtils.marks.get(4)},
+            new Object[]{"Англ. Яз", "12.06.22", testUtils.marks.get(5)}
         );
         when(dbService.getDayRepository()
             .uniqNameSubjectAndDatAndMarksByParams(eq(20L), eq(20L), any())).thenReturn(marks);
@@ -208,14 +207,14 @@ public class DnevnikControllerTest {
 
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void prepareActualPeriod(School school) {
-        when(school.getPeriods()).thenReturn(randomUtils.periods);
-        doReturn(randomUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
+        when(school.getPeriods()).thenReturn(testUtils.periods);
+        doReturn(testUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
     }
 
     /** RU: создаём уроки для учеников */
     private void prepareLessons() {
         when(dbService.getLessonRepository()
-            .findBySchoolIdAndGrpId(20L, 20L)).thenReturn(randomUtils.lessons);
+            .findBySchoolIdAndGrpId(20L, 20L)).thenReturn(testUtils.lessons);
     }
 
     private final String getInfo_Summary = "[start] запускает клиента в раздел дневника и подтверждает клиенту права";
@@ -264,12 +263,7 @@ class DnevnikControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public DnevnikController dnevnikController(AuthController authController) {
-        return spy(new DnevnikController(authController));
+    public DnevnikController dnevnikController() {
+        return spy(new DnevnikController());
     }
 }

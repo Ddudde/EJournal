@@ -6,13 +6,12 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -31,10 +30,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -55,7 +54,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.*;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({TeachersControllerConfig.class})
@@ -67,12 +66,10 @@ public class TeachersControllerTest {
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private TeachersController teachersController;
@@ -80,8 +77,14 @@ public class TeachersControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(teachersController)
             .setMessageConverters(converter)
@@ -140,7 +143,7 @@ public class TeachersControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":9764}",
             answer.getValue().toString());
     }
@@ -177,7 +180,7 @@ public class TeachersControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":9764,\"name\":\"Якуш А.О.\"}",
             answer.getValue().toString());
     }
@@ -217,7 +220,7 @@ public class TeachersControllerTest {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addTea_Summary, "addTea_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("addTeaC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addTeaC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":null,\"name\":\"Якушева А.О.\"}",
             answer.getValue().toString());
     }
@@ -288,12 +291,7 @@ class TeachersControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public TeachersController teachersController(AuthController authController) {
-        return spy(new TeachersController(authController));
+    public TeachersController teachersController() {
+        return spy(new TeachersController());
     }
 }

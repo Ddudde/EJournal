@@ -1,4 +1,4 @@
-package ru.data.models;
+package ru.data.DAO;
 
 import lombok.*;
 

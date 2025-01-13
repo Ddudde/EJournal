@@ -5,7 +5,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
 import org.springframework.stereotype.Service;
-import ru.data.models.auth.SettingUser;
+import ru.data.DAO.auth.SettingUser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,12 +16,6 @@ import static java.util.Arrays.asList;
 
 /** RU: сервис для работы с push-уведомлениями пользователям
  * <pre>
- * beenDo: Сделано
- *  + Javadoc
- *  + Переписка
- *  # Swagger
- *  # Тестирование
- *
  * toDo: Доделать
  *  Протестировать работоспособность
  * </pre> */

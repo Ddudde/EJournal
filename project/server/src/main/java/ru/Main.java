@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import ru.data.models.school.School;
+import ru.data.DAO.school.School;
 import ru.services.MainService;
 
 import java.text.DateFormat;
@@ -17,13 +17,7 @@ import java.text.SimpleDateFormat;
 import static org.asciidoctor.OptionsBuilder.options;
 import static org.asciidoctor.jruby.AsciidoctorJRuby.Factory.create;
 
-/** RU: Главный класс, запуск сервера
- * <pre>
- * beenDo: Сделано
- * + Javadoc
- * + Переписка
- * # Тестирование
- * </pre> */
+/** RU: Главный класс, запуск сервера */
 @SpringBootApplication(exclude = { JacksonAutoConfiguration.class })
 @EnableScheduling
 public class Main {

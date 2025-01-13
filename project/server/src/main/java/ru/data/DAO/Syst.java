@@ -1,9 +1,9 @@
-package ru.data.models;
+package ru.data.DAO;
 
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import ru.data.models.auth.User;
+import ru.data.DAO.auth.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;

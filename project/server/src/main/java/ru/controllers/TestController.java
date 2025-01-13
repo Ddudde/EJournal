@@ -20,18 +20,10 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела тестирования
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TestController">http://localhost:9001/swagger/htmlSwag/#/TestController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre> */
 @RequestMapping("/test")
 @RequiredArgsConstructor
 @RestController public class TestController {
-    private final AuthController authController;
     private final IniDBService iniDBService;
 
     /** RU: изменяет параметры тестирования
@@ -72,7 +64,7 @@ import static ru.Main.datas;
             .endObject();
         iniDBService.getTestInfo(wrtr);
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.TEST, "main", "main", "main", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.TEST, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

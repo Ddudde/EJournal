@@ -1,9 +1,9 @@
 package ru.data.DTO;
 
 import lombok.NoArgsConstructor;
-import ru.data.models.school.Day;
-import ru.data.models.school.Mark;
-import ru.data.models.school.Period;
+import ru.data.DAO.school.Day;
+import ru.data.DAO.school.Mark;
+import ru.data.DAO.school.Period;
 
 @NoArgsConstructor
 public class PrepareMarkDTO {

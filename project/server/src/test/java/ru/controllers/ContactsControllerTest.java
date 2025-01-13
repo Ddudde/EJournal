@@ -6,13 +6,12 @@ import com.epages.restdocs.apispec.SimpleType;
 import com.google.gson.JsonObject;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -30,14 +29,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.data.models.auth.User;
-import ru.data.models.school.School;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 
@@ -53,7 +52,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.*;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({ContactsControllerConfig.class})
@@ -62,16 +61,14 @@ public class ContactsControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private ContactsController contactsController;
@@ -79,8 +76,14 @@ public class ContactsControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(contactsController)
             .setMessageConverters(converter)
@@ -114,7 +117,8 @@ public class ContactsControllerTest {
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(contactSwaggerDocs("chContact_whenEmpty_Portal_AdminUser"));
-        verify(authController, times(0)).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: завуч для контактов школы
@@ -127,9 +131,9 @@ public class ContactsControllerTest {
         final School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(dbService.getSyst().getContacts())
-            .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
+            .thenReturn(getCloneContacts(testUtils.contactsTest.get(0)));
         when(school.getContacts())
-            .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
+            .thenReturn(getCloneContacts(testUtils.contactsTest.get(0)));
 
         mockMvc.perform(put("/contacts/chContact/")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -143,7 +147,7 @@ public class ContactsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(contactSwaggerDocs("chContact_whenGood_YO_HTeacher"));
 
-        verify(authController).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"val\":\"А проект вышел большим...\",\"p\":\"mapPr\",\"p1\":\"text\"}",
             answer.getValue().toString());
     }
@@ -155,7 +159,7 @@ public class ContactsControllerTest {
     void chContact_whenGood_Portal_AdminUser() throws Exception {
         getSub().setLvlMore2("Por");
         when(dbService.getSyst().getContacts())
-            .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
+            .thenReturn(getCloneContacts(testUtils.contactsTest.get(0)));
 
         mockMvc.perform(put("/contacts/chContact/")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -169,7 +173,7 @@ public class ContactsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(contactSwaggerDocs("chContact_whenGood_Portal_AdminUser"));
 
-        verify(authController).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"val\":\"А проект вышел большим...\",\"p\":\"mapPr\",\"p1\":\"text\"}",
             answer.getValue().toString());
     }
@@ -216,7 +220,7 @@ public class ContactsControllerTest {
         School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(school.getContacts())
-            .thenReturn(randomUtils.contactsTest.get(0));
+            .thenReturn(testUtils.contactsTest.get(0));
 
         mockMvc.perform(get("/contacts/getContacts/{type}", "Yo")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -231,7 +235,7 @@ public class ContactsControllerTest {
     @CustomUser
     void getContacts_whenGood_Portal_AdminUser() throws Exception {
         when(dbService.getSyst().getContacts())
-            .thenReturn(randomUtils.contactsTest.get(0));
+            .thenReturn(testUtils.contactsTest.get(0));
 
         mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -258,12 +262,7 @@ class ContactsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public ContactsController contactsController(AuthController authController) {
-        return spy(new ContactsController(authController));
+    public ContactsController contactsController() {
+        return spy(new ContactsController());
     }
 }

@@ -1,4 +1,4 @@
-package ru.data.models.school;
+package ru.data.DAO.school;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import ru.data.models.auth.User;
+import ru.data.DAO.auth.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;

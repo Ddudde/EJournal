@@ -6,13 +6,12 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -30,17 +29,17 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.*;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({ParentsControllerConfig.class})
@@ -65,25 +64,29 @@ public class ParentsControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
-    
-    @Autowired
-    private DBService dbService;
+    private MockedStatic theMock;
 
     @Autowired
-    private AuthController authController;
+    private DBService dbService;
 
     @Autowired
     private ParentsController parentsController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
+
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
     
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(parentsController)
             .setMessageConverters(converter)
@@ -144,7 +147,7 @@ public class ParentsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("remPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any()));
         assertEquals("{\"id\":3872}",
             answer.getValue().toString());
         assertEquals(users.size(), 5);
@@ -181,7 +184,7 @@ public class ParentsControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("chPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any()));
         assertEquals("{\"id\":3872,\"name\":\"Петров П.А.\"}",
             answer.getValue().toString());
     }
@@ -209,7 +212,7 @@ public class ParentsControllerTest {
         final School sch1 = mock(School.class);
         when(dbService.getRoleRepository().saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.userById(20L)).thenReturn(usersTest.get(0));
+        when(dbService.userById(20L)).thenReturn(getCloneUsers(usersTest.get(0)));
         getSub().setLvlSch("20");
         when(dbService.schoolById(20L)).thenReturn(sch1);
 
@@ -234,7 +237,7 @@ public class ParentsControllerTest {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPar_Summary, "addPar_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("addParC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addParC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any()));
         assertEquals("{\"id\":3872,\"body\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\",\"par\":{\"null\":{\"name\":\"Петрова А.Б.\"}}}}",
             answer.getValue().toString());
     }
@@ -312,7 +315,7 @@ public class ParentsControllerTest {
     void getInfoForHTeacher_whenGood_HTEACHER() throws Exception {
         final School sch1 = mock(School.class);
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch1);
-        when(sch1.getGroups()).thenReturn(randomUtils.groups);
+        when(sch1.getGroups()).thenReturn(testUtils.groups);
 
         mockMvc.perform(get("/parents/getInfoFH")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -339,12 +342,7 @@ class ParentsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public ParentsController parentsController(AuthController authController) {
-        return spy(new ParentsController(authController));
+    public ParentsController parentsController() {
+        return spy(new ParentsController());
     }
 }

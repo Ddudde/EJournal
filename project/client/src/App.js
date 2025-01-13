@@ -27,7 +27,7 @@ import React, {useEffect, useRef} from "react";
 import Profile from "./components/main/profile/Profile";
 import Settings from "./components/main/settings/Settings";
 import Tutor from "./components/tutor/Tutor";
-import Journal from "./components/prepjur/Journal";
+import Journal from "./components/prepjur/TeacherJournal.jsx";
 import Request from "./components/request/Request";
 import Redirect from "./components/main/Redirect";
 import Test from "./components/test/Test";

@@ -11,11 +11,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.data.DAO.auth.SettingUser;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
-import ru.data.models.auth.SettingUser;
-import ru.data.models.auth.User;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,20 +27,10 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела настроек
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/SettingsController">http://localhost:9001/swagger/htmlSwag/#/SettingsController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre> */
 @RequestMapping("/settings")
 @RequiredArgsConstructor
 @RestController public class SettingsController {
-
-    /** RU: Контроллер авторизации + сервис */
-    private final AuthController authController;
 
     /** RU: подтверждение емэйла
      * @see DocsHelpController#point(Object, Object) Описание */

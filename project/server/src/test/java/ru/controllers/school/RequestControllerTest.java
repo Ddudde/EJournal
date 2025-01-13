@@ -6,13 +6,12 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -30,13 +29,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
+import ru.controllers.SSEController;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.services.MainService;
 import ru.services.db.DBService;
 import ru.services.db.IniDBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 
@@ -51,7 +50,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
+import static utils.TestUtils.defaultDescription;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({RequestControllerConfig.class})
@@ -60,25 +59,29 @@ public class RequestControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private RequestController requestController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
+
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
     
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(requestController)
             .setMessageConverters(converter)
@@ -113,7 +116,8 @@ public class RequestControllerTest {
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(addReq_Summary, "addReq_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -133,7 +137,7 @@ public class RequestControllerTest {
             """))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(addReq_Summary, "addReq_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":null,\"body\":{\"title\":\"mail@mail.com\",\"date\":\"11.11.1111\",\"text\":\"Дрыздов А.А.\"}}",
             answer.getValue().toString());
     }
@@ -151,7 +155,8 @@ public class RequestControllerTest {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(delReq_Summary, "delReq_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -159,7 +164,7 @@ public class RequestControllerTest {
     @Test @Tag("delReq")
     @CustomUser
     void delReq_whenGood_Admin() throws Exception {
-        when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+        when(dbService.requestById(20L)).thenReturn(testUtils.requestTest.get(0));
 
         mockMvc.perform(delete("/requests/delReq")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -170,7 +175,7 @@ public class RequestControllerTest {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delReq_Summary, "delReq_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":352}",
             answer.getValue().toString());
     }
@@ -188,7 +193,8 @@ public class RequestControllerTest {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chTitle_Summary, "chTitle_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -196,7 +202,7 @@ public class RequestControllerTest {
     @Test @Tag("chTitle")
     @CustomUser
     void chTitle_whenGood_Admin() throws Exception {
-        when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+        when(dbService.requestById(20L)).thenReturn(testUtils.requestTest.get(0));
 
         mockMvc.perform(patch("/requests/chTitle")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -208,7 +214,7 @@ public class RequestControllerTest {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chTitle_Summary, "chTitle_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":352,\"title\":\"example@pepl.qq\"}",
             answer.getValue().toString());
     }
@@ -226,7 +232,8 @@ public class RequestControllerTest {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chDate_Summary, "chDate_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -234,7 +241,7 @@ public class RequestControllerTest {
     @Test @Tag("chDate")
     @CustomUser
     void chDate_whenGood_Admin() throws Exception {
-        when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+        when(dbService.requestById(20L)).thenReturn(testUtils.requestTest.get(0));
 
         mockMvc.perform(patch("/requests/chDate")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -246,7 +253,7 @@ public class RequestControllerTest {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chDate_Summary, "chDate_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":352,\"date\":\"01.01.2001\"}",
             answer.getValue().toString());
     }
@@ -265,7 +272,8 @@ public class RequestControllerTest {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chText_Summary, "chText_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -273,7 +281,7 @@ public class RequestControllerTest {
     @Test @Tag("chText")
     @CustomUser
     void chText_whenGood_Admin() throws Exception {
-        when(dbService.requestById(20L)).thenReturn(randomUtils.requestTest.get(0));
+        when(dbService.requestById(20L)).thenReturn(testUtils.requestTest.get(0));
 
         mockMvc.perform(patch("/requests/chText")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -285,7 +293,7 @@ public class RequestControllerTest {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chText_Summary, "chText_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":352,\"text\":\"Дроздич Г.Г.\"}",
             answer.getValue().toString());
     }
@@ -308,7 +316,7 @@ public class RequestControllerTest {
     @Test @Tag("getRequests")
     @CustomUser
     void getRequests_whenGood_Admin() throws Exception {
-        when(dbService.getRequests()).thenReturn(randomUtils.requestTest);
+        when(dbService.getRequests()).thenReturn(testUtils.requestTest);
 
         mockMvc.perform(get("/requests/getRequests")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -340,12 +348,7 @@ class RequestControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public RequestController requestController(AuthController authController) {
-        return spy(new RequestController(authController));
+    public RequestController requestController() {
+        return spy(new RequestController());
     }
 }

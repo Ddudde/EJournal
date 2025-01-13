@@ -9,12 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.data.DAO.Contacts;
+import ru.data.DAO.Syst;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.Contacts;
-import ru.data.models.Syst;
-import ru.data.models.auth.User;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -25,18 +25,10 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела контактов + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ContactsController">http://localhost:9001/swagger/htmlSwag/#/ContactsController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre> */
 @RequestMapping("/contacts")
 @RequiredArgsConstructor
 @RestController public class ContactsController {
-    private final AuthController authController;
 
     /** RU: изменение контакта + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -74,7 +66,7 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chContactC", ans, TypesConnect.CONTACTS, sub.getLvlSch(), "main", "main", sub.getLvlMore2());
+            SSEController.sendEventFor("chContactC", ans, TypesConnect.CONTACTS, sub.getLvlSch(), "main", "main", sub.getLvlMore2());
         }, wrtr, stat);
     }
 
@@ -108,7 +100,7 @@ import static ru.Main.datas;
             stat = HttpStatus.OK;
         }
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), sub.getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", type);
+            SSEController.changeSubscriber(auth.getUUID(), sub.getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", type);
         }, wrtr, stat, false);
     }
 

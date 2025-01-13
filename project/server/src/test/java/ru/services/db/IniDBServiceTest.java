@@ -10,10 +10,10 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.data.models.Syst;
-import ru.data.models.auth.User;
+import ru.data.DAO.Syst;
+import ru.data.DAO.auth.User;
 import ru.services.MainService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -26,8 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static utils.RandomUtils.schools;
-import static utils.RandomUtils.usersTest;
+import static utils.TestUtils.schools;
+import static utils.TestUtils.usersTest;
 
 @ExtendWith(MockitoExtension.class)
 public class IniDBServiceTest {
@@ -40,7 +40,7 @@ public class IniDBServiceTest {
     @InjectMocks
     private IniDBService iniDBService;
 
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
 
     private static Method getUsersTM;
 
@@ -136,8 +136,7 @@ public class IniDBServiceTest {
         getTestInfo_run("{\"bodyT\":{\"admins\":{},\"schools\":{}}}");
     }
 
-    /** RU: подаёт список из случайных школ и должен вернуть заполненный JSON
-     * toDo: исправить тест, после всеобщего теста руинится */
+    /** RU: подаёт список из случайных школ и должен вернуть заполненный JSON */
     @Test @Tag("getTestInfo")
     void getTestInfo_whenGood() throws Exception {
         Syst syst = mock(Syst.class, Answers.RETURNS_DEEP_STUBS);

@@ -11,14 +11,7 @@ import ru.security.user.CustomToken;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-/** RU: сервис для работы с рассылками по электронной почте
- * <pre>
- * beenDo: Сделано
- *  + Javadoc
- *  + Переписка
- *  # Swagger
- *  # Тестирование
- * </pre> */
+/** RU: сервис для работы с рассылками по электронной почте */
 @Getter
 @RequiredArgsConstructor
 @Service public class EmailService {

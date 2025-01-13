@@ -26,15 +26,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 import java.util.List;
@@ -49,16 +48,16 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
-import static utils.RandomUtils.defaultDescription;
+import static utils.TestUtils.defaultDescription;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@Import({JournalControllerConfig.class})
+@Import({KidJournalControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JournalControllerTest {
+public class KidJournalControllerTest {
     private MockMvc mockMvc;
     private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
@@ -67,12 +66,12 @@ public class JournalControllerTest {
     private DBService dbService;
 
     @Autowired
-    private JournalController journalController;
+    private KidJournalController kidJournalController;
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
         authInjector.afterPropertiesSet();
-        mockMvc = MockMvcBuilders.standaloneSetup(journalController)
+        mockMvc = MockMvcBuilders.standaloneSetup(kidJournalController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
             .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
@@ -88,10 +87,10 @@ public class JournalControllerTest {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
-            .tag("JournalController")
+            .tag("KidJournalController")
             .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
-        return document("JournalController/" + methodName, resource(snip.build()));
+        return document("KidJournalController/" + methodName, resource(snip.build()));
     }
 
     private final String getInfoPers_Summary = "Отправляет данные о итоговых оценках";
@@ -125,19 +124,19 @@ public class JournalControllerTest {
         mockMvc.perform(get("/journal/getInfoPers")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
-            .andExpect(content().json("{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"9764\":\"III четверть\",\"3456\":\"IV четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"9764\":\"1\",\"352\":\"Н\"},\"Математика\":{\"9764\":\"2\",\"352\":\"5\",\"3872\":\"5\"}}}"))
+            .andExpect(content().string("{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"9764\":\"III четверть\",\"3456\":\"IV четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"9764\":\"1\",\"352\":\"Н\"},\"Математика\":{\"9764\":\"2\",\"352\":\"5\",\"3872\":\"5\"}}}"))
             .andDo(defaultSwaggerDocs(getInfoPers_Summary, "getInfoPers_whenGood_KID"));
     }
 
     /** RU: создаём случайные оценки периодов */
     private void prepareMarksPers() {
         final List<Object[]> marksPers = List.of(
-            new Object[]{"Англ. Яз", randomUtils.marksPeriod.get(0)},
-            new Object[]{"Математика", randomUtils.marksPeriod.get(1)},
-            new Object[]{"Химия", randomUtils.marksPeriod.get(2)},
-            new Object[]{"Математика", randomUtils.marksPeriod.get(3)},
-            new Object[]{"Математика", randomUtils.marksPeriod.get(4)},
-            new Object[]{"Англ. Яз", randomUtils.marksPeriod.get(5)}
+            new Object[]{"Англ. Яз", testUtils.marksPeriod.get(0)},
+            new Object[]{"Математика", testUtils.marksPeriod.get(1)},
+            new Object[]{"Химия", testUtils.marksPeriod.get(2)},
+            new Object[]{"Математика", testUtils.marksPeriod.get(3)},
+            new Object[]{"Математика", testUtils.marksPeriod.get(4)},
+            new Object[]{"Англ. Яз", testUtils.marksPeriod.get(5)}
         );
         when(dbService.getMarkRepository()
             .uniqNameSubjectAndMarksByParams(any(), eq("per"), any())).thenReturn(marksPers);
@@ -188,12 +187,12 @@ public class JournalControllerTest {
     /** RU: создаём обычные случайные оценки */
     private void prepareMarks() {
         final List<Object[]> marks = List.of(
-            new Object[]{"Англ. Яз", "10.06.22", randomUtils.marks.get(0)},
-            new Object[]{"Математика", "10.06.22", randomUtils.marks.get(1)},
-            new Object[]{"Химия", "10.06.22", randomUtils.marks.get(2)},
-            new Object[]{"Математика", "10.06.22", randomUtils.marks.get(3)},
-            new Object[]{"Математика", "11.06.22", randomUtils.marks.get(4)},
-            new Object[]{"Англ. Яз", "12.06.22", randomUtils.marks.get(5)}
+            new Object[]{"Англ. Яз", "10.06.22", testUtils.marks.get(0)},
+            new Object[]{"Математика", "10.06.22", testUtils.marks.get(1)},
+            new Object[]{"Химия", "10.06.22", testUtils.marks.get(2)},
+            new Object[]{"Математика", "10.06.22", testUtils.marks.get(3)},
+            new Object[]{"Математика", "11.06.22", testUtils.marks.get(4)},
+            new Object[]{"Англ. Яз", "12.06.22", testUtils.marks.get(5)}
         );
         when(dbService.getDayRepository()
             .uniqNameSubjectAndDatAndMarksByParams(eq(20L), eq(20L), any())).thenReturn(marks);
@@ -201,8 +200,8 @@ public class JournalControllerTest {
 
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void prepareActualPeriod(School school) {
-        when(school.getPeriods()).thenReturn(randomUtils.periods);
-        doReturn(randomUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
+        when(school.getPeriods()).thenReturn(testUtils.periods);
+        doReturn(testUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
     }
 }
 
@@ -210,7 +209,7 @@ public class JournalControllerTest {
 @Import({CustomAccessDenied.class})
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
-class JournalControllerConfig {
+class KidJournalControllerConfig {
 
     @Bean
     public DBService dbService() {
@@ -223,12 +222,7 @@ class JournalControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public JournalController journalController(AuthController authController) {
-        return spy(new JournalController(authController));
+    public KidJournalController kidJournalController() {
+        return spy(new KidJournalController());
     }
 }

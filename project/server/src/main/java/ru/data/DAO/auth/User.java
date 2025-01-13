@@ -1,4 +1,4 @@
-package ru.data.models.auth;
+package ru.data.DAO.auth;
 
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;

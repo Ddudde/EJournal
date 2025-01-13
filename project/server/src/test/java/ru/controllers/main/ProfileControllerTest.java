@@ -7,13 +7,12 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -32,14 +31,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
+import ru.controllers.SSEController;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 
@@ -54,8 +53,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({ProfileControllerConfig.class})
@@ -67,6 +66,7 @@ public class ProfileControllerTest {
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
@@ -75,16 +75,19 @@ public class ProfileControllerTest {
     private PushService pushService;
 
     @Autowired
-    private AuthController authController;
-
-    @Autowired
     private ProfileController profileController;
 
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(profileController)
             .setMessageConverters(converter)
@@ -219,7 +222,8 @@ public class ProfileControllerTest {
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     @Test @Tag("chEmail")
@@ -236,7 +240,7 @@ public class ProfileControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"body\":{\"email\":\"mail1@example.com\",\"role\":4}}",
             answer.getValue().toString());
     }
@@ -255,7 +259,8 @@ public class ProfileControllerTest {
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     @Test @Tag("chInfo")
@@ -272,7 +277,7 @@ public class ProfileControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"body\":{\"more\":\"testInfo\"}}",
             answer.getValue().toString());
     }
@@ -290,7 +295,8 @@ public class ProfileControllerTest {
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenEmpty_Anonim"));
-        verify(authController, times(0)).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -311,7 +317,7 @@ public class ProfileControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenGood_Admin"));
-        verify(authController).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"body\":{\"oLogin\":\"nm12\",\"nLogin\":\"nm\"}}",
             answer.getValue().toString());
     }
@@ -364,7 +370,7 @@ public class ProfileControllerTest {
     @CustomAuth
     void getProfile_whenGood_CustomLogin_Anonim() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        when(dbService.userByLogin("nm12")).thenReturn(RandomUtils.usersTest.get(4));
+        when(dbService.userByLogin("nm12")).thenReturn(TestUtils.usersTest.get(4));
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -396,12 +402,7 @@ class ProfileControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public ProfileController profileController(AuthController authController) {
-        return spy(new ProfileController(authController));
+    public ProfileController profileController() {
+        return spy(new ProfileController());
     }
 }

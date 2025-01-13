@@ -4,12 +4,12 @@ import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import ru.data.DAO.Contacts;
+import ru.data.DAO.News;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.*;
 import ru.data.SSE.Subscriber;
-import ru.data.models.Contacts;
-import ru.data.models.News;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
-import ru.data.models.school.*;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 
 /** RU: Класс для получения случайных сущностей и их хранения */
 @NoArgsConstructor
-public class RandomUtils {
+public class TestUtils {
 
     public static final String defaultDescription = "Также возможны 401, 403 и 500 коды ответов";
 
@@ -109,9 +109,9 @@ public class RandomUtils {
         new Mark(usersTest.get(1), periods.get(2), "1", 1, "per", null),
         new Mark(usersTest.get(1), periods.get(2), "2", 1, "per", null),
         new Mark(usersTest.get(1), periods.get(2), "4", 1, "per", null),
-        new Mark(usersTest.get(1), periods.get(2), "5", 1, "per", null),
-        new Mark(usersTest.get(1), periods.get(2), "5", 1, "per", null),
-        new Mark(usersTest.get(1), periods.get(2), "Н", 1, "per", null)
+        new Mark(usersTest.get(1), periods.get(0), "5", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(1), "5", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(0), "Н", 1, "per", null)
     ));
 
     public static Subscriber getSub(){

@@ -28,9 +28,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.models.auth.SettingUser;
-import ru.data.models.auth.User;
+import ru.data.DAO.auth.SettingUser;
+import ru.data.DAO.auth.User;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.services.EmailService;
@@ -51,8 +50,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({SettingsControllerConfig.class})
@@ -486,12 +485,7 @@ class SettingsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public SettingsController settingsController(AuthController authController) {
-        return spy(new SettingsController(authController));
+    public SettingsController settingsController() {
+        return spy(new SettingsController());
     }
 }

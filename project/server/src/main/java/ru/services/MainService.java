@@ -16,14 +16,14 @@ import ru.controllers.CallInterface;
 import ru.controllers.main.SettingsController;
 import ru.controllers.people.StudentsController;
 import ru.controllers.people.TeachersController;
-import ru.controllers.school.analytics.JournalController;
+import ru.controllers.school.analytics.KidJournalController;
 import ru.controllers.school.analytics.ScheduleController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Lesson;
+import ru.data.DAO.school.Period;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Lesson;
-import ru.data.models.school.Period;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.db.DBService;
@@ -41,12 +41,7 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static ru.Main.datas;
 
 /** RU: главный сервис. Позволяет получить доступ к другим сервисам,
- * также имеет некоторый функционал в основном связанный с работой JSON
- * <pre>
- * beenDo: Сделано
- *  + Javadoc
- *  + Тестирование
- * </pre> */
+ * также имеет некоторый функционал в основном связанный с работой JSON */
 @Slf4j
 @RequiredArgsConstructor
 @Getter
@@ -320,7 +315,7 @@ import static ru.Main.datas;
 
     /** RU: исходя из заданных периодов в школе и актуальной даты
      * выбирается активный период
-     * @see JournalController#getInfo(ru.controllers.analytics.DataJournal) Пример использования */
+     * @see KidJournalController#getInfo(ru.controllers.analytics.DataJournal) Пример использования */
     @SuppressWarnings("JavadocReference")
     public Period getActualPeriodBySchool(School school) {
         try {

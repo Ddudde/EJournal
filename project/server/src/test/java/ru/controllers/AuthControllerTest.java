@@ -2,17 +2,15 @@ package ru.controllers;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
-import com.epages.restdocs.apispec.SimpleType;
 import com.google.gson.JsonObject;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +31,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.configs.SecurityConfig;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.CustomToken;
@@ -47,17 +45,18 @@ import ru.services.db.IniDBService;
 import javax.servlet.ServletException;
 import java.util.UUID;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.*;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({AuthControllerConfig.class})
@@ -69,12 +68,10 @@ public class AuthControllerTest {
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private MainService mainService;
 
     @Autowired
     private AuthController authController;
@@ -84,9 +81,15 @@ public class AuthControllerTest {
 
     @Captor
     private ArgumentCaptor<Object> obj;
+
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
     
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(authController)
             .setMessageConverters(converter)
@@ -114,47 +117,7 @@ public class AuthControllerTest {
         return document("AuthController/" + methodName, resource(snip.build()));
     }
 
-    private RestDocumentationResultHandler start_Docs(String methodName) {
-        final ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
-            .summary("[start#1] Открытие Server Sent Events для нового клиента или сохранение подписки для старого пользователя")
-            .description(defaultDescription + """
-            Подписка сохраняется в течении одного запуска сервера.
-            """)
-            .pathParameters(parameterWithName("uuidAuth").optional()
-                .type(SimpleType.STRING)
-                .description("Авторизация, в ней подписка и пользователь")
-            )
-            .tag("AuthController");
-        return document("AuthController/" + methodName, resource(snip.build()));
-    }
-
-    /** RU: стартует для нового клиента */
-    @Test @Tag("start")
-    void start_whenGoodNext_Anonim() throws Exception {
-        mockMvc.perform(get("/auth/start"))
-            .andExpect(status().isOk())
-            .andDo(start_Docs("start_whenGoodNext_Anonim"));
-        assertNotEquals(0, mainService.subscriptions.size());
-    }
-
-    /** RU: стартует со старой подпиской */
-    @Test @Tag("start")
-    @CustomUser
-    void start_whenGood_AdminUser() throws Exception {
-        final CustomToken cu = ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication());
-        final String uuid = cu.getUUID();
-        final Subscriber sub = mock(Subscriber.class, Answers.RETURNS_DEEP_STUBS);
-        when(sub.getLogin()).thenReturn("nm12");
-        mainService.subscriptions.put(UUID.fromString(uuid), sub);
-
-        mockMvc.perform(get("/auth/start/{uuidAuth}", uuid))
-            .andExpect(status().isOk())
-            .andDo(start_Docs("start_whenGood_AdminUser"));
-        verify(sub).setSSE(any(), eq(UUID.fromString(uuid)));
-    }
-
-    private final String infCon_Summary = "[start#2] Изменение подписки";
+    private final String infCon_Summary = "[start] Изменение подписки";
 
     /** RU: старая авторизованная подписка пользователя существует
      * новая заменяется старой */
@@ -201,11 +164,11 @@ public class AuthControllerTest {
     @CustomUser
     void auth_whenWrong_AdminUser() throws Exception {
         final User user = getSub().getUser();
+        final CustomToken newAuth = new CustomToken(new Subscriber(), UUID.randomUUID().toString());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(dbService.userByLogin(any())).thenReturn(null);
         when(user.getPassword()).thenReturn("passTest1");
-        SecurityContextHolder.getContext()
-            .setAuthentication(new CustomToken(new Subscriber(), UUID.randomUUID().toString()));
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         System.out.println(getAuth());
 
@@ -368,7 +331,8 @@ public class AuthControllerTest {
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(setCodePep_Summary, "setCodePep_whenEmpty_AdminUser"));
-        verify(authController, times(0)).sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -388,7 +352,8 @@ public class AuthControllerTest {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(setCodePep_Summary, "setCodePep_whenGood_AdminUser"));
         verify(user).setCode((String) obj.capture());
-        verify(authController, times(2)).sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any()),
+            times(2));
         assertEquals("{\"id\":9764,\"code\":\"%s\",\"id1\":0}".formatted(obj.getValue().toString()),
             answer.getValue().toString());
     }
