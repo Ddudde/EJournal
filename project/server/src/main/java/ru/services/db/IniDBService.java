@@ -17,6 +17,8 @@ import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.*;
+import ru.data.SSE.Subscriber;
+import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 
@@ -441,7 +443,7 @@ import static java.util.Arrays.asList;
      * }
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see TestController#getInfo(ru.mirea.controllers.DataTest) Пример использования */
+     * @see TestController#getInfo(Subscriber, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public void getTestInfo(JsonTreeWriter wrtr) throws Exception {
         wrtr.name("bodyT").beginObject()

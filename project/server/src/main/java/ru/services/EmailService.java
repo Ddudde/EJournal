@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import ru.controllers.main.SettingsController;
-import ru.security.user.CustomToken;
+import ru.data.SSE.Subscriber;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -40,7 +40,7 @@ import javax.mail.internet.MimeMessage;
     /** RU: посылает на указанную почту код подтверждения для регистрации
      * @param to адрес электронной почты
      * @param code код восстановления
-     * @see SettingsController#startEmail(SettingsController.DataSettings, CustomToken)  Пример использования */
+     * @see SettingsController#startEmail(SettingsController.DataSettings, Subscriber)   Пример использования */
     @SuppressWarnings("JavadocReference")
     public void sendRegCode(String to, String code) {
         String text = """
@@ -60,7 +60,7 @@ import javax.mail.internet.MimeMessage;
      * @param to адрес электронной почты
      * @param code код восстановления
      * @param title заголовок письма
-     * @see SettingsController#chPass(SettingsController.DataSettings, CustomToken)  Пример использования */
+     * @see SettingsController#chPass(SettingsController.DataSettings, Subscriber)   Пример использования */
     @SuppressWarnings("JavadocReference")
     public void sendRecCode(String to, String code, String title) {
         String text = """

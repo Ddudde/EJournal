@@ -134,7 +134,7 @@ import static ru.Main.datas;
      * </pre>
      * @return ID первой группы
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see StudentsController#getInfo(ru.controllers.people.DataStudents) Пример использования */
+     * @see StudentsController#getInfo(Subscriber, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public Long groupsBySchoolOfUser(User user, JsonWriter wrtr) throws Exception {
         Long first = null;
@@ -164,7 +164,7 @@ import static ru.Main.datas;
      * Дальше определённая дисциплина и учителя, которые её преподают
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see TeachersController#getTeachers(ru.controllers.people.DataTeachers)  Пример использования */
+     * @see TeachersController#getTeachers(CustomToken, Subscriber)   Пример использования */
     @SuppressWarnings("JavadocReference")
     public void teachersBySchool(School school, JsonWriter wrtr) throws Exception {
         wrtr.name("nt").beginObject().name("tea").beginObject();
@@ -190,14 +190,14 @@ import static ru.Main.datas;
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Новая версия с пустым JSON
-     * @see SettingsController#getSettings(CustomToken) Пример использования */
+     * @see SettingsController#getSettings(Subscriber)  Пример использования */
     public ResponseEntity getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat) {
         return getObjR(callable, wrtr, stat, true);
     }
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Новая версия с не пустым JSON
-     * @see SettingsController#getSettings(CustomToken) Пример использования */
+     * @see SettingsController#getSettings(Subscriber)  Пример использования */
     public ResponseEntity getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat, boolean nul) {
         var obj = getObj(callable, wrtr, !stat.isError());
         ResponseEntity.BodyBuilder build;
@@ -211,7 +211,7 @@ import static ru.Main.datas;
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Старая версия
-     * @see SettingsController#getSettings(CustomToken) Пример использования */
+     * @see SettingsController#getSettings(Subscriber)  Пример использования */
     private JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, boolean bol) {
         JsonObject ans = null;
         try {
@@ -235,7 +235,7 @@ import static ru.Main.datas;
      * @param data JSON данные клиента
      * @param type POST/GET/PATCH...
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see SettingsController#getSettings(CustomToken) Пример использования */
+     * @see SettingsController#getSettings(Subscriber)  Пример использования */
     public JsonTreeWriter init(String data, String type) throws Exception {
         log.debug(type + "! " + data);
         JsonTreeWriter wrtr = new JsonTreeWriter();
@@ -262,7 +262,7 @@ import static ru.Main.datas;
      * }
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see ScheduleController#getSchedule(ru.controllers.analytics.DataSchedule) Пример использования */
+     * @see ScheduleController#getSchedule(Long, Subscriber, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public void getShedule(String nameWrtr, User user, JsonTreeWriter wrtr, Long gId) throws Exception {
         Long schId = dbService.getFirstRole(user.getRoles()).getYO().getId();
@@ -307,7 +307,7 @@ import static ru.Main.datas;
 
     /** RU: исходя из заданных периодов в школе и актуальной даты
      * выбирается активный период
-     * @see KidJournalController#getInfo(ru.controllers.analytics.DataJournal) Пример использования */
+     * @see KidJournalController#getInfo(Subscriber, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public Period getActualPeriodBySchool(School school) {
         try {

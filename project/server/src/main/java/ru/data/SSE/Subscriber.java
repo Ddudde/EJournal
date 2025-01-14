@@ -3,7 +3,7 @@ package ru.data.SSE;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import ru.controllers.AuthController;
+import ru.controllers.SSEController;
 import ru.data.DAO.auth.User;
 
 import java.util.UUID;
@@ -48,7 +48,7 @@ import static ru.Main.datas;
     }
 
     /** RU: изменияет Server Sent Events пользователя и устанавливает ему UUID
-     * @see AuthController#start(String)  */
+     * @see SSEController#start(String)   */
     public void setSSE(SseEmitter SSE, UUID uuid) {
         this.SSE = SSE;
         if(SSE == null) return;
