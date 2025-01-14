@@ -37,7 +37,7 @@ loadScripts(document, 'script');</script>
 <li>
 <p>Summary:</p>
 <ul>
-<li>Nested</li>
+<li><a href="#nested-class-summary">Nested</a></li>
 <li>Field</li>
 <li><a href="#constructor-summary">Constr</a></li>
 <li><a href="#method-summary">Method</a></li>
@@ -57,7 +57,7 @@ loadScripts(document, 'script');</script>
 <div id="navbar-sub-list">
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested-class-summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
@@ -93,9 +93,38 @@ loadScripts(document, 'script');</script>
 @RestController
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">TeachersController</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<div class="block">RU: Контроллер для управления/просмотра преподавателей учебных центров + Server Sent Events
+ <pre>
+ Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TeachersController">http://localhost:9001/swagger/htmlSwag/#/TeachersController</a>
+ </pre></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE"><code>Subscriber</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<li>
+<section class="nested-class-summary" id="nested-class-summary">
+<h2>Nested Class Summary</h2>
+<div class="caption"><span>Nested Classes</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>(package private) static final class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="TeachersController.DataTeachers.html" class="type-name-link" title="class in ru.controllers.people">TeachersController.DataTeachers</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">RU: Данные клиента используемые TeachersController в методах</div>
+</div>
+</div>
+</section>
+</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -120,21 +149,31 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.gson.JsonObject</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTea(ru.controllers.people.DataTeachers)" class="member-name-link">addTea</a><wbr>(<a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.gson.JsonObject</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chPep(ru.controllers.people.DataTeachers)" class="member-name-link">chPep</a><wbr>(<a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.gson.JsonObject</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTeachers(ru.controllers.people.DataTeachers)" class="member-name-link">getTeachers</a><wbr>(<a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.gson.JsonObject</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remPep(ru.controllers.people.DataTeachers)" class="member-name-link">remPep</a><wbr>(<a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.gson.JsonObject</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCodePep(ru.controllers.people.DataTeachers)" class="member-name-link">setCodePep</a><wbr>(<a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTea(ru.controllers.people.TeachersController.DataTeachers,ru.data.SSE.Subscriber)" class="member-name-link">addTea</a><wbr>(<a href="TeachersController.DataTeachers.html" title="class in ru.controllers.people">TeachersController.DataTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">RU: создаёт нового учителя для учебного центра</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chPep(ru.controllers.people.TeachersController.DataTeachers,ru.data.SSE.Subscriber)" class="member-name-link">chPep</a><wbr>(<a href="TeachersController.DataTeachers.html" title="class in ru.controllers.people">TeachersController.DataTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">RU: изменяет ФИО преподавателю учебного центра.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTeachers(ru.security.user.CustomToken,ru.data.SSE.Subscriber)" class="member-name-link">getTeachers</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">RU: [start] отправка списка учителей учебного центра</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remPep(ru.controllers.people.TeachersController.DataTeachers,ru.data.SSE.Subscriber)" class="member-name-link">remPep</a><wbr>(<a href="TeachersController.DataTeachers.html" title="class in ru.controllers.people">TeachersController.DataTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">RU: удаление роли преподавателя
+ Не реализовано в клиенте.</div>
+</div>
 </div>
 </div>
 </div>
@@ -167,43 +206,96 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="remPep(ru.controllers.people.DataTeachers)">
+<section class="detail" id="remPep(ru.controllers.people.TeachersController.DataTeachers,ru.data.SSE.Subscriber)">
 <h3>remPep</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/remPep")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.gson.JsonObject</span>&nbsp;<span class="element-name">remPep</span><wbr><span class="parameters">(@RequestBody
- <a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</span></div>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+@DeleteMapping("/remPep")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remPep</span><wbr><span class="parameters">(@RequestBody
+ <a href="TeachersController.DataTeachers.html" title="class in ru.controllers.people">TeachersController.DataTeachers</a>&nbsp;body,
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
+                                                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
+<div class="block">RU: удаление роли преподавателя
+ Не реализовано в клиенте.</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="chPep(ru.controllers.people.DataTeachers)">
+<section class="detail" id="chPep(ru.controllers.people.TeachersController.DataTeachers,ru.data.SSE.Subscriber)">
 <h3>chPep</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/chPep")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.gson.JsonObject</span>&nbsp;<span class="element-name">chPep</span><wbr><span class="parameters">(@RequestBody
- <a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</span></div>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+@PatchMapping("/chPep")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chPep</span><wbr><span class="parameters">(@RequestBody
+ <a href="TeachersController.DataTeachers.html" title="class in ru.controllers.people">TeachersController.DataTeachers</a>&nbsp;body,
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
+                                                    throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
+<div class="block">RU: изменяет ФИО преподавателю учебного центра.
+ Не реализовано в клиенте.</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="setCodePep(ru.controllers.people.DataTeachers)">
-<h3>setCodePep</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/setCodePep")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.gson.JsonObject</span>&nbsp;<span class="element-name">setCodePep</span><wbr><span class="parameters">(@RequestBody
- <a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="addTea(ru.controllers.people.DataTeachers)">
+<section class="detail" id="addTea(ru.controllers.people.TeachersController.DataTeachers,ru.data.SSE.Subscriber)">
 <h3>addTea</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/addTea")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.gson.JsonObject</span>&nbsp;<span class="element-name">addTea</span><wbr><span class="parameters">(@RequestBody
- <a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</span></div>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+@PostMapping("/addTea")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">addTea</span><wbr><span class="parameters">(@RequestBody
+ <a href="TeachersController.DataTeachers.html" title="class in ru.controllers.people">TeachersController.DataTeachers</a>&nbsp;body,
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
+                                                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
+<div class="block">RU: создаёт нового учителя для учебного центра</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getTeachers(ru.controllers.people.DataTeachers)">
+<section class="detail" id="getTeachers(ru.security.user.CustomToken,ru.data.SSE.Subscriber)">
 <h3>getTeachers</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/getTeachers")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.gson.JsonObject</span>&nbsp;<span class="element-name">getTeachers</span><wbr><span class="parameters">(@RequestBody
- <a href="DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a>&nbsp;body)</span></div>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@GetMapping("/getTeachers")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getTeachers</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
+                                                                                throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
+<div class="block">RU: [start] отправка списка учителей учебного центра</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 </li>
 </ul>

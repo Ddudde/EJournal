@@ -96,15 +96,6 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: Контроллер для раздела управления/просмотра завучей учебных центров + Server Sent Events
  <pre>
  Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/HTeachersController">http://localhost:9001/swagger/htmlSwag/#/HTeachersController</a>
-
- beenDo: Сделано
-  + Javadoc
-  + Security
-  + Переписка
-  + Переписка2
-  + Тестирование
-  + Swagger
-
  toDo: много кривизны на клиенте. Функции школ и групп.
  </pre></div>
 <dl class="notes">
@@ -160,66 +151,68 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">addGroup</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">addGroup</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: создаёт группу + Server Sent Events</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">addPep</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">addPep</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: создаёт пользователя-завуча + Server Sent Events</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">addSch</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">addSch</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: добавление учебного центра администратором портала</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">chGroup</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">chGroup</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменяет название группы + Server Sent Events</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">chPep</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">chPep</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменяет фамилию пользователя + Server Sent Events</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">chSch</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">chSch</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение имени учебного центра администратором портала</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfo(ru.security.user.CustomToken)" class="member-name-link">getInfo</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfo(ru.security.user.CustomToken,ru.data.SSE.Subscriber)" class="member-name-link">getInfo</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: отправка списка завучей учебного центра</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfoForAdmins(ru.security.user.CustomToken)" class="member-name-link">getInfoForAdmins</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfoForAdmins(ru.security.user.CustomToken,ru.data.SSE.Subscriber)" class="member-name-link">getInfoForAdmins</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: [start] отправка списка завучей учебного центра для администраторов</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">remGroup</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">remGroup</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: удаляет группу + Server Sent Events</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">remPep</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">remPep</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: удаляет у пользователя роль завуча + Server Sent Events</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)" class="member-name-link">remSch</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)" class="member-name-link">remSch</a><wbr>(<a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: удаление учебного центра администратором портала</div>
 </div>
@@ -255,13 +248,14 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="remGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="remGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>remGroup</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
 @DeleteMapping("/remGroup")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remGroup</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                        throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: удаляет группу + Server Sent Events</div>
 <dl class="notes">
@@ -277,13 +271,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="addGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="addGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>addGroup</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
 @PostMapping("/addGroup")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">addGroup</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                        throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: создаёт группу + Server Sent Events</div>
 <dl class="notes">
@@ -299,13 +294,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="chGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="chGroup(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>chGroup</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
 @PatchMapping("/chGroup")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chGroup</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                       throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменяет название группы + Server Sent Events</div>
 <dl class="notes">
@@ -321,13 +317,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="chPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="chPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>chPep</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
 @PatchMapping("/chPep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chPep</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменяет фамилию пользователя + Server Sent Events</div>
 <dl class="notes">
@@ -343,13 +340,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="remPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="remPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>remPep</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
 @DeleteMapping("/remPep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remPep</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: удаляет у пользователя роль завуча + Server Sent Events</div>
 <dl class="notes">
@@ -365,13 +363,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="addPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="addPep(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>addPep</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
 @PostMapping("/addPep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">addPep</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: создаёт пользователя-завуча + Server Sent Events</div>
 <dl class="notes">
@@ -387,13 +386,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="chSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="chSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>chSch</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @PatchMapping("/chSch")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chSch</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение имени учебного центра администратором портала</div>
 <dl class="notes">
@@ -409,13 +409,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="addSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="addSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>addSch</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @PostMapping("/addSch")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">addSch</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: добавление учебного центра администратором портала</div>
 <dl class="notes">
@@ -431,13 +432,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="remSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.security.user.CustomToken)">
+<section class="detail" id="remSch(ru.controllers.people.HTeachersController.DataHTeachers,ru.data.SSE.Subscriber)">
 <h3>remSch</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @DeleteMapping("/remSch")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remSch</span><wbr><span class="parameters">(@RequestBody
  <a href="HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: удаление учебного центра администратором портала</div>
 <dl class="notes">
@@ -453,11 +455,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getInfo(ru.security.user.CustomToken)">
+<section class="detail" id="getInfo(ru.security.user.CustomToken,ru.data.SSE.Subscriber)">
 <h3>getInfo</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
 @GetMapping("/getInfo")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getInfo</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getInfo</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                             throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: отправка списка завучей учебного центра</div>
 <dl class="notes">
@@ -473,11 +477,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getInfoForAdmins(ru.security.user.CustomToken)">
+<section class="detail" id="getInfoForAdmins(ru.security.user.CustomToken,ru.data.SSE.Subscriber)">
 <h3>getInfoForAdmins</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @GetMapping("/getInfoFA")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getInfoForAdmins</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getInfoForAdmins</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: [start] отправка списка завучей учебного центра для администраторов</div>
 <dl class="notes">

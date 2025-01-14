@@ -96,13 +96,6 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: Контроллер для раздела заявок на подключение к системе учебных учреждений + Server Sent Events
  <pre>
  Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/RequestController">http://localhost:9001/swagger/htmlSwag/#/RequestController</a>
- beenDo: Сделано
-  + Javadoc
-  + Security
-  + Переписка
-  + Переписка2
-  + Тестирование
-  + Swagger
  </pre></div>
 <dl class="notes">
 <dt>See Also:</dt>
@@ -162,31 +155,32 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: добавляет заявку + Server Sent Events</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chDate(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)" class="member-name-link">chDate</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chDate(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)" class="member-name-link">chDate</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение даты заявки + Server Sent Events</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chText(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)" class="member-name-link">chText</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chText(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)" class="member-name-link">chText</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение текста заявки + Server Sent Events</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chTitle(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)" class="member-name-link">chTitle</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chTitle(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)" class="member-name-link">chTitle</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение заголовка заявки + Server Sent Events</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#delReq(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)" class="member-name-link">delReq</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#delReq(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)" class="member-name-link">delReq</a><wbr>(<a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: удаление заявки + Server Sent Events</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRequests(ru.security.user.CustomToken)" class="member-name-link">getRequests</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRequests(ru.data.SSE.Subscriber,ru.security.user.CustomToken)" class="member-name-link">getRequests</a><wbr>(<a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
+ <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: [start] отправляет инфу о заявках</div>
 </div>
@@ -242,13 +236,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="delReq(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)">
+<section class="detail" id="delReq(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)">
 <h3>delReq</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @DeleteMapping("/delReq")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">delReq</span><wbr><span class="parameters">(@RequestBody
  <a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: удаление заявки + Server Sent Events</div>
 <dl class="notes">
@@ -264,13 +259,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="chTitle(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)">
+<section class="detail" id="chTitle(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)">
 <h3>chTitle</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @PatchMapping("/chTitle")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chTitle</span><wbr><span class="parameters">(@RequestBody
  <a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                       throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение заголовка заявки + Server Sent Events</div>
 <dl class="notes">
@@ -286,13 +282,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="chDate(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)">
+<section class="detail" id="chDate(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)">
 <h3>chDate</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @PatchMapping("/chDate")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chDate</span><wbr><span class="parameters">(@RequestBody
  <a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение даты заявки + Server Sent Events</div>
 <dl class="notes">
@@ -308,13 +305,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="chText(ru.controllers.school.RequestController.DataRequest,ru.security.user.CustomToken)">
+<section class="detail" id="chText(ru.controllers.school.RequestController.DataRequest,ru.data.SSE.Subscriber)">
 <h3>chText</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @PatchMapping("/chText")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chText</span><wbr><span class="parameters">(@RequestBody
  <a href="RequestController.DataRequest.html" title="class in ru.controllers.school">RequestController.DataRequest</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение текста заявки + Server Sent Events</div>
 <dl class="notes">
@@ -330,11 +328,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getRequests(ru.security.user.CustomToken)">
+<section class="detail" id="getRequests(ru.data.SSE.Subscriber,ru.security.user.CustomToken)">
 <h3>getRequests</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @GetMapping("/getRequests")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getRequests</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getRequests</span><wbr><span class="parameters">(@AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
+ <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                                                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: [start] отправляет инфу о заявках</div>
 <dl class="notes">

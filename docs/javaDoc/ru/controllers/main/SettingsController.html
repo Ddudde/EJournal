@@ -96,13 +96,6 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: Контроллер для раздела настроек
  <pre>
  Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/SettingsController">http://localhost:9001/swagger/htmlSwag/#/SettingsController</a>
- beenDo: Сделано
-  + Javadoc
-  + Security
-  + Переписка
-  + Переписка2
-  + Тестирование
-  + Swagger
  </pre></div>
 </section>
 <section class="summary">
@@ -116,7 +109,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>(package private) static class&nbsp;</code></div>
+<div class="col-first even-row-color"><code>(package private) static final class&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="SettingsController.DataSettings.html" class="type-name-link" title="class in ru.controllers.main">SettingsController.DataSettings</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">RU: Данные клиента используемые SettingsController в методах</div>
@@ -149,49 +142,49 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">addNotifToken</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)" class="member-name-link">addNotifToken</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: установка токена уведомлений</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#checkCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">checkCodeEmail</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#checkCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)" class="member-name-link">checkCodeEmail</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: подтверждение емэйла</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#checkPasCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">checkPasCodeEmail</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#checkPasCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)" class="member-name-link">checkPasCodeEmail</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменяет пароль пользователя при помощи емэйла</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chPass(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">chPass</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chPass(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)" class="member-name-link">chPass</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменяет пароль пользователя при помощи емэйла/секретной фразы</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chSettings(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">chSettings</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chSettings(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)" class="member-name-link">chSettings</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: Вкл/выкл подсказки или ряд уведомлений</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSettings(ru.security.user.CustomToken)" class="member-name-link">getSettings</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSettings(ru.data.SSE.Subscriber)" class="member-name-link">getSettings</a><wbr>(<a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: отправляет настройки клиенту</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">remNotifToken</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)" class="member-name-link">remNotifToken</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: удаление токена уведомлений</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#startEmail(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)" class="member-name-link">startEmail</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#startEmail(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)" class="member-name-link">startEmail</a><wbr>(<a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение электронной почты пользователя или добавление при регистрации</div>
 </div>
@@ -227,159 +220,182 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="checkCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)">
+<section class="detail" id="checkCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)">
 <h3>checkCodeEmail</h3>
 <div class="member-signature"><span class="annotations">@PatchMapping("/checkCodeEmail")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">checkCodeEmail</span><wbr><span class="parameters">(@RequestBody
  <a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                              throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: подтверждение емэйла</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: invCod, emailCode, email</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="startEmail(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)">
+<section class="detail" id="startEmail(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)">
 <h3>startEmail</h3>
 <div class="member-signature"><span class="annotations">@PatchMapping("/startEmail")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">startEmail</span><wbr><span class="parameters">(@RequestBody
  <a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                          throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение электронной почты пользователя или добавление при регистрации</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: invCod, email</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="remNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)">
+<section class="detail" id="remNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)">
 <h3>remNotifToken</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/remNotifToken")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PostMapping("/remNotifToken")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remNotifToken</span><wbr><span class="parameters">(@RequestBody
  <a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                             throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: удаление токена уведомлений</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: notifToken</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="addNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)">
+<section class="detail" id="addNotifToken(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)">
 <h3>addNotifToken</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/addNotifToken")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PostMapping("/addNotifToken")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">addNotifToken</span><wbr><span class="parameters">(@RequestBody
  <a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                             throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: установка токена уведомлений</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: notifToken</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="chSettings(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)">
+<section class="detail" id="chSettings(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)">
 <h3>chSettings</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chSettings")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/chSettings")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chSettings</span><wbr><span class="parameters">(@RequestBody
  <a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                          throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: Вкл/выкл подсказки или ряд уведомлений</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: val, id</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="checkPasCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)">
+<section class="detail" id="checkPasCodeEmail(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)">
 <h3>checkPasCodeEmail</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/checkPasCodeEmail")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/checkPasCodeEmail")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">checkPasCodeEmail</span><wbr><span class="parameters">(@RequestBody
  <a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменяет пароль пользователя при помощи емэйла</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: emailCode, nPar</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="chPass(ru.controllers.main.SettingsController.DataSettings,ru.security.user.CustomToken)">
+<section class="detail" id="chPass(ru.controllers.main.SettingsController.DataSettings,ru.data.SSE.Subscriber)">
 <h3>chPass</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chPass")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/chPass")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">chPass</span><wbr><span class="parameters">(@RequestBody
  <a href="SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                            throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменяет пароль пользователя при помощи емэйла/секретной фразы</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: login, emailSt, secFR, email, nPar</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getSettings(ru.security.user.CustomToken)">
+<section class="detail" id="getSettings(ru.data.SSE.Subscriber)">
 <h3>getSettings</h3>
-<div class="member-signature"><span class="annotations">@GetMapping("/getSettings")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getSettings</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@GetMapping("/getSettings")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getSettings</span><wbr><span class="parameters">(@AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: отправляет настройки клиенту</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>

@@ -94,6 +94,13 @@ loadScripts(document, 'script');</script>
 @EnableWebSecurity
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">SecurityConfig</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<div class="block">RU: Начало описания security.
+ Без шифрования в БД(NoOpPasswordEncoder).
+ Авторизация Token(UUID) в header "x-access-token".
+ Анонимные пользователи тоже наделяются токеном.
+ При авторизации в системе используются логин/пароль.
+ Они передаются без шифрования в POST auth/auth
+ И хранится токен в клиенте LocalStorage</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -107,7 +114,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#authHeader" class="member-name-link">authHeader</a></code></div>
+<div class="col-second even-row-color"><code><a href="#authTokenHeader" class="member-name-link">authTokenHeader</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -142,12 +149,9 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.security.web.SecurityFilterChain</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity)" class="member-name-link">filterChain</a><wbr>(org.springframework.security.config.annotation.web.builders.HttpSecurity&nbsp;http)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.security.crypto.password.PasswordEncoder</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.security.crypto.password.NoOpPasswordEncoder</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#passwordEncoder()" class="member-name-link">passwordEncoder</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.security.provisioning.InMemoryUserDetailsManager</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#userDetailsService()" class="member-name-link">userDetailsService</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -166,14 +170,14 @@ loadScripts(document, 'script');</script>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="authHeader">
-<h3>authHeader</h3>
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">authHeader</span></div>
+<section class="detail" id="authTokenHeader">
+<h3>authTokenHeader</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">authTokenHeader</span></div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../constant-values.html#ru.configs.SecurityConfig.authHeader">Constant Field Values</a></li>
+<li><a href="../../constant-values.html#ru.configs.SecurityConfig.authTokenHeader">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -229,14 +233,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="passwordEncoder()">
 <h3>passwordEncoder</h3>
 <div class="member-signature"><span class="annotations">@Bean
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.security.crypto.password.PasswordEncoder</span>&nbsp;<span class="element-name">passwordEncoder</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="userDetailsService()">
-<h3>userDetailsService</h3>
-<div class="member-signature"><span class="annotations">@Bean
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.security.provisioning.InMemoryUserDetailsManager</span>&nbsp;<span class="element-name">userDetailsService</span>()</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.security.crypto.password.NoOpPasswordEncoder</span>&nbsp;<span class="element-name">passwordEncoder</span>()</div>
 </section>
 </li>
 </ul>

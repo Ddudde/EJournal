@@ -93,16 +93,9 @@ loadScripts(document, 'script');</script>
 @RestController
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">AuthController</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">RU: Контроллер для раздела авторизации и управлением Server Sent Events
+<div class="block">RU: Контроллер для раздела авторизации
  <pre>
  Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AuthController">http://localhost:9001/swagger/htmlSwag/#/AuthController</a>
- beenDo: Сделано
-  + Javadoc
-  + Security
-  + Переписка
-  + Переписка2
-  + Тестирование
-  + Swagger
  </pre></div>
 <dl class="notes">
 <dt>See Also:</dt>
@@ -157,7 +150,8 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#auth(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)" class="member-name-link">auth</a><wbr>(<a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#auth(ru.controllers.AuthController.DataAuth,ru.data.SSE.Subscriber,ru.security.user.CustomToken)" class="member-name-link">auth</a><wbr>(<a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
  <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: авторизация пользователя</div>
@@ -167,26 +161,12 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: проверка инвайта для регистрации/регистрации новой роли</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSubscriber(java.lang.String)" class="member-name-link">getSubscriber</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#infCon(java.lang.String,java.lang.String,ru.data.SSE.TypesConnect,java.lang.String,java.lang.String,java.lang.String,java.lang.String)" class="member-name-link">infCon</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;login,
- <a href="../data/SSE/TypesConnect.html" title="enum class in ru.data.SSE">TypesConnect</a>&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlSch,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlGr,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore1,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore2)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">RU: изменение подписки
- Все параметры, являются свойствами подписки</div>
-</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#infCon(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)" class="member-name-link">infCon</a><wbr>(<a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#infCon(ru.controllers.AuthController.DataAuth,ru.data.SSE.Subscriber,ru.security.user.CustomToken)" class="member-name-link">infCon</a><wbr>(<a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
  <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">RU: [start#2] изменение подписки</div>
+<div class="block">RU: [start] изменение подписки</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reg(ru.controllers.AuthController.DataAuth)" class="member-name-link">reg</a><wbr>(<a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body)</code></div>
@@ -194,32 +174,16 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: регистрация пользователя</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remCon(ru.security.user.CustomToken)" class="member-name-link">remCon</a><wbr>(<a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remCon(ru.data.SSE.Subscriber,ru.security.user.CustomToken)" class="member-name-link">remCon</a><wbr>(<a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
+ <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: завершение сеанса</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sendEventFor(java.lang.String,java.lang.Object,ru.data.SSE.TypesConnect,java.lang.String,java.lang.String,java.lang.String,java.lang.String)" class="member-name-link">sendEventFor</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;evName,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;data,
- <a href="../data/SSE/TypesConnect.html" title="enum class in ru.data.SSE">TypesConnect</a>&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlSch,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlGr,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore1,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore2)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCodePep(ru.controllers.AuthController.DataAuth,ru.data.SSE.Subscriber)" class="member-name-link">setCodePep</a><wbr>(<a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">RU: отправляет всем подходящим клиентам информацию по определённому ивенту</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCodePep(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)" class="member-name-link">setCodePep</a><wbr>(<a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
- <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: установка/обновление инвайта для регистрации + Server Sent Events</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.web.servlet.mvc.method.annotation.SseEmitter</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#start(java.lang.String)" class="member-name-link">start</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuidAuth)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">RU: [start#1] открытие Server Sent Events для нового клиента
- или сохранение подписки для старого пользователя</div>
 </div>
 </div>
 </div>
@@ -253,79 +217,16 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="start(java.lang.String)">
-<h3>start</h3>
-<div class="member-signature"><span class="annotations">@GetMapping(value={"/start/{uuidAuth}","/start"},
-            produces="text/event-stream")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.web.servlet.mvc.method.annotation.SseEmitter</span>&nbsp;<span class="element-name">start</span><wbr><span class="parameters">(@PathVariable(required=false)
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuidAuth)</span>
-                                                                       throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">RU: [start#1] открытие Server Sent Events для нового клиента
- или сохранение подписки для старого пользователя</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>uuidAuth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - Исключение вызывается при ошибках с Json</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="sendEventFor(java.lang.String,java.lang.Object,ru.data.SSE.TypesConnect,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">
-<h3>sendEventFor</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">sendEventFor</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;evName,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;data,
- <a href="../data/SSE/TypesConnect.html" title="enum class in ru.data.SSE">TypesConnect</a>&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlSch,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlGr,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore1,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore2)</span></div>
-<div class="block">RU: отправляет всем подходящим клиентам информацию по определённому ивенту</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>evName</code> - Название ивента</dd>
-<dd><code>data</code> - Обычно JsonObject или текст</dd>
-<dd><code>type</code> - Обозначает название раздела в котором находится клиент</dd>
-<dd><code>lvlGr</code> - "main" обозначает любое значение</dd>
-<dt>See Also:</dt>
-<dd>
-<ul class="tag-list">
-<li><a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE"><code>Subscriber</code></a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getSubscriber(java.lang.String)">
-<h3>getSubscriber</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a></span>&nbsp;<span class="element-name">getSubscriber</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="infCon(java.lang.String,java.lang.String,ru.data.SSE.TypesConnect,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">
+<section class="detail" id="infCon(ru.controllers.AuthController.DataAuth,ru.data.SSE.Subscriber,ru.security.user.CustomToken)">
 <h3>infCon</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">infCon</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;login,
- <a href="../data/SSE/TypesConnect.html" title="enum class in ru.data.SSE">TypesConnect</a>&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlSch,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlGr,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore1,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;lvlMore2)</span></div>
-<div class="block">RU: изменение подписки
- Все параметры, являются свойствами подписки</div>
-</section>
-</li>
-<li>
-<section class="detail" id="infCon(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)">
-<h3>infCon</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
-@PatchMapping("/infCon")
+<div class="member-signature"><span class="annotations">@PatchMapping("/infCon")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">infCon</span><wbr><span class="parameters">(@RequestBody
  <a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
+ @AuthenticationPrincipal
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
  <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                                            throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
-<div class="block">RU: [start#2] изменение подписки</div>
+<div class="block">RU: [start] изменение подписки</div>
 <dl class="notes">
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
@@ -339,10 +240,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="remCon(ru.security.user.CustomToken)">
+<section class="detail" id="remCon(ru.data.SSE.Subscriber,ru.security.user.CustomToken)">
 <h3>remCon</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/remCon")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remCon</span><wbr><span class="parameters">(<a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span></div>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub != null)")
+@PatchMapping("/remCon")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">remCon</span><wbr><span class="parameters">(@AuthenticationPrincipal
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
+ <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span></div>
 <div class="block">RU: завершение сеанса</div>
 <dl class="notes">
 <dt>See Also:</dt>
@@ -355,11 +259,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="auth(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)">
+<section class="detail" id="auth(ru.controllers.AuthController.DataAuth,ru.data.SSE.Subscriber,ru.security.user.CustomToken)">
 <h3>auth</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/auth")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PostMapping("/auth")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">auth</span><wbr><span class="parameters">(@RequestBody
  <a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
+ @AuthenticationPrincipal
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
  <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                                          throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: авторизация пользователя</div>
@@ -413,13 +320,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setCodePep(ru.controllers.AuthController.DataAuth,ru.security.user.CustomToken)">
+<section class="detail" id="setCodePep(ru.controllers.AuthController.DataAuth,ru.data.SSE.Subscriber)">
 <h3>setCodePep</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand (hasAuthority(\'ADMIN\') or hasAuthority(\'HTEACHER\'))")
 @PatchMapping("/setCodePep")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">setCodePep</span><wbr><span class="parameters">(@RequestBody
  <a href="AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a>&nbsp;body,
- <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                                throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: установка/обновление инвайта для регистрации + Server Sent Events</div>
 <dl class="notes">

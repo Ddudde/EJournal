@@ -5,9 +5,10 @@ ru.controllers.main
 ru.controllers.people
 ru.controllers.school
 ru.controllers.school.analytics
-ru.data.models
-ru.data.models.auth
-ru.data.models.school
+ru.data.DAO
+ru.data.DAO.auth
+ru.data.DAO.school
+ru.data.DTO
 ru.data.reps
 ru.data.reps.auth
 ru.data.reps.school

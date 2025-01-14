@@ -94,12 +94,6 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">RU: сервис для работы с push-уведомлениями пользователям
  <pre>
- beenDo: Сделано
-  + Javadoc
-  + Переписка
-  # Swagger
-  # Тестирование
-
  toDo: Доделать
   Протестировать работоспособность
  </pre></div>
@@ -131,25 +125,25 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addToken(ru.data.models.auth.SettingUser,java.lang.String)" class="member-name-link">addToken</a><wbr>(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addToken(ru.data.DAO.auth.SettingUser,java.lang.String)" class="member-name-link">addToken</a><wbr>(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;token)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: добавляет токен уведомлений пользователю</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTopic(ru.data.models.auth.SettingUser,java.lang.String)" class="member-name-link">addTopic</a><wbr>(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTopic(ru.data.DAO.auth.SettingUser,java.lang.String)" class="member-name-link">addTopic</a><wbr>(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;topic)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: добавляет тему пользователю</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remToken(ru.data.models.auth.SettingUser,java.lang.String)" class="member-name-link">remToken</a><wbr>(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remToken(ru.data.DAO.auth.SettingUser,java.lang.String)" class="member-name-link">remToken</a><wbr>(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;token)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: удаляет токен уведомлений пользователя</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remTopic(ru.data.models.auth.SettingUser,java.lang.String)" class="member-name-link">remTopic</a><wbr>(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remTopic(ru.data.DAO.auth.SettingUser,java.lang.String)" class="member-name-link">remTopic</a><wbr>(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;topic)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: удаляет тему пользователю</div>
@@ -255,33 +249,33 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="addToken(ru.data.models.auth.SettingUser,java.lang.String)">
+<section class="detail" id="addToken(ru.data.DAO.auth.SettingUser,java.lang.String)">
 <h3>addToken</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addToken</span><wbr><span class="parameters">(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addToken</span><wbr><span class="parameters">(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;token)</span></div>
 <div class="block">RU: добавляет токен уведомлений пользователю</div>
 </section>
 </li>
 <li>
-<section class="detail" id="remToken(ru.data.models.auth.SettingUser,java.lang.String)">
+<section class="detail" id="remToken(ru.data.DAO.auth.SettingUser,java.lang.String)">
 <h3>remToken</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">remToken</span><wbr><span class="parameters">(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">remToken</span><wbr><span class="parameters">(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;token)</span></div>
 <div class="block">RU: удаляет токен уведомлений пользователя</div>
 </section>
 </li>
 <li>
-<section class="detail" id="addTopic(ru.data.models.auth.SettingUser,java.lang.String)">
+<section class="detail" id="addTopic(ru.data.DAO.auth.SettingUser,java.lang.String)">
 <h3>addTopic</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addTopic</span><wbr><span class="parameters">(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addTopic</span><wbr><span class="parameters">(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;topic)</span></div>
 <div class="block">RU: добавляет тему пользователю</div>
 </section>
 </li>
 <li>
-<section class="detail" id="remTopic(ru.data.models.auth.SettingUser,java.lang.String)">
+<section class="detail" id="remTopic(ru.data.DAO.auth.SettingUser,java.lang.String)">
 <h3>remTopic</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">remTopic</span><wbr><span class="parameters">(<a href="../data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a>&nbsp;settingUser,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">remTopic</span><wbr><span class="parameters">(<a href="../data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a>&nbsp;settingUser,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;topic)</span></div>
 <div class="block">RU: удаляет тему пользователю</div>
 </section>

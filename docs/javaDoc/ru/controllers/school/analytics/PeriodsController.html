@@ -37,7 +37,7 @@ loadScripts(document, 'script');</script>
 <li>
 <p>Summary:</p>
 <ul>
-<li>Nested</li>
+<li><a href="#nested-class-summary">Nested</a></li>
 <li>Field</li>
 <li><a href="#constructor-summary">Constr</a></li>
 <li><a href="#method-summary">Method</a></li>
@@ -57,7 +57,7 @@ loadScripts(document, 'script');</script>
 <div id="navbar-sub-list">
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested-class-summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
@@ -93,9 +93,30 @@ loadScripts(document, 'script');</script>
 @RestController
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">PeriodsController</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<div class="block">RU: Контроллер для просмотра и редактирования периодов обучения учебного центра
+ <pre>
+ Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/PeriodsController">http://localhost:9001/swagger/htmlSwag/#/PeriodsController</a>
+ </pre></div>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<li>
+<section class="nested-class-summary" id="nested-class-summary">
+<h2>Nested Class Summary</h2>
+<div class="caption"><span>Nested Classes</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>(package private) static final class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="PeriodsController.DataPeriods.html" class="type-name-link" title="class in ru.controllers.school.analytics">PeriodsController.DataPeriods</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">RU: Данные клиента используемые PeriodsController в методах</div>
+</div>
+</div>
+</section>
+</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -120,12 +141,18 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.gson.JsonObject</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addPer(ru.controllers.school.analytics.DataPeriods)" class="member-name-link">addPer</a><wbr>(<a href="DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a>&nbsp;body)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.gson.JsonObject</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfo(ru.controllers.school.analytics.DataPeriods)" class="member-name-link">getInfo</a><wbr>(<a href="DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a>&nbsp;body)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addPer(ru.controllers.school.analytics.PeriodsController.DataPeriods,ru.data.SSE.Subscriber)" class="member-name-link">addPer</a><wbr>(<a href="PeriodsController.DataPeriods.html" title="class in ru.controllers.school.analytics">PeriodsController.DataPeriods</a>&nbsp;body,
+ <a href="../../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">RU: создаёт новый период обучения учебного центра</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfo(ru.security.user.CustomToken,ru.data.SSE.Subscriber)" class="member-name-link">getInfo</a><wbr>(<a href="../../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ <a href="../../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">RU: [start] отправляет данные о расписании периодов обучения учебного центра</div>
+</div>
 </div>
 </div>
 </div>
@@ -158,19 +185,48 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="addPer(ru.controllers.school.analytics.DataPeriods)">
+<section class="detail" id="addPer(ru.controllers.school.analytics.PeriodsController.DataPeriods,ru.data.SSE.Subscriber)">
 <h3>addPer</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/addPer")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.gson.JsonObject</span>&nbsp;<span class="element-name">addPer</span><wbr><span class="parameters">(@RequestBody
- <a href="DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a>&nbsp;body)</span></div>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+@PostMapping("/addPer")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">addPer</span><wbr><span class="parameters">(@RequestBody
+ <a href="PeriodsController.DataPeriods.html" title="class in ru.controllers.school.analytics">PeriodsController.DataPeriods</a>&nbsp;body,
+ @AuthenticationPrincipal
+ <a href="../../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
+                                                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
+<div class="block">RU: создаёт новый период обучения учебного центра</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getInfo(ru.controllers.school.analytics.DataPeriods)">
+<section class="detail" id="getInfo(ru.security.user.CustomToken,ru.data.SSE.Subscriber)">
 <h3>getInfo</h3>
-<div class="member-signature"><span class="annotations">@PostMapping("/getInfo")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.gson.JsonObject</span>&nbsp;<span class="element-name">getInfo</span><wbr><span class="parameters">(@RequestBody
- <a href="DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a>&nbsp;body)</span></div>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'HTEACHER\')")
+@GetMapping("/getInfo")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getInfo</span><wbr><span class="parameters">(<a href="../../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ @AuthenticationPrincipal
+ <a href="../../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
+                                                                            throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
+<div class="block">RU: [start] отправляет данные о расписании периодов обучения учебного центра</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 </li>
 </ul>

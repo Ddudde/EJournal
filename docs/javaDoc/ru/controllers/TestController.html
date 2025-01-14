@@ -96,13 +96,6 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: Контроллер для раздела тестирования
  <pre>
  Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TestController">http://localhost:9001/swagger/htmlSwag/#/TestController</a>
- beenDo: Сделано
-  + Javadoc
-  + Security
-  + Переписка
-  + Переписка2
-  + Тестирование
-  + Swagger
  </pre></div>
 </section>
 <section class="summary">
@@ -149,13 +142,14 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chTests(ru.controllers.TestController.DataTest,ru.security.user.CustomToken)" class="member-name-link">chTests</a><wbr>(<a href="TestController.DataTest.html" title="class in ru.controllers">TestController.DataTest</a>&nbsp;body,
- <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chTests(ru.controllers.TestController.DataTest,ru.data.SSE.Subscriber)" class="member-name-link">chTests</a><wbr>(<a href="TestController.DataTest.html" title="class in ru.controllers">TestController.DataTest</a>&nbsp;body,
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменяет параметры тестирования</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfo(ru.security.user.CustomToken)" class="member-name-link">getInfo</a><wbr>(<a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInfo(ru.data.SSE.Subscriber,ru.security.user.CustomToken)" class="member-name-link">getInfo</a><wbr>(<a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
+ <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: [start] отправка инфы для тестов</div>
 </div>
@@ -191,13 +185,14 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="chTests(ru.controllers.TestController.DataTest,ru.security.user.CustomToken)">
+<section class="detail" id="chTests(ru.controllers.TestController.DataTest,ru.data.SSE.Subscriber)">
 <h3>chTests</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @PutMapping("/chTests")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">chTests</span><wbr><span class="parameters">(@RequestBody
  <a href="TestController.DataTest.html" title="class in ru.controllers">TestController.DataTest</a>&nbsp;body,
- <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                             throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменяет параметры тестирования</div>
 <dl class="notes">
@@ -213,11 +208,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getInfo(ru.security.user.CustomToken)">
+<section class="detail" id="getInfo(ru.data.SSE.Subscriber,ru.security.user.CustomToken)">
 <h3>getInfo</h3>
-<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#auth.getSub().getUser() != null)\nand hasAuthority(\'ADMIN\')")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'ADMIN\')")
 @GetMapping("/getInfo")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getInfo</span><wbr><span class="parameters">(<a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getInfo</span><wbr><span class="parameters">(@AuthenticationPrincipal
+ <a href="../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub,
+ <a href="../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
                                                                             throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: [start] отправка инфы для тестов</div>
 <dl class="notes">

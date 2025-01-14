@@ -92,13 +92,7 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="annotations">@Service
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">IniDBService</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">RU: Класс для рандомизация данных, тестовые данные для БД
- <pre>
- beenDo: Сделано
-  + Переписка
-  + Javadoc
-  + Тестирование
- </pre></div>
+<div class="block">RU: Класс для рандомизация данных, тестовые данные для БД</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -196,17 +190,17 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: готовит JSON с данными приготовленными для тестирования по всей системе
  <pre>
  "bodyT" : {
-     "admins" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.models.auth.User&gt;)</code>},
+     "admins" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.DAO.auth.User&gt;)</code>},
      "schools" :{
          school.id : {
              "name",
-             "hteachers" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.models.auth.User&gt;)</code>},
-             "teachers" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.models.auth.User&gt;)</code>},
+             "hteachers" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.DAO.auth.User&gt;)</code>},
+             "teachers" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.DAO.auth.User&gt;)</code>},
              "groups" :{
                  group.id : {
                      "name",
-                     "kids" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.models.auth.User&gt;)</code>},
-                     "parents" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.models.auth.User&gt;)</code>}
+                     "kids" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.DAO.auth.User&gt;)</code>},
+                     "parents" :{<code>getUsersT(com.google.gson.internal.bind.JsonTreeWriter, java.util.List&lt;ru.data.DAO.auth.User&gt;)</code>}
                  }
              }
          }
@@ -219,7 +213,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../controllers/TestController.html#getInfo(ru.security.user.CustomToken)"><code>Пример использования</code></a></li>
+<li><a href="../../controllers/TestController.html#getInfo(ru.data.SSE.Subscriber,ru.security.user.CustomToken)"><code>Пример использования</code></a></li>
 </ul>
 </dd>
 </dl>

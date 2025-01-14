@@ -96,13 +96,6 @@ loadScripts(document, 'script');</script>
 <div class="block">RU: Контроллер для раздела профиля и частично управлением аккаунтом + Server Sent Events
  <pre>
  Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ProfileController">http://localhost:9001/swagger/htmlSwag/#/ProfileController</a>
- beenDo: Сделано
-  + Javadoc
-  + Security
-  + Переписка
-  + Переписка2
-  + Тестирование
-  + Swagger
  </pre></div>
 <dl class="notes">
 <dt>See Also:</dt>
@@ -124,7 +117,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>(package private) static class&nbsp;</code></div>
+<div class="col-first even-row-color"><code>(package private) static final class&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="ProfileController.DataProfile.html" class="type-name-link" title="class in ru.controllers.main">ProfileController.DataProfile</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">RU: Данные клиента используемые ProfileController в методах</div>
@@ -157,43 +150,44 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chEmail(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)" class="member-name-link">chEmail</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chEmail(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)" class="member-name-link">chEmail</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение/добавление электронной почты определённой роли пользователя + Server Sent Events</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chInfo(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)" class="member-name-link">chInfo</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chInfo(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)" class="member-name-link">chInfo</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение/добавление дополнительной информации о пользователе + Server Sent Events</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chKid(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)" class="member-name-link">chKid</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chKid(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)" class="member-name-link">chKid</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение контроллируемого ученика у родителя</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chLogin(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)" class="member-name-link">chLogin</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chLogin(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)" class="member-name-link">chLogin</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение логина пользователя + Server Sent Events</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chRole(ru.security.user.CustomToken)" class="member-name-link">chRole</a><wbr>(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chRole(ru.data.SSE.Subscriber)" class="member-name-link">chRole</a><wbr>(<a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: изменение роли на следующую по иерархии из имеющихся у пользователя</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exit(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)" class="member-name-link">exit</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exit(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)" class="member-name-link">exit</a><wbr>(<a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: выход с аккаунта</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;com.google.gson.JsonObject&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getProfile(java.lang.String,ru.security.user.CustomToken)" class="member-name-link">getProfile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;login,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getProfile(java.lang.String,ru.security.user.CustomToken,ru.data.SSE.Subscriber)" class="member-name-link">getProfile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;login,
+ <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">RU: [start] отправляет инфу профиля либо другого пользователя либо личную</div>
 </div>
@@ -229,139 +223,161 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="chKid(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)">
+<section class="detail" id="chKid(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)">
 <h3>chKid</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chKid")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)\nand hasAuthority(\'PARENT\')")
+@PatchMapping("/chKid")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">chKid</span><wbr><span class="parameters">(@RequestBody
  <a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                           throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение контроллируемого ученика у родителя</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: idL</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="chRole(ru.security.user.CustomToken)">
+<section class="detail" id="chRole(ru.data.SSE.Subscriber)">
 <h3>chRole</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chRole")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">chRole</span><wbr><span class="parameters">(<a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/chRole")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">chRole</span><wbr><span class="parameters">(@AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                            throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение роли на следующую по иерархии из имеющихся у пользователя</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="exit(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)">
+<section class="detail" id="exit(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)">
 <h3>exit</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/exit")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/exit")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">exit</span><wbr><span class="parameters">(@RequestBody
  <a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                    throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: выход с аккаунта</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: notifToken</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="chEmail(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)">
+<section class="detail" id="chEmail(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)">
 <h3>chEmail</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chEmail")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/chEmail")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chEmail</span><wbr><span class="parameters">(@RequestBody
  <a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                       throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение/добавление электронной почты определённой роли пользователя + Server Sent Events</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: email</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="chInfo(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)">
+<section class="detail" id="chInfo(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)">
 <h3>chInfo</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chInfo")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/chInfo")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chInfo</span><wbr><span class="parameters">(@RequestBody
  <a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение/добавление дополнительной информации о пользователе + Server Sent Events</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: info</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="chLogin(ru.controllers.main.ProfileController.DataProfile,ru.security.user.CustomToken)">
+<section class="detail" id="chLogin(ru.controllers.main.ProfileController.DataProfile,ru.data.SSE.Subscriber)">
 <h3>chLogin</h3>
-<div class="member-signature"><span class="annotations">@PatchMapping("/chLogin")
+<div class="member-signature"><span class="annotations">@PreAuthorize("@code401.check(#sub.getUser() != null)")
+@PatchMapping("/chLogin")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">chLogin</span><wbr><span class="parameters">(@RequestBody
  <a href="ProfileController.DataProfile.html" title="class in ru.controllers.main">ProfileController.DataProfile</a>&nbsp;body,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                       throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: изменение логина пользователя + Server Sent Events</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>body</code> - Данные с клиента, задействуются свойства: nLogin</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getProfile(java.lang.String,ru.security.user.CustomToken)">
+<section class="detail" id="getProfile(java.lang.String,ru.security.user.CustomToken,ru.data.SSE.Subscriber)">
 <h3>getProfile</h3>
 <div class="member-signature"><span class="annotations">@GetMapping({"/getProfile","/getProfile/{login}"})
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;com.google.gson.JsonObject&gt;</span>&nbsp;<span class="element-name">getProfile</span><wbr><span class="parameters">(@PathVariable(required=false)
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;login,
- <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth)</span>
+ <a href="../../security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a>&nbsp;auth,
+ @AuthenticationPrincipal
+ <a href="../../data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a>&nbsp;sub)</span>
                                                                                throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block">RU: [start] отправляет инфу профиля либо другого пользователя либо личную</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>login</code> - Логин пользователя</dd>
-<dd><code>auth</code> - Авторизация, в ней подписка и пользователь</dd>
-<dt>Returns:</dt>
-<dd>Объект и код статуса</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - Исключение вызывается при ошибках с Json</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../DocsHelpController.html#point(java.lang.Object,java.lang.Object)"><code>Описание</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>

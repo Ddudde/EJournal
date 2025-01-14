@@ -65,17 +65,19 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/AuthController.html" title="class in ru.controllers">AuthController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">RU: Контроллер для раздела авторизации и управлением Server Sent Events</div>
+<div class="block">RU: Контроллер для раздела авторизации</div>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/AuthController.DataAuth.html" title="class in ru.controllers">AuthController.DataAuth</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Данные клиента используемые AuthController в методах</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/security/AuthenticationFilter.html" title="class in ru.security">AuthenticationFilter</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: кастомный фильтр для авторизации токенами и Basic Auth(без изменений)</div>
+</div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/controllers/CallInterface.html" title="interface in ru.controllers">CallInterface</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/Contacts.html" title="class in ru.data.models">Contacts</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/Contacts.html" title="class in ru.data.DAO">Contacts</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/ContactsController.html" title="class in ru.controllers">ContactsController</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
@@ -97,105 +99,101 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/security/user/CustomToken.html" title="class in ru.security.user">CustomToken</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/DataPeriods.html" title="class in ru.controllers.school.analytics">DataPeriods</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/school/Day.html" title="class in ru.data.DAO.school">Day</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/DataPJournal.html" title="class in ru.controllers.school">DataPJournal</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/DataSchedule.html" title="class in ru.controllers.school.analytics">DataSchedule</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/DataStudents.html" title="class in ru.controllers.people">DataStudents</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/DataTeachers.html" title="class in ru.controllers.people">DataTeachers</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/school/Day.html" title="class in ru.data.models.school">Day</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/DayRepository.html" title="interface in ru.data.reps.school">DayRepository</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/db/DBService.html" title="class in ru.services.db">DBService</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/DayRepository.html" title="interface in ru.data.reps.school">DayRepository</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/db/DBService.html" title="class in ru.services.db">DBService</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: сервис с различными геттерами к БД</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/DnevnikController.html" title="class in ru.controllers.school">DnevnikController</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">RU: Контроллер для просмотра дневника ученика</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/DnevnikController.html" title="class in ru.controllers.school">DnevnikController</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для просмотра дневника ученика.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/controllers/DocsHelpController.html" title="interface in ru.controllers">DocsHelpController</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/controllers/DocsHelpController.html" title="interface in ru.controllers">DocsHelpController</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
 <div class="block">RU: JavaDoc для контроллеров</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/EmailService.html" title="class in ru.services">EmailService</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/EmailService.html" title="class in ru.services">EmailService</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: сервис для работы с рассылками по электронной почте</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/controllers/EmptyInterface.html" title="interface in ru.controllers">EmptyInterface</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/school/Group.html" title="class in ru.data.models.school">Group</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DTO/GetSubscriberDTO.html" title="class in ru.data.DTO">GetSubscriberDTO</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/GroupRepository.html" title="interface in ru.data.reps.school">GroupRepository</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/HTeachersController.html" title="class in ru.controllers.people">HTeachersController</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/school/Group.html" title="class in ru.data.DAO.school">Group</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/GroupRepository.html" title="interface in ru.data.reps.school">GroupRepository</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/HTeachersController.html" title="class in ru.controllers.people">HTeachersController</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Контроллер для раздела управления/просмотра завучей учебных центров + Server Sent Events</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/HTeachersController.DataHTeachers.html" title="class in ru.controllers.people">HTeachersController.DataHTeachers</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Данные клиента используемые HTeachersController в методах</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/db/IniDBService.html" title="class in ru.services.db">IniDBService</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">RU: Класс для рандомизация данных, тестовые данные для БД</div>
-</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/JournalController.html" title="class in ru.controllers.school.analytics">JournalController</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/db/IniDBService.html" title="class in ru.services.db">IniDBService</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block">RU: Контроллер для раздела просмотра оценок + Server Sent Events</div>
+<div class="block">RU: Класс для рандомизация данных, тестовые данные для БД</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/security/JWT/JwtAuthenticationFilter.html" title="class in ru.security.JWT">JwtAuthenticationFilter</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/security/JWT/JwtProvider.html" title="class in ru.security.JWT">JwtProvider</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/school/Lesson.html" title="class in ru.data.models.school">Lesson</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/LessonRepository.html" title="interface in ru.data.reps.school">LessonRepository</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/Main.html" title="class in ru">Main</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/KidJournalController.html" title="class in ru.controllers.school.analytics">KidJournalController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для раздела просмотра оценок + Server Sent Events</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/school/Lesson.html" title="class in ru.data.DAO.school">Lesson</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/LessonRepository.html" title="interface in ru.data.reps.school">LessonRepository</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/Main.html" title="class in ru">Main</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Главный класс, запуск сервера</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/MainService.html" title="class in ru.services">MainService</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/services/MainService.html" title="class in ru.services">MainService</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: главный сервис.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/school/Mark.html" title="class in ru.data.models.school">Mark</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/MarkRepository.html" title="interface in ru.data.reps.school">MarkRepository</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/News.html" title="class in ru.data.models">News</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/NewsController.html" title="class in ru.controllers">NewsController</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/school/Mark.html" title="class in ru.data.DAO.school">Mark</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/MarkRepository.html" title="interface in ru.data.reps.school">MarkRepository</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/News.html" title="class in ru.data.DAO">News</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/NewsController.html" title="class in ru.controllers">NewsController</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Контроллер для раздела новостей + Server Sent Events</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/NewsController.DataNews.html" title="class in ru.controllers">NewsController.DataNews</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/NewsController.DataNews.html" title="class in ru.controllers">NewsController.DataNews</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Данные клиента используемые NewsController в методах</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/NewsRepository.html" title="interface in ru.data.reps">NewsRepository</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/NewsRepository.html" title="interface in ru.data.reps">NewsRepository</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/ParentsController.html" title="class in ru.controllers.people">ParentsController</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Контроллер для раздела управления/просмотра родителей группы учебного центра + Server Sent Events</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/ParentsController.DataParents.html" title="class in ru.controllers.people">ParentsController.DataParents</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/ParentsController.DataParents.html" title="class in ru.controllers.people">ParentsController.DataParents</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Данные клиента используемые ParentsController в методах</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/school/Period.html" title="class in ru.data.models.school">Period</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/PeriodRepository.html" title="interface in ru.data.reps.school">PeriodRepository</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/PeriodsController.html" title="class in ru.controllers.school.analytics">PeriodsController</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/PJournalController.html" title="class in ru.controllers.school">PJournalController</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/school/Period.html" title="class in ru.data.DAO.school">Period</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/PeriodRepository.html" title="interface in ru.data.reps.school">PeriodRepository</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/PeriodsController.html" title="class in ru.controllers.school.analytics">PeriodsController</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для просмотра и редактирования периодов обучения учебного центра</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/PeriodsController.DataPeriods.html" title="class in ru.controllers.school.analytics">PeriodsController.DataPeriods</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Данные клиента используемые PeriodsController в методах</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DTO/PrepareMarkDTO.html" title="class in ru.data.DTO">PrepareMarkDTO</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/main/ProfileController.html" title="class in ru.controllers.main">ProfileController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
@@ -209,7 +207,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: сервис для работы с push-уведомлениями пользователям</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/school/Request.html" title="class in ru.data.models.school">Request</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/school/Request.html" title="class in ru.data.DAO.school">Request</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/RequestController.html" title="class in ru.controllers.school">RequestController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
@@ -221,48 +219,80 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/RequestRepository.html" title="interface in ru.data.reps.school">RequestRepository</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/auth/Role.html" title="class in ru.data.models.auth">Role</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/auth/Role.html" title="class in ru.data.DAO.auth">Role</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/auth/RoleRepository.html" title="interface in ru.data.reps.auth">RoleRepository</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab3"><a href="ru/security/user/Roles.html" title="enum class in ru.security.user">Roles</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab3">&nbsp;</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/ScheduleController.html" title="class in ru.controllers.school.analytics">ScheduleController</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/school/School.html" title="class in ru.data.models.school">School</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/SchoolRepository.html" title="interface in ru.data.reps.school">SchoolRepository</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/configs/SecurityConfig.html" title="class in ru.configs">SecurityConfig</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/main/SettingsController.html" title="class in ru.controllers.main">SettingsController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для управления/просмотра расписания + Server Sent Events</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/analytics/ScheduleController.DataSchedule.html" title="class in ru.controllers.school.analytics">ScheduleController.DataSchedule</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Данные клиента используемые ScheduleController в методах</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/school/School.html" title="class in ru.data.DAO.school">School</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/school/SchoolRepository.html" title="interface in ru.data.reps.school">SchoolRepository</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/configs/SecurityConfig.html" title="class in ru.configs">SecurityConfig</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Начало описания security.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/main/SettingsController.html" title="class in ru.controllers.main">SettingsController</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Контроллер для раздела настроек</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/main/SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/main/SettingsController.DataSettings.html" title="class in ru.controllers.main">SettingsController.DataSettings</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Данные клиента используемые SettingsController в методах</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/auth/SettingUser.html" title="class in ru.data.models.auth">SettingUser</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/auth/SettingUserRepository.html" title="interface in ru.data.reps.auth">SettingUserRepository</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/configs/SpringConfig.html" title="class in ru.configs">SpringConfig</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/auth/SettingUser.html" title="class in ru.data.DAO.auth">SettingUser</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/auth/SettingUserRepository.html" title="interface in ru.data.reps.auth">SettingUserRepository</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/configs/SpringConfig.html" title="class in ru.configs">SpringConfig</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: конфигурация Бинов с настройкой init</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/StudentsController.html" title="class in ru.controllers.people">StudentsController</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/SSEController.html" title="class in ru.controllers">SSEController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для управления Server Sent Events</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/StudentsController.html" title="class in ru.controllers.people">StudentsController</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для раздела управления/просмотра учеников группы учебного центра + Server Sent Events</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/StudentsController.DataStudents.html" title="class in ru.controllers.people">StudentsController.DataStudents</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Данные клиента используемые StudentsController в методах</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/SSE/Subscriber.html" title="class in ru.data.SSE">Subscriber</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Подписка, используется для Server Sent Events и иногда в других местах</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/Syst.html" title="class in ru.data.models">Syst</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/SystRepository.html" title="interface in ru.data.reps">SystRepository</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/TeachersController.html" title="class in ru.controllers.people">TeachersController</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/Syst.html" title="class in ru.data.DAO">Syst</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/SystRepository.html" title="interface in ru.data.reps">SystRepository</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/TeacherJournalController.html" title="class in ru.controllers.school">TeacherJournalController</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для просмотра и редактирования журнала(оценки и домашние задания) группы</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/school/TeacherJournalController.DataPJournal.html" title="class in ru.controllers.school">TeacherJournalController.DataPJournal</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Данные клиента используемые PJournalController в методах</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/TeachersController.html" title="class in ru.controllers.people">TeachersController</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Контроллер для управления/просмотра преподавателей учебных центров + Server Sent Events</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/people/TeachersController.DataTeachers.html" title="class in ru.controllers.people">TeachersController.DataTeachers</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">RU: Данные клиента используемые TeachersController в методах</div>
+</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/controllers/TestController.html" title="class in ru.controllers">TestController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">RU: Контроллер для раздела тестирования</div>
@@ -273,16 +303,14 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab3"><a href="ru/data/SSE/TypesConnect.html" title="enum class in ru.data.SSE">TypesConnect</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/models/auth/User.html" title="class in ru.data.models.auth">User</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/data/DAO/auth/User.html" title="class in ru.data.DAO.auth">User</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="ru/data/reps/auth/UserRepository.html" title="interface in ru.data.reps.auth">UserRepository</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab1">&nbsp;</div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="ru/security/user/UserService.html" title="class in ru.security.user">UserService</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="ru/configs/WebMVCConfig.html" title="class in ru.configs">WebMVCConfig</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">RU: конфиг MVC</div>
-</div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 </div>
 </div>
 </div>
