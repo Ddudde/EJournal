@@ -125,10 +125,15 @@ asciidoctorPdf {
 asciidoctor {
     sourceDir '../../'
     sources {
-        exclude '/project/', '/release/', '/docs/'
+        exclude '/project/', '/release/', '/docs/', '/imgAsciiDoc/'
     }
     outputDir '../../docs/EJournal/asciiDoc'
     baseDirFollowsSourceFile()
+    resources {
+        from(sourceDir) {
+            include 'imgAsciiDoc/**'
+        }
+    }
     attributes \
         'icons': 'font',
 //        'snippets': file("build/generated-snippets"),
