@@ -3,8 +3,8 @@ package ru.data.reps.school;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.data.models.auth.User;
-import ru.data.models.school.Lesson;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Lesson;
 
 import java.util.List;
 

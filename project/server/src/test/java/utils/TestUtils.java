@@ -4,12 +4,12 @@ import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import ru.data.DAO.Contacts;
+import ru.data.DAO.News;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.*;
 import ru.data.SSE.Subscriber;
-import ru.data.models.Contacts;
-import ru.data.models.News;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
-import ru.data.models.school.*;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 
 /** RU: Класс для получения случайных сущностей и их хранения */
 @NoArgsConstructor
-public class RandomUtils {
+public class TestUtils {
 
     public static final String defaultDescription = "Также возможны 401, 403 и 500 коды ответов";
 
@@ -72,10 +72,16 @@ public class RandomUtils {
         getPeriod(3456L, "IV четверть", "01.04.24", "30.08.24")
     ));
 
-    public final List<Group> groups = new ArrayList<>(asList(
+    public static final List<Group> groups = new ArrayList<>(asList(
         getGroup(2323L, namesGroup[0]),
         getGroup(3456L, namesGroup[1]),
         getGroup(4354L, namesGroup[2])
+    ));
+
+    public static final List<School> schools = new ArrayList<>(asList(
+        getSchool(9600, "Лицей №3293", 2616, 4866, 4117),
+        getSchool(1137, "Гимназия №2246", 3146, 4701, 5506),
+        getSchool(2903, "Школа №217", 1973, 5375, 7100)
     ));
 
     public final List<Lesson> lessons = new ArrayList<>(asList(
@@ -88,6 +94,24 @@ public class RandomUtils {
         new Lesson(null, null, 3, 4, "1837", "Физика", usersTest.get(1)),
         new Lesson(null, null, 4, 3, "482", "Русский Яз.", usersTest.get(2)),
         new Lesson(null, null, 4, 4, "394", "Физика", usersTest.get(3))
+    ));
+
+    public final List<Mark> marks = new ArrayList<>(asList(
+        new Mark(usersTest.get(1), periods.get(2), "1", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "2", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "4", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "5", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "5", 1, "norm", "Ответ на уроке"),
+        new Mark(usersTest.get(1), periods.get(2), "Н", 1, "norm", null)
+    ));
+
+    public final List<Mark> marksPeriod = new ArrayList<>(asList(
+        new Mark(usersTest.get(1), periods.get(2), "1", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(2), "2", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(2), "4", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(0), "5", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(1), "5", 1, "per", null),
+        new Mark(usersTest.get(1), periods.get(0), "Н", 1, "per", null)
     ));
 
     public static Subscriber getSub(){
@@ -149,7 +173,7 @@ public class RandomUtils {
         return lessons;
     }
 
-    public Group getGroup(long id, String nameGrp) {
+    private static Group getGroup(long id, String nameGrp) {
         final Group group = new Group(nameGrp);
         group.getKids().addAll(usersTest);
         group.setId(id);
@@ -157,7 +181,7 @@ public class RandomUtils {
         return group;
     }
 
-    public School getSchool(long id, String nameSch, long... ids) {
+    public static School getSchool(long id, String nameSch, long... ids) {
 //        final String[] namesSch = {"Гимназия №", "Школа №", "Лицей №"};
 //        String nameSch = namesSch[(int) Math.round(Math.random() * 2)] + (Math.round(Math.random() * 5000) + 1);
         final List list = List.of();

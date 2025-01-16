@@ -1,11 +1,11 @@
-package ru.data.models.school;
+package ru.data.DAO.school;
 
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import ru.data.models.Contacts;
-import ru.data.models.News;
-import ru.data.models.auth.User;
+import ru.data.DAO.Contacts;
+import ru.data.DAO.News;
+import ru.data.DAO.auth.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;

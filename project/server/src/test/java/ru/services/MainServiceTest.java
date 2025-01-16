@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Lesson;
-import ru.data.models.school.Period;
-import ru.data.models.school.School;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Lesson;
+import ru.data.DAO.school.Period;
+import ru.data.DAO.school.School;
 import ru.security.user.Roles;
 import ru.services.db.DBService;
 import ru.services.db.IniDBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
-import static utils.RandomUtils.namesSubj;
-import static utils.RandomUtils.usersTest;
+import static utils.TestUtils.namesSubj;
+import static utils.TestUtils.usersTest;
 
 @ExtendWith(MockitoExtension.class)
 public class MainServiceTest {
@@ -39,7 +39,7 @@ public class MainServiceTest {
     @InjectMocks
     private MainService mainService;
 
-    private final RandomUtils randomUtils = new RandomUtils();
+    private final TestUtils testUtils = new TestUtils();
 
     /** RU: подаёт пустой список и должен получить условно пустой JSON */
     @Test @Tag("groupsBySchoolOfUser")
@@ -55,7 +55,7 @@ public class MainServiceTest {
     @Test @Tag("groupsBySchoolOfUser")
     void groupsBySchoolOfUser_whenGood(@Mock User user, @Mock(answer = Answers.RETURNS_DEEP_STUBS) School school) throws Exception {
         when(dbService.getFirstRole(anyMap()).getYO()).thenReturn(school);
-        when(school.getGroups()).thenReturn(randomUtils.groups);
+        when(school.getGroups()).thenReturn(testUtils.groups);
 
         JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();
@@ -70,6 +70,7 @@ public class MainServiceTest {
         JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();
         mainService.teachersBySchool(school, wrtr);
+        wrtr.endObject();
         assertEquals(expected, wrtr.get().getAsJsonObject().toString());
     }
 
@@ -169,7 +170,7 @@ public class MainServiceTest {
 
     /** RU: общий сценарий тестирования */
     private Period getActualPeriodBySchool_run(School school, LocalDate date) {
-        when(school.getPeriods()).thenReturn(randomUtils.periods);
+        when(school.getPeriods()).thenReturn(testUtils.periods);
         try (MockedStatic<LocalDate> mocked = Mockito.mockStatic(LocalDate.class)) {
             mocked.when(LocalDate::now).thenReturn(date);
             return mainService.getActualPeriodBySchool(school);

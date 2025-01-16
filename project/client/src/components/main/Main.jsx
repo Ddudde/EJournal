@@ -31,7 +31,7 @@ import ls1 from "../../media/ls-icon1.png";
 import ls2 from "../../media/ls-icon2.png";
 import ls3 from "../../media/ls-icon3.png";
 
-import {cAuth, cProfiles} from "../other/Controllers";
+import {cAuth, cProfiles, cSSE} from "../other/Controllers";
 
 let act, ke, gr, cState, dispatch, paneInfo, themeInfo, scrolling,
 timid, d1, warnErrNet, server;
@@ -201,7 +201,7 @@ export function remEvent(id) {
 }
 
 function iniNet() {
-    eventSource = new EventSource(server + '/' + cAuth + 'start/' + localStorage.getItem("sec"));
+    eventSource = new EventSource(server + '/' + cSSE + 'start/' + localStorage.getItem("sec"));
     eventSource.onopen = e => console.log('open');
     eventSource.onerror = e => {
         if (e.readyState == EventSource.CLOSED) {

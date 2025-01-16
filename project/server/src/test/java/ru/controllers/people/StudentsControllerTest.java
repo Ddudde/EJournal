@@ -5,14 +5,13 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -24,25 +23,22 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 import java.util.ArrayList;
@@ -58,18 +54,23 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.*;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({StudentsControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StudentsControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final TestUtils testUtils = new TestUtils();
+    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private StudentsController studentsController;
@@ -77,32 +78,28 @@ public class StudentsControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
+    @AfterEach
+    void afterEach() {
+        theMock.close();
     }
 
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(studentsController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -120,11 +117,11 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/students/remPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(remPep_Summary, "remPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenEmpty_Anonim"));
     }
 
     @Test @Tag("remPep")
@@ -138,17 +135,16 @@ public class StudentsControllerTest {
         when(group.getKids()).thenReturn(users);
 
         mockMvc.perform(delete("/students/remPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
                 "id": 20
             }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(remPep_Summary, "remPep_whenGood_HTEACHER"));
+            """)).andExpect(status().isOk())
+            .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":3872}",
             answer.getValue().toString());
     }
@@ -161,11 +157,11 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/students/chPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(chPep_Summary, "chPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenEmpty_Anonim"));
     }
 
     @Test @Tag("chPep")
@@ -175,18 +171,17 @@ public class StudentsControllerTest {
         when(dbService.userById(20L)).thenReturn(user);
 
         mockMvc.perform(patch("/students/chPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
                 "id": 20,
                 "name": "Вейс А.А."
             }
-            """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(chPep_Summary, "chPep_whenGood_HTEACHER"));
+            """)).andExpect(status().isOk())
+            .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":3872,\"name\":\"Вейс А.А.\"}",
             answer.getValue().toString());
     }
@@ -199,11 +194,11 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/students/addPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(addPep_Summary, "addPep_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenEmpty_Anonim"));
     }
 
     @Test @Tag("addPep")
@@ -220,17 +215,16 @@ public class StudentsControllerTest {
 
 
         mockMvc.perform(post("/students/addPep")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
                 "name": "Вейс А.А."
             }
-            """))
-            .andExpect(status().isCreated())
-            .andDo(default_Docs(addPep_Summary, "addPep_whenGood_HTEACHER"));
+            """)).andExpect(status().isCreated())
+            .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_HTEACHER"));
 
-        verify(authController).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":null,\"body\":{\"name\":\"Вейс А.А.\"}}",
             answer.getValue().toString());
     }
@@ -243,26 +237,26 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getStud/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getStud_Summary, "getStud_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getStud_Summary, "getStud_whenEmpty_Anonim"));
     }
 
     @Test @Tag("getStud")
     @CustomUser(roles = Roles.KID)
     void getStud_whenGood_KID() throws Exception {
         final School sch = mock(School.class);
-        final Group group = randomUtils.groups.get(0);
+        final Group group = testUtils.groups.get(0);
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch);
         when(dbService.getFirstRole(any()).getGrp().getId()).thenReturn(20L);
         when(dbService.groupById(20L)).thenReturn(group);
-        when(sch.getGroups()).thenReturn(randomUtils.groups);
+        when(sch.getGroups()).thenReturn(testUtils.groups);
 
         mockMvc.perform(get("/students/getStud/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
-            .andDo(default_Docs(getStud_Summary, "getStud_whenGood_KID"));
+            .andDo(defaultSwaggerDocs(getStud_Summary, "getStud_whenGood_KID"));
     }
 
     private final String getInfo_Summary = "[start] запускает клиента в раздел Одноклассники и подтверждает клиенту права";
@@ -274,18 +268,18 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
 
     @Test @Tag("getInfo")
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
         mockMvc.perform(get("/students/getInfo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
-            .andDo(default_Docs(getInfo_Summary, "getInfo_whenGood_KID"));
+            .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
 
     @Test @Tag("getInfoForHTeacher")
@@ -294,9 +288,9 @@ public class StudentsControllerTest {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
+            .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
     }
 
     @Test @Tag("getInfoForHTeacher")
@@ -304,13 +298,13 @@ public class StudentsControllerTest {
     void getInfoForHTeacher_whenGood_HTEACHER() throws Exception {
         final School sch = mock(School.class);
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch);
-        when(sch.getGroups()).thenReturn(randomUtils.groups);
+        when(sch.getGroups()).thenReturn(testUtils.groups);
 
         mockMvc.perform(get("/students/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323}"))
-            .andDo(default_Docs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));
+            .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));
     }
 }
 
@@ -331,12 +325,7 @@ class StudentsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public StudentsController studentsController(AuthController authController) {
-        return spy(new StudentsController(authController));
+    public StudentsController studentsController() {
+        return spy(new StudentsController());
     }
 }

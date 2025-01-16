@@ -1,5 +1,6 @@
 package ru.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,8 +10,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.configs.SecurityConfig;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
 import ru.security.user.CustomToken;
 
 import javax.servlet.FilterChain;
@@ -26,12 +27,13 @@ import java.util.UUID;
 import static ru.Main.datas;
 
 /** RU: кастомный фильтр для авторизации токенами и Basic Auth(без изменений) */
+@Slf4j
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private final String basicScheme = "Basic ";
 
     public AuthenticationFilter(RequestMatcher req, AuthenticationManager authenticationManager) {
         super(req, authenticationManager);
-        System.out.println("AuthenticationFilter " + getAuthenticationManager());
+        log.trace("AuthenticationFilter " + getAuthenticationManager());
     }
 
     @Override
@@ -66,7 +68,7 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
     /** RU: получает информацию для авторизации токенами */
     private UUID getTokenFromHeader(HttpServletRequest request) {
         String tok = request.getHeader(SecurityConfig.authTokenHeader);
-        System.out.println("attemptAuthentication " + tok);
+        log.debug("attemptAuthentication " + tok);
         return Optional.ofNullable(tok)
             .map(UUID::fromString)
             .orElse(UUID.randomUUID());
@@ -104,13 +106,13 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        System.out.println("successfulAuthentication " + authResult);
+        log.debug("successfulAuthentication " + authResult);
         SecurityContextHolder.getContext().setAuthentication(authResult);
         chain.doFilter(request, response);
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        System.out.println("unsuccessfulAuthentication " + failed);
+        log.debug("unsuccessfulAuthentication " + failed);
     }
 }

@@ -2,17 +2,16 @@ package ru.controllers;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
-import com.epages.restdocs.apispec.SimpleType;
 import com.google.gson.JsonObject;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +32,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.configs.SecurityConfig;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.CustomToken;
@@ -43,33 +42,38 @@ import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
 import ru.services.db.IniDBService;
-import utils.RandomUtils;
 
 import javax.servlet.ServletException;
 import java.util.UUID;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.*;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getSub;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
+@Slf4j
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({AuthControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AuthControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private MainService mainService;
 
     @Autowired
     private AuthController authController;
@@ -80,22 +84,19 @@ public class AuthControllerTest {
     @Captor
     private ArgumentCaptor<Object> obj;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
+    @AfterEach
+    void afterEach() {
+        theMock.close();
     }
-
+    
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(authController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
@@ -104,7 +105,11 @@ public class AuthControllerTest {
         return (CustomToken) SecurityContextHolder.getContext().getAuthentication();
     }
 
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         final ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -114,47 +119,7 @@ public class AuthControllerTest {
         return document("AuthController/" + methodName, resource(snip.build()));
     }
 
-    private RestDocumentationResultHandler start_Docs(String methodName) {
-        final ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
-            .summary("[start#1] Открытие Server Sent Events для нового клиента или сохранение подписки для старого пользователя")
-            .description(defaultDescription + """
-            Подписка сохраняется в течении одного запуска сервера.
-            """)
-            .pathParameters(parameterWithName("uuidAuth").optional()
-                .type(SimpleType.STRING)
-                .description("Авторизация, в ней подписка и пользователь")
-            )
-            .tag("AuthController");
-        return document("AuthController/" + methodName, resource(snip.build()));
-    }
-
-    /** RU: стартует для нового клиента */
-    @Test @Tag("start")
-    void start_whenGoodNext_Anonim() throws Exception {
-        mockMvc.perform(get("/auth/start"))
-            .andExpect(status().isOk())
-            .andDo(start_Docs("start_whenGoodNext_Anonim"));
-        assertNotEquals(0, mainService.subscriptions.size());
-    }
-
-    /** RU: стартует со старой подпиской */
-    @Test @Tag("start")
-    @CustomUser
-    void start_whenGood_AdminUser() throws Exception {
-        final CustomToken cu = ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication());
-        final String uuid = cu.getUUID();
-        final Subscriber sub = mock(Subscriber.class, Answers.RETURNS_DEEP_STUBS);
-        when(sub.getLogin()).thenReturn("nm12");
-        mainService.subscriptions.put(UUID.fromString(uuid), sub);
-
-        mockMvc.perform(get("/auth/start/{uuidAuth}", uuid))
-            .andExpect(status().isOk())
-            .andDo(start_Docs("start_whenGood_AdminUser"));
-        verify(sub).setSSE(any(), eq(UUID.fromString(uuid)));
-    }
-
-    private final String infCon_Summary = "[start#2] Изменение подписки";
+    private final String infCon_Summary = "[start] Изменение подписки";
 
     /** RU: старая авторизованная подписка пользователя существует
      * новая заменяется старой */
@@ -162,19 +127,18 @@ public class AuthControllerTest {
     @CustomUser
     void infCon_whenGood_AdminUser() throws Exception {
         mockMvc.perform(patch("/auth/infCon/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "login": "nm12",
-            "type": "TUTOR",
-            "notifToken": "passTest",
-            "permis": true
-        }
-                """))
-            .andExpect(status().isOk())
+            {
+                "login": "nm12",
+                "type": "TUTOR",
+                "notifToken": "passTest",
+                "permis": true
+            }
+            """)).andExpect(status().isOk())
             .andExpect(content().string("{\"role\":4}"))
-            .andDo(default_Docs(infCon_Summary, "infCon_whenGood_AdminUser"));
+            .andDo(defaultSwaggerDocs(infCon_Summary, "infCon_whenGood_AdminUser"));
     }
 
     private final String remCon_Summary = "Завершение сеанса";
@@ -188,9 +152,9 @@ public class AuthControllerTest {
         getSub().setSSE(sseEmitter);
 
         mockMvc.perform(patch("/auth/remCon/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
-            .andDo(default_Docs(remCon_Summary, "remCon_whenGood_AdminUser"));
+            .andDo(defaultSwaggerDocs(remCon_Summary, "remCon_whenGood_AdminUser"));
     }
 
     private final String auth_Summary = "Авторизация пользователя";
@@ -202,25 +166,25 @@ public class AuthControllerTest {
     @CustomUser
     void auth_whenWrong_AdminUser() throws Exception {
         final User user = getSub().getUser();
+        final CustomToken newAuth = new CustomToken(new Subscriber(), UUID.randomUUID().toString());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(dbService.userByLogin(any())).thenReturn(null);
         when(user.getPassword()).thenReturn("passTest1");
-        SecurityContextHolder.getContext()
-            .setAuthentication(new CustomToken(new Subscriber(), UUID.randomUUID().toString()));
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        System.out.println(getAuth());
+        log.trace(getAuth() + "");
 
         mockMvc.perform(post("/auth/auth/")
                 .header(HttpHeaders.AUTHORIZATION, "Basic bm0xMjpwYXNzVGVzdA==")// Basic Auth
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "notifToken": "uuidTest",
-            "permis": true
-        }
+            {
+                "notifToken": "uuidTest",
+                "permis": true
+            }
             """)).andExpect(status().isUnauthorized())
-            .andDo(default_Docs(auth_Summary, "auth_whenWrong_AdminUser"));
+            .andDo(defaultSwaggerDocs(auth_Summary, "auth_whenWrong_AdminUser"));
     }
 
     /** RU: админ
@@ -234,16 +198,16 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/auth/auth/")
                 .header(HttpHeaders.AUTHORIZATION, "Basic bm0xMjpwYXNzVGVzdA==")// Basic Auth
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "notifToken": "uuidTest",
-            "permis": true
-        }
+            {
+                "notifToken": "uuidTest",
+                "permis": true
+            }
             """)).andExpect(status().isOk())
             .andExpect(content().string("{\"auth\":true,\"login\":\"nm12\",\"role\":4,\"uuidS\":\"" + uuid + "\",\"roles\":true,\"secFr\":false,\"email\":false}"))
-            .andDo(default_Docs(auth_Summary, "auth_whenGood_AdminUser"));
+            .andDo(defaultSwaggerDocs(auth_Summary, "auth_whenGood_AdminUser"));
     }
 
     private final String reg_Summary = "Регистрация пользователя";
@@ -256,19 +220,19 @@ public class AuthControllerTest {
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
         mockMvc.perform(post("/auth/reg/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "login": "nm",
-            "code": "uuidTest",
-            "mod": "inv",
-            "ico": "3",
-            "secFr": "secretTest",
-            "par": "passTest"
-        }
+            {
+                "login": "nm",
+                "code": "uuidTest",
+                "mod": "inv",
+                "ico": "3",
+                "secFr": "secretTest",
+                "par": "passTest"
+            }
             """)).andExpect(status().isNotFound())
-            .andDo(default_Docs(reg_Summary, "reg_whenWrongLogin_Anonim"));
+            .andDo(defaultSwaggerDocs(reg_Summary, "reg_whenWrongLogin_Anonim"));
     }
 
     /** RU: инвайт неверный */
@@ -278,20 +242,20 @@ public class AuthControllerTest {
         when(dbService.userByLogin("nm")).thenReturn(null);
 
         mockMvc.perform(post("/auth/reg/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "login": "nm",
-            "code": "uuidTest",
-            "mod": "inv",
-            "ico": "3",
-            "secFr": "secretTest",
-            "par": "passTest"
-        }
+            {
+                "login": "nm",
+                "code": "uuidTest",
+                "mod": "inv",
+                "ico": "3",
+                "secFr": "secretTest",
+                "par": "passTest"
+            }
             """)).andExpect(status().isAccepted())
             .andExpect(content().string("{\"error\":\"noInv\"}"))
-            .andDo(default_Docs(reg_Summary, "reg_whenWrong_Anonim"));
+            .andDo(defaultSwaggerDocs(reg_Summary, "reg_whenWrong_Anonim"));
     }
 
     /** RU: регистирирует пользователя нового */
@@ -303,19 +267,19 @@ public class AuthControllerTest {
         when(dbService.userByLogin("nm")).thenReturn(null);
 
         mockMvc.perform(post("/auth/reg/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "login": "nm",
-            "code": "uuidTest",
-            "mod": "inv",
-            "ico": "3",
-            "secFr": "secretTest",
-            "par": "passTest"
-        }
+            {
+                "login": "nm",
+                "code": "uuidTest",
+                "mod": "inv",
+                "ico": "3",
+                "secFr": "secretTest",
+                "par": "passTest"
+            }
             """)).andExpect(status().isCreated())
-            .andDo(default_Docs(reg_Summary, "reg_whenGood_Anonim"));
+            .andDo(defaultSwaggerDocs(reg_Summary, "reg_whenGood_Anonim"));
     }
 
     private final String checkInvCode_Summary = "Проверка инвайта для регистрации/регистрации новой роли";
@@ -328,11 +292,11 @@ public class AuthControllerTest {
         when(dbService.userByCode(null)).thenReturn(null);
 
         mockMvc.perform(post("/auth/checkInvCode/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
-            .andDo(default_Docs(checkInvCode_Summary, "checkInvCode_whenWrong_AdminUser"));
+            .andDo(defaultSwaggerDocs(checkInvCode_Summary, "checkInvCode_whenWrong_AdminUser"));
     }
 
     /** RU: админ
@@ -344,14 +308,14 @@ public class AuthControllerTest {
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
         mockMvc.perform(post("/auth/checkInvCode/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "code": "uuidTest"
-        }
+            {
+                "code": "uuidTest"
+            }
             """)).andExpect(status().isOk())
-            .andDo(default_Docs(checkInvCode_Summary, "checkInvCode_whenGood_AdminUser"));
+            .andDo(defaultSwaggerDocs(checkInvCode_Summary, "checkInvCode_whenGood_AdminUser"));
     }
 
     private final String setCodePep_Summary = "Установка/обновление инвайта для регистрации + Server Sent Events";
@@ -364,12 +328,13 @@ public class AuthControllerTest {
         when(dbService.userByLogin(null)).thenReturn(null);
 
         mockMvc.perform(patch("/auth/setCodePep/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
-            .andDo(default_Docs(setCodePep_Summary, "setCodePep_whenEmpty_AdminUser"));
-        verify(authController, times(0)).sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(defaultSwaggerDocs(setCodePep_Summary, "setCodePep_whenEmpty_AdminUser"));
+        theMock.verify(() -> SSEController.sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: админ
@@ -380,16 +345,17 @@ public class AuthControllerTest {
         final User user = getSub().getUser();
 
         mockMvc.perform(patch("/auth/setCodePep/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "id": "nm12"
-        }
+            {
+                "id": "nm12"
+            }
             """)).andExpect(status().isOk())
-            .andDo(default_Docs(setCodePep_Summary, "setCodePep_whenGood_AdminUser"));
+            .andDo(defaultSwaggerDocs(setCodePep_Summary, "setCodePep_whenGood_AdminUser"));
         verify(user).setCode((String) obj.capture());
-        verify(authController, times(2)).sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any());
+        theMock.verify(() -> SSEController.sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any()),
+            times(2));
         assertEquals("{\"id\":9764,\"code\":\"%s\",\"id1\":0}".formatted(obj.getValue().toString()),
             answer.getValue().toString());
     }

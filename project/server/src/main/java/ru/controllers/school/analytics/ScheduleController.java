@@ -4,19 +4,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Lesson;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Lesson;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -28,35 +30,25 @@ import static ru.Main.datas;
 /** RU: Контроллер для управления/просмотра расписания + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ScheduleController">http://localhost:9001/swagger/htmlSwag/#/ScheduleController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
  * </pre>
  * @see Subscriber */
+@Slf4j
 @RequestMapping("/schedule")
 @RequiredArgsConstructor
 @RestController public class ScheduleController {
 
-    private final AuthController authController;
-
     /** RU: добавление урока + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addLesson")
-    public ResponseEntity<Void> addLesson(@RequestBody DataSchedule body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addLesson(@RequestBody DataSchedule body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init("", "[POST] /addLesson");
         final Group group = datas.getDbService().groupById(body.group);
         if(group == null) return ResponseEntity.notFound().build();
 
-        final Long schId = Long.parseLong(auth.getSub().getLvlSch()),
+        final Long schId = Long.parseLong(sub.getLvlSch()),
             teaId = body.obj.getAsJsonObject("prepod").get("id").getAsLong();
         final School school = datas.getDbService().schoolById(schId);
         final Lesson lesson = new Lesson();
@@ -78,16 +70,17 @@ import static ru.Main.datas;
         datas.getDbService().getSchoolRepository().saveAndFlush(school);
         wrtr.name("bodyT").beginObject();
         datas.teachersBySchool(school, wrtr);
+        wrtr.endObject();
         body.obj.addProperty("group", group.getName());
         wrtr.name("day").value(body.day)
             .name("les").value(lesson.getNumLesson());
         return datas.getObjR(ans -> {
             ans.add("body", body.obj);
             if(teaU != null) {
-                authController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, auth.getSub().getLvlSch(), "main", "tea", teaU.getId()+"");
+                SSEController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), "main", "tea", teaU.getId()+"");
             }
-            authController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, auth.getSub().getLvlSch(), "main", "ht", "main");
-            authController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, auth.getSub().getLvlSch(), group.getId()+"", "main", "main");
+            SSEController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), "main", "ht", "main");
+            SSEController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), group.getId()+"", "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -106,10 +99,10 @@ import static ru.Main.datas;
 
     /** RU: отправляет данные о расписании для группы
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @GetMapping("/getSchedule/{grId}")
-    public ResponseEntity<JsonObject> getSchedule(@PathVariable Long grId, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getSchedule(@PathVariable Long grId, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getSchedule");
         final var ref = new Object() {
             Group group = null;
@@ -130,32 +123,32 @@ import static ru.Main.datas;
             if(user.getSelRole() == Roles.KID || user.getSelRole() == Roles.PARENT) {
                 group = ref.group.getId()+"";
             }
-            authController.infCon(auth.getUUID(), null, null, null, group, null, null);
+            SSEController.changeSubscriber(auth.getUUID(), null, null, null, group, null, null);
         }, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: [start] подтверждает клиенту права
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfo")
-    public ResponseEntity<Void> getInfo(CustomToken auth) throws Exception {
-        System.out.println("[GET] /getInfo");
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<Void> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        log.info("[GET] /getInfo");
+        final User user = sub.getUser();
         final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
-        authController.infCon(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", "main", "main");
+        SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", "main", "main");
         return ResponseEntity.ok().build();
     }
 
     /** RU: [start] отправляет список групп и учителей учебного центра
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and (hasAuthority('HTEACHER') OR hasAuthority('TEACHER'))""")
     @GetMapping("/getInfoToHT")
-    public ResponseEntity<JsonObject> getInfoForHTeacherOrTEACHER(CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getInfoForHTeacherOrTEACHER(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfoToHT");
         wrtr.name("bodyG").beginObject();
         final Long firstG = datas.groupsBySchoolOfUser(user, wrtr);
@@ -163,6 +156,7 @@ import static ru.Main.datas;
         wrtr.name("firstG").value(firstG)
             .name("bodyT").beginObject();
         datas.teachersBySchool(school, wrtr);
+        wrtr.endObject();
         return datas.getObjR(ans -> {
             String role = "main", teacherId = "main";
             if(user.getSelRole() == Roles.HTEACHER) role = "ht";
@@ -170,7 +164,7 @@ import static ru.Main.datas;
                 role = "tea";
                 teacherId = user.getId()+"";
             }
-            authController.infCon(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", role, teacherId);
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", role, teacherId);
         }, wrtr, HttpStatus.OK, false);
     }
 

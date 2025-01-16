@@ -1,4 +1,4 @@
-package ru.data.models.school;
+package ru.data.DAO.school;
 
 import lombok.*;
 

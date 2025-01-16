@@ -10,14 +10,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -31,22 +31,12 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела управления/просмотра завучей учебных центров + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/HTeachersController">http://localhost:9001/swagger/htmlSwag/#/HTeachersController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
  * toDo: много кривизны на клиенте. Функции школ и групп.
  * </pre>
  * @see Subscriber */
 @RequestMapping("/hteachers")
 @RequiredArgsConstructor
 @RestController public class HTeachersController {
-    private final AuthController authController;
 
     /** RU: удаляет группу + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -67,7 +57,7 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(group.getId());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("remGroupC", ans, TypesConnect.MAIN, school.getId() + "", "main", "ht", "main");
+            SSEController.sendEventFor("remGroupC", ans, TypesConnect.MAIN, school.getId() + "", "main", "ht", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -91,7 +81,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(group.getId())
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addGroupC", ans, TypesConnect.MAIN, school.getId() + "", "main", "ht", "main");
+            SSEController.sendEventFor("addGroupC", ans, TypesConnect.MAIN, school.getId() + "", "main", "ht", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -114,7 +104,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(group.getId())
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chGroupC", ans, TypesConnect.MAIN, school.getId() + "", "main", "ht", "main");
+            SSEController.sendEventFor("chGroupC", ans, TypesConnect.MAIN, school.getId() + "", "main", "ht", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -140,12 +130,12 @@ import static ru.Main.datas;
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
             if (user.getSelRole() == Roles.ADMIN) {
-                authController.sendEventFor("chInfoL2C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
-                authController.sendEventFor("chInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId() + "", "main", "ht", "main");
+                SSEController.sendEventFor("chInfoL2C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+                SSEController.sendEventFor("chInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId() + "", "main", "ht", "main");
             }
             if (user.getSelRole() == Roles.HTEACHER) {
-                authController.sendEventFor("chInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
-                authController.sendEventFor("chInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
+                SSEController.sendEventFor("chInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+                SSEController.sendEventFor("chInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
             }
         }, wrtr, HttpStatus.OK);
     }
@@ -173,12 +163,12 @@ import static ru.Main.datas;
             .name("id1").value(sch.getId());
         return datas.getObjR(ans -> {
             if (user.getSelRole() == Roles.ADMIN) {
-                authController.sendEventFor("remInfoL2C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
-                authController.sendEventFor("remInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId() + "", "main", "ht", "main");
+                SSEController.sendEventFor("remInfoL2C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+                SSEController.sendEventFor("remInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId() + "", "main", "ht", "main");
             }
             if (user.getSelRole() == Roles.HTEACHER) {
-                authController.sendEventFor("remInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
-                authController.sendEventFor("remInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
+                SSEController.sendEventFor("remInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+                SSEController.sendEventFor("remInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
             }
         }, wrtr, HttpStatus.OK);
     }
@@ -215,12 +205,12 @@ import static ru.Main.datas;
             .name("name").value(body.name).endObject();
         return datas.getObjR(ans -> {
             if (user.getSelRole() == Roles.ADMIN) {
-                authController.sendEventFor("addInfoL2C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
-                authController.sendEventFor("addInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId() + "", "main", "ht", "main");
+                SSEController.sendEventFor("addInfoL2C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+                SSEController.sendEventFor("addInfoL1C", ans, TypesConnect.HTEACHERS, sch.getId() + "", "main", "ht", "main");
             }
             if (user.getSelRole() == Roles.HTEACHER) {
-                authController.sendEventFor("addInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
-                authController.sendEventFor("addInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
+                SSEController.sendEventFor("addInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+                SSEController.sendEventFor("addInfoL2C", ans, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
             }
         }, wrtr, HttpStatus.CREATED);
     }
@@ -242,7 +232,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(body.schId)
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+            SSEController.sendEventFor("chInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -261,7 +251,7 @@ import static ru.Main.datas;
             .name("name").value(body.name)
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+            SSEController.sendEventFor("addInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
@@ -280,7 +270,7 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(body.schId);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("remInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
+            SSEController.sendEventFor("remInfoL1C", ans, TypesConnect.HTEACHERS, sub.getLvlSch(), "main", sub.getLvlMore1(), "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -296,7 +286,7 @@ import static ru.Main.datas;
 
         datas.usersByList(school.getHteachers(), true, wrtr);
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.HTEACHERS, school.getId() + "", "main", "ht", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.HTEACHERS, school.getId() + "", "main", "ht", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 
@@ -316,7 +306,7 @@ import static ru.Main.datas;
             wrtr.endObject().endObject();
         }
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.HTEACHERS, "null", "main", "adm", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

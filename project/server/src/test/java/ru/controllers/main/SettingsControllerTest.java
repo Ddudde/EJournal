@@ -4,7 +4,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import config.CustomAuth;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -21,26 +21,22 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
-import ru.data.SSE.Subscriber;
-import ru.data.models.auth.SettingUser;
-import ru.data.models.auth.User;
+import ru.data.DAO.auth.SettingUser;
+import ru.data.DAO.auth.User;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.services.EmailService;
 import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
 import ru.services.db.IniDBService;
-import utils.RandomUtils;
 
 import javax.servlet.ServletException;
 
@@ -54,12 +50,19 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({SettingsControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SettingsControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
 
     @Autowired
     private DBService dbService;
@@ -73,32 +76,22 @@ public class SettingsControllerTest {
     @Autowired
     private SettingsController settingsController;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
-    }
-
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(settingsController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -110,17 +103,17 @@ public class SettingsControllerTest {
 
     private final String checkCodeEmail_Summary = "Подтверждение емэйла";
 
-    /** RU: аноним
-     * клиент не отправляет данные и получает 401 код */
     @Test @Tag("checkCodeEmail")
     @CustomAuth
     void checkCodeEmail_whenEmpty_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
+        
         mockMvc.perform(patch("/settings/checkCodeEmail/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(checkCodeEmail_Summary, "checkCodeEmail_whenEmpty_AdminUser"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(checkCodeEmail_Summary, "checkCodeEmail_whenEmpty_AdminUser"));
     }
 
     /** RU: админ
@@ -128,36 +121,37 @@ public class SettingsControllerTest {
     @Test @Tag("checkCodeEmail")
     @CustomUser
     void checkCodeEmail_whenGood_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         User user = getSub().getUser();
         when(dbService.userByCode("uuid")).thenReturn(user);
         user.getSettings().setEmailCode("code");
 
         mockMvc.perform(patch("/settings/checkCodeEmail/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "invCod": "uuid",
-            "emailCode": "code",
-            "email": "test@mail.com"
-        }
-            """)).andExpect(status().isOk())
-            .andDo(default_Docs(checkCodeEmail_Summary, "checkCodeEmail_whenGood_AdminUser"));
+            {
+                "invCod": "uuid",
+                "emailCode": "code",
+                "email": "test@mail.com"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(checkCodeEmail_Summary, "checkCodeEmail_whenGood_AdminUser"));
     }
 
     private final String startEmail_Summary = "Изменение электронной почты пользователя или добавление при регистрации";
 
-    /** RU: аноним
-     * клиент не отправляет данных и получает 401 код */
     @Test @Tag("startEmail")
     @CustomAuth
     void startEmail_whenEmpty_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isUnauthorized();
+        
         mockMvc.perform(patch("/settings/startEmail/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isUnauthorized())
-            .andDo(default_Docs(startEmail_Summary, "startEmail_whenEmpty_AdminUser"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(startEmail_Summary, "startEmail_whenEmpty_AdminUser"));
     }
 
     /** RU: админ
@@ -165,35 +159,36 @@ public class SettingsControllerTest {
     @Test @Tag("startEmail")
     @CustomUser
     void startEmail_whenGood_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         User user = getSub().getUser();
         when(dbService.userByCode("uuid")).thenReturn(user);
 
         mockMvc.perform(patch("/settings/startEmail/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "invCod": "uuid",
-            "email": "test@mail.com"
-        }
-            """)).andExpect(status().isOk())
-            .andDo(default_Docs(startEmail_Summary, "startEmail_whenGood_AdminUser"));
+            {
+                "invCod": "uuid",
+                "email": "test@mail.com"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(startEmail_Summary, "startEmail_whenGood_AdminUser"));
         verify(emailService, times(1)).sendRegCode(eq("test@mail.com"), any());
     }
 
     private final String remNotifToken_Summary = "Удаление токена уведомлений";
 
-    /** RU: админ
-     * клиент не отправляет токен и получает 404 код */
     @Test @Tag("remNotifToken")
     @CustomUser
     void remNotifToken_whenEmpty_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isNotFound();
+        
         mockMvc.perform(post("/settings/remNotifToken/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
-            .andDo(default_Docs(remNotifToken_Summary, "remNotifToken_whenEmpty_AdminUser"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(remNotifToken_Summary, "remNotifToken_whenEmpty_AdminUser"));
     }
 
     /** RU: админ
@@ -201,31 +196,35 @@ public class SettingsControllerTest {
     @Test @Tag("remNotifToken")
     @CustomUser
     void remNotifToken_whenGood_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
+        
         mockMvc.perform(post("/settings/remNotifToken/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "notifToken": "testtoken"
-        }
-            """)).andExpect(status().isOk())
-            .andDo(default_Docs(remNotifToken_Summary, "remNotifToken_whenGood_AdminUser"));
+            {
+                "notifToken": "testtoken"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(remNotifToken_Summary, "remNotifToken_whenGood_AdminUser"));
         verify(pushService, times(1)).remToken(any(), eq("testtoken"));
     }
 
     private final String addNotifToken_Summary = "Установка токена уведомлений";
 
-    /** RU: админ
-     * клиент не отправляет токен и получает 404 код */
     @Test @Tag("addNotifToken")
     @CustomUser
     void addNotifToken_whenEmpty_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isNotFound();
+        
         mockMvc.perform(post("/settings/addNotifToken/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
-            .andDo(default_Docs(addNotifToken_Summary, "addNotifToken_whenEmpty_AdminUser"));
+
+            .andExpect(statusCode)
+
+            .andDo(defaultSwaggerDocs(addNotifToken_Summary, "addNotifToken_whenEmpty_AdminUser"));
     }
 
     /** RU: админ
@@ -233,15 +232,17 @@ public class SettingsControllerTest {
     @Test @Tag("addNotifToken")
     @CustomUser
     void addNotifToken_whenGood_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
+        
         mockMvc.perform(post("/settings/addNotifToken/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "notifToken": "testtoken"
-        }
-            """)).andExpect(status().isOk())
-            .andDo(default_Docs(addNotifToken_Summary, "addNotifToken_whenGood_AdminUser"));
+            {
+                "notifToken": "testtoken"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(addNotifToken_Summary, "addNotifToken_whenGood_AdminUser"));
         verify(pushService, times(1)).addToken(any(), eq("testtoken"));
     }
 
@@ -252,12 +253,14 @@ public class SettingsControllerTest {
     @Test @Tag("chSettings")
     @CustomUser
     void chSettings_whenEmpty_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isNotFound();
+        
         mockMvc.perform(patch("/settings/chSettings/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound())
-            .andDo(default_Docs(chSettings_Summary, "chSettings_whenEmpty_AdminUser"));
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chSettings_Summary, "chSettings_whenEmpty_AdminUser"));
     }
 
     /** RU: админ
@@ -265,20 +268,21 @@ public class SettingsControllerTest {
     @Test @Tag("chSettings")
     @CustomUser
     void chSettings_whenGood_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = mock(SettingUser.class);
         User user = getSub().getUser();
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chSettings/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "id": "checkbox_notify_new_sch",
-            "val": true
-        }
-            """)).andExpect(status().isOk())
-            .andDo(default_Docs(chSettings_Summary, "chSettings_whenGood_AdminUser"));
+            {
+                "id": "checkbox_notify_new_sch",
+                "val": true
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(chSettings_Summary, "chSettings_whenGood_AdminUser"));
         verify(settingUser, times(1)).setNNewReqSch(eq(true));
     }
 
@@ -289,21 +293,22 @@ public class SettingsControllerTest {
     @Test @Tag("checkPasCodeEmail")
     @CustomUser
     void checkPasCodeEmail_whenWrongCode_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isNotFound();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmailCode("11112");
         User user = getSub().getUser();
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/checkPasCodeEmail/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "emailCode": "1111",
-            "nPar": "1234"
-        }
-            """)).andExpect(status().isNotFound())
-            .andDo(default_Docs(checkPasCodeEmail_Summary, "checkPasCodeEmail_whenWrongCode_AdminUser"));
+            {
+                "emailCode": "1111",
+                "nPar": "1234"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(checkPasCodeEmail_Summary, "checkPasCodeEmail_whenWrongCode_AdminUser"));
         verify(user, times(0)).setPassword(eq("1234"));
     }
 
@@ -312,6 +317,7 @@ public class SettingsControllerTest {
     @Test @Tag("checkPasCodeEmail")
     @CustomUser
     void checkPasCodeEmail_whenGood_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmailCode("1111");
         User user = getSub().getUser();
@@ -319,16 +325,16 @@ public class SettingsControllerTest {
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/checkPasCodeEmail/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "login": "nm12",
-            "emailCode": "1111",
-            "nPar": "1234"
-        }
-            """)).andExpect(status().isOk())
-            .andDo(default_Docs(checkPasCodeEmail_Summary, "checkPasCodeEmail_whenGood_AdminUser"));
+            {
+                "login": "nm12",
+                "emailCode": "1111",
+                "nPar": "1234"
+            }
+            """)).andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(checkPasCodeEmail_Summary, "checkPasCodeEmail_whenGood_AdminUser"));
         verify(user, times(1)).setPassword(eq("1234"));
     }
 
@@ -339,22 +345,23 @@ public class SettingsControllerTest {
     @Test @Tag("chPass")
     @CustomUser
     void chPass_whenError_secFr_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isAccepted();
         SettingUser settingUser = new SettingUser();
         settingUser.setSecFr("victoria_secret1");
         User user = getSub().getUser();
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chPass/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "emailSt": false,
-            "secFR": "victoria_secret"
-        }
-            """)).andExpect(status().isAccepted())
+            {
+                "emailSt": false,
+                "secFR": "victoria_secret"
+            }
+            """)).andExpect(statusCode)
             .andExpect(content().string("{\"error\":\"secFr\"}"))
-            .andDo(default_Docs(chPass_Summary, "chPass_whenError_secFr_AdminUser"));
+            .andDo(defaultSwaggerDocs(chPass_Summary, "chPass_whenError_secFr_AdminUser"));
     }
 
     /** RU: админ
@@ -362,6 +369,7 @@ public class SettingsControllerTest {
     @Test @Tag("chPass")
     @CustomUser
     void chPass_whenGood_secFr_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setSecFr("victoria_secret");
         User user = getSub().getUser();
@@ -369,18 +377,18 @@ public class SettingsControllerTest {
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chPass/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "login": "nm12",
-            "emailSt": false,
-            "secFR": "victoria_secret",
-            "nPar": "passs"
-        }
-            """)).andExpect(status().isOk())
+            {
+                "login": "nm12",
+                "emailSt": false,
+                "secFR": "victoria_secret",
+                "nPar": "passs"
+            }
+            """)).andExpect(statusCode)
             .andExpect(content().string("{}"))
-            .andDo(default_Docs(chPass_Summary, "chPass_whenGood_secFr_AdminUser"));
+            .andDo(defaultSwaggerDocs(chPass_Summary, "chPass_whenGood_secFr_AdminUser"));
         verify(user, times(1)).setPassword(eq("passs"));
     }
 
@@ -389,6 +397,7 @@ public class SettingsControllerTest {
     @Test @Tag("chPass")
     @CustomUser
     void chPass_whenGood_Email_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmail("test@mail.com");
         User user = getSub().getUser();
@@ -396,17 +405,17 @@ public class SettingsControllerTest {
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chPass/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "login": "nm12",
-            "emailSt": true,
-            "email": "test@mail.com"
-        }
-            """)).andExpect(status().isOk())
+            {
+                "login": "nm12",
+                "emailSt": true,
+                "email": "test@mail.com"
+            }
+            """)).andExpect(statusCode)
             .andExpect(content().string("{}"))
-            .andDo(default_Docs(chPass_Summary, "chPass_whenGood_Email_AdminUser"));
+            .andDo(defaultSwaggerDocs(chPass_Summary, "chPass_whenGood_Email_AdminUser"));
         verify(emailService, times(1)).sendRecCode(eq("test@mail.com"), any(), any());
     }
 
@@ -417,12 +426,13 @@ public class SettingsControllerTest {
     @Test @Tag("getSettings")
     @CustomUser
     void getSettings_whenEmpty_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isNotFound();
         when(getSub().getUser().getSettings()).thenReturn(null);
 
         mockMvc.perform(get("/settings/getSettings/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
-            .andExpect(status().isNotFound())
-            .andDo(default_Docs(getSettings_Summary, "getSettings_whenEmpty_AdminUser"));
+                .header(SecurityConfig.authTokenHeader, bearerToken))
+            .andExpect(statusCode)
+            .andDo(defaultSwaggerDocs(getSettings_Summary, "getSettings_whenEmpty_AdminUser"));
     }
 
     /** RU: админ
@@ -430,15 +440,16 @@ public class SettingsControllerTest {
     @Test @Tag("getSettings")
     @CustomUser
     void getSettings_whenGood_AdminUser() throws Exception {
+        final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setNNewReqSch(true);
         when(getSub().getUser().getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(get("/settings/getSettings/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
-            .andExpect(status().isOk())
+                .header(SecurityConfig.authTokenHeader, bearerToken))
+            .andExpect(statusCode)
             .andExpect(content().json("{\"checkbox_hints\":true,\"checkbox_notify\":false,\"checkbox_notify_sched\":false,\"checkbox_notify_marks\":false,\"checkbox_notify_yo\":false,\"checkbox_notify_por\":false,\"checkbox_notify_new_sch\":true}"))
-            .andDo(default_Docs(getSettings_Summary, "getSettings_whenGood_AdminUser"));
+            .andDo(defaultSwaggerDocs(getSettings_Summary, "getSettings_whenGood_AdminUser"));
     }
 }
 
@@ -474,12 +485,7 @@ class SettingsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public SettingsController settingsController(AuthController authController) {
-        return spy(new SettingsController(authController));
+    public SettingsController settingsController() {
+        return spy(new SettingsController());
     }
 }

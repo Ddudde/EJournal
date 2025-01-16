@@ -1,14 +1,14 @@
 = Asciidoc
 Natik Muradov <myratoff25@gmail.com>
-:revnumber: v0.1
-:revdate: 08.12.2024
+:revnumber: v0.2
+:revdate: 16.01.2025
 :revremark: Основное описание
 :sectnums:
 :hardbreaks-option:
 :toc: left
 :toclevels: 4
 :toc-title: Содержание
-:imagesdir: ./img
+:imagesdir: ./imgAsciiDoc
 
 ====
 Github: https://github.com/Ddudde/EJournal
@@ -140,3 +140,25 @@ beenDo - что уже сделано
 | На сервере произошла непредвиденная ошибка
 
 |===
+
+== Логгирование
+====
+Логи сохраняются в папку: \project\server\logs.
+Slf4j + logback-spring
+====
+
+== Логическая схема базы данных
+====
+Нотация IDEF1X. Создавалась в Draw.io и исходник не сохранился.
+Возможно немного устаревшая, но существует:)
+[#img-logicModel]
+image::logicModel.jpg[]
+====
+
+== Физическая схема базы данных
+====
+Создавалась в Intellij Idea UE 2023.X
+Возможно немного устаревшая, но существует:)
+[#img-physicalModel]
+image::physicalModel.png[]
+====

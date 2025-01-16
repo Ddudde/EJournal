@@ -5,14 +5,13 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.epages.restdocs.apispec.SimpleType;
 import com.google.gson.JsonObject;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -24,23 +23,20 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
-import ru.data.models.school.School;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 
@@ -56,19 +52,23 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.RandomUtils.defaultDescription;
-import static utils.RandomUtils.getCloneContacts;
+import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({ContactsControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ContactsControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final TestUtils testUtils = new TestUtils();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private ContactsController contactsController;
@@ -76,32 +76,27 @@ public class ContactsControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
+    @AfterEach
+    void afterEach() {
+        theMock.close();
     }
 
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(contactsController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler chContact_Docs(String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler contactSwaggerDocs(String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary("Изменение контакта + Server Sent Events")
             .description(defaultDescription)
@@ -117,12 +112,13 @@ public class ContactsControllerTest {
     @CustomUser
     void chContact_whenEmpty_Portal_AdminUser() throws Exception {
         mockMvc.perform(put("/contacts/chContact/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
-            .andDo(chContact_Docs("chContact_whenEmpty_Portal_AdminUser"));
-        verify(authController, times(0)).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(contactSwaggerDocs("chContact_whenEmpty_Portal_AdminUser"));
+        theMock.verify(() -> SSEController.sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: завуч для контактов школы
@@ -135,21 +131,23 @@ public class ContactsControllerTest {
         final School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(dbService.getSyst().getContacts())
-            .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
+            .thenReturn(getCloneContacts(testUtils.contactsTest.get(0)));
         when(school.getContacts())
-            .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
+            .thenReturn(getCloneContacts(testUtils.contactsTest.get(0)));
+
         mockMvc.perform(put("/contacts/chContact/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "p": "mapPr",
-            "p1": "text",
-            "val": "А проект вышел большим..."
-        }
+            {
+                "p": "mapPr",
+                "p1": "text",
+                "val": "А проект вышел большим..."
+            }
             """)).andExpect(status().isOk())
-            .andDo(chContact_Docs("chContact_whenGood_YO_HTeacher"));
-        verify(authController).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(contactSwaggerDocs("chContact_whenGood_YO_HTeacher"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"val\":\"А проект вышел большим...\",\"p\":\"mapPr\",\"p1\":\"text\"}",
             answer.getValue().toString());
     }
@@ -161,19 +159,21 @@ public class ContactsControllerTest {
     void chContact_whenGood_Portal_AdminUser() throws Exception {
         getSub().setLvlMore2("Por");
         when(dbService.getSyst().getContacts())
-            .thenReturn(getCloneContacts(randomUtils.contactsTest.get(0)));
+            .thenReturn(getCloneContacts(testUtils.contactsTest.get(0)));
+
         mockMvc.perform(put("/contacts/chContact/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "p": "mapPr",
-            "p1": "text",
-            "val": "А проект вышел большим..."
-        }
+            {
+                "p": "mapPr",
+                "p1": "text",
+                "val": "А проект вышел большим..."
+            }
             """)).andExpect(status().isOk())
-            .andDo(chContact_Docs("chContact_whenGood_Portal_AdminUser"));
-        verify(authController).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(contactSwaggerDocs("chContact_whenGood_Portal_AdminUser"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"val\":\"А проект вышел большим...\",\"p\":\"mapPr\",\"p1\":\"text\"}",
             answer.getValue().toString());
     }
@@ -204,8 +204,9 @@ public class ContactsControllerTest {
     @CustomUser
     void getContacts_whenEmpty_Portal_AdminUser() throws Exception {
         when(dbService.getSyst()).thenReturn(null);
+
         mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isNotFound())
             .andDo(getContacts_Docs("getContacts_whenEmpty_Portal_AdminUser", true));
     }
@@ -219,9 +220,10 @@ public class ContactsControllerTest {
         School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(school.getContacts())
-            .thenReturn(randomUtils.contactsTest.get(0));
+            .thenReturn(testUtils.contactsTest.get(0));
+
         mockMvc.perform(get("/contacts/getContacts/{type}", "Yo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))
             .andDo(getContacts_Docs("getContacts_whenGood_YO_HTeacher", false));
@@ -233,9 +235,10 @@ public class ContactsControllerTest {
     @CustomUser
     void getContacts_whenGood_Portal_AdminUser() throws Exception {
         when(dbService.getSyst().getContacts())
-            .thenReturn(randomUtils.contactsTest.get(0));
+            .thenReturn(testUtils.contactsTest.get(0));
+
         mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))
             .andDo(getContacts_Docs("getContacts_whenGood_Portal_AdminUser", false));
@@ -259,12 +262,7 @@ class ContactsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public ContactsController contactsController(AuthController authController) {
-        return spy(new ContactsController(authController));
+    public ContactsController contactsController() {
+        return spy(new ContactsController());
     }
 }

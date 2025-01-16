@@ -2,106 +2,99 @@ package ru.controllers.school.analytics;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.Main;
-import ru.controllers.AuthController;
+import org.springframework.web.bind.annotation.*;
+import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Period;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.User;
-import ru.data.models.school.Period;
-import ru.data.models.school.School;
-import ru.security.user.Roles;
-import ru.services.MainService;
+import ru.security.user.CustomToken;
 
+import static ru.Main.datas;
+
+/** RU: Контроллер для просмотра и редактирования периодов обучения учебного центра
+ * <pre>
+ * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/PeriodsController">http://localhost:9001/swagger/htmlSwag/#/PeriodsController</a>
+ * </pre> */
+@Slf4j
 @RequestMapping("/periods")
-@NoArgsConstructor
+@RequiredArgsConstructor
 @RestController public class PeriodsController {
 
-    @Autowired
-    private MainService datas;
-
-    @Autowired
-    private AuthController authController;
-
-    @PostMapping(value = "/addPer")
-    public JsonObject addPer(@RequestBody DataPeriods body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
-        final var ref = new Object() {
-            Long schId = null;
-        };
-        try {
-            body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
-                School school = user.getRoles().get(Roles.HTEACHER).getYO();
-                ref.schId = school.getId();
-                Period period = new Period();
-                period.setName(body.name);
-                period.setDateN(body.perN);
-                period.setDateK(body.perK);
-                datas.getDbService().getPeriodRepository().saveAndFlush(period);
-                school.getPeriods().add(period);
-                datas.getDbService().getSchoolRepository().saveAndFlush(school);
-                body.wrtr.name("id").value(period.getId())
-                    .name("body").beginObject()
-                    .name("name").value(period.getName())
-                    .name("perN").value(period.getDateN())
-                    .name("perK").value(period.getDateK())
-                    .endObject();
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.sendEventFor("addPerC", ans, TypesConnect.PERIODS, ref.schId +"", "main", "main", "main");
-        }, body.wrtr, body.bol);
+    /** RU: создаёт новый период обучения учебного центра
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#sub.getUser() != null)
+        and hasAuthority('HTEACHER')""")
+    @PostMapping("/addPer")
+    public ResponseEntity<Void> addPer(@RequestBody DataPeriods body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addPer");
+        final School school = user.getSelecRole().getYO();
+        final Period period = new Period();
+        period.setName(body.name);
+        period.setDateN(body.perN);
+        period.setDateK(body.perK);
+        datas.getDbService().getPeriodRepository().saveAndFlush(period);
+        school.getPeriods().add(period);
+        datas.getDbService().getSchoolRepository().saveAndFlush(school);
+        wrtr.name("id").value(period.getId())
+            .name("body").beginObject()
+            .name("name").value(period.getName())
+            .name("perN").value(period.getDateN())
+            .name("perK").value(period.getDateK())
+            .endObject();
+        return datas.getObjR(ans -> {
+            SSEController.sendEventFor("addPerC", ans, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
+        }, wrtr, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/getInfo")
-    public JsonObject getInfo(@RequestBody DataPeriods body) {
-        Subscriber subscriber = authController.getSubscriber(body.uuid);
-        User user = datas.getDbService().userByLogin(subscriber.getLogin());
-        final var ref = new Object() {
-            Long schId = null;
-        };
-        try {
-            body.wrtr = datas.init(body.toString());
-            if(user != null && user.getRoles().containsKey(Roles.HTEACHER)) {
-                School school = user.getRoles().get(Roles.HTEACHER).getYO();
-                ref.schId = school.getId();
-                if (!ObjectUtils.isEmpty(school.getPeriods())){
-                    System.out.println(school.getPeriods());
-                    body.wrtr.name("bodyP").beginObject();
-                    int i = 0;
-                    for (Period period : school.getPeriods()) {
-                        if(period == null) continue;
-                        body.wrtr.name(i+"").beginObject()
-                            .name("name").value(period.getName())
-                            .name("perN").value(period.getDateN())
-                            .name("perK").value(period.getDateK())
-                            .endObject();
-                        i++;
-                    }
-                    body.wrtr.endObject();
-                }
-            }
-        } catch (Exception e) {body.bol = Main.excp(e);}
-        return datas.getObj(ans -> {
-            authController.infCon(body.uuid, null, TypesConnect.PERIODS, ref.schId +"", "main", "main", "main");
-        }, body.wrtr, body.bol);
+    /** RU: [start] отправляет данные о расписании периодов обучения учебного центра
+     * @see DocsHelpController#point(Object, Object) Описание */
+    @PreAuthorize("""
+        @code401.check(#sub.getUser() != null)
+        and hasAuthority('HTEACHER')""")
+    @GetMapping("/getInfo")
+    public ResponseEntity<JsonObject> getInfo(CustomToken auth, @AuthenticationPrincipal Subscriber sub) throws Exception {
+        final User user = sub.getUser();
+        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
+        final School school = user.getSelecRole().getYO();
+        if (ObjectUtils.isEmpty(school.getPeriods())) {
+            return ResponseEntity.notFound().build();
+        }
+        log.trace(school.getPeriods() + "");
+        wrtr.name("bodyP").beginObject();
+        int i = 0;
+        for (Period period : school.getPeriods()) {
+            if(period == null) continue;
+            wrtr.name(i+"").beginObject()
+                .name("name").value(period.getName())
+                .name("perN").value(period.getDateN())
+                .name("perK").value(period.getDateK())
+                .endObject();
+            i++;
+        }
+        wrtr.endObject();
+        return datas.getObjR(ans -> {
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
+        }, wrtr, HttpStatus.OK, false);
     }
-}
 
-@ToString
-@NoArgsConstructor @AllArgsConstructor
-class DataPeriods {
-    public String uuid, name, perN, perK;
-    public transient boolean bol = true;
-    public transient JsonTreeWriter wrtr;
+    /** RU: Данные клиента используемые PeriodsController в методах
+     * @see PeriodsController */
+    @ToString
+    @RequiredArgsConstructor
+    static final class DataPeriods {
+        public final String name, perN, perK;
+    }
 }

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from "react";
-import journalCSS from './journal.module.css';
+import teacherJournalCSS from './teacherJournal.module.css';
 import {Helmet} from "react-helmet-async";
 import {useDispatch, useSelector} from "react-redux";
 import {groups, pjournal, schedules, states, themes} from "../../store/selector";
@@ -49,17 +49,17 @@ function selecPredm(param) {
 }
 
 function getPredms(predmsK) {
-    return <div className={journalCSS.blockList}>
-        <div className={journalCSS.nav_i+' '+journalCSS.selEl} id={journalCSS.nav_i}>
-            <div className={journalCSS.elInf}>Предмет:</div>
-            {jourInfo.predms && <div className={journalCSS.elText}>{jourInfo.predms[jourInfo.predm]}</div>}
-            <img className={journalCSS.mapImg} src={theme.theme_ch ? mapd : mapl} alt=""/>
+    return <div className={teacherJournalCSS.blockList}>
+        <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.selEl} id={teacherJournalCSS.nav_i}>
+            <div className={teacherJournalCSS.elInf}>Предмет:</div>
+            {jourInfo.predms && <div className={teacherJournalCSS.elText}>{jourInfo.predms[jourInfo.predm]}</div>}
+            <img className={teacherJournalCSS.mapImg} src={theme.theme_ch ? mapd : mapl} alt=""/>
         </div>
-        <div className={journalCSS.list}>
+        <div className={teacherJournalCSS.list}>
             {jourInfo.predms && predmsK.map(param1 =>
-                param1 != jourInfo.predm && <div className={journalCSS.nav_i+' '+journalCSS.listEl} id={journalCSS.nav_i} onClick={e => selecPredm(param1)}>
-                    <div className={journalCSS.elInf}>Предмет:</div>
-                    <div className={journalCSS.elText}>{jourInfo.predms[param1]}</div>
+                param1 != jourInfo.predm && <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.listEl} id={teacherJournalCSS.nav_i} onClick={e => selecPredm(param1)}>
+                    <div className={teacherJournalCSS.elInf}>Предмет:</div>
+                    <div className={teacherJournalCSS.elText}>{jourInfo.predms[param1]}</div>
                 </div>
             )}
         </div>
@@ -85,15 +85,15 @@ function ele(x, par, b) {
 
 function onEdit(e, dbut) {
     let par = e.target.parentElement;
-    if(dbut) par = document.querySelector("." + journalCSS.AppHeader);
+    if(dbut) par = document.querySelector("." + teacherJournalCSS.AppHeader);
     par.setAttribute('data-st', '1');
 }
 
 function onFin(e) {
     let par, inp, bo;
     par = e.target.parentElement;
-    inp = par.querySelectorAll("." + journalCSS.inp);
-    bo = par.classList.contains(journalCSS.blNew);
+    inp = par.querySelectorAll("." + teacherJournalCSS.inp);
+    bo = par.classList.contains(teacherJournalCSS.blNew);
     if(bo) par = par.parentElement;
     if (inps[inp[0].id] && inps[inp[1].id]) {
         if(bo) {
@@ -117,7 +117,7 @@ function onFinM(e) {
 function onDel(e) {
     let par, inp, idi;
     par = e.target.parentElement;
-    inp = par.querySelectorAll("." + journalCSS.inp);
+    inp = par.querySelectorAll("." + teacherJournalCSS.inp);
     idi = inp[0].id.split("_")[1];
     dispatch(changeJType(undefined, idi));
     parb.upddel = true;
@@ -125,8 +125,8 @@ function onDel(e) {
 
 function onClose(e, dbut) {
     let par = e.target.parentElement;
-    if(par.classList.contains(journalCSS.blNew)) par = par.parentElement;
-    if(dbut) par = document.querySelector("." + journalCSS.AppHeader);
+    if(par.classList.contains(teacherJournalCSS.blNew)) par = par.parentElement;
+    if(dbut) par = document.querySelector("." + teacherJournalCSS.AppHeader);
     par.setAttribute('data-st', '0');
 }
 
@@ -267,7 +267,7 @@ function getDays() {
         }
     }
     rez = days.map(param =>
-        <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.nav_iTextD} id={journalCSS.nav_i}>
+        <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur+" "+teacherJournalCSS.nav_iTextD} id={teacherJournalCSS.nav_i}>
             {getDayofMonth(param)}
         </div>
     )
@@ -288,100 +288,100 @@ function selMar(p) {
 }
 
 function getBlockInstr(p3) {
-    return <div className={journalCSS.blockInstrum+" "+journalCSS.ju}>
-        <div className={journalCSS.blockMarks}>
-            <div className={journalCSS.marks} data-tr>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "1" ? "1" : "0"} onClick={() => selMar(1)}>
+    return <div className={teacherJournalCSS.blockInstrum+" "+teacherJournalCSS.ju}>
+        <div className={teacherJournalCSS.blockMarks}>
+            <div className={teacherJournalCSS.marks} data-tr>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == "1" ? "1" : "0"} onClick={() => selMar(1)}>
                     1
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "2" ? "1" : "0"} onClick={() => selMar(2)}>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == "2" ? "1" : "0"} onClick={() => selMar(2)}>
                     2
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "3" ? "1" : "0"} onClick={() => selMar(3)}>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == "3" ? "1" : "0"} onClick={() => selMar(3)}>
                     3
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "4" ? "1" : "0"} onClick={() => selMar(4)}>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == "4" ? "1" : "0"} onClick={() => selMar(4)}>
                     4
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "5" ? "1" : "0"} onClick={() => selMar(5)}>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == "5" ? "1" : "0"} onClick={() => selMar(5)}>
                     5
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "Н" ? "1" : "0"} onClick={() => selMar("Н")}>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == "Н" ? "1" : "0"} onClick={() => selMar("Н")}>
                     Н
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == "Л" ? "1" : "0"} onClick={() => selMar("Л")}>
-                    <img className={journalCSS.imger} src={(jourInfo.mar == "Л" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == "Л" ? "1" : "0"} onClick={() => selMar("Л")}>
+                    <img className={teacherJournalCSS.imger} src={(jourInfo.mar == "Л" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
                 </div>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.mar == 0 ? "1" : "0"} onClick={() => selMar(0)}>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.mar == 0 ? "1" : "0"} onClick={() => selMar(0)}>
                     <br/>
                 </div>
             </div>
-            <div className={journalCSS.nav_i} id={journalCSS.nav_i}>
+            <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i}>
                 Выбрать оценку
             </div>
         </div>
-        <div className={journalCSS.blockTypes}>
-            <div className={journalCSS.types+" "+journalCSS.types1}>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-st="0" data-ac="0">
-                    <div className={journalCSS.field+" "+journalCSS.fi}>
+        <div className={teacherJournalCSS.blockTypes}>
+            <div className={teacherJournalCSS.types+" "+teacherJournalCSS.types1}>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-st="0" data-ac="0">
+                    <div className={teacherJournalCSS.field+" "+teacherJournalCSS.fi}>
                         {Object.getOwnPropertyNames(jourInfo.typs).map(param => {
                             if(param.length > p3.length) p3 = param;
                         }) && p3 + ", вес: " + jourInfo.typs[p3]}
                     </div>
-                    <img className={journalCSS.imgfield+" "+journalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                    <img className={journalCSS.imginp+" "+journalCSS.fi} src={no} onClick={onDel} title="Удалить тип" alt=""/>
+                    <img className={teacherJournalCSS.imgfield+" "+teacherJournalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                    <img className={teacherJournalCSS.imginp+" "+teacherJournalCSS.fi} src={no} onClick={onDel} title="Удалить тип" alt=""/>
                 </div>
             </div>
-            <div className={journalCSS.types} data-tr data-real>
-                <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-ac={jourInfo.typ == "" ? "1" : "0"} onClick={() => selTyp("")}>
-                    <img className={journalCSS.imger} src={(jourInfo.typ == "" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
+            <div className={teacherJournalCSS.types} data-tr data-real>
+                <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-ac={jourInfo.typ == "" ? "1" : "0"} onClick={() => selTyp("")}>
+                    <img className={teacherJournalCSS.imger} src={(jourInfo.typ == "" ? !theme.theme_ch : theme.theme_ch) ? erad : eral} alt=""/>
                 </div>
                 {Object.getOwnPropertyNames(jourInfo.typs).map(param =>
-                    <div className={journalCSS.nav_i} id={journalCSS.nav_i} data-st="0" data-ac={jourInfo.typ == param ? "1" : "0"} onClick={() => selTyp(param)}>
-                        <div className={journalCSS.field+" "+journalCSS.fi}>
+                    <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} data-st="0" data-ac={jourInfo.typ == param ? "1" : "0"} onClick={() => selTyp(param)}>
+                        <div className={teacherJournalCSS.field+" "+teacherJournalCSS.fi}>
                             {param}, вес: {jourInfo.typs[param]}
                         </div>
-                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                        <div className={teacherJournalCSS.preinf+" "+teacherJournalCSS.in}>
                             Тип:
                         </div>
-                        <input className={journalCSS.inp+" "+journalCSS.in} id={"inpt_" + param} onChange={chStatB} defaultValue={param} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
-                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                        <input className={teacherJournalCSS.inp+" "+teacherJournalCSS.in} id={"inpt_" + param} onChange={chStatB} defaultValue={param} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
+                        <div className={teacherJournalCSS.preinf+" "+teacherJournalCSS.in}>
                             , вес:
                         </div>
-                        <input className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.mass} id={"inpv_" + param} onChange={chStatB} defaultValue={jourInfo.typs[param]} type="text" pattern="^[0-9]+$"/>
+                        <input className={teacherJournalCSS.inp+" "+teacherJournalCSS.in+" "+teacherJournalCSS.mass} id={"inpv_" + param} onChange={chStatB} defaultValue={jourInfo.typs[param]} type="text" pattern="^[0-9]+$"/>
                         {ele(false, "inpt_" + param, true)}
                         {ele(false, "inpv_" + param, true)}
-                        <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
-                        <img className={journalCSS.imginp+" "+journalCSS.in} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                        <img className={journalCSS.imgfield+" "+journalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
-                        <img className={journalCSS.imginp+" "+journalCSS.fi} src={no} onClick={onDel} title="Удалить тип" alt=""/>
+                        <img className={teacherJournalCSS.imginp+" yes "+teacherJournalCSS.in} src={yes} onClick={onFin} title="Подтвердить изменения" alt=""/>
+                        <img className={teacherJournalCSS.imginp+" "+teacherJournalCSS.in} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                        <img className={teacherJournalCSS.imgfield+" "+teacherJournalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                        <img className={teacherJournalCSS.imginp+" "+teacherJournalCSS.fi} src={no} onClick={onDel} title="Удалить тип" alt=""/>
                     </div>
                 )}
-                <div className={journalCSS.nav_iZag} data-st="0">
-                    <div className={journalCSS.nav_i+" "+journalCSS.chPass} id={journalCSS.nav_i} data-ac='1' onClick={onEdit}>
+                <div className={teacherJournalCSS.nav_iZag} data-st="0">
+                    <div className={teacherJournalCSS.nav_i+" "+teacherJournalCSS.chPass} id={teacherJournalCSS.nav_i} data-ac='1' onClick={onEdit}>
                         Добавить новый тип
                     </div>
-                    <div className={journalCSS.nav_i+" "+journalCSS.blNew} id={journalCSS.nav_i} data-ac="0">
-                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                    <div className={teacherJournalCSS.nav_i+" "+teacherJournalCSS.blNew} id={teacherJournalCSS.nav_i} data-ac="0">
+                        <div className={teacherJournalCSS.preinf+" "+teacherJournalCSS.in}>
                             Тип:
                         </div>
-                        <input className={journalCSS.inp+" "+journalCSS.in} id={"inpnt_"} onChange={chStatB} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
-                        <div className={journalCSS.preinf+" "+journalCSS.in}>
+                        <input className={teacherJournalCSS.inp+" "+teacherJournalCSS.in} id={"inpnt_"} onChange={chStatB} type="text" pattern="^[A-Za-zА-Яа-яЁё\s0-9]+$"/>
+                        <div className={teacherJournalCSS.preinf+" "+teacherJournalCSS.in}>
                             , вес:
                         </div>
-                        <input className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.mass} id={"inpnv_"} onChange={chStatB} type="text" pattern="^[0-9]+$"/>
+                        <input className={teacherJournalCSS.inp+" "+teacherJournalCSS.in+" "+teacherJournalCSS.mass} id={"inpnv_"} onChange={chStatB} type="text" pattern="^[0-9]+$"/>
                         {ele(false, "inpnt_", true)}
                         {ele(false, "inpnv_", true)}
-                        <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFin} title="Подтвердить" alt=""/>
-                        <img className={journalCSS.imginp+" "+journalCSS.in} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                        <img className={teacherJournalCSS.imginp+" yes "+teacherJournalCSS.in} src={yes} onClick={onFin} title="Подтвердить" alt=""/>
+                        <img className={teacherJournalCSS.imginp+" "+teacherJournalCSS.in} style={{marginRight: "1vw"}} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
                     </div>
                 </div>
             </div>
-            <div className={journalCSS.nav_i} id={journalCSS.nav_i}>
+            <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i}>
                 Выбрать тип оценки
             </div>
         </div>
-        <div className={journalCSS.nav_i} id={journalCSS.nav_i} onClick={e=>onEdit(e, true)}>
+        <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} onClick={e=>onEdit(e, true)}>
             Задать домашнее задание
         </div>
     </div>;
@@ -393,58 +393,53 @@ function onCon(e) {
 
 function setInfoP1() {
     let scr, e, marks;
-    sendToServer({
-        uuid: cState.uuid
-    }, 'POST', cPjournal+"getInfoP1")
+    sendToServer(0, 'GET', cPjournal+"getInfoP1")
         .then(data => {
             console.log(data);
-            if(data.error == false) {
-                dispatch(changePjournal(CHANGE_PJOURNAL, "pers", data.bodyPers));
-                dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.bodyS));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "predms", data.bodyPred));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "min", data.min));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "max", data.max));
-                if (!data.bodyPred[jourInfo.predm]) {
+            if(data.status == 200){
+                dispatch(changePjournal(CHANGE_PJOURNAL, "pers", data.body.bodyPers));
+                dispatch(changeAnalytics(CHANGE_SCHEDULE_GL, 0, 0, 0, data.body.bodyS));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "predms", data.body.bodyPred));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "min", data.body.min));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "max", data.body.max));
+                if (!data.body.bodyPred[jourInfo.predm]) {
                     dispatch(changePjournal(CHANGE_PJOURNAL, "predm", 0));
-                    setInfoP2(data.bodyPred[0]);
+                    setInfoP2(data.body.bodyPred[0]);
                 } else {
-                    setInfoP2(data.bodyPred[jourInfo.predm]);
+                    setInfoP2(data.body.bodyPred[jourInfo.predm]);
                 }
-                scr = document.querySelector("." + journalCSS.days);
+                scr = document.querySelector("." + teacherJournalCSS.days);
                 if(!scr) return;
                 scr.scrollTo(scr.scrollWidth, 0);
-                marks = document.querySelector("." + journalCSS.marks);
+                marks = document.querySelector("." + teacherJournalCSS.marks);
                 if(marks) marks.addEventListener("transitionend", trEnd);
-                document.querySelector("." + journalCSS.types + "[data-real]").addEventListener("transitionend", trEnd);
-                for(e of document.querySelectorAll("." + journalCSS.nav_i + " > [id^='inpt_']")){
+                document.querySelector("." + teacherJournalCSS.types + "[data-real]").addEventListener("transitionend", trEnd);
+                for(e of document.querySelectorAll("." + teacherJournalCSS.nav_i + " > [id^='inpt_']")){
                     chStatB({target: e});
                 }
-                for(e of document.querySelectorAll("." + journalCSS.nav_i + " > [id^='inpv_']")){
+                for(e of document.querySelectorAll("." + teacherJournalCSS.nav_i + " > [id^='inpv_']")){
                     chStatB({target: e});
                 }
-                for(e of document.querySelectorAll("." + journalCSS.nav_i + " > [id^='inpd_']")){
+                for(e of document.querySelectorAll("." + teacherJournalCSS.nav_i + " > [id^='inpd_']")){
                     chStatM({target: e});
                 }
-                chStatB({target: document.querySelector("." + journalCSS.nav_i + " > [id^='inpnt_']")});
-                chStatB({target: document.querySelector("." + journalCSS.nav_i + " > [id^='inpnv_']")});
+                chStatB({target: document.querySelector("." + teacherJournalCSS.nav_i + " > [id^='inpnt_']")});
+                chStatB({target: document.querySelector("." + teacherJournalCSS.nav_i + " > [id^='inpnv_']")});
             }
         });
 }
 
 function setInfoP2(predm) {
     if(!predm) return;
-    sendToServer({
-        uuid: cState.uuid,
-        predm: predm
-    }, 'POST', cPjournal+"getInfoP2")
+    sendToServer(0, 'GET', cPjournal+"getInfoP2/"+predm)
         .then(data => {
             console.log(data);
-            if(data.error == false){
-                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.bodyG));
-                if (!data.bodyG[groupsInfo.els.group]) {
-                    selGr = data.firstG;
-                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.firstG)));
-                    setInfoP3(data.firstG);
+            if(data.status == 200){
+                dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, data.body.bodyG));
+                if (!data.body.bodyG[groupsInfo.els.group]) {
+                    selGr = data.body.firstG;
+                    dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, parseInt(data.body.firstG)));
+                    setInfoP3(data.body.firstG);
                 } else {
                     selGr = groupsInfo.els.group;
                     setInfoP3(groupsInfo.els.group);
@@ -455,31 +450,28 @@ function setInfoP2(predm) {
 
 function setInfoP3(group) {
     if(!group) return;
-    sendToServer({
-        uuid: cState.uuid,
-        group: group
-    }, 'POST', cPjournal+"getInfoP3")
+    sendToServer(0, 'GET', cPjournal+"getInfoP3/"+group)
         .then(data => {
             console.log(data);
-            if(data.error == false){
+            if(data.status == 200){
                 let weight, sum, mar, wei;
-                for(let kid in data.bodyK) {
+                for(let kid in data.body.bodyK) {
                     weight = 0;
                     sum = 0;
-                    for(let day in data.bodyK[kid].days) {
-                        mar = parseInt(data.bodyK[kid].days[day].mark);
+                    for(let day in data.body.bodyK[kid].days) {
+                        mar = parseInt(data.body.bodyK[kid].days[day].mark);
                         if(!mar || isNaN(mar)) continue;
-                        wei = parseInt(data.bodyK[kid].days[day].weight);
+                        wei = parseInt(data.body.bodyK[kid].days[day].weight);
                         if(!wei) wei = 1;
                         sum += mar*wei;
                         weight += wei;
                     }
                     if (sum && weight) {
-                        data.bodyK[kid].avg.mark = (sum/weight).toFixed(2);
+                        data.body.bodyK[kid].avg.mark = (sum/weight).toFixed(2);
                     }
                 }
-                dispatch(changePjournal(CHANGE_PJOURNAL_GL, 0, data.bodyK));
-                dispatch(changePjournal(CHANGE_PJOURNAL, "dz", data.bodyD));
+                dispatch(changePjournal(CHANGE_PJOURNAL_GL, 0, data.body.bodyK));
+                dispatch(changePjournal(CHANGE_PJOURNAL, "dz", data.body.bodyD));
             }
         });
 }
@@ -517,7 +509,6 @@ function addMarkC(e) {
 function addMark (weight, kid, day, per) {
     console.log("addMark");
     sendToServer({
-        uuid: cState.uuid,
         weight: weight,
         kid: kid,
         day: day,
@@ -531,13 +522,12 @@ function addMark (weight, kid, day, per) {
 function addHomework (day, homework, par) {
     console.log("addHomework");
     sendToServer({
-        uuid: cState.uuid,
         day: day,
         group: groupsInfo.els.group,
         homework: homework
     }, 'POST', cPjournal+"addHomework")
         .then(data => {
-            if(data.error == false) {
+            if(data.status == 201){
                 par.setAttribute('data-st', '0');
             }
         });
@@ -548,7 +538,7 @@ function addHomeworkC(e) {
     dispatch(changeDZ(msg.day, msg.homework));
 }
 
-export function Journal() {
+export function TeacherJournal() {
     theme = useSelector(themes);
     cState = useSelector(states);
     schedulesInfo = useSelector(schedules);
@@ -582,7 +572,7 @@ export function Journal() {
         if(parb.upddel) {
             parb.upddel = false;
             let idi;
-            for(let el of document.querySelectorAll("." + journalCSS.inp)){
+            for(let el of document.querySelectorAll("." + teacherJournalCSS.inp)){
                 idi = el.id.split("_");
                 if(idi[1] != "") el.value = idi[0] == "inpt" ? idi[1] : jourInfo.typs[idi[1]];
             }
@@ -598,7 +588,7 @@ export function Journal() {
     if(jourInfo.predms) predmsK = Object.getOwnPropertyNames(jourInfo.predms);
     if(jourInfo.pers) pers = Object.getOwnPropertyNames(jourInfo.pers);
     console.log("test", kidsK, predmsK);
-    return <div className={journalCSS.AppHeader} data-st='0'>
+    return <div className={teacherJournalCSS.AppHeader} data-st='0'>
         <Helmet>
             <title>Журнал</title>
         </Helmet>
@@ -606,61 +596,61 @@ export function Journal() {
                 <ErrFound text={errText}/>
             :
                 <>
-                    <nav className={journalCSS.panel} id="her">
-                        <div className={journalCSS.pane}>
+                    <nav className={teacherJournalCSS.panel} id="her">
+                        <div className={teacherJournalCSS.pane}>
                             <Pane cla={true}/>
                         </div>
                         {getPredms(predmsK)}
                     </nav>
-                    <div className={journalCSS.blockPredm+" "+journalCSS.ju}>
-                        <div className={journalCSS.predm}>
-                            <div className={journalCSS.days}>
-                                <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.namd} id={journalCSS.nav_i}>
+                    <div className={teacherJournalCSS.blockPredm+" "+teacherJournalCSS.ju}>
+                        <div className={teacherJournalCSS.predm}>
+                            <div className={teacherJournalCSS.days}>
+                                <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur+" "+teacherJournalCSS.namd} id={teacherJournalCSS.nav_i}>
                                     <br/>
                                 </div>
-                                <div className={journalCSS.daysGrid}>
-                                    <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.nav_iBr} id={journalCSS.nav_i}>
+                                <div className={teacherJournalCSS.daysGrid}>
+                                    <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur+" "+teacherJournalCSS.nav_iBr} id={teacherJournalCSS.nav_i}>
                                         <br/>
                                     </div>
                                     {ele(0, "lMonth")}
                                     {getDays()}
-                                    <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur}>
-                                        <div className={journalCSS.nav_iText}>
+                                    <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur}>
+                                        <div className={teacherJournalCSS.nav_iText}>
                                             Средняя
                                         </div>
                                     </div>
                                     {jourInfo.pers && pers.map((param, i, x, per = jourInfo.pers[param]) =>
-                                        <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur}>
-                                            <div className={journalCSS.nav_iTextPer} data-s={per.length > 2 ? 1 : 0}>
+                                        <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur}>
+                                            <div className={teacherJournalCSS.nav_iTextPer} data-s={per.length > 2 ? 1 : 0}>
                                                 {per}
                                             </div>
                                         </div>
                                     )}
                                 </div>
                                 {kidsK && kidsK.map((param, i, x, kid = jourInfo.jur[param]) => <>
-                                    <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" nam " + journalCSS.nam} id={journalCSS.nav_i}>
+                                    <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur+" nam " + teacherJournalCSS.nam} id={teacherJournalCSS.nav_i}>
                                         {kid.name}
                                     </div>
-                                    <div className={journalCSS.predmGrid} id={param}>
-                                        <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.nav_iBr} id={journalCSS.nav_i}>
+                                    <div className={teacherJournalCSS.predmGrid} id={param}>
+                                        <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur+" "+teacherJournalCSS.nav_iBr} id={teacherJournalCSS.nav_i}>
                                             <br/>
                                         </div>
                                         {days.map((param1, i1, x1, marL = kid.days ? kid.days[param1] : undefined) => <>
-                                            {!marL && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur} id={journalCSS.nav_i} onClick={e=>chM(param, param1)}>
+                                            {!marL && <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur} id={teacherJournalCSS.nav_i} onClick={e=>chM(param, param1)}>
                                                 <br/>
                                             </div>}
-                                            {marL && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur} id={journalCSS.nav_i} onClick={e=>chM(param, param1)}>
+                                            {marL && <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur} id={teacherJournalCSS.nav_i} onClick={e=>chM(param, param1)}>
                                                 {marL.mark}
-                                                {marL.weight > 1 && <div className={journalCSS.nav_i+' '+journalCSS.nav_iJur+" "+journalCSS.nav_iWeight} id={journalCSS.nav_i}>
+                                                {marL.weight > 1 && <div className={teacherJournalCSS.nav_i+' '+teacherJournalCSS.nav_iJur+" "+teacherJournalCSS.nav_iWeight} id={teacherJournalCSS.nav_i}>
                                                     {marL.weight}
                                                 </div>}
                                             </div>}
                                         </>)}
-                                        <div className={journalCSS.nav_i + ' ' + journalCSS.nav_iJur + " " + journalCSS.nav_iTextM} style={{fontSize: "0.85vw"}}>
+                                        <div className={teacherJournalCSS.nav_i + ' ' + teacherJournalCSS.nav_iJur + " " + teacherJournalCSS.nav_iTextM} style={{fontSize: "0.85vw"}}>
                                             {kid.avg ? kid.avg.mark : <br/>}
                                         </div>
                                         {jourInfo.pers && pers.map(param1 =>
-                                            <div className={journalCSS.nav_i + ' ' + journalCSS.nav_iJur + " " + journalCSS.nav_iTextM} onClick={() => chM(param, undefined, param1)}>
+                                            <div className={teacherJournalCSS.nav_i + ' ' + teacherJournalCSS.nav_iJur + " " + teacherJournalCSS.nav_iTextM} onClick={() => chM(param, undefined, param1)}>
                                                 {kid.avg && kid.avg[param1] ? kid.avg[param1] : <br/>}
                                             </div>
                                         )}
@@ -670,32 +660,32 @@ export function Journal() {
                         </div>
                     </div>
                     {getBlockInstr(p3)}
-                    <div className={journalCSS.blockDom+" "+journalCSS.dom}>
-                        <div className={journalCSS.day}>
-                            <div className={journalCSS.nav_i+" "+journalCSS.nav_iJur} id={journalCSS.nav_i}>
+                    <div className={teacherJournalCSS.blockDom+" "+teacherJournalCSS.dom}>
+                        <div className={teacherJournalCSS.day}>
+                            <div className={teacherJournalCSS.nav_i+" "+teacherJournalCSS.nav_iJur} id={teacherJournalCSS.nav_i}>
                                 Дата
                             </div>
-                            <div className={journalCSS.nav_i+" "+journalCSS.nav_iJur} id={journalCSS.nav_i}>
+                            <div className={teacherJournalCSS.nav_i+" "+teacherJournalCSS.nav_iJur} id={teacherJournalCSS.nav_i}>
                                 Домашнее задание
                             </div>
                             {days && days.reverse().map((param, i, x, dM = param.split(",")[0]) => <>
-                                <div className={journalCSS.nav_i+" "+journalCSS.nav_iJur} id={journalCSS.nav_i}>
+                                <div className={teacherJournalCSS.nav_i+" "+teacherJournalCSS.nav_iJur} id={teacherJournalCSS.nav_i}>
                                     {dM}
                                 </div>
-                                <div className={journalCSS.nav_i+" "+journalCSS.nav_iJur} id={journalCSS.nav_i} data-st="0">
-                                    <pre className={journalCSS.field+" "+journalCSS.fi}>
+                                <div className={teacherJournalCSS.nav_i+" "+teacherJournalCSS.nav_iJur} id={teacherJournalCSS.nav_i} data-st="0">
+                                    <pre className={teacherJournalCSS.field+" "+teacherJournalCSS.fi}>
                                         {jourInfo.dz[param] || <br/>}
                                     </pre>
-                                    <textarea className={journalCSS.inp+" "+journalCSS.in+" "+journalCSS.inparea} id={"inpd_" + param} defaultValue={jourInfo.dz[param]} onChange={chStatM}/>
-                                    <img className={journalCSS.imginp+" yes "+journalCSS.in} src={yes} onClick={onFinM} title="Подтвердить изменения" alt=""/>
-                                    <img className={journalCSS.imginp+" "+journalCSS.in} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
-                                    <img className={journalCSS.imgfield+" "+journalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
+                                    <textarea className={teacherJournalCSS.inp+" "+teacherJournalCSS.in+" "+teacherJournalCSS.inparea} id={"inpd_" + param} defaultValue={jourInfo.dz[param]} onChange={chStatM}/>
+                                    <img className={teacherJournalCSS.imginp+" yes "+teacherJournalCSS.in} src={yes} onClick={onFinM} title="Подтвердить изменения" alt=""/>
+                                    <img className={teacherJournalCSS.imginp+" "+teacherJournalCSS.in} src={no} onClick={onClose} title="Отменить изменения и выйти из режима редактирования" alt=""/>
+                                    <img className={teacherJournalCSS.imgfield+" "+teacherJournalCSS.fi} src={ed} onClick={onEdit} title="Редактировать" alt=""/>
                                 </div>
                             </>)}
                         </div>
                     </div>
-                    <div className={journalCSS.blockInstrum+" "+journalCSS.dom}>
-                        <div className={journalCSS.nav_i} id={journalCSS.nav_i} onClick={e=>onClose(e, true)}>
+                    <div className={teacherJournalCSS.blockInstrum+" "+teacherJournalCSS.dom}>
+                        <div className={teacherJournalCSS.nav_i} id={teacherJournalCSS.nav_i} onClick={e=>onClose(e, true)}>
                             Вернуться к журналу
                         </div>
                     </div>
@@ -703,4 +693,4 @@ export function Journal() {
         }
     </div>
 }
-export default Journal;
+export default TeacherJournal;

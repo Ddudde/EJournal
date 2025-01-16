@@ -8,7 +8,7 @@ Natik Muradov <myratoff25@gmail.com>
 :toc: left
 :toclevels: 4
 :toc-title: Содержание
-:imagesdir: ./img
+:imagesdir: ./imgAsciiDoc
 
 ====
 Основное описание в AsciiDoc.

@@ -5,14 +5,13 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.epages.restdocs.apispec.SimpleType;
 import com.google.gson.JsonObject;
 import config.CustomUser;
-import org.junit.jupiter.api.BeforeAll;
+import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +23,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -32,17 +30,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
-import ru.data.models.school.School;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.School;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
-import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
-import utils.RandomUtils;
+import utils.TestUtils;
 
 import javax.servlet.ServletException;
 
@@ -55,18 +51,24 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.Main.datas;
-import static utils.RandomUtils.defaultDescription;
+import static utils.TestUtils.defaultDescription;
+import static utils.TestUtils.getSub;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({NewsControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NewsControllerTest {
+    private MockMvc mockMvc;
+    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
+    private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
+    private final TestUtils testUtils = new TestUtils();
+    private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
+    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    private MockedStatic theMock;
 
     @Autowired
     private DBService dbService;
-
-    @Autowired
-    private AuthController authController;
 
     @Autowired
     private NewsController newsController;
@@ -74,32 +76,28 @@ public class NewsControllerTest {
     @Captor
     private ArgumentCaptor<JsonObject> answer;
 
-    private MockMvc mockMvc;
-    private final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
-    private final RandomUtils randomUtils = new RandomUtils();
-    private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
-    private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
-
-    @BeforeAll
-    static void beforeAll() throws ServletException {
-        authInjector.afterPropertiesSet();
+    @AfterEach
+    void afterEach() {
+        theMock.close();
     }
-
+    
     @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
+    void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(SSEController.class);
+        authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(newsController)
             .setMessageConverters(converter)
             .setControllerAdvice(controllerExceptionHandler)
+            .setCustomArgumentResolvers(subscriberMethodArgumentResolver)
             .apply(documentationConfiguration(restDocumentation))
             .addFilters(authInjector).build();
     }
 
-    private Subscriber getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
-            .getAuthentication()).getSub();
-    }
-
-    private RestDocumentationResultHandler default_Docs(String summary, String methodName) {
+    /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
+     * @param summary Заголовок эндпоинта
+     * @param methodName Название теста
+     * @return Сниппет */
+    private RestDocumentationResultHandler defaultSwaggerDocs(String summary, String methodName) {
         ResourceSnippetParametersBuilder snip = ResourceSnippetParameters.builder()
             .summary(summary)
             .description(defaultDescription)
@@ -118,13 +116,16 @@ public class NewsControllerTest {
     void delNews_whenEmpty_Portal_AdminUser() throws Exception {
         when(dbService.newsById(any())).thenReturn(null);
         getSub().setLvlMore2("Por");
+
         mockMvc.perform(delete("/news/delNews/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
-            .andDo(default_Docs(delNews_Summary, "delNews_whenEmpty_Portal_AdminUser"));
-        verify(authController, times(0)).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenEmpty_Portal_AdminUser"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: завуч для школьных новостей
@@ -132,18 +133,20 @@ public class NewsControllerTest {
     @Test @Tag("delNews")
     @CustomUser(roles = Roles.HTEACHER)
     void delNews_whenGood_YO_HTeacher() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Yo");
+
         mockMvc.perform(delete("/news/delNews/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "id": 1
-        }
+            {
+                "id": 1
+            }
             """)).andExpect(status().isOk())
-            .andDo(default_Docs(delNews_Summary, "delNews_whenGood_YO_HTeacher"));
-        verify(authController).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_YO_HTeacher"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1}",
             answer.getValue().toString());
     }
@@ -153,18 +156,20 @@ public class NewsControllerTest {
     @Test @Tag("delNews")
     @CustomUser
     void delNews_whenGood_Portal_AdminUser() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Por");
+
         mockMvc.perform(delete("/news/delNews/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "id": 1
-        }
+            {
+                "id": 1
+            }
             """)).andExpect(status().isOk())
-            .andDo(default_Docs(delNews_Summary, "delNews_whenGood_Portal_AdminUser"));
-        verify(authController).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_Portal_AdminUser"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1}",
             answer.getValue().toString());
     }
@@ -177,13 +182,16 @@ public class NewsControllerTest {
     @CustomUser
     void chNews_whenEmpty_Portal_AdminUser() throws Exception {
         getSub().setLvlMore2("Por");
+
         mockMvc.perform(put("/news/chNews/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
-            .andDo(default_Docs(chNews_Summary, "chNews_whenEmpty_Portal_AdminUser"));
-        verify(authController, times(0)).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenEmpty_Portal_AdminUser"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(0));
     }
 
     /** RU: завуч для школьных новостей
@@ -191,21 +199,22 @@ public class NewsControllerTest {
     @Test @Tag("chNews")
     @CustomUser(roles = Roles.HTEACHER)
     void chNews_whenGood_YO_HTeacher() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Yo");
+
         mockMvc.perform(put("/news/chNews/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "id": 1,
-            "val": "А проект вышел большим...",
-            "type": "title"
-        }
-        """))
-            .andExpect(status().isOk())
-            .andDo(default_Docs(chNews_Summary, "chNews_whenGood_YO_HTeacher"));
-        verify(authController).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+            {
+                "id": 1,
+                "val": "А проект вышел большим...",
+                "type": "title"
+            }
+            """)).andExpect(status().isOk())
+            .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_YO_HTeacher"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
             answer.getValue().toString());
     }
@@ -215,20 +224,22 @@ public class NewsControllerTest {
     @Test @Tag("chNews")
     @CustomUser
     void chNews_whenGood_Portal_AdminUser() throws Exception {
-        when(dbService.newsById(1L)).thenReturn(randomUtils.newsTest.get(1));
+        when(dbService.newsById(1L)).thenReturn(testUtils.newsTest.get(1));
         getSub().setLvlMore2("Por");
+
         mockMvc.perform(put("/news/chNews/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-        {
-            "id": 1,
-            "val": "А проект вышел большим...",
-            "type": "title"
-        }
+            {
+                "id": 1,
+                "val": "А проект вышел большим...",
+                "type": "title"
+            }
             """)).andExpect(status().isOk())
-            .andDo(default_Docs(chNews_Summary, "chNews_whenGood_Portal_AdminUser"));
-        verify(authController).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_Portal_AdminUser"));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()));
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
             answer.getValue().toString());
     }
@@ -241,13 +252,16 @@ public class NewsControllerTest {
         when(dbService.getNewsRepository().saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         getSub().setLvlMore2(type);
+
         mockMvc.perform(post("/news/addNews" + type + "/")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454")
+                .header(SecurityConfig.authTokenHeader, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
             .andExpect(status)
-            .andDo(default_Docs(type.equals("YO") ? addNewsYO_Summary : addNewsPortal_Summary, methodName));
-        verify(authController, times(timesSSE)).sendEventFor(eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any());
+            .andDo(defaultSwaggerDocs(type.equals("YO") ? addNewsYO_Summary : addNewsPortal_Summary, methodName));
+
+        theMock.verify(() -> SSEController.sendEventFor(eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any()),
+            times(timesSSE));
     }
 
     /** RU: завуч для школьных новостей
@@ -257,6 +271,7 @@ public class NewsControllerTest {
     void addNewsYO_whenGood_HTeacher() throws Exception {
         User user = getSub().getUser();
         user.getSelecRole().setYO(mock(School.class));
+
         addNews_run("addNewsYO_whenGood_HTeacher", """
         {
             "title": "День рождения портала!",
@@ -265,7 +280,7 @@ public class NewsControllerTest {
         }
         """, "Yo", 1, status().isCreated());
         assertEquals("{\"body\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"img_url\":null,\"text\":\"Начались первые работы\"},\"id\":null}",
-                answer.getValue().toString());
+            answer.getValue().toString());
     }
 
     /** RU: завуч для школьных новостей
@@ -296,6 +311,7 @@ public class NewsControllerTest {
             "text": "Начались первые работы"
         }
         """, "Por", 1, status().isCreated());
+
         assertEquals("{\"body\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"img_url\":null,\"text\":\"Начались первые работы\"},\"id\":null}",
             answer.getValue().toString());
     }
@@ -320,7 +336,7 @@ public class NewsControllerTest {
     @CustomUser
     void getNews_whenEmpty_Portal_Admin() throws Exception {
         mockMvc.perform(get("/news/getNews/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{}"))
             .andDo(getNews_Docs("getNews_whenEmpty_Portal_Admin"));
@@ -334,9 +350,10 @@ public class NewsControllerTest {
         User user = getSub().getUser();
         user.getSelecRole().setYO(mock(School.class));
         when(user.getSelecRole().getYO().getNews())
-            .thenReturn(randomUtils.newsTest);
+            .thenReturn(testUtils.newsTest);
+
         mockMvc.perform(get("/news/getNews/{type}", "Yo")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
             .andDo(getNews_Docs("getNews_whenGood_YO_HTeacher"));
@@ -348,9 +365,10 @@ public class NewsControllerTest {
     @CustomUser
     void getNews_whenGood_Portal_AdminUser() throws Exception {
         when(datas.getDbService().getSyst().getNews())
-            .thenReturn(randomUtils.newsTest);
+            .thenReturn(testUtils.newsTest);
+
         mockMvc.perform(get("/news/getNews/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, "9693b2a1-77bb-4426-8045-9f9b4395d454"))
+                .header(SecurityConfig.authTokenHeader, bearerToken))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
             .andDo(getNews_Docs("getNews_whenGood_Portal_AdminUser"));
@@ -379,12 +397,7 @@ class NewsControllerConfig {
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public NewsController newsController(AuthController authController) {
-        return spy(new NewsController(authController));
+    public NewsController newsController() {
+        return spy(new NewsController());
     }
 }

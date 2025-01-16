@@ -7,15 +7,16 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.Syst;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.Syst;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -29,28 +30,19 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела управления/просмотра администраторов + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AdminsController">http://localhost:9001/swagger/htmlSwag/#/AdminsController</a>
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
  * </pre>
  * @see Subscriber */
 @RequestMapping("/admins")
 @RequiredArgsConstructor
 @RestController public class AdminsController {
 
-    private final AuthController authController;
-
     /** RU: удаляет у пользователя роль администратора + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody DataAdmins body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user1 = datas.getDbService().userById(body.id);
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /remPep");
         final Syst syst = datas.getDbService().getSyst();
@@ -65,17 +57,17 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(user1.getId());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            SSEController.sendEventFor("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
     /** RU: изменяет фамилию пользователя + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody DataAdmins body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user1 = datas.getDbService().userById(body.id);
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chPep");
         if (user1 == null) return ResponseEntity.notFound().build();
@@ -86,17 +78,17 @@ import static ru.Main.datas;
         wrtr.name("id").value(user1.getId())
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            SSEController.sendEventFor("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
     /** RU: создаёт пользователя-администратора + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('ADMIN')""")
     @PostMapping("/addPep")
-    public ResponseEntity<Void> addPep(@RequestBody DataAdmins body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addPep(@RequestBody DataAdmins body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final Syst syst = datas.getDbService().getSyst();
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addPep");
         if (syst == null) return ResponseEntity.notFound().build();
@@ -116,26 +108,26 @@ import static ru.Main.datas;
             .name("name").value(body.name)
             .endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
+            SSEController.sendEventFor("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
     /** RU: [start] отправляет список администраторов
      * @see DocsHelpController#point(Object, Object) Описание */
     @GetMapping("/getAdmins")
-    public ResponseEntity<JsonObject> getAdmins(CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> getAdmins(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         final Syst syst = datas.getDbService().getSyst();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getAdmins");
         if (syst == null) return ResponseEntity.notFound().build();
 
         datas.usersByList(syst.getAdmins(), true, wrtr);
         return datas.getObjR(ans -> {
-            final User user = auth.getSub().getUser();
+            final User user = sub.getUser();
             String role = "main";
             if (user.getRoles().containsKey(Roles.ADMIN)) {
                 role = "adm";
             }
-            authController.infCon(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
         }, wrtr, HttpStatus.OK, false);
     }
 

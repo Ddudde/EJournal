@@ -2,16 +2,17 @@ package ru.services.db;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.data.models.News;
-import ru.data.models.Syst;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.SettingUser;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.Period;
-import ru.data.models.school.Request;
-import ru.data.models.school.School;
+import ru.data.DAO.News;
+import ru.data.DAO.Syst;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.SettingUser;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.Period;
+import ru.data.DAO.school.Request;
+import ru.data.DAO.school.School;
 import ru.data.reps.ContactsRepository;
 import ru.data.reps.NewsRepository;
 import ru.data.reps.SystRepository;
@@ -24,14 +25,8 @@ import ru.security.user.Roles;
 import java.util.List;
 import java.util.Map;
 
-/** RU: сервис с различными геттерами к БД
- * <pre>
- * beenDo: Сделано
- *  + Javadoc
- *  + Переписка
- *  # Swagger
- *  # Тестирование
- * </pre> */
+/** RU: сервис с различными геттерами к БД */
+@Slf4j
 @Getter
 @AllArgsConstructor
 @Service public class DBService {
@@ -64,7 +59,7 @@ import java.util.Map;
 
     public SettingUser createSettingUser(SettingUser settingUser) {
         SettingUser savedSettingUser = settingUserRepository.saveAndFlush(settingUser);
-        System.out.println(savedSettingUser);
+        log.trace(savedSettingUser + "");
         return savedSettingUser;
     }
 
@@ -107,7 +102,7 @@ import java.util.Map;
 
     public Syst createSyst(Syst syst) {
         Syst savedSyst = systRepository.saveAndFlush(syst);
-        System.out.println(savedSyst);
+        log.trace(savedSyst + "");
         return savedSyst;
     }
 

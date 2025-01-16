@@ -4,8 +4,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.util.ObjectUtils;
+import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
-import ru.data.models.auth.User;
 import ru.security.user.CustomToken;
 
 import java.util.UUID;
@@ -13,8 +13,8 @@ import java.util.UUID;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static ru.Main.datas;
-import static utils.RandomUtils.getCloneUsers;
-import static utils.RandomUtils.usersTest;
+import static utils.TestUtils.getCloneUsers;
+import static utils.TestUtils.usersTest;
 
 /** RU: создаёт SecurityContext для SpringTest c @CustomUser
  * @see CustomUser */

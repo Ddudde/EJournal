@@ -1,5 +1,6 @@
 export let cPeriods = "periods/";
 export let cAuth = "auth/";
+export let cSSE = "sse/";
 export let cSettings = "settings/";
 export let cNews = "news/";
 export let cJournal = "journal/";

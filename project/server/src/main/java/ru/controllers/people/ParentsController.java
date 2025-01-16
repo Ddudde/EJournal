@@ -4,20 +4,22 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
-import ru.controllers.AuthController;
 import ru.controllers.DocsHelpController;
+import ru.controllers.SSEController;
+import ru.data.DAO.auth.Role;
+import ru.data.DAO.auth.User;
+import ru.data.DAO.school.Group;
+import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
-import ru.data.models.auth.Role;
-import ru.data.models.auth.User;
-import ru.data.models.school.Group;
-import ru.data.models.school.School;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -31,33 +33,23 @@ import static ru.Main.datas;
 /** RU: Контроллер для раздела управления/просмотра родителей группы учебного центра + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ParentsController">http://localhost:9001/swagger/htmlSwag/#/ParentsController</a>
- *
- * beenDo: Сделано
- *  + Javadoc
- *  + Security
- *  + Переписка
- *  + Переписка2
- *  + Тестирование
- *  + Swagger
- *
- * </pre>
+ </pre>
  * @see Subscriber */
+@Slf4j
 @RequestMapping("/parents")
 @RequiredArgsConstructor
 @RestController public class ParentsController {
 
-    private final AuthController authController;
-
     /** RU: удаляет роль родителя + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('HTEACHER')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataParents body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody DataParents body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user1 = datas.getDbService().userById(body.id);
         final JsonTreeWriter wrtr = datas.init("", "[DELETE] /remPep");
-        final Group group = datas.getDbService().groupById(Long.parseLong(auth.getSub().getLvlGr()));
+        final Group group = datas.getDbService().groupById(Long.parseLong(sub.getLvlGr()));
         if (group == null || user1 == null) {
             return ResponseEntity.notFound().build();
         }
@@ -68,7 +60,7 @@ import static ru.Main.datas;
 
         wrtr.name("id").value(user1.getId());
         return datas.getObjR(ans -> {
-            authController.sendEventFor("remPepC", ans, TypesConnect.PARENTS, auth.getSub().getLvlSch(), auth.getSub().getLvlGr(), "main", "main");
+            SSEController.sendEventFor("remPepC", ans, TypesConnect.PARENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -76,10 +68,10 @@ import static ru.Main.datas;
      * Не реализовано в клиенте
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('HTEACHER')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataParents body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody DataParents body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user1 = datas.getDbService().userById(body.id);
         final JsonTreeWriter wrtr = datas.init("", "[PATCH] /chPep");
         if (user1 == null) return ResponseEntity.notFound().build();
@@ -90,7 +82,7 @@ import static ru.Main.datas;
         wrtr.name("id").value(user1.getId())
             .name("name").value(body.name);
         return datas.getObjR(ans -> {
-            authController.sendEventFor("chPepC", ans, TypesConnect.PARENTS, auth.getSub().getLvlSch(), auth.getSub().getLvlGr(), "main", "main");
+            SSEController.sendEventFor("chPepC", ans, TypesConnect.PARENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
 
@@ -98,10 +90,10 @@ import static ru.Main.datas;
      * и сразу прикрепляет к существующему ребёнку без родителей + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addPar")
-    public ResponseEntity<Void> addPar(@RequestBody DataParents body, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> addPar(@RequestBody DataParents body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init("", "[POST] /addPar");
         final User kidU = datas.getDbService().userById(body.id);
         final JsonObject par = body.bod.getAsJsonObject("par");
@@ -109,7 +101,7 @@ import static ru.Main.datas;
         final Date dateAfter = Date.from(after);
         if (kidU == null) return ResponseEntity.notFound().build();
 
-        final School school = datas.getDbService().schoolById(Long.parseLong(auth.getSub().getLvlSch()));
+        final School school = datas.getDbService().schoolById(Long.parseLong(sub.getLvlSch()));
         wrtr.name("id").value(kidU.getId())
             .name("body").beginObject()
             .name("name").value(kidU.getFio())
@@ -136,16 +128,16 @@ import static ru.Main.datas;
         }
         wrtr.endObject().endObject();
         return datas.getObjR(ans -> {
-            authController.sendEventFor("addParC", ans, TypesConnect.PARENTS, auth.getSub().getLvlSch(), auth.getSub().getLvlGr(), "main", "main");
+            SSEController.sendEventFor("addParC", ans, TypesConnect.PARENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
     /** RU: отправляет список ребёнок-родители группы
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#auth.getSub().getUser() != null)")
+    @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @GetMapping("/getParents/{grId}")
-    public ResponseEntity<JsonObject> getParents(@PathVariable Long grId, CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getParents(@PathVariable Long grId, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getParents");
         final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
         if (!user.getRoles().containsKey(Roles.HTEACHER)) {
@@ -176,36 +168,36 @@ import static ru.Main.datas;
         datas.usersByList(group.getKids(), true, wrtr);
         wrtr.endObject();
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, null, school.getId() + "", group.getId() + "", null, null);
+            SSEController.changeSubscriber(auth.getUUID(), null, null, school.getId() + "", group.getId() + "", null, null);
         }, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: [start] запускает клиента в раздел Родители и подтверждает клиенту права
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and !hasAuthority('ADMIN')""")
     @GetMapping("/getInfo")
-    public ResponseEntity<Void> getInfo(CustomToken auth) throws Exception {
-        System.out.println("[GET] /getInfo");
-        authController.infCon(auth.getUUID(), null, TypesConnect.PARENTS, "main", "main", "main", "main");
+    public ResponseEntity<Void> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        log.info("[GET] /getInfo");
+        SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PARENTS, "main", "main", "main", "main");
         return ResponseEntity.ok().build();
     }
 
     /** RU: [start] отправляет список групп учебного центра и подтверждает клиенту права
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#auth.getSub().getUser() != null)
+        @code401.check(#sub.getUser() != null)
         and hasAuthority('HTEACHER')""")
     @GetMapping("/getInfoFH")
-    public ResponseEntity<JsonObject> getInfoForHTeacher(CustomToken auth) throws Exception {
-        final User user = auth.getSub().getUser();
+    public ResponseEntity<JsonObject> getInfoForHTeacher(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+        final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
         wrtr.name("bodyG").beginObject();
         final Long firstG = datas.groupsBySchoolOfUser(user, wrtr);
         wrtr.name("firstG").value(firstG);
         return datas.getObjR(ans -> {
-            authController.infCon(auth.getUUID(), null, TypesConnect.PARENTS, "main", "main", "ht", "main");
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PARENTS, "main", "main", "ht", "main");
         }, wrtr, HttpStatus.OK, false);
     }
 
