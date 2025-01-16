@@ -444,8 +444,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="details">
 <span id="author" class="author">Natik Muradov</span><br>
 <span id="email" class="email"><a href="mailto:myratoff25@gmail.com">myratoff25@gmail.com</a></span><br>
-<span id="revnumber">version v0.1,</span>
-<span id="revdate">08.12.2024</span>
+<span id="revnumber">version v0.2,</span>
+<span id="revdate">16.01.2025</span>
 <br><span id="revremark">Основное описание</span>
 </div>
 <div id="toc" class="toc2">
@@ -461,6 +461,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_http-статус-коды">5.2. HTTP статус коды</a></li>
 </ul>
 </li>
+<li><a href="#_логгирование">6. Логгирование</a></li>
+<li><a href="#_логическая-схема-базы-данных">7. Логическая схема базы данных</a></li>
+<li><a href="#_физическая-схема-базы-данных">8. Физическая схема базы данных</a></li>
 </ul>
 </div>
 </div>
@@ -765,11 +768,60 @@ beenDo - что уже сделано</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_логгирование">6. Логгирование</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Логи сохраняются в папку: \project\server\logs.<br>
+Slf4j + logback-spring</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_логическая-схема-базы-данных">7. Логическая схема базы данных</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Нотация IDEF1X. Создавалась в Draw.io и исходник не сохранился.<br>
+Возможно немного устаревшая, но существует:)</p>
+</div>
+<div id="img-logicModel" class="imageblock">
+<div class="content">
+<img src="./imgAsciiDoc/logicModel.jpg" alt="logicModel">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_физическая-схема-базы-данных">8. Физическая схема базы данных</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Создавалась в Intellij Idea UE 2023.X<br>
+Возможно немного устаревшая, но существует:)</p>
+</div>
+<div id="img-physicalModel" class="imageblock">
+<div class="content">
+<img src="./imgAsciiDoc/physicalModel.png" alt="physicalModel">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version v0.1<br>
-Last updated 2024-12-28 00:09:27 +0300
+Version v0.2<br>
+Last updated 2025-01-16 23:05:03 +0300
 </div>
 </div>
 </body>
