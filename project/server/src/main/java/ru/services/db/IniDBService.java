@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.Main;
@@ -34,52 +35,34 @@ import static java.util.Arrays.asList;
 @Getter @Setter
 @RequiredArgsConstructor
 @Service public class IniDBService {
-
     private final List<SettingUser> setts = new ArrayList<>();
-
     private List<News> newsList = new ArrayList<>();
-
     private List<Contacts> contactsList = new ArrayList<>();
-
     private final List<Period> periods = new ArrayList<>();
-
     private final List<Group> groups = new ArrayList<>();
-
     private final List<School> schools = new ArrayList<>();
-
     private final List<Lesson> lessons = new ArrayList<>();
-
     private final List<Role> roles = new ArrayList<>();
-
     private List<User> users = new ArrayList<>();
-
     private Request request;
-
     private Syst syst;
-
     private final List<Mark> marks = new ArrayList<>();
-
     private final List<Day> days = new ArrayList<>();
-
     private final Faker fakerRu = new Faker(new Locale("ru"));
-
     private final Faker fakerEn = new Faker();
-
     private final String[] namesSch = {"Гимназия №", "Школа №", "Лицей №"};
-
     private final String[] namesGrp = {"А", "Б", "В", "Г", "Д"};
-
     private final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
+    private final MainService datas;
+    private final PasswordEncoder passwordEncoder;
 
     /** RU: дата: +30 дней от актуальной */
     private Date dateAfter;
 
-    private final MainService datas;
-
     private void postConstruct() {
-        SettingUser setts = datas.getDbService().getSettingUserRepository().saveAndFlush(new SettingUser(1));
-        Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role("ex@ya.ru"));
-        User user = datas.getDbService().getUserRepository().saveAndFlush(new User("nm12", "1111",
+        final SettingUser setts = datas.getDbService().getSettingUserRepository().saveAndFlush(new SettingUser(1));
+        final Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role("ex@ya.ru"));
+        final User user = datas.getDbService().getUserRepository().saveAndFlush(new User("nm12", passwordEncoder.encode("1111"),
             "Петров В.В.", Map.of(
             Roles.ADMIN, role
         ), Roles.ADMIN, setts));
@@ -137,20 +120,22 @@ import static java.util.Arrays.asList;
      * @param roleN Роль пользователя
      * @param selRole Выбранная роль пользователя */
     private User getNUser(Role roleN, Roles selRole) {
-        SettingUser settingUser = datas.getDbService().getSettingUserRepository()
+        final SettingUser settingUser = datas.getDbService().getSettingUserRepository()
             .saveAndFlush(new SettingUser((int) (Math.round(Math.random() * 2) + 1)));
         setts.add(settingUser);
-        Role role = datas.getDbService().getRoleRepository().saveAndFlush(roleN);
+        final Role role = datas.getDbService().getRoleRepository().saveAndFlush(roleN);
         roles.add(role);
-        String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
+        final String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
         if(fakerEn.bool().bool()) {
-            String uuid = UUID.randomUUID().toString();
+            final String uuid = UUID.randomUUID().toString();
             return datas.getDbService().getUserRepository().saveAndFlush(new User(fio, Map.of(
                 selRole, role
             ), selRole, Main.df.format(dateAfter), uuid));
         } else {
+            final String login = MainService.getRandomUsername(fakerEn);
+            final String password = passwordEncoder.encode(fakerEn.internet().password());
             return datas.getDbService().getUserRepository()
-                .saveAndFlush(new User(MainService.getRandomUsername(fakerEn), fakerEn.internet().password(),
+                .saveAndFlush(new User(login, password,
                     fio, Map.of(
                     selRole, role
                 ), selRole, settingUser));

@@ -2,7 +2,6 @@ package ru.controllers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
@@ -22,6 +22,7 @@ import ru.data.SSE.TypesConnect;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -37,8 +38,9 @@ import static ru.Main.datas;
  * @see Subscriber */
 @Slf4j
 @RequestMapping("/auth")
-@NoArgsConstructor
+@RequiredArgsConstructor
 @RestController public class AuthController {
+    private final PasswordEncoder passwordEncoder;
 
     /** RU: [start] изменение подписки
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -136,41 +138,45 @@ import static ru.Main.datas;
         final User user = datas.getDbService().userByLogin(body.login),
             user1 = datas.getDbService().userByCode(body.code);
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /reg");
-        HttpStatus stat = HttpStatus.NOT_FOUND;
-        if(user1 == null){
-            wrtr.name("error").value("noInv");
-            stat = HttpStatus.ACCEPTED;
-        } else if(user == null) {
-            if(Objects.equals(body.mod, "inv")) {
-                if(user1.getSettings() == null) {
-                    user1.setSettings(datas.getDbService().createSettingUser(new SettingUser(body.ico)));
-                }
-                user1.setSelRole(datas.getDbService().getFirstRoleId(user1.getRoles()));
-                if(user1.getRoles().containsKey(Roles.PARENT) && !ObjectUtils.isEmpty(user1.getRoles().get(Roles.PARENT).getKids())) {
-                    user1.setSelKid(user1.getRoles().get(Roles.PARENT).getKids().get(0).getId());
-                }
-            } else if(Objects.equals(body.mod, "rea")){
-                user1.setCode(null);
-                user1.setExpDate(null);
-            }
-            user1.setUsername(body.login);
-            user1.setPassword(body.par);
-            user1.getSettings().setIco(body.ico);
-            datas.getDbService().getUserRepository().saveAndFlush(user1);
-            if(user1.getSettings() != null) {
-                final School school = datas.getDbService().getFirstRole(user1.getRoles()).getYO();
-                if (school != null) {
-                    datas.getPushService().addTopic(user1.getSettings(), school.getId() + "News");
-                }
-                datas.getPushService().addTopic(user1.getSettings(), "news");
-                datas.getDbService().getSettingUserRepository().saveAndFlush(user1.getSettings());
-                if(!ObjectUtils.isEmpty(body.secFr)) {
-                    user1.getSettings().setSecFr(body.secFr);
-                }
-            }
-            stat = HttpStatus.CREATED;
-        }
+        final HttpStatus stat = createUser(wrtr, user, user1, body);
         return datas.getObjR(ans -> {}, wrtr, stat, false);
+    }
+
+    private HttpStatus createUser(JsonTreeWriter wrtr, User user, User user1, DataAuth body) throws IOException {
+        if(user1 == null) {
+            wrtr.name("error").value("noInv");
+            return HttpStatus.ACCEPTED;
+        }
+        if(user != null) return HttpStatus.NOT_FOUND;
+
+        if(Objects.equals(body.mod, "inv")) {
+            if(user1.getSettings() == null) {
+                user1.setSettings(datas.getDbService().createSettingUser(new SettingUser(body.ico)));
+            }
+            user1.setSelRole(datas.getDbService().getFirstRoleId(user1.getRoles()));
+            if(user1.getRoles().containsKey(Roles.PARENT) && !ObjectUtils.isEmpty(user1.getRoles().get(Roles.PARENT).getKids())) {
+                user1.setSelKid(user1.getRoles().get(Roles.PARENT).getKids().get(0).getId());
+            }
+        } else if(Objects.equals(body.mod, "rea")){
+            user1.setCode(null);
+            user1.setExpDate(null);
+        }
+        user1.setUsername(body.login);
+        user1.setPassword(passwordEncoder.encode(body.par));
+        user1.getSettings().setIco(body.ico);
+        datas.getDbService().getUserRepository().saveAndFlush(user1);
+        if(user1.getSettings() != null) {
+            final School school = datas.getDbService().getFirstRole(user1.getRoles()).getYO();
+            if (school != null) {
+                datas.getPushService().addTopic(user1.getSettings(), school.getId() + "News");
+            }
+            datas.getPushService().addTopic(user1.getSettings(), "news");
+            datas.getDbService().getSettingUserRepository().saveAndFlush(user1.getSettings());
+            if(!ObjectUtils.isEmpty(body.secFr)) {
+                user1.getSettings().setSecFr(body.secFr);
+            }
+        }
+        return HttpStatus.CREATED;
     }
 
     /** RU: проверка инвайта для регистрации/регистрации новой роли

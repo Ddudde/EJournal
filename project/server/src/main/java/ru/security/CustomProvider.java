@@ -1,5 +1,6 @@
 package ru.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -11,6 +12,7 @@ import ru.security.user.CustomToken;
 import java.util.Collection;
 import java.util.Set;
 
+@Slf4j
 @Component
 public class CustomProvider implements AuthenticationProvider {
 
@@ -22,7 +24,7 @@ public class CustomProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         if(authentication.isAuthenticated()) {
-            System.out.println("authenticate! " + authentication);
+            log.debug("authenticate! " + authentication);
             return authentication;
         }
 

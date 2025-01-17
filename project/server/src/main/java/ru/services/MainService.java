@@ -237,7 +237,7 @@ import static ru.Main.datas;
      * @exception Exception Исключение вызывается при ошибках с Json
      * @see SettingsController#getSettings(Subscriber)  Пример использования */
     public JsonTreeWriter init(String data, String type) throws Exception {
-        log.debug(type + "! " + data);
+        log.info(type + "! " + data);
         JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();
         return wrtr;
