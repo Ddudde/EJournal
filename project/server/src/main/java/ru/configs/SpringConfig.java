@@ -2,6 +2,7 @@ package ru.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.services.EmailService;
 import ru.services.MainService;
 import ru.services.PushService;
@@ -18,7 +19,7 @@ public class SpringConfig {
     }
 
     @Bean(initMethod = "postConstruct")
-    public IniDBService iniDBService(MainService mainService) {
-        return new IniDBService(mainService);
+    public IniDBService iniDBService(MainService mainService, PasswordEncoder passwordEncoder) {
+        return new IniDBService(mainService, passwordEncoder);
     }
 }

@@ -25,6 +25,8 @@ import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -388,12 +390,17 @@ class AuthControllerConfig {
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(8);
+    }
+
+    @Bean
     public IniDBService iniDBService(MainService mainService) {
         return mock(IniDBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Bean
-    public AuthController authController() {
-        return spy(new AuthController());
+    public AuthController authController(PasswordEncoder passwordEncoder) {
+        return spy(new AuthController(passwordEncoder));
     }
 }

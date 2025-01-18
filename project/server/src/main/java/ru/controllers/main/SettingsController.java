@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.Main;
@@ -33,6 +34,7 @@ import static ru.Main.datas;
 @RequestMapping("/settings")
 @RequiredArgsConstructor
 @RestController public class SettingsController {
+    private final PasswordEncoder passwordEncoder;
 
     /** RU: подтверждение емэйла
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -88,7 +90,8 @@ import static ru.Main.datas;
     @PostMapping("/remNotifToken")
     public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        log.info("[POST] /remNotifToken ! " + body.toString());        if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
+        log.info("[POST] /remNotifToken ! " + body.toString());
+        if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
         datas.getPushService().remToken(settingUser, body.notifToken);
@@ -151,7 +154,7 @@ import static ru.Main.datas;
         user.getSettings().setEmailCode(null);
         user.getSettings().setExpDateEC(null);
         datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
-        user.setPassword(body.nPar);
+        user.setPassword(passwordEncoder.encode(body.nPar));
         datas.getDbService().getUserRepository().saveAndFlush(user);
         return ResponseEntity.ok().build();
     }
@@ -180,7 +183,7 @@ import static ru.Main.datas;
                 settingUser.setExpDateEC(Main.df.format(dateAfter));
                 datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
             } else {
-                user.setPassword(body.nPar);
+                user.setPassword(passwordEncoder.encode(body.nPar));
                 datas.getDbService().getUserRepository().saveAndFlush(user);
             }
             stat = HttpStatus.OK;

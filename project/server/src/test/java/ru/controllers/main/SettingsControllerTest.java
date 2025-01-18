@@ -21,6 +21,8 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -72,6 +74,9 @@ public class SettingsControllerTest {
 
     @Autowired
     private PushService pushService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private SettingsController settingsController;
@@ -173,6 +178,7 @@ public class SettingsControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(startEmail_Summary, "startEmail_whenGood_AdminUser"));
+
         verify(emailService, times(1)).sendRegCode(eq("test@mail.com"), any());
     }
 
@@ -207,6 +213,7 @@ public class SettingsControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(remNotifToken_Summary, "remNotifToken_whenGood_AdminUser"));
+
         verify(pushService, times(1)).remToken(any(), eq("testtoken"));
     }
 
@@ -243,6 +250,7 @@ public class SettingsControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(addNotifToken_Summary, "addNotifToken_whenGood_AdminUser"));
+
         verify(pushService, times(1)).addToken(any(), eq("testtoken"));
     }
 
@@ -309,6 +317,7 @@ public class SettingsControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(checkPasCodeEmail_Summary, "checkPasCodeEmail_whenWrongCode_AdminUser"));
+
         verify(user, times(0)).setPassword(eq("1234"));
     }
 
@@ -335,7 +344,8 @@ public class SettingsControllerTest {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(checkPasCodeEmail_Summary, "checkPasCodeEmail_whenGood_AdminUser"));
-        verify(user, times(1)).setPassword(eq("1234"));
+
+        verify(passwordEncoder, times(1)).encode(eq("1234"));
     }
 
     private final String chPass_Summary = "Изменяет пароль пользователя при помощи емэйла/секретной фразы";
@@ -389,7 +399,8 @@ public class SettingsControllerTest {
             """)).andExpect(statusCode)
             .andExpect(content().string("{}"))
             .andDo(defaultSwaggerDocs(chPass_Summary, "chPass_whenGood_secFr_AdminUser"));
-        verify(user, times(1)).setPassword(eq("passs"));
+
+        verify(passwordEncoder, times(1)).encode(eq("passs"));
     }
 
     /** RU: админ
@@ -480,12 +491,17 @@ class SettingsControllerConfig {
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return spy(new BCryptPasswordEncoder(8));
+    }
+
+    @Bean
     public IniDBService iniDBService() {
         return mock(IniDBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Bean
-    public SettingsController settingsController() {
-        return spy(new SettingsController());
+    public SettingsController settingsController(PasswordEncoder passwordEncoder) {
+        return spy(new SettingsController(passwordEncoder));
     }
 }

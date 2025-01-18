@@ -7,6 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.configs.SecurityConfig;
@@ -30,17 +31,19 @@ import static ru.Main.datas;
 @Slf4j
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private final String basicScheme = "Basic ";
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthenticationFilter(RequestMatcher req, AuthenticationManager authenticationManager) {
+    public AuthenticationFilter(RequestMatcher req, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
         super(req, authenticationManager);
+        this.passwordEncoder = passwordEncoder;
         log.trace("AuthenticationFilter " + getAuthenticationManager());
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        UUID token = getTokenFromHeader(request);
-        User user = getUserFromHeader(request);
-        CustomToken requestAuthentication = setToken(token, user);
+        final UUID token = getTokenFromHeader(request);
+        final User user = getUserFromHeader(request);
+        final CustomToken requestAuthentication = setToken(token, user);
         requestAuthentication.setDetails(this.authenticationDetailsSource.buildDetails(request));
         return getAuthenticationManager().authenticate(requestAuthentication);
     }
@@ -52,7 +55,7 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
     private CustomToken setToken(UUID token, User basic) {
         if(!datas.subscriptions.containsKey(token)) return new CustomToken();
 
-        Subscriber sub = datas.subscriptions.get(token);
+        final Subscriber sub = datas.subscriptions.get(token);
         if(basic != null) {
             sub.setLogin(basic.getUsername());
             sub.setType(null);
@@ -67,7 +70,7 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 
     /** RU: получает информацию для авторизации токенами */
     private UUID getTokenFromHeader(HttpServletRequest request) {
-        String tok = request.getHeader(SecurityConfig.authTokenHeader);
+        final String tok = request.getHeader(SecurityConfig.authTokenHeader);
         log.debug("attemptAuthentication " + tok);
         return Optional.ofNullable(tok)
             .map(UUID::fromString)
@@ -83,12 +86,14 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
         if (!header.startsWith(basicScheme) || header.length() < 7) {
             return null;
         }
-        String token = decodeFromBase64(header);
+        final String token = decodeFromBase64(header);
         int delim = token.indexOf(":");
         if (delim == -1) return null;
 
-        User user = datas.getDbService().userByLogin(token.substring(0, delim));
-        if(user == null || !user.getPassword().equals(token.substring(delim + 1))) {
+        final String login = token.substring(0, delim);
+        final String password = token.substring(delim + 1);
+        final User user = datas.getDbService().userByLogin(login);
+        if(user == null || !passwordEncoder.matches(password, user.getPassword())) {
             return null;
         }
         return user;

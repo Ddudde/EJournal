@@ -114,7 +114,7 @@ function sendToServerApp(bod, typeC, url, auth) {
         headers: {'Content-Type': 'application/json'}
     };
     if(auth) {
-        sed.headers["Authorization"] = "Basic " + btoa(auth);
+        sed.headers["Authorization"] = "Basic " + window.btoa(auth);
     }
     if(localStorage.getItem("sec")) {
         sed.headers["x-access-token"] = localStorage.getItem("sec");
