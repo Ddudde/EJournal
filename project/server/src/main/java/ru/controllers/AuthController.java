@@ -142,38 +142,38 @@ import static ru.Main.datas;
         return datas.getObjR(ans -> {}, wrtr, stat, false);
     }
 
-    private HttpStatus createUser(JsonTreeWriter wrtr, User user, User user1, DataAuth body) throws IOException {
-        if(user1 == null) {
+    private HttpStatus createUser(JsonTreeWriter wrtr, User existLogin, User invitedUser, DataAuth body) throws IOException {
+        if(invitedUser == null) {
             wrtr.name("error").value("noInv");
             return HttpStatus.ACCEPTED;
         }
-        if(user != null) return HttpStatus.NOT_FOUND;
+        if(existLogin != null) return HttpStatus.NOT_FOUND;
 
         if(Objects.equals(body.mod, "inv")) {
-            if(user1.getSettings() == null) {
-                user1.setSettings(datas.getDbService().createSettingUser(new SettingUser(body.ico)));
+            if(invitedUser.getSettings() == null) {
+                invitedUser.setSettings(datas.getDbService().createSettingUser(new SettingUser(body.ico)));
             }
-            user1.setSelRole(datas.getDbService().getFirstRoleId(user1.getRoles()));
-            if(user1.getRoles().containsKey(Roles.PARENT) && !ObjectUtils.isEmpty(user1.getRoles().get(Roles.PARENT).getKids())) {
-                user1.setSelKid(user1.getRoles().get(Roles.PARENT).getKids().get(0).getId());
+            invitedUser.setSelRole(datas.getDbService().getFirstRoleId(invitedUser.getRoles()));
+            if(invitedUser.getRoles().containsKey(Roles.PARENT) && !ObjectUtils.isEmpty(invitedUser.getRoles().get(Roles.PARENT).getKids())) {
+                invitedUser.setSelKid(invitedUser.getRoles().get(Roles.PARENT).getKids().get(0).getId());
             }
         } else if(Objects.equals(body.mod, "rea")){
-            user1.setCode(null);
-            user1.setExpDate(null);
+            invitedUser.setCode(null);
+            invitedUser.setExpDate(null);
         }
-        user1.setUsername(body.login);
-        user1.setPassword(passwordEncoder.encode(body.par));
-        user1.getSettings().setIco(body.ico);
-        datas.getDbService().getUserRepository().saveAndFlush(user1);
-        if(user1.getSettings() != null) {
-            final School school = datas.getDbService().getFirstRole(user1.getRoles()).getYO();
+        invitedUser.setUsername(body.login);
+        invitedUser.setPassword(passwordEncoder.encode(body.par));
+        invitedUser.getSettings().setIco(body.ico);
+        datas.getDbService().getUserRepository().saveAndFlush(invitedUser);
+        if(invitedUser.getSettings() != null) {
+            final School school = datas.getDbService().getFirstRole(invitedUser.getRoles()).getYO();
             if (school != null) {
-                datas.getPushService().addTopic(user1.getSettings(), school.getId() + "News");
+                datas.getPushService().addTopic(invitedUser.getSettings(), school.getId() + "News");
             }
-            datas.getPushService().addTopic(user1.getSettings(), "news");
-            datas.getDbService().getSettingUserRepository().saveAndFlush(user1.getSettings());
+            datas.getPushService().addTopic(invitedUser.getSettings(), "news");
+            datas.getDbService().getSettingUserRepository().saveAndFlush(invitedUser.getSettings());
             if(!ObjectUtils.isEmpty(body.secFr)) {
-                user1.getSettings().setSecFr(body.secFr);
+                invitedUser.getSettings().setSecFr(body.secFr);
             }
         }
         return HttpStatus.CREATED;
