@@ -119,7 +119,7 @@ import static java.util.Arrays.asList;
      * настройки, роль
      * @param roleN Роль пользователя
      * @param selRole Выбранная роль пользователя */
-    private User getNUser(Role roleN, Roles selRole) {
+    private User getNUser(Role roleN, Roles selRole, String testPassword) {
         final SettingUser settingUser = datas.getDbService().getSettingUserRepository()
             .saveAndFlush(new SettingUser((int) (Math.round(Math.random() * 2) + 1)));
         setts.add(settingUser);
@@ -128,37 +128,42 @@ import static java.util.Arrays.asList;
         final String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
         if(fakerEn.bool().bool()) {
             final String uuid = UUID.randomUUID().toString();
-            return datas.getDbService().getUserRepository().saveAndFlush(new User(fio, Map.of(
+            final User user = datas.getDbService().getUserRepository().saveAndFlush(new User(fio, Map.of(
                 selRole, role
             ), selRole, Main.df.format(dateAfter), uuid));
+            users.add(user);
+            return user;
         } else {
             final String login = MainService.getRandomUsername(fakerEn);
-            final String password = passwordEncoder.encode(fakerEn.internet().password());
-            return datas.getDbService().getUserRepository()
+            final String password = passwordEncoder.encode(testPassword);
+            final User user = datas.getDbService().getUserRepository()
                 .saveAndFlush(new User(login, password,
                     fio, Map.of(
                     selRole, role
                 ), selRole, settingUser));
+            users.add(user);
+            return user;
         }
     }
 
     /** RU: создаёт данные системы:
-     * Новости, контакты, админы-пользователи */
-    private void getRandSystem() {
-        Instant after = Instant.now().plus(Duration.ofDays(30));
+     * Новости, контакты, админы-пользователи и пароль для тестовых аккаунтов */
+    private void getRandSystem(String testPassword) {
+        final Instant after = Instant.now().plus(Duration.ofDays(30));
         dateAfter = Date.from(after);
         newsList = datas.getDbService().getNewsRepository().saveAllAndFlush(asList(
             new News("День рождения портала!","25.04.2022", "Начались первые работы"),
             new News("А проект вышел большим...","02.12.2022", "/static/media/tuman.jpg", "Да-да, всё ещё не конец...")
         ));
 
-        contactsList = datas.getDbService().getContactsRepository().saveAllAndFlush(asList(
-            new Contacts(
-                "8 (800) 555 35 37\n5 (353) 555 00 88",
+        contactsList = datas.getDbService().getContactsRepository()
+            .saveAllAndFlush(asList(new Contacts("8 (800) 555 35 37\n5 (353) 555 00 88",
                 "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
                 "/static/media/map.jpg")
         ));
-        syst = datas.getDbService().createSyst(new Syst(newsList, contactsList.get(0)));
+        final Syst systM = new Syst(newsList, contactsList.get(0));
+        systM.setTestPassword(testPassword);
+        syst = datas.getDbService().createSyst(systM);
         log.trace(getSyst() + "");
 
         users.clear();
@@ -167,8 +172,8 @@ import static java.util.Arrays.asList;
 
         int max = (int) Math.round(Math.random() * 3) + 2, i;
         for(i = 0; i < max; i++) {
-            User user = getNUser(new Role(fakerEn.internet().emailAddress()), Roles.ADMIN);
-            users.add(user);
+            final Role role = new Role(fakerEn.internet().emailAddress());
+            final User user = getNUser(role, Roles.ADMIN, testPassword);
             syst.getAdmins().add(user);
         }
         syst = datas.getDbService().getSystRepository().saveAndFlush(syst);
@@ -204,14 +209,15 @@ import static java.util.Arrays.asList;
 
     /** RU: создаёт данные групп и относящиеся к ним данные:
      * учеников, родителей, группа, расписание */
-    private List<Group> getRandGroups(School school, List<User> tea) {
-        List<Group> groupsPerSch = new ArrayList<>();
-        int max = (int) Math.round(Math.random() * 3) + 2, i, max1, i1,
+    private List<Group> getRandGroups(School school, List<User> tea, String testPassword) {
+        final List<Group> groupsPerSch = new ArrayList<>();
+        final int countOfGroups = (int) Math.round(Math.random() * 3) + 2;
+        int i, i1,
             grI = 1,
             namI = 0,
             maxGrI = (int) Math.round(Math.random() * 3) + 1;
-        for(i = 0; i < max; i++) {
-            String nameGrp = grI + namesGrp[namI];
+        for(i = 0; i < countOfGroups; i++) {
+            final String nameGrp = grI + namesGrp[namI];
             if(maxGrI == 0) {
                 grI++;
                 namI = 0;
@@ -222,24 +228,27 @@ import static java.util.Arrays.asList;
             }
             Group group = datas.getDbService().getGroupRepository().saveAndFlush(new Group(nameGrp));
 
-            max1 = (int) Math.round(Math.random() * 3) + 2;
-            for(i1 = 0; i1 < max1; i1++) {
-                User userP = getNUser(new Role(fakerEn.internet().emailAddress(), school), Roles.PARENT);
+            final int countOfIterationsCreatePeople = (int) Math.round(Math.random() * 3) + 2;
+            for(i1 = 0; i1 < countOfIterationsCreatePeople; i1++) {
+                Role roleP = new Role(fakerEn.internet().emailAddress(), school);
+                final User userP = getNUser(roleP, Roles.PARENT, testPassword);
 
-                User userK1 = getNUser(new Role(fakerEn.internet().emailAddress(), school, group), Roles.KID);
-                userK1.getRole(Roles.KID).getParents().add(userP);
+                final Role roleK1 = new Role(fakerEn.internet().emailAddress(), school, group);
+                roleK1.getParents().add(userP);
+                final User userK1 = getNUser(roleK1, Roles.KID, testPassword);
 
-                User userK2 = getNUser(new Role(fakerEn.internet().emailAddress(), school, group), Roles.KID);
-                userK2.getRole(Roles.KID).getParents().add(userP);
+                final Role roleK2 = new Role(fakerEn.internet().emailAddress(), school, group);
+                roleK2.getParents().add(userP);
+                final User userK2 = getNUser(roleK2, Roles.KID, testPassword);
 
                 group.getKids().add(userK1);
                 group.getKids().add(userK2);
-                userP.getRole(Roles.PARENT).getKids().add(userK1);
-                userP.getRole(Roles.PARENT).getKids().add(userK2);
+                roleP = userP.getRole(Roles.PARENT);
+                roleP.getKids().add(userK1);
+                roleP.getKids().add(userK2);
+                datas.getDbService().getRoleRepository().saveAndFlush(roleP);
                 userP.setSelKid(userK1.getId());
-                users.add(datas.getDbService().getUserRepository().saveAndFlush(userP));
-                users.add(datas.getDbService().getUserRepository().saveAndFlush(userK1));
-                users.add(datas.getDbService().getUserRepository().saveAndFlush(userK2));
+                datas.getDbService().getUserRepository().saveAndFlush(userP);
             }
 
             group = datas.getDbService().getGroupRepository().saveAndFlush(group);
@@ -253,7 +262,7 @@ import static java.util.Arrays.asList;
     /** RU: создаёт данные школ и относящиеся к ним данные:
      * школа, новости, контакты, периоды обучения, групп
      * пользователей: завучей, учителей, учеников, родителей*/
-    private void getRandSchools() {
+    private void getRandSchools(String testPassword) {
         groups.clear();
         schools.clear();
         periods.clear();
@@ -262,19 +271,19 @@ import static java.util.Arrays.asList;
         int max = (int) Math.round(Math.random() * 3) + 2, i, max1, i1;
         School school = null;
         for(i = 0; i < max; i++) {
-            String nameSch = namesSch[(int) Math.round(Math.random() * 2)] + (Math.round(Math.random() * 5000) + 1);
-            News news = datas.getDbService().getNewsRepository()
+            final String nameSch = namesSch[(int) Math.round(Math.random() * 2)] + (Math.round(Math.random() * 5000) + 1);
+            final News news = datas.getDbService().getNewsRepository()
                 .saveAndFlush(new News("Мы(" + nameSch + ") перешли на этот сервис","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
             newsList.add(news);
 
-            Contacts contacts = datas.getDbService().getContactsRepository()
+            final Contacts contacts = datas.getDbService().getContactsRepository()
                 .saveAndFlush(new Contacts(
                     "8 (800) 555 35 36\n5 (353) 555 00 88",
                     nameSch + "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
                     "/static/media/map.jpg"));
             contactsList.add(contacts);
 
-            List<Period> periodsPerSch = datas.getDbService().getPeriodRepository()
+            final List<Period> periodsPerSch = datas.getDbService().getPeriodRepository()
                 .saveAllAndFlush(asList(
                     new Period("I четверть", "01.09.23", "03.11.23"),
                     new Period("II четверть", "12.11.23", "29.12.23"),
@@ -289,8 +298,8 @@ import static java.util.Arrays.asList;
             User user = null, userL;
             max1 = (int) Math.round(Math.random() * 3) + 2;
             for(i1 = 0; i1 < max1; i1++) {
-                userL = getNUser(new Role(fakerEn.internet().emailAddress(), school), Roles.HTEACHER);
-                users.add(userL);
+                final Role role = new Role(fakerEn.internet().emailAddress(), school);
+                userL = getNUser(role, Roles.HTEACHER, testPassword);
                 school.getHteachers().add(userL);
                 if(userL.getUsername() != null) user = userL;
             }
@@ -301,8 +310,8 @@ import static java.util.Arrays.asList;
 
             max1 = (int) Math.round(Math.random() * 3) + 2;
             for(i1 = 0; i1 < max1; i1++) {
-                userL = getNUser(new Role(fakerEn.internet().emailAddress(), Set.of(namesSubj[(int) Math.round(Math.random() * 4)]), school), Roles.TEACHER);
-                users.add(userL);
+                final Role role = new Role(fakerEn.internet().emailAddress(), Set.of(namesSubj[(int) Math.round(Math.random() * 4)]), school);
+                userL = getNUser(role, Roles.TEACHER, testPassword);
                 school.getTeachers().add(userL);
                 if(userL.getUsername() != null) user = userL;
             }
@@ -310,7 +319,7 @@ import static java.util.Arrays.asList;
                 log.trace("tea " + user.getUsername() + " " + user.getPassword());
             }
 
-            school.setGroups(getRandGroups(school, new ArrayList<>(school.getTeachers())));
+            school.setGroups(getRandGroups(school, new ArrayList<>(school.getTeachers()), testPassword));
 
             schools.add(datas.getDbService().getSchoolRepository().saveAndFlush(school));
         }
@@ -319,8 +328,9 @@ import static java.util.Arrays.asList;
     /** RU: рандомизируются данные системы(новости, админы), создаются несколько школ
      * и сохраняются в базу данных */
     public void testOn() {
-        getRandSystem();
-        getRandSchools();
+        String testPassword = fakerEn.internet().password();
+        getRandSystem(testPassword);
+        getRandSchools(testPassword);
     }
 
     /** RU: очищаются/удаляются все данные */
@@ -390,8 +400,7 @@ import static java.util.Arrays.asList;
      * user.id : {
      *     "fio",
      *     "login",
-     *     "pass",
-     *     "code",
+     *     "code"
      * }
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
@@ -401,7 +410,6 @@ import static java.util.Arrays.asList;
             wrtr.name(user.getId()+"").beginObject()
                 .name("fio").value(user.getFio())
                 .name("login").value(user.getUsername())
-                .name("pass").value(user.getPassword())
                 .name("code").value(user.getCode())
                 .endObject();
         }
@@ -431,9 +439,14 @@ import static java.util.Arrays.asList;
      * @see TestController#getInfo(Subscriber, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public void getTestInfo(JsonTreeWriter wrtr) throws Exception {
-        wrtr.name("bodyT").beginObject()
-            .name("admins").beginObject();
-        if(getSyst() != null) getUsersT(wrtr, getSyst().getAdmins());
+        wrtr.name("bodyT").beginObject();
+        if(getSyst() != null) {
+            wrtr.name("testPassword").value(getSyst().getTestPassword());
+        }
+        wrtr.name("admins").beginObject();
+        if(getSyst() != null) {
+            getUsersT(wrtr, getSyst().getAdmins());
+        }
         wrtr.endObject()
             .name("schools").beginObject();
         if(getSchools() != null) {

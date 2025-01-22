@@ -160,7 +160,7 @@ import static ru.Main.datas;
                     wrtr.name("link").value(studU.getCode());
                 }
                 wrtr.name("par").beginObject();
-                datas.usersByList(studU.getRoles().get(Roles.KID).getParents(), true, wrtr);
+                datas.usersByList(studU.getRole(Roles.KID).getParents(), true, wrtr);
                 wrtr.endObject().endObject();
             }
         }

@@ -24,7 +24,7 @@ import ru.security.AuthenticationFilter;
 import ru.security.CustomProvider;
 
 /** RU: Начало описания security.
- * Без шифрования в БД(NoOpPasswordEncoder).
+ * В БД пароли хранятся зашифрованно(BCryptPasswordEncoder).
  * Авторизация Token(UUID) в header "x-access-token".
  * Анонимные пользователи тоже наделяются токеном.
  * При авторизации в системе используются логин/пароль.

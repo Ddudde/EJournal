@@ -27,7 +27,7 @@ public class WebMVCConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedOrigins("http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io", "http://localhost:9001")
-            .allowedMethods("GET","POST","PATCH","DELETE");
+            .allowedMethods("GET","POST","PATCH","PUT","DELETE");
     }
 
     /** RU: для поддержки Gson */

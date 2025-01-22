@@ -277,7 +277,7 @@ function setParents(firstG, bodyG) {
     sendToServer(0, 'GET', cParents+"getParents/" + selGr)
         .then(data => {
             console.log(data);
-            dispatch(changePeople(CHANGE_PARENTS_GL, undefined, undefined, undefined, data.bodyP));
+            dispatch(changePeople(CHANGE_PARENTS_GL, undefined, undefined, undefined, data.body.bodyP));
             if(firstG != undefined) {
                 dispatch(changeGroups(CHANGE_GROUPS_GL, undefined, bodyG));
                 dispatch(changeGroups(CHANGE_GROUPS_GR, undefined, firstG));
