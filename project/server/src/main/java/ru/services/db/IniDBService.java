@@ -128,9 +128,10 @@ import static java.util.Arrays.asList;
         final String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
         if(fakerEn.bool().bool()) {
             final String uuid = UUID.randomUUID().toString();
-            final User user = datas.getDbService().getUserRepository().saveAndFlush(new User(fio, Map.of(
-                selRole, role
-            ), selRole, Main.df.format(dateAfter), uuid));
+            final User user = datas.getDbService().getUserRepository()
+                .saveAndFlush(new User(fio, Map.of(
+                    selRole, role
+                ), selRole, Main.df.format(dateAfter), uuid));
             users.add(user);
             return user;
         } else {
@@ -196,9 +197,10 @@ import static java.util.Arrays.asList;
                         && school.getTeachers().contains(teaU)){
                     school.getTeachers().remove(teaU);
                 }
-                if(!teaU.getRoles().get(Roles.TEACHER).getSubjects().contains(nameSubj)) {
-                    teaU.getRoles().get(Roles.TEACHER).getSubjects().add(nameSubj);
-                    datas.getDbService().getRoleRepository().saveAndFlush(teaU.getRoles().get(Roles.TEACHER));
+                if(!teaU.getRole(Roles.TEACHER).getSubjects().contains(nameSubj)) {
+                    teaU.getRole(Roles.TEACHER).getSubjects().add(nameSubj);
+                    datas.getDbService().getRoleRepository()
+                        .saveAndFlush(teaU.getRole(Roles.TEACHER));
                 }
                 lesson = datas.getDbService().getLessonRepository()
                     .saveAndFlush(new Lesson(school, group, day, les, kab, nameSubj, teaU));
@@ -226,7 +228,8 @@ import static java.util.Arrays.asList;
                 namI++;
                 maxGrI--;
             }
-            Group group = datas.getDbService().getGroupRepository().saveAndFlush(new Group(nameGrp));
+            Group group = datas.getDbService().getGroupRepository()
+                .saveAndFlush(new Group(nameGrp));
 
             final int countOfIterationsCreatePeople = (int) Math.round(Math.random() * 3) + 2;
             for(i1 = 0; i1 < countOfIterationsCreatePeople; i1++) {
@@ -285,10 +288,10 @@ import static java.util.Arrays.asList;
 
             final List<Period> periodsPerSch = datas.getDbService().getPeriodRepository()
                 .saveAllAndFlush(asList(
-                    new Period("I четверть", "01.09.23", "03.11.23"),
-                    new Period("II четверть", "12.11.23", "29.12.23"),
-                    new Period("III четверть", "12.01.24", "29.03.24"),
-                    new Period("IV четверть", "01.04.24", "30.08.24")
+                    new Period("I четверть", "01.09.24", "03.11.24"),
+                    new Period("II четверть", "12.11.24", "29.12.24"),
+                    new Period("III четверть", "12.01.25", "29.03.25"),
+                    new Period("IV четверть", "01.04.25", "30.08.25")
                 ));
             periods.addAll(periodsPerSch);
 

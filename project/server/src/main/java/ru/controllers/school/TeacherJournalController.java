@@ -160,7 +160,7 @@ import static ru.Main.datas;
 
         final List<Mark> marksOfKidAndDay = datas.getDbService().getMarkRepository()
             .findByIdInAndUsrId(marksIdByDay.get(dayAndNumOfMark[0]), body.kid);
-        log.trace(marksOfKidAndDay.toString());
+        log.trace(marksOfKidAndDay + "");
         if (!ObjectUtils.isEmpty(marksOfKidAndDay)) {
             prepareMarkDTO.mark = marksOfKidAndDay.get(numLes);
             prepareMarkDTO.day = days.get(numLes);
@@ -183,14 +183,16 @@ import static ru.Main.datas;
         if (group == null) return ResponseEntity.notFound().build();
 
         final Map<String, List<Long>> marksByDay = getMarksByDay(school.getId(), user.getId(), group.getId(), sub.getLvlMore2());
-        log.trace(marksByDay.toString());
+        log.trace(marksByDay + "");
         wrtr.name("bodyD").beginObject();
         final List<Object[]> homeworks = datas.getDbService().getDayRepository()
             .uniqDatAndHomeworkByParams(school.getId(), group.getId(), sub.getLvlMore2());
         final Map<String, String> homeworkByDay = homeworks.stream().collect(Collectors
             .toMap(s -> (String) s[0], s -> (String) s[1]));
-        for (String dat : homeworkByDay.keySet()) {
-            wrtr.name(dat).value(homeworkByDay.get(dat));
+        if (homeworkByDay != null) {
+            for (String dat : homeworkByDay.keySet()) {
+                wrtr.name(dat).value(homeworkByDay.get(dat));
+            }
         }
         wrtr.endObject();
         getJournalAndPeriods(marksByDay, wrtr, group.getKids(), school, sub.getLvlMore2());
@@ -223,7 +225,10 @@ import static ru.Main.datas;
     private void getJournalAndPeriods(Map<String, List<Long>> marksByDay, JsonTreeWriter wrtr, List<User> kids, School school, String nameSubject) throws IOException {
         final Period actPeriod = datas.getActualPeriodBySchool(school);
         wrtr.name("bodyK").beginObject();
-        if (ObjectUtils.isEmpty(kids)) return;
+        if (ObjectUtils.isEmpty(kids) || ObjectUtils.isEmpty(marksByDay)) {
+            wrtr.endObject();
+            return;
+        }
 
         for (User kid : kids) {
             if (kid == null) continue;
@@ -236,7 +241,7 @@ import static ru.Main.datas;
                 final List<Mark> marksOfKid = datas.getDbService().getMarkRepository()
                     .findByIdInAndUsrIdAndPeriodId(marksByDay.get(dat), kid.getId(), actPeriod.getId());
                 log.trace(dat);
-                log.trace(marksOfKid.toString());
+                log.trace(marksOfKid + "");
 
                 int i1 = -1;
                 for (Mark marksM : marksOfKid) {
@@ -294,7 +299,7 @@ import static ru.Main.datas;
         if (ObjectUtils.isEmpty(groupsL)) {
             return ResponseEntity.notFound().build();
         }
-        log.trace(groupsL.toString());
+        log.trace(groupsL + "");
         wrtr.name("bodyG").beginObject();
         for (Long i : groupsL) {
             final Group gr = datas.getDbService().groupById(i);

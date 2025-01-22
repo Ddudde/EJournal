@@ -71,7 +71,7 @@ import static ru.Main.datas;
                 (list, item) -> list.add((Mark) item[1]),
                 (left, right) -> right
             )));
-        log.trace(mapM.toString());
+        log.trace(mapM + "");
         if(!ObjectUtils.isEmpty(mapM)) {
             final List<String> lessonsByKid = datas.getDbService().getLessonRepository()
                 .uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
@@ -118,6 +118,8 @@ import static ru.Main.datas;
                     (left, right) -> right
                 ))));
         log.trace("mapD " + mapD);
+        if(mapD == null) return ResponseEntity.notFound().build();
+
         final List<String> lessonsByKid = datas.getDbService().getLessonRepository()
             .uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
         for(String les : lessonsByKid) {
