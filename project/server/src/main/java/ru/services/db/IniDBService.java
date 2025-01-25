@@ -24,11 +24,16 @@ import ru.security.user.Roles;
 import ru.services.MainService;
 
 import java.text.ParseException;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 import static java.util.Arrays.asList;
+import static ru.Main.datas;
 
 /** RU: Класс для рандомизация данных, тестовые данные для БД */
 @Slf4j
@@ -53,16 +58,19 @@ import static java.util.Arrays.asList;
     private final String[] namesSch = {"Гимназия №", "Школа №", "Лицей №"};
     private final String[] namesGrp = {"А", "Б", "В", "Г", "Д"};
     private final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
-    private final MainService datas;
     private final PasswordEncoder passwordEncoder;
+    private final Random random = new Random();
 
     /** RU: дата: +30 дней от актуальной */
     private Date dateAfter;
 
     private void postConstruct() {
-        final SettingUser setts = datas.getDbService().getSettingUserRepository().saveAndFlush(new SettingUser(1));
-        final Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role("ex@ya.ru"));
-        final User user = datas.getDbService().getUserRepository().saveAndFlush(new User("nm12", passwordEncoder.encode("1111"),
+        final SettingUser setts = datas.getDbService().getSettingUserRepository()
+            .saveAndFlush(new SettingUser(1));
+        final Role role = datas.getDbService().getRoleRepository()
+            .saveAndFlush(new Role("ex@ya.ru"));
+        final User user = datas.getDbService().getUserRepository()
+            .saveAndFlush(new User("nm12", passwordEncoder.encode("1111"),
             "Петров В.В.", Map.of(
             Roles.ADMIN, role
         ), Roles.ADMIN, setts));
@@ -121,12 +129,12 @@ import static java.util.Arrays.asList;
      * @param selRole Выбранная роль пользователя */
     private User getNUser(Role roleN, Roles selRole, String testPassword) {
         final SettingUser settingUser = datas.getDbService().getSettingUserRepository()
-            .saveAndFlush(new SettingUser((int) (Math.round(Math.random() * 2) + 1)));
+            .saveAndFlush(new SettingUser(random.nextInt(2) + 1));
         setts.add(settingUser);
         final Role role = datas.getDbService().getRoleRepository().saveAndFlush(roleN);
         roles.add(role);
         final String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
-        if(fakerEn.bool().bool()) {
+        if(random.nextBoolean()) {
             final String uuid = UUID.randomUUID().toString();
             final User user = datas.getDbService().getUserRepository()
                 .saveAndFlush(new User(fio, Map.of(
@@ -171,7 +179,7 @@ import static java.util.Arrays.asList;
         setts.clear();
         roles.clear();
 
-        int max = (int) Math.round(Math.random() * 3) + 2, i;
+        int max = random.nextInt(3) + 2, i;
         for(i = 0; i < max; i++) {
             final Role role = new Role(fakerEn.internet().emailAddress());
             final User user = getNUser(role, Roles.ADMIN, testPassword);
@@ -180,19 +188,24 @@ import static java.util.Arrays.asList;
         syst = datas.getDbService().getSystRepository().saveAndFlush(syst);
     }
 
-    /** RU: рандомит расписание:
+    /** RU: рандомит расписание, запускает рандом оценок и домашних заданий:
      * 6 возможных дней, 7 возможных уроков, и записывает учителю урок */
-    private void getRandSchedule(School school, Group group, List<User> tea){
+    private List<String> getRandSchedule(School school, Group group, List<User> tea){
         int day, les;
         Lesson lesson;
-        if (ObjectUtils.isEmpty(tea)) return;
+        final List<String> nameSubjects = new ArrayList<>();
+        if (ObjectUtils.isEmpty(tea)) return null;
+
         for(day = 0; day < 5; day++) {
-            if(fakerEn.bool().bool()) continue;
+            if(random.nextBoolean()) continue;
+
             for(les = 0; les < 6; les++) {
-                if(fakerEn.bool().bool()) continue;
-                String kab = ((int) Math.round(Math.random() * 2000) + 1) + "",
-                    nameSubj = namesSubj[(int) Math.round(Math.random() * 4)];
-                User teaU = tea.get((int) Math.round(Math.random() * (tea.size() - 1)));
+                if(random.nextBoolean()) continue;
+
+                final String kab = (random.nextInt(2000) + 1) + "";
+                final String nameSubj = namesSubj[random.nextInt(5)];
+                final int indexOfTeacher = random.nextInt(tea.size());
+                final User teaU = tea.get(indexOfTeacher);
                 if(!ObjectUtils.isEmpty(school.getTeachers())
                         && school.getTeachers().contains(teaU)){
                     school.getTeachers().remove(teaU);
@@ -205,25 +218,88 @@ import static java.util.Arrays.asList;
                 lesson = datas.getDbService().getLessonRepository()
                     .saveAndFlush(new Lesson(school, group, day, les, kab, nameSubj, teaU));
                 lessons.add(lesson);
+
+                nameSubjects.add(nameSubj);
+
+                getRandomMark(group, school, nameSubj, day, teaU);
             }
+        }
+        return nameSubjects;
+    }
+
+    /** RU: выставляет с 10% шансом случайные оценки группе.
+     * <pre>
+     * В первые 4 недели актуального периода, на каждый урок в течении дня ставит оценку с 10% шанса.
+     * Возможные оценки: от 1 до 5 или "Н", "Н" - оценка "не был на уроке"
+     * Возможный вес оценки: от 1 до 5, "3" - самостоятельная работа, "5" - контрольная работа
+     * </pre> */
+    private void getRandomMark(Group group, School school, String nameSubj, int dayOfWeek, User teaU) {
+        final Period period = datas.getActualPeriodBySchool(school);
+        final LocalDate startDate = LocalDate.parse(period.getDateN(), Main.dateFormat);
+        dayOfWeek++;
+        final TemporalAdjuster adjuster = TemporalAdjusters.nextOrSame(DayOfWeek.of(dayOfWeek));
+        LocalDate nextOrSameDayOfWeek = startDate.with(adjuster);
+        int plusWeek;
+        for(plusWeek = 1; plusWeek < 5; plusWeek++) {
+            final String dayInFormat = nextOrSameDayOfWeek.format(Main.dateFormat);
+            nextOrSameDayOfWeek = nextOrSameDayOfWeek.plusWeeks(plusWeek);
+            final Day day = new Day();
+            day.setDat(dayInFormat);
+            day.setGrp(group);
+            day.setTeacher(teaU);
+            day.setSchool(school);
+            day.setNameSubject(nameSubj);
+            if(getRandomInPercent(75)) {
+                day.setHomework(getRandomHomework());
+            }
+            for(User kid : group.getKids()) {
+                if(!getRandomInPercent(10)) continue;
+
+                int mark = random.nextInt(1, 7);
+                int weight = random.nextInt(1, 6);
+                String markStr = mark + "";
+                if(mark == 6) markStr = "Н";
+                String style = "Ответ на уроке";
+                if(weight == 3) style = "Самостоятельная работа";
+                if(weight == 5) style = "Контрольная работа";
+                final Mark markDAO = new Mark(kid, period, markStr, weight, "norm", style);
+                datas.getDbService().getMarkRepository().saveAndFlush(markDAO);
+                day.getMarks().add(markDAO);
+            }
+            datas.getDbService().getDayRepository().saveAndFlush(day);
         }
     }
 
+    /** RU: c 75% шансом даёт группе домашку на определённый урок
+     * @return Примеры: "Стр. 62-63 пересказ", "Упр. 6 Стр. 103" */
+    private String getRandomHomework() {
+        final int a = random.nextInt(1, 1000);
+        final int b = random.nextInt(1, 1000);
+        if(random.nextBoolean()) {
+            return String.format("Упр. %s Стр. %s", a, b);
+        }
+        return String.format("Стр. %s-%s пересказ", a, b);
+    }
+
+    private boolean getRandomInPercent(int percent) {
+        return random.nextInt(101) <= percent;
+    }
+
     /** RU: создаёт данные групп и относящиеся к ним данные:
-     * учеников, родителей, группа, расписание */
+     * учеников, родителей, группа, расписание, оценки, итоговые оценки, домашние задания */
     private List<Group> getRandGroups(School school, List<User> tea, String testPassword) {
         final List<Group> groupsPerSch = new ArrayList<>();
-        final int countOfGroups = (int) Math.round(Math.random() * 3) + 2;
+        final int countOfGroups = random.nextInt(3) + 2;
         int i, i1,
             grI = 1,
             namI = 0,
-            maxGrI = (int) Math.round(Math.random() * 3) + 1;
+            maxGrI = random.nextInt(3) + 1;
         for(i = 0; i < countOfGroups; i++) {
             final String nameGrp = grI + namesGrp[namI];
             if(maxGrI == 0) {
                 grI++;
                 namI = 0;
-                maxGrI = (int) Math.round(Math.random() * 4) + 1;
+                maxGrI = random.nextInt(4) + 1;
             } else {
                 namI++;
                 maxGrI--;
@@ -231,7 +307,7 @@ import static java.util.Arrays.asList;
             Group group = datas.getDbService().getGroupRepository()
                 .saveAndFlush(new Group(nameGrp));
 
-            final int countOfIterationsCreatePeople = (int) Math.round(Math.random() * 3) + 2;
+            final int countOfIterationsCreatePeople = random.nextInt(3) + 2;
             for(i1 = 0; i1 < countOfIterationsCreatePeople; i1++) {
                 Role roleP = new Role(fakerEn.internet().emailAddress(), school);
                 final User userP = getNUser(roleP, Roles.PARENT, testPassword);
@@ -257,9 +333,40 @@ import static java.util.Arrays.asList;
             group = datas.getDbService().getGroupRepository().saveAndFlush(group);
             groupsPerSch.add(group);
 
-            getRandSchedule(school, group, tea);
+            final List<String> nameSubjects = getRandSchedule(school, group, tea);
+            getRandomMarkPers(school, group, nameSubjects);
         }
         return groupsPerSch;
+    }
+
+    /** RU: выставляет с 25% шансом случайные периодовые оценки группе.
+     * <pre>
+     * Во все возможные периоды учебного центра.
+     * По 5 балльной шкале, от 1 до 5
+     * </pre> */
+    private void getRandomMarkPers(School school, Group group, List<String> nameSubjects) {
+        for(Period period : school.getPeriods()) {
+            for(String nameSubject : nameSubjects) {
+                for(User kid : group.getKids()) {
+                    if (!getRandomInPercent(25)) continue;
+
+                    int mark = random.nextInt(1, 6);
+                    String markStr = mark + "";
+                    Mark markDAO = datas.getDbService().getMarkRepository()
+                        .findByTypeAndStyleAndPeriodIdAndUsrId("per", nameSubject, period.getId(), kid.getId());
+                    if(markDAO == null) {
+                        markDAO = new Mark();
+                        markDAO.setUsr(kid);
+                        markDAO.setPeriod(period);
+                        markDAO.setType("per");
+                        markDAO.setWeight(1);
+                        markDAO.setStyle(nameSubject);
+                    }
+                    markDAO.setMark(markStr);
+                    datas.getDbService().getMarkRepository().saveAndFlush(markDAO);
+                }
+            }
+        }
     }
 
     /** RU: создаёт данные школ и относящиеся к ним данные:
@@ -271,10 +378,11 @@ import static java.util.Arrays.asList;
         periods.clear();
         lessons.clear();
 
-        int max = (int) Math.round(Math.random() * 3) + 2, i, max1, i1;
+        final int countOfSchool = random.nextInt(3) + 2;
+        int i, i1;
         School school = null;
-        for(i = 0; i < max; i++) {
-            final String nameSch = namesSch[(int) Math.round(Math.random() * 2)] + (Math.round(Math.random() * 5000) + 1);
+        for(i = 0; i < countOfSchool; i++) {
+            final String nameSch = namesSch[random.nextInt(3)] + (random.nextInt(5000) + 1);
             final News news = datas.getDbService().getNewsRepository()
                 .saveAndFlush(new News("Мы(" + nameSch + ") перешли на этот сервис","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
             newsList.add(news);
@@ -298,9 +406,9 @@ import static java.util.Arrays.asList;
             school = datas.getDbService().getSchoolRepository()
                 .saveAndFlush(new School(nameSch, asList(news), contacts, periodsPerSch));
 
+            final int countIterationsCreateHteachers = random.nextInt(3) + 2;
             User user = null, userL;
-            max1 = (int) Math.round(Math.random() * 3) + 2;
-            for(i1 = 0; i1 < max1; i1++) {
+            for(i1 = 0; i1 < countIterationsCreateHteachers; i1++) {
                 final Role role = new Role(fakerEn.internet().emailAddress(), school);
                 userL = getNUser(role, Roles.HTEACHER, testPassword);
                 school.getHteachers().add(userL);
@@ -311,8 +419,8 @@ import static java.util.Arrays.asList;
                 user = null;
             }
 
-            max1 = (int) Math.round(Math.random() * 3) + 2;
-            for(i1 = 0; i1 < max1; i1++) {
+            final int countIterationCreateTeachers = random.nextInt(3) + 2;
+            for(i1 = 0; i1 < countIterationCreateTeachers; i1++) {
                 final Role role = new Role(fakerEn.internet().emailAddress(), Set.of(namesSubj[(int) Math.round(Math.random() * 4)]), school);
                 userL = getNUser(role, Roles.TEACHER, testPassword);
                 school.getTeachers().add(userL);
@@ -331,7 +439,7 @@ import static java.util.Arrays.asList;
     /** RU: рандомизируются данные системы(новости, админы), создаются несколько школ
      * и сохраняются в базу данных */
     public void testOn() {
-        String testPassword = fakerEn.internet().password();
+        final String testPassword = fakerEn.internet().password();
         getRandSystem(testPassword);
         getRandSchools(testPassword);
     }

@@ -177,7 +177,7 @@ import static ru.Main.datas;
     @GetMapping("/getInfoP3/{groupId}")
     public ResponseEntity<JsonObject> getInfoPart3(@PathVariable Long groupId, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfoP3");
+        final JsonTreeWriter wrtr = datas.init(groupId + "", "[GET] /getInfoP3");
         final School school = user.getSelecRole().getYO();
         final Group group = datas.getDbService().groupById(groupId);
         if (group == null) return ResponseEntity.notFound().build();
@@ -187,8 +187,10 @@ import static ru.Main.datas;
         wrtr.name("bodyD").beginObject();
         final List<Object[]> homeworks = datas.getDbService().getDayRepository()
             .uniqDatAndHomeworkByParams(school.getId(), group.getId(), sub.getLvlMore2());
-        final Map<String, String> homeworkByDay = homeworks.stream().collect(Collectors
-            .toMap(s -> (String) s[0], s -> (String) s[1]));
+        final Map<String, String> homeworkByDay = homeworks.stream()
+            .filter(obj->obj[0] != null && obj[1] != null)
+            .collect(Collectors.toMap(s -> (String) s[0], s -> (String) s[1],
+                (first, second) -> first));
         if (homeworkByDay != null) {
             for (String dat : homeworkByDay.keySet()) {
                 wrtr.name(dat).value(homeworkByDay.get(dat));
@@ -229,7 +231,6 @@ import static ru.Main.datas;
             wrtr.endObject();
             return;
         }
-
         for (User kid : kids) {
             if (kid == null) continue;
 

@@ -17,9 +17,9 @@ import static ru.Main.datas;
 public class AuthSecurityContext implements WithSecurityContextFactory<CustomAuth> {
     @Override
     public SecurityContext createSecurityContext(CustomAuth customUser) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        Subscriber sub = new Subscriber();
-        CustomToken auth = new CustomToken(sub, UUID.randomUUID().toString());
+        final SecurityContext context = SecurityContextHolder.getContext();
+        final Subscriber sub = new Subscriber();
+        final CustomToken auth = new CustomToken(sub, UUID.randomUUID().toString());
         when(datas.getDbService().userByLogin(any())).thenReturn(null);
         context.setAuthentication(auth);
         return context;

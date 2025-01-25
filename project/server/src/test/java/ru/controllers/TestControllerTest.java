@@ -212,7 +212,7 @@ class TestControllerConfig {
 
     @Bean
     public IniDBService iniDBService(MainService mainService, PasswordEncoder passwordEncoder) {
-        return spy(new IniDBService(mainService, passwordEncoder));
+        return spy(new IniDBService(passwordEncoder));
     }
 
     @Bean

@@ -64,25 +64,26 @@ import static ru.Main.datas;
         wrtr.endObject();
         final List<Object[]> marks = datas.getDbService().getMarkRepository()
             .uniqNameSubjectAndMarksByParams(user.getId(), "per", periods);
-        final Map<String, List<Mark>> mapM = marks.stream().collect(Collectors.groupingBy(
+        final Map<String, List<Mark>> marksByNameSubjects = marks.stream().collect(Collectors.groupingBy(
             obj -> (String) obj[0],
             Collector.of(
                 ArrayList<Mark>::new,
                 (list, item) -> list.add((Mark) item[1]),
                 (left, right) -> right
             )));
-        log.trace(mapM + "");
-        if(!ObjectUtils.isEmpty(mapM)) {
+        log.trace(marksByNameSubjects + "");
+        if(!ObjectUtils.isEmpty(marksByNameSubjects)) {
             final List<String> lessonsByKid = datas.getDbService().getLessonRepository()
                 .uniqSubNameBySchoolAndGrp(sch.getId(), group.getId());
             for(String les : lessonsByKid) {
-                if(mapM.containsKey(les)) continue;
-                mapM.put(les, null);
+                if(marksByNameSubjects.containsKey(les)) continue;
+                marksByNameSubjects.put(les, null);
             }
             wrtr.name("bodyM").beginObject();
-            for (String les : mapM.keySet()) {
+            for (Map.Entry<String, List<Mark>> entry : marksByNameSubjects.entrySet()) {
+                final String les = entry.getKey();
                 wrtr.name(les).beginObject();
-                for (Mark marksM : mapM.get(les)) {
+                for (Mark marksM : entry.getValue()) {
                     wrtr.name(marksM.getPeriod().getId()+"").value(marksM.getMark());
                 }
                 wrtr.endObject();
@@ -159,9 +160,10 @@ import static ru.Main.datas;
             wrtr.name(nameSub).beginObject()
                 .name("days").beginObject();
             if(!ObjectUtils.isEmpty(mapM)) {
-                for (String dat : mapM.keySet()) {
+                for (Map.Entry<String, List<Mark>> entry : mapM.entrySet()) {
                     int i1 = -1;
-                    for (Mark marksM : mapM.get(dat)) {
+                    final String dat = entry.getKey();
+                    for (Mark marksM : entry.getValue()) {
                         wrtr.name(i1 == -1 ? dat : (dat + "," + i1)).beginObject()
                             .name("mark").value(marksM.getMark())
                             .name("weight").value(marksM.getWeight())

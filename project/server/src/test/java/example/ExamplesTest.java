@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import ru.Main;
 import ru.data.SSE.TypesConnect;
 import ru.security.user.Roles;
 import ru.services.MainService;
@@ -26,8 +27,11 @@ import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -37,6 +41,14 @@ import static java.util.Arrays.asList;
 @Slf4j
 @Disabled
 class ExamplesTest {
+
+    @Test
+    void testDate() {
+        final LocalDate start = LocalDate.parse("13.01.25", Main.dateFormat);
+        LocalDate nextOrSameFriday = start.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+        nextOrSameFriday = nextOrSameFriday.plusWeeks(1);
+        log.trace(nextOrSameFriday.format(Main.dateFormat));
+    }
 
     @Test
     void testEnumSet() {

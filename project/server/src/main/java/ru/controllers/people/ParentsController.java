@@ -118,10 +118,10 @@ import static ru.Main.datas;
             wrtr.name(inv.getId() + "").beginObject()
                 .name("name").value(inv.getFio());
 
-            if (!inv.getRoles().get(Roles.PARENT).getKids().contains(kidU)) {
-                inv.getRoles().get(Roles.PARENT).getKids().add(kidU);
+            if (!inv.getRole(Roles.PARENT).getKids().contains(kidU)) {
+                inv.getRole(Roles.PARENT).getKids().add(kidU);
             }
-            kidU.getRoles().get(Roles.KID).getParents().add(inv);
+            kidU.getRole(Roles.KID).getParents().add(inv);
             datas.getDbService().getUserRepository().saveAndFlush(kidU);
 
             wrtr.endObject();
