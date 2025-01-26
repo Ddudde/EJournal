@@ -9,8 +9,7 @@ import {eventSource, sendToServer, setActived} from "../main/Main";
 import CheckBox from "../other/checkBox/CheckBox";
 import {cTest} from "../other/Controllers";
 
-let dispatch, testInfo, inps, cState, errText, checkBoxInfo;
-inps = {inpntt : "Текст", inpnzt : "Заголовок", inpndt: new Date().toLocaleString("ru", {day:"2-digit", month: "2-digit", year:"numeric"})};
+let dispatch, testInfo, cState, errText, checkBoxInfo;
 errText = "Данные для тестирования не сформированы...";
 
 let [_, forceUpdate] = [];
@@ -27,9 +26,6 @@ function getPep(x) {
             Логин
         </div>
         <div className={testCSS.nav_i+" "+testCSS.nav_iTable} style={{gridColumn: "4"}}>
-            Пароль
-        </div>
-        <div className={testCSS.nav_i+" "+testCSS.nav_iTable} style={{gridColumn: "5"}}>
             Код-приглашение
         </div>
         {Object.getOwnPropertyNames(x).map((param, i) =>
@@ -42,9 +38,6 @@ function getPep(x) {
                 </div>
                 <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
                     {x[param].login}
-                </div>
-                <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
-                    {x[param].pass}
                 </div>
                 <div className={testCSS.nav_i+" "+testCSS.nav_iTable}>
                     {x[param].code}
@@ -90,10 +83,6 @@ function visB(e) {
     el.dataset.act = el.dataset.act == "0" ? "1" : "0";
 }
 
-function ele (x, par) {
-    if(!inps[par]) inps[par] = x;
-}
-
 export function Test() {
     checkBoxInfo = useSelector(checkbox);
     testInfo = useSelector(testRed);
@@ -136,6 +125,9 @@ export function Test() {
                             <CheckBox text={"Режим тестирования"} checkbox_id={"checkbox_test"}/>
                         </div>
                         <div className={testCSS.blockInfo} data-act={(checkBoxInfo.checkbox_test || false) ? '1' : '0'}>
+                            <div className={testCSS.nav_i} id={testCSS.nav_i}>
+                                Пароль для всех тестовых аккаунтов: {testInfo.testPassword}
+                            </div>
                             <div className={testCSS.nav_i} id={testCSS.nav_i}>
                                 Данные:
                             </div>

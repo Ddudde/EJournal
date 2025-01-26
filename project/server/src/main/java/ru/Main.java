@@ -14,6 +14,7 @@ import ru.services.MainService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 import static org.asciidoctor.OptionsBuilder.options;
 import static org.asciidoctor.jruby.AsciidoctorJRuby.Factory.create;
@@ -39,19 +40,13 @@ public class Main {
     /** RU: Формат даты, к которой легко обратиться */
     public final static DateFormat df = new SimpleDateFormat("dd.MM.yy");
 
+    /** RU: Формат даты, к которой легко обратиться */
+    public final static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy");
+
     /** RU: Входная точка, запускает спринг */
     public static void main(String... args) {
         ctx = SpringApplication.run(Main.class);
         log.trace("Hello world!");
-//        User user = datas.getDbService().userByLogin("nm12");
-//        System.out.println(user);
-//        School school = datas.getDbService().schoolById(26L);
-//        System.out.println(school);
-//        serverService.getDbService().getDayRepository().uniqDatAndMarksByParams();
-//        serverService.getEmailService().sendRegCode("myratoff25@gmail.com");
-//        serverService.sendSimpleMessage("myratoff25@gmail.com", "TestG2", "test");
-//        serverService.sendSimpleMessage("nat.muradov@yandex.com", "TestY2", "test");
-//        genAsciiDoc();
     }
 
     /** RU: Показывает исключение и в зависимости от свойства {@link #debug} с подробностью
@@ -68,7 +63,6 @@ public class Main {
     /** RU: публикует asciiDoc в формате PDF и HTML
      * @see #main(String[]) Пример использования*/
     private static void genAsciiDoc() {
-        //test comm
         try(Asciidoctor asciidoctor = create()) {
             final OptionsBuilder options = options().inPlace(true)
 //            .backend("pdf");

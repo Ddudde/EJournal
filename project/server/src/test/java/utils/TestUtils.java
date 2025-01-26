@@ -13,10 +13,7 @@ import ru.data.SSE.Subscriber;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
@@ -24,19 +21,13 @@ import static org.mockito.Mockito.mock;
 /** RU: Класс для получения случайных сущностей и их хранения */
 @NoArgsConstructor
 public class TestUtils {
-
     public static final String defaultDescription = "Также возможны 401, 403 и 500 коды ответов";
-
     public static final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
-
     public static final String[] namesGroup = {"1А", "1Б", "1В"};
-
     private final Faker fakerRu = new Faker(new Locale("ru"));
-
     private final Faker fakerEn = new Faker();
-
     private static final Gson gson = new Gson();
-
+    private final Random random = new Random();
     public static final User parentTest = getUser(3872, "Якушева", "Аркадий", "Оксана", "esse_et", "k02o9ezp8tacrfp", false);
 
     public static final List<User> usersTest = asList(
@@ -105,6 +96,7 @@ public class TestUtils {
         new Mark(usersTest.get(1), periods.get(2), "Н", 1, "norm", null)
     ));
 
+    //toDo: Исправить тесты: в style должно храниться название дисциплины
     public final List<Mark> marksPeriod = new ArrayList<>(asList(
         new Mark(usersTest.get(1), periods.get(2), "1", 1, "per", null),
         new Mark(usersTest.get(1), periods.get(2), "2", 1, "per", null),
@@ -163,10 +155,10 @@ public class TestUtils {
             if(fakerEn.bool().bool()) continue;
             for(les = 0; les < 6; les++) {
                 if(fakerEn.bool().bool()) continue;
-                final String kab = ((int) Math.round(Math.random() * 2000) + 1) + "",
-                    nameSubj = namesSubj[(int) Math.round(Math.random() * 4)],
-                    nameGroup = namesGroup[(int) Math.round(Math.random() * 2)];
-                final User teaU = tea.get((int) Math.round(Math.random() * (tea.size() - 1)));
+                final String kab = (random.nextInt(2000) + 1) + "",
+                    nameSubj = namesSubj[random.nextInt(5)],
+                    nameGroup = namesGroup[random.nextInt(3)];
+                final User teaU = tea.get(random.nextInt(tea.size()));
                 lessons.add(new Lesson(null, new Group(nameGroup), day, les, kab, nameSubj, teaU));
             }
         }

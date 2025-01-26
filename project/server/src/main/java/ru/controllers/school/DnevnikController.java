@@ -81,9 +81,12 @@ import static ru.Main.datas;
         wrtr.name("max").value(actPeriod.getDateK());
         final List<Object[]> homeworks = datas.getDbService().getDayRepository()
             .uniqNameSubAndDatAndHomeworkByParams(school.getId(), group.getId());
-        final Map<String, Map<String, String>> mapH = homeworks.stream().collect(Collectors.groupingBy(
-            obj -> (String) obj[0],
-            Collectors.toMap(obj -> (String) obj[1], obj -> (String) obj[2])
+        final Map<String, Map<String, String>> mapH = homeworks.stream()
+            .filter(obj->obj[0] != null && obj[1] != null && obj[2] != null)
+            .collect(Collectors.groupingBy(
+                obj -> (String) obj[0],
+                Collectors.toMap(obj -> (String) obj[1], obj -> (String) obj[2],
+                    (first, second) -> first)
         ));
 
         getJournal(wrtr, mapD, mapH);

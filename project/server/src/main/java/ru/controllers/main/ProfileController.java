@@ -93,7 +93,7 @@ import static ru.Main.datas;
     @PreAuthorize("@code401.check(#sub.getUser() != null)")
     @PatchMapping("/exit")
     public ResponseEntity<Void> exit(@RequestBody DataProfile body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        log.info("[PATCH] /exit ! " + body.toString());
+        log.info("[PATCH] /exit ! " + body);
         final User user = sub.getUser();
         if (!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();

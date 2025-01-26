@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 @ToString
 @Entity public class Syst {
+    private String testPassword;
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -30,10 +31,6 @@ import java.util.List;
 
     @OneToOne(orphanRemoval = true)
     private Contacts contacts;
-
-    public Syst(List<User> admins) {
-        this.admins = admins;
-    }
 
     public Syst(List<News> news, Contacts contacts) {
         this.news = new ArrayList<>(news);

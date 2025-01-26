@@ -20,6 +20,6 @@ public class SpringConfig {
 
     @Bean(initMethod = "postConstruct")
     public IniDBService iniDBService(MainService mainService, PasswordEncoder passwordEncoder) {
-        return new IniDBService(mainService, passwordEncoder);
+        return new IniDBService(passwordEncoder);
     }
 }

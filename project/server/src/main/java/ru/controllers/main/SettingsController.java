@@ -40,7 +40,7 @@ import static ru.Main.datas;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/checkCodeEmail")
     public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        log.info("[PATCH] /checkCodeEmail ! " + body.toString());
+        log.info("[PATCH] /checkCodeEmail ! " + body);
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
             user = datas.getDbService().userByCode(body.invCod);
@@ -63,7 +63,7 @@ import static ru.Main.datas;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/startEmail")
     public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        log.info("[PATCH] /startEmail ! " + body.toString());
+        log.info("[PATCH] /startEmail ! " + body);
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
             user = datas.getDbService().userByCode(body.invCod);
@@ -90,7 +90,7 @@ import static ru.Main.datas;
     @PostMapping("/remNotifToken")
     public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        log.info("[POST] /remNotifToken ! " + body.toString());
+        log.info("[POST] /remNotifToken ! " + body);
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
@@ -105,7 +105,7 @@ import static ru.Main.datas;
     @PostMapping("/addNotifToken")
     public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        log.info("[POST] /addNotifToken ! " + body.toString());
+        log.info("[POST] /addNotifToken ! " + body);
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
@@ -120,7 +120,7 @@ import static ru.Main.datas;
     @PatchMapping("/chSettings")
     public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final User user = sub.getUser();
-        log.info("[PATCH] /chBool ! " + body.toString());
+        log.info("[PATCH] /chBool ! " + body);
         if(ObjectUtils.isEmpty(body.id)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
@@ -146,7 +146,7 @@ import static ru.Main.datas;
     @PatchMapping("/checkPasCodeEmail")
     public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
-        log.info("[PATCH] /checkPasCodeEmail ! " + body.toString());
+        log.info("[PATCH] /checkPasCodeEmail ! " + body);
         final User user = empLogin ? sub.getUser() : datas.getDbService().userByLogin(body.login);
         if(!Objects.equals(user.getSettings().getEmailCode(), body.emailCode)) {
             return ResponseEntity.notFound().build();

@@ -18,12 +18,11 @@ import java.util.Set;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Entity(name = "rol") public class Role {
+    private String email;
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
-
-    private String email;
 
     @OneToOne
     private School YO;
@@ -32,12 +31,12 @@ import java.util.Set;
     private Group grp;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany
+    @ManyToMany
     @JoinColumn(name = "role_kid_id")
     private List<User> kids;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany
+    @ManyToMany
     @JoinColumn(name = "role_par_id")
     private List<User> parents;
 

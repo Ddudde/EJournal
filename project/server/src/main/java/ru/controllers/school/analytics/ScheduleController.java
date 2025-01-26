@@ -91,8 +91,8 @@ import static ru.Main.datas;
             //удаление из списка учителей не вписанных в расписание
             school.getTeachers().remove(teaU);
         }
-        if(!teaU.getRoles().get(Roles.TEACHER).getSubjects().contains(lesson.getNameSubject())) {
-            teaU.getRoles().get(Roles.TEACHER).getSubjects().add(lesson.getNameSubject());
+        if(!teaU.getRole(Roles.TEACHER).getSubjects().contains(lesson.getNameSubject())) {
+            teaU.getRole(Roles.TEACHER).getSubjects().add(lesson.getNameSubject());
             datas.getDbService().getUserRepository().saveAndFlush(teaU);
         }
     }
@@ -112,7 +112,7 @@ import static ru.Main.datas;
         } else if(user.getSelRole() == Roles.PARENT) {
             final User kidU = datas.getDbService().userById(user.getSelKid());
             if(kidU != null) {
-                ref.group = kidU.getRoles().get(Roles.KID).getGrp();
+                ref.group = kidU.getRole(Roles.KID).getGrp();
             }
         } else if(user.getSelRole() == Roles.HTEACHER) {
             ref.group = datas.getDbService().groupById(grId);
