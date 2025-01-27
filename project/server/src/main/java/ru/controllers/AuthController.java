@@ -12,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.Main;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
@@ -21,6 +20,7 @@ import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
+import ru.services.MainService;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -204,7 +204,7 @@ import static ru.Main.datas;
         final Instant after = Instant.now().plus(Duration.ofDays(30));
         final Date dateAfter = Date.from(after);
         user1.setCode(uuid.toString());
-        user1.setExpDate(Main.df.format(dateAfter));
+        user1.setExpDate(MainService.df.format(dateAfter));
         datas.getDbService().getUserRepository().saveAndFlush(user1);
         final Long schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
 

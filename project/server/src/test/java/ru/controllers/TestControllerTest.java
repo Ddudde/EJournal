@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +32,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.Syst;
-import ru.data.DAO.school.School;
+import ru.data.reps.ContactsRepository;
+import ru.data.reps.NewsRepository;
+import ru.data.reps.SystRepository;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.*;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.services.MainService;
@@ -39,12 +46,9 @@ import ru.services.db.DBService;
 import ru.services.db.IniDBService;
 
 import javax.servlet.ServletException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -67,7 +71,10 @@ public class TestControllerTest {
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
 
     @Autowired
-    private DBService dbService;
+    private LessonRepository lessonRepository;
+
+    @Autowired
+    private SchoolRepository schoolRepository;
 
     @Autowired
     private IniDBService iniDBService;
@@ -118,16 +125,7 @@ public class TestControllerTest {
     @Test @Tag("chTests")
     @CustomUser
     void chTests_whenGood_AdminUser() throws Exception {
-        List<School> schools = new ArrayList<>(asList(
-            getSchool(9600, "Лицей №3293", 2616, 4866, 4117),
-            getSchool(1137, "Гимназия №2246", 3146, 4701, 5506),
-            getSchool(2903, "Школа №217", 1973, 5375, 7100)
-        ));
-        Syst syst = mock(Syst.class, Answers.RETURNS_DEEP_STUBS);
-        iniDBService.setSyst(syst);
-        when(syst.getAdmins()).thenReturn(usersTest);
-        iniDBService.getSchools().addAll(schools);
-        when(dbService.getLessonRepository().uniqTeachersUBySchool(anyLong())).thenReturn(usersTest);
+        prepareSchools();
 
         mockMvc.perform(put("/test/chTests")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -184,8 +182,9 @@ public class TestControllerTest {
         Syst syst = mock(Syst.class, Answers.RETURNS_DEEP_STUBS);
         iniDBService.setSyst(syst);
         when(syst.getAdmins()).thenReturn(usersTest);
-        iniDBService.getSchools().addAll(schools);
-        when(dbService.getLessonRepository().uniqTeachersUBySchool(anyLong())).thenReturn(usersTest);
+        when(schoolRepository.findAllById(any())).thenReturn(schools);
+        iniDBService.getSchools().add(0L);
+        when(lessonRepository.uniqTeachersUBySchool(anyLong())).thenReturn(usersTest);
     }
 }
 
@@ -194,6 +193,51 @@ public class TestControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class TestControllerConfig {
+
+    @Mock
+    private SettingUserRepository settingUserRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private NewsRepository newsRepository;
+
+    @Mock
+    private ContactsRepository contactsRepository;
+
+    @Mock
+    private DayRepository dayRepository;
+
+    @Mock
+    private MarkRepository markRepository;
+
+    @Mock
+    private GroupRepository groupRepository;
+
+    @Mock
+    private PeriodRepository periodRepository;
+
+    @Mock
+    private RequestRepository requestRepository;
+
+    @Bean
+    public SystRepository systRepository() {
+        return mock(SystRepository.class);
+    }
+
+    @Bean
+    public LessonRepository lessonRepository() {
+        return mock(LessonRepository.class);
+    }
+
+    @Bean
+    public SchoolRepository schoolRepository() {
+        return mock(SchoolRepository.class);
+    }
 
     @Bean
     public DBService dbService() {
@@ -211,8 +255,11 @@ class TestControllerConfig {
     }
 
     @Bean
-    public IniDBService iniDBService(MainService mainService, PasswordEncoder passwordEncoder) {
-        return spy(new IniDBService(passwordEncoder));
+    public IniDBService iniDBService(MainService mainService, PasswordEncoder passwordEncoder, DBService dbService,
+         SchoolRepository schoolRepository, SystRepository systRepository, LessonRepository lessonRepository) {
+        return spy(new IniDBService(passwordEncoder, settingUserRepository, roleRepository, userRepository,
+            schoolRepository, dbService, newsRepository, contactsRepository, systRepository, dayRepository,
+            lessonRepository, markRepository, groupRepository, periodRepository, requestRepository));
     }
 
     @Bean

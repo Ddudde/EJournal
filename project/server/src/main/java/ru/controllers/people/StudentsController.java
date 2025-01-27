@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.Main;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSEController;
 import ru.data.DAO.auth.Role;
@@ -22,6 +21,7 @@ import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
+import ru.services.MainService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -104,7 +104,7 @@ import static ru.Main.datas;
         final Role role = datas.getDbService().getRoleRepository().saveAndFlush(new Role(null, school, group));
         final User inv = new User(body.name, Map.of(
             Roles.KID, role
-            ), Main.df.format(dateAfter));
+            ), MainService.df.format(dateAfter));
         datas.getDbService().getUserRepository().saveAndFlush(inv);
         group.getKids().add(inv);
         datas.getDbService().getGroupRepository().saveAndFlush(group);

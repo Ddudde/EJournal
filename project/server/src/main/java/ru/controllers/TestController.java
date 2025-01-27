@@ -9,10 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.Main;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
 import ru.security.user.CustomToken;
+import ru.services.MainService;
 import ru.services.db.IniDBService;
 
 import static ru.Main.datas;
@@ -35,10 +35,10 @@ import static ru.Main.datas;
     public ResponseEntity<JsonObject> chTests(@RequestBody DataTest body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chTests");
         switch (body.id) {
-            case "checkbox_debug" -> Main.debug = body.val;
+            case "checkbox_debug" -> MainService.debug = body.val;
             case "checkbox_test" -> {
-                Main.test = body.val;
-                if(Main.test) {
+                MainService.test = body.val;
+                if(MainService.test) {
                     iniDBService.testOn();
                 } else {
                     iniDBService.testOff();
@@ -59,8 +59,8 @@ import static ru.Main.datas;
     public ResponseEntity<JsonObject> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
         wrtr.name("bodyS").beginObject()
-            .name("checkbox_debug").value(Main.debug)
-            .name("checkbox_test").value(Main.test)
+            .name("checkbox_debug").value(MainService.debug)
+            .name("checkbox_test").value(MainService.test)
             .endObject();
         iniDBService.getTestInfo(wrtr);
         return datas.getObjR(ans -> {

@@ -3,10 +3,12 @@ package ru.data.reps.school;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.data.DAO.school.Day;
 
 import java.util.List;
 
+@Repository
 public interface DayRepository extends JpaRepository<Day, Long> {
 
     Day findBySchoolIdAndTeacherIdAndGrpIdAndNameSubjectAndDat(Long school, Long teacher, Long grp, String nameSubject, String dat);

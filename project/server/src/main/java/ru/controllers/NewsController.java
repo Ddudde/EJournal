@@ -16,7 +16,12 @@ import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.data.SSE.Subscriber;
 import ru.data.SSE.TypesConnect;
+import ru.data.reps.NewsRepository;
+import ru.data.reps.SystRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
+import ru.services.PushService;
+import ru.services.db.DBService;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,6 +37,11 @@ import static ru.Main.datas;
 @RequestMapping("/news")
 @RequiredArgsConstructor
 @RestController public class NewsController {
+    private final DBService dbService;
+    private final PushService pushService;
+    private final SystRepository systRepository;
+    private final NewsRepository newsRepository;
+    private final SchoolRepository schoolRepository;
 
     /** RU: удаление новости + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
@@ -42,15 +52,15 @@ import static ru.Main.datas;
     @DeleteMapping("/delNews")
     public ResponseEntity<Void> delNews(@RequestBody DataNews body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[DELETE] /delNews");
-        final News news = datas.getDbService().newsById(body.id);
-        final Syst syst = datas.getDbService().getSyst();
+        final News news = dbService.newsById(body.id);
+        final Syst syst = dbService.getSyst();
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if (news != null) {
             if (Objects.equals(sub.getLvlMore2(), "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
                 syst.getNews().remove(news);
-                datas.getDbService().getSystRepository().saveAndFlush(syst);
+                systRepository.saveAndFlush(syst);
             }
-            datas.getDbService().getNewsRepository().delete(news);
+            newsRepository.delete(news);
             wrtr.name("id").value(body.id);
             stat = HttpStatus.OK;
         }
@@ -68,8 +78,8 @@ import static ru.Main.datas;
         or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
     @PutMapping("/chNews")
     public ResponseEntity<Void> chNews(@RequestBody DataNews body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT]  /chNews");
-        final News news = datas.getDbService().newsById(body.id);
+        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chNews");
+        final News news = dbService.newsById(body.id);
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if (news != null && !ObjectUtils.isEmpty(body.type)) {
             switch (body.type) {
@@ -79,7 +89,7 @@ import static ru.Main.datas;
                 case "text" -> news.setText(body.val);
                 default -> {}
             }
-            datas.getDbService().getNewsRepository().saveAndFlush(news);
+            newsRepository.saveAndFlush(news);
             wrtr.name("id").value(body.id)
                 .name("type").value(body.type)
                 .name("val").value(body.val);
@@ -112,16 +122,15 @@ import static ru.Main.datas;
         final School school = user.getSelecRole().getYO();
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if (school != null && !ObjectUtils.isEmpty(body.date)) {
-            News news = datas.getDbService().getNewsRepository()
-                .saveAndFlush(new News(body.title, body.date, body.img_url,
-                    body.text));
+            News news = newsRepository
+                .saveAndFlush(new News(body.title, body.date, body.img_url, body.text));
             school.getNews().add(news);
-            datas.getDbService().getSchoolRepository().saveAndFlush(school);
+            schoolRepository.saveAndFlush(school);
             writeNews(wrtr, news);
             stat = HttpStatus.CREATED;
         }
         return datas.getObjR(ans -> {
-            datas.getPushService().send(school.getId()+"News", "Новые объявления!",
+            pushService.send(school.getId()+"News", "Новые объявления!",
                 "В вашей школе новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
                 "/DipvLom/static/media/info.jpg");
             SSEController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
@@ -137,19 +146,18 @@ import static ru.Main.datas;
     @PostMapping("/addNewsPor")
     public ResponseEntity<Void> addNewsPortal(@RequestBody DataNews body, @AuthenticationPrincipal Subscriber sub) throws Exception {
         final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addNewsPor");
-        final Syst syst = datas.getDbService().getSyst();
+        final Syst syst = dbService.getSyst();
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if (syst != null && !ObjectUtils.isEmpty(body.date)) {
-            News news = datas.getDbService().getNewsRepository()
-                .saveAndFlush(new News(body.title, body.date, body.img_url,
-                    body.text));
+            News news = newsRepository
+                .saveAndFlush(new News(body.title, body.date, body.img_url, body.text));
             syst.getNews().add(news);
-            datas.getDbService().getSystRepository().saveAndFlush(syst);
+            systRepository.saveAndFlush(syst);
             writeNews(wrtr, news);
             stat = HttpStatus.CREATED;
         }
         return datas.getObjR(ans -> {
-            datas.getPushService().send("news", "Новые объявления!",
+            pushService.send("news", "Новые объявления!",
                 "На портале появилось новое объявление!\nУведомления можно регулировать на странице 'Настройки'",
                 "/DipvLom/static/media/info.jpg");
             SSEController.sendEventFor("addNewsC", ans, TypesConnect.NEWS, sub.getLvlSch(),
@@ -165,7 +173,7 @@ import static ru.Main.datas;
         final User user = sub.getUser();
         final JsonTreeWriter wrtr = datas.init("type= "+type, "[GET] /getNews");
         List<News> list = null;
-        final Syst syst = datas.getDbService().getSyst();
+        final Syst syst = dbService.getSyst();
         HttpStatus stat = HttpStatus.NOT_FOUND;
         final var ref = new Object() {
             Long schId = null;
@@ -173,7 +181,7 @@ import static ru.Main.datas;
         };
         if (user != null) {
             ref.log = user.getUsername();
-            School school = user.getSelecRole().getYO();
+            final School school = user.getSelecRole().getYO();
             if (Objects.equals(type, "Yo") && school != null) {
                 ref.schId = school.getId();
                 list = school.getNews();

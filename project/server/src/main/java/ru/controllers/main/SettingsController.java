@@ -12,11 +12,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.Main;
 import ru.controllers.DocsHelpController;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.SSE.Subscriber;
+import ru.services.MainService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -79,7 +79,7 @@ import static ru.Main.datas;
         settingUser.setEmailCode(code);
         final Instant after = Instant.now().plus(Duration.ofDays(1));
         final Date dateAfter = Date.from(after);
-        settingUser.setExpDateEC(Main.df.format(dateAfter));
+        settingUser.setExpDateEC(MainService.df.format(dateAfter));
         datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
         return ResponseEntity.ok().build();
     }
@@ -180,7 +180,7 @@ import static ru.Main.datas;
                 settingUser.setEmailCode(code);
                 final Instant after = Instant.now().plus(Duration.ofDays(1));
                 final Date dateAfter = Date.from(after);
-                settingUser.setExpDateEC(Main.df.format(dateAfter));
+                settingUser.setExpDateEC(MainService.df.format(dateAfter));
                 datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
             } else {
                 user.setPassword(passwordEncoder.encode(body.nPar));

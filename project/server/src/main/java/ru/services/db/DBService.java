@@ -30,31 +30,18 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @Service public class DBService {
-
     private final UserRepository userRepository;
-
     private final SchoolRepository schoolRepository;
-
     private final RequestRepository requestRepository;
-
     private final SystRepository systRepository;
-
     private final NewsRepository newsRepository;
-
     private final ContactsRepository contactsRepository;
-
     private final GroupRepository groupRepository;
-
     private final DayRepository dayRepository;
-
     private final LessonRepository lessonRepository;
-
     private final MarkRepository markRepository;
-
     private final SettingUserRepository settingUserRepository;
-
     private final PeriodRepository periodRepository;
-
     private final RoleRepository roleRepository;
 
     public SettingUser createSettingUser(SettingUser settingUser) {

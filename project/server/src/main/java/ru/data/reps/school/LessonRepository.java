@@ -3,11 +3,13 @@ package ru.data.reps.school;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Lesson;
 
 import java.util.List;
 
+@Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
     @Query("SELECT DISTINCT l.nameSubject FROM Lesson l WHERE (l.school.id = :school) AND (l.grp.id = :grp)")
     List<String> uniqSubNameBySchoolAndGrp(@Param("school") Long school, @Param("grp") Long grp);

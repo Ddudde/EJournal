@@ -28,8 +28,11 @@ import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.db.DBService;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -46,18 +49,21 @@ import static ru.Main.datas;
 @RequiredArgsConstructor
 @Getter
 @Service public class MainService {
-
-    /** RU: объект отправляемый при ошибках. {"error":true}*/
-    private final JsonObject errObj = new JsonObject();
-
-    /** RU: объект отправляемый при пустых телах. {}*/
-    private final JsonObject nullObj = new JsonObject();
-
     private final PushService pushService;
-
     private final DBService dbService;
-
     private final EmailService emailService;
+
+    /** RU: Формат даты, к которой легко обратиться */
+    public final static DateFormat df = new SimpleDateFormat("dd.MM.yy");
+
+    /** RU: Формат даты, к которой легко обратиться */
+    public final static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy");
+
+    /** RU: Вкл/выкл режима подробного описания ошибок */
+    public static boolean debug = true;
+
+    /** RU: Вкл/выкл режима генерации тестовых данных */
+    public static boolean test = true;
 
     /** RU: Глобальные подписки, для авторизации и Server Sent Events*/
     public final Map<UUID, Subscriber> subscriptions = new ConcurrentHashMap<>();
@@ -65,8 +71,7 @@ import static ru.Main.datas;
     /** RU: инициирует побочные сервисы */
     public void postConstruct() {
         datas = this;
-        errObj.addProperty("error", true);
-        if(Main.test) {
+        if(test) {
             subscriptions.put(UUID.fromString("9693b2a1-77bb-4426-8045-9f9b4395d454"), new Subscriber("nm12"));
         }
     }
@@ -201,7 +206,7 @@ import static ru.Main.datas;
     public ResponseEntity getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat, boolean nul) {
         var obj = getObj(callable, wrtr, !stat.isError());
         ResponseEntity.BodyBuilder build;
-        if(obj == errObj && !stat.isError()) {
+        if(obj == null && !stat.isError()) {
             build = ResponseEntity.internalServerError();
         } else {
             build = ResponseEntity.status(stat);
@@ -212,7 +217,7 @@ import static ru.Main.datas;
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Старая версия
      * @see SettingsController#getSettings(Subscriber)  Пример использования */
-    private JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, boolean bol) {
+    private JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, boolean isNotError) {
         JsonObject ans = null;
         try {
             wrtr.endObject();
@@ -220,13 +225,12 @@ import static ru.Main.datas;
             log.debug("dsf" + ans);
             wrtr.close();
         } catch (Exception e) {
-            bol = Main.excp(e);
+            isNotError = Main.excp(e);
         }
-        if (ans != null && bol) {
-            callable.call(ans);
-        } else {
-            ans = errObj;
+        if (ans == null || !isNotError) {
+            return null;
         }
+        callable.call(ans);
         return ans;
     }
 
@@ -313,7 +317,7 @@ import static ru.Main.datas;
         try {
             long now = DAYS.toMillis(LocalDate.now().toEpochDay());
             for (Period per : school.getPeriods()) {
-                if (now >= Main.df.parse(per.getDateN()).getTime() && now <= Main.df.parse(per.getDateK()).getTime()) {
+                if (now >= df.parse(per.getDateN()).getTime() && now <= df.parse(per.getDateK()).getTime()) {
                     return per;
                 }
             }
