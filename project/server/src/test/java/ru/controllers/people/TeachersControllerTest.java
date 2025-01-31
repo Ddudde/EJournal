@@ -34,6 +34,11 @@ import ru.controllers.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.GroupRepository;
+import ru.data.reps.school.LessonRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -67,6 +72,12 @@ public class TeachersControllerTest {
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
     private MockedStatic theMock;
+
+    @Autowired
+    private LessonRepository lessonRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private DBService dbService;
@@ -126,7 +137,7 @@ public class TeachersControllerTest {
     @Test @Tag("remPep")
     @CustomUser(roles = Roles.HTEACHER)
     void remPep_whenGood_HTEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final Group group = mock(Group.class);
         getSub().setLvlGr("20");
         when(dbService.userById(20L)).thenReturn(user);
@@ -166,7 +177,7 @@ public class TeachersControllerTest {
     @Test @Tag("chPep")
     @CustomUser(roles = Roles.HTEACHER)
     void chPep_whenGood_HTEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
 
         mockMvc.perform(patch("/teachers/chPep")
@@ -204,7 +215,7 @@ public class TeachersControllerTest {
     @CustomUser(roles = Roles.HTEACHER)
     void addTea_whenGood_HTEACHER() throws Exception {
         final School sch1 = mock(School.class);
-        when(dbService.getRoleRepository().saveAndFlush(any()))
+        when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         getSub().setLvlSch("20");
         when(dbService.schoolById(20L)).thenReturn(sch1);
@@ -243,7 +254,7 @@ public class TeachersControllerTest {
     @CustomUser(roles = Roles.HTEACHER)
     void getTeachers_whenGood_HTEACHER() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getId()).thenReturn(20L);
         when(sch1.getTeachers()).thenReturn(usersTest);
@@ -269,8 +280,7 @@ public class TeachersControllerTest {
         when(dbService.userById(23L)).thenReturn(usersTest.get(1));
         when(dbService.userById(24L)).thenReturn(usersTest.get(2));
         when(dbService.userById(25L)).thenReturn(usersTest.get(3));
-        when(dbService.getLessonRepository()
-            .uniqTeachersLBySchool(20L)).thenReturn(lessons);
+        when(lessonRepository.uniqTeachersLBySchool(20L)).thenReturn(lessons);
     }
 }
 
@@ -279,6 +289,19 @@ public class TeachersControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class TeachersControllerConfig {
+    private final SchoolRepository schoolRepository = mock(SchoolRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final GroupRepository groupRepository = mock(GroupRepository.class);
+
+    @Bean
+    public LessonRepository lessonRepository() {
+        return mock(LessonRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public RoleRepository roleRepository() {
+        return mock(RoleRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
 
     @Bean
     public DBService dbService() {
@@ -286,12 +309,12 @@ class TeachersControllerConfig {
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+    public MainService mainService(DBService dbService, LessonRepository lessonRepository) {
+        return new MainService(dbService, lessonRepository);
     }
 
     @Bean
-    public TeachersController teachersController() {
-        return spy(new TeachersController());
+    public TeachersController teachersController(DBService dbService, MainService mainService, RoleRepository roleRepository) {
+        return spy(new TeachersController(userRepository, dbService, groupRepository, mainService, roleRepository, schoolRepository));
     }
 }

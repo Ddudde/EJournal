@@ -13,14 +13,14 @@ import ru.data.DAO.Contacts;
 import ru.data.DAO.Syst;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.ContactsRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
+import ru.services.MainService;
+import ru.services.db.DBService;
 
 import java.util.Objects;
-
-import static ru.Main.datas;
 
 /** RU: Контроллер для раздела контактов + Server Sent Events
  * <pre>
@@ -29,16 +29,19 @@ import static ru.Main.datas;
 @RequestMapping("/contacts")
 @RequiredArgsConstructor
 @RestController public class ContactsController {
+    private final DBService dbService;
+    private final MainService mainService;
+    private final ContactsRepository contactsRepository;
 
     /** RU: изменение контакта + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PutMapping("/chContact")
-    public ResponseEntity<Void> chContact(@RequestBody DataContacts body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final Syst syst = datas.getDbService().getSyst();
+    public ResponseEntity<Void> chContact(@RequestBody DataContacts body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final Syst syst = dbService.getSyst();
         Contacts contacts = null;
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chContact");
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PUT] /chContact");
         HttpStatus stat = HttpStatus.NOT_FOUND;
         if(user.getRoles().containsKey(Roles.ADMIN) && Objects.equals(sub.getLvlMore2(), "Por")){
             contacts = syst.getContacts();
@@ -59,13 +62,13 @@ import static ru.Main.datas;
                     contacts.setImgUrl(body.val);
                 }
             }
-            datas.getDbService().getContactsRepository().saveAndFlush(contacts);
+            contactsRepository.saveAndFlush(contacts);
             wrtr.name("val").value(body.val)
                 .name("p").value(body.p)
                 .name("p1").value(body.p1);
             stat = HttpStatus.OK;
         }
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("chContactC", ans, TypesConnect.CONTACTS, sub.getLvlSch(), "main", "main", sub.getLvlMore2());
         }, wrtr, stat);
     }
@@ -74,10 +77,10 @@ import static ru.Main.datas;
      * @param type Нужный тип: Por - портал, Yo - школы
      * @see DocsHelpController#point(Object, Object) Описание */
     @GetMapping("/getContacts/{type}")
-    public ResponseEntity<JsonObject> getContacts(@PathVariable String type, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("type= "+type, "[GET] /getContacts");
-        final Syst syst = datas.getDbService().getSyst();
+    public ResponseEntity<JsonObject> getContacts(@PathVariable String type, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("type= "+type, "[GET] /getContacts");
+        final Syst syst = dbService.getSyst();
         Contacts contacts = null;
         HttpStatus stat = HttpStatus.NOT_FOUND;
         final var ref = new Object() {
@@ -99,8 +102,8 @@ import static ru.Main.datas;
                 .endObject();
             stat = HttpStatus.OK;
         }
-        return datas.getObjR(ans -> {
-            SSEController.changeSubscriber(auth.getUUID(), sub.getLogin(), TypesConnect.CONTACTS, ref.schId + "", "main", "main", type);
+        return mainService.getObjR(ans -> {
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.CONTACTS, ref.schId + "", "main", "main", type);
         }, wrtr, stat, false);
     }
 

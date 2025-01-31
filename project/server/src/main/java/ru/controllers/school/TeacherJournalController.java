@@ -13,12 +13,17 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSEController;
+import ru.controllers.TypesConnect;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.*;
 import ru.data.DTO.PrepareMarkDTO;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.school.DayRepository;
+import ru.data.reps.school.LessonRepository;
+import ru.data.reps.school.MarkRepository;
 import ru.security.user.CustomToken;
+import ru.services.MainService;
+import ru.services.db.DBService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
-import static ru.Main.datas;
 
 /** RU: Контроллер для просмотра и редактирования журнала(оценки и домашние задания) группы
  * <pre>
@@ -37,22 +40,27 @@ import static ru.Main.datas;
 @RequestMapping("/pjournal")
 @RequiredArgsConstructor
 @RestController public class TeacherJournalController {
+    private final DayRepository dayRepository;
+    private final MarkRepository markRepository;
+    private final DBService dbService;
+    private final MainService mainService;
+    private final LessonRepository lessonRepository;
 
     /** RU: создаёт домашнее задание на определённое занятие дня группе
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
     @PostMapping("/addHomework")
-    public ResponseEntity<Void> addHomework(@RequestBody DataPJournal body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addHomework");
-        final Group group = datas.getDbService().groupById(body.group);
+    public ResponseEntity<Void> addHomework(@RequestBody DataPJournal body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addHomework");
+        final Group group = dbService.groupById(body.group);
         if (group == null) return ResponseEntity.notFound().build();
 
         final School school = user.getSelecRole().getYO();
         final String[] lesDay = body.day.split(",");
-        Day day = datas.getDbService().getDayRepository()
+        Day day = dayRepository
             .findBySchoolIdAndTeacherIdAndGrpIdAndNameSubjectAndDat(school.getId(), user.getId(), group.getId(), sub.getLvlMore2(), lesDay[0]);
         if (day == null) {
             day = new Day();
@@ -63,10 +71,10 @@ import static ru.Main.datas;
             day.setNameSubject(sub.getLvlMore2());
         }
         day.setHomework(body.homework);
-        datas.getDbService().getDayRepository().saveAndFlush(day);
+        dayRepository.saveAndFlush(day);
         wrtr.name("day").value(body.day)
             .name("homework").value(body.homework);
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("addHomeworkC", ans, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
         }, wrtr, HttpStatus.CREATED);
     }
@@ -74,14 +82,14 @@ import static ru.Main.datas;
     /** RU: создаёт оценку к определённому уроку либо целому периоду(итоговая оценка)
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
     @PostMapping("/addMark")
-    public ResponseEntity<Void> addMark(@RequestBody DataPJournal body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addMark");
-        final Group group = datas.getDbService().groupById(body.group);
-        final User objU = datas.getDbService().userById(body.kid);
+    public ResponseEntity<Void> addMark(@RequestBody DataPJournal body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addMark");
+        final Group group = dbService.groupById(body.group);
+        final User objU = dbService.userById(body.kid);
         if (group == null || objU == null) {
             return ResponseEntity.notFound().build();
         }
@@ -96,10 +104,10 @@ import static ru.Main.datas;
         mark.setType(isNotPeriodMark ? "norm" : "per");
         mark.setWeight(body.weight);
         mark.setStyle(isNotPeriodMark ? body.style : sub.getLvlMore2());
-        datas.getDbService().getMarkRepository().saveAndFlush(mark);
+        markRepository.saveAndFlush(mark);
         if(isNotPeriodMark && !prepareMarkDTO.oldMark) {
             prepareMarkDTO.day.getMarks().add(mark);
-            datas.getDbService().getDayRepository().saveAndFlush(prepareMarkDTO.day);
+            dayRepository.saveAndFlush(prepareMarkDTO.day);
         }
         wrtr.name("kid").value(objU.getId())
             .name("day").value(body.day)
@@ -109,7 +117,7 @@ import static ru.Main.datas;
             .name("type").value(mark.getStyle())
             .name("per").value(body.per)
             .endObject();
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("addMarkC", ans, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
         }, wrtr, HttpStatus.CREATED);
     }
@@ -121,8 +129,8 @@ import static ru.Main.datas;
         PrepareMarkDTO prepareMarkDTO;
         if(!isNotPeriodMark) {
             prepareMarkDTO = new PrepareMarkDTO();
-            prepareMarkDTO.period = datas.getDbService().periodById(body.per);
-            prepareMarkDTO.mark = datas.getDbService().getMarkRepository()
+            prepareMarkDTO.period = dbService.periodById(body.per);
+            prepareMarkDTO.mark = markRepository
                 .findByTypeAndStyleAndPeriodIdAndUsrId("per", nameSubject, body.per, body.kid);
             prepareMarkDTO.oldMark = false;
             return prepareMarkDTO;
@@ -138,7 +146,7 @@ import static ru.Main.datas;
         day.setTeacher(user);
         day.setSchool(school);
         day.setNameSubject(nameSubject);
-        datas.getDbService().getDayRepository().saveAndFlush(day);
+        dayRepository.saveAndFlush(day);
         prepareMarkDTO.day = day;
         return prepareMarkDTO;
     }
@@ -146,11 +154,11 @@ import static ru.Main.datas;
     //toDo: перепроверить #numLes
     private PrepareMarkDTO getExistMark(DataPJournal body, School school, User user, Group group, String nameSubject, String[] dayAndNumOfMark) {
         final PrepareMarkDTO prepareMarkDTO = new PrepareMarkDTO();
-        prepareMarkDTO.period = datas.getActualPeriodBySchool(school);
+        prepareMarkDTO.period = mainService.getActualPeriodBySchool(school);
         final Map<String, List<Long>> marksIdByDay = getMarksByDay(school.getId(), user.getId(), group.getId(), nameSubject);
         if (ObjectUtils.isEmpty(marksIdByDay)) return prepareMarkDTO;
 
-        final List<Day> days = datas.getDbService().getDayRepository()
+        final List<Day> days = dayRepository
             .findBySchoolIdAndTeacherIdAndGrpIdAndNameSubject(school.getId(), user.getId(), group.getId(), nameSubject);
         int numLes = 0;
         if (dayAndNumOfMark.length > 1) {
@@ -158,7 +166,7 @@ import static ru.Main.datas;
         }
         if (!marksIdByDay.containsKey(dayAndNumOfMark[0])) return prepareMarkDTO;
 
-        final List<Mark> marksOfKidAndDay = datas.getDbService().getMarkRepository()
+        final List<Mark> marksOfKidAndDay = markRepository
             .findByIdInAndUsrId(marksIdByDay.get(dayAndNumOfMark[0]), body.kid);
         log.trace(marksOfKidAndDay + "");
         if (!ObjectUtils.isEmpty(marksOfKidAndDay)) {
@@ -172,20 +180,20 @@ import static ru.Main.datas;
     /** RU: отправляет данные о оценках, домашних заданиях и итоговых оценках группы подчинённой преподавателю на дисциплине
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
     @GetMapping("/getInfoP3/{groupId}")
-    public ResponseEntity<JsonObject> getInfoPart3(@PathVariable Long groupId, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(groupId + "", "[GET] /getInfoP3");
+    public ResponseEntity<JsonObject> getInfoPart3(@PathVariable Long groupId, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(groupId + "", "[GET] /getInfoP3");
         final School school = user.getSelecRole().getYO();
-        final Group group = datas.getDbService().groupById(groupId);
+        final Group group = dbService.groupById(groupId);
         if (group == null) return ResponseEntity.notFound().build();
 
         final Map<String, List<Long>> marksByDay = getMarksByDay(school.getId(), user.getId(), group.getId(), sub.getLvlMore2());
         log.trace(marksByDay + "");
         wrtr.name("bodyD").beginObject();
-        final List<Object[]> homeworks = datas.getDbService().getDayRepository()
+        final List<Object[]> homeworks = dayRepository
             .uniqDatAndHomeworkByParams(school.getId(), group.getId(), sub.getLvlMore2());
         final Map<String, String> homeworkByDay = homeworks.stream()
             .filter(obj->obj[0] != null && obj[1] != null)
@@ -199,7 +207,7 @@ import static ru.Main.datas;
         wrtr.endObject();
         getJournalAndPeriods(marksByDay, wrtr, group.getKids(), school, sub.getLvlMore2());
 
-        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: заполняет JSON.
@@ -225,7 +233,7 @@ import static ru.Main.datas;
      * @param marksByDay Map с оценками. По дате
      * @throws IOException Исключение вызывается при ошибках с Json */
     private void getJournalAndPeriods(Map<String, List<Long>> marksByDay, JsonTreeWriter wrtr, List<User> kids, School school, String nameSubject) throws IOException {
-        final Period actPeriod = datas.getActualPeriodBySchool(school);
+        final Period actPeriod = mainService.getActualPeriodBySchool(school);
         wrtr.name("bodyK").beginObject();
         if (ObjectUtils.isEmpty(kids) || ObjectUtils.isEmpty(marksByDay)) {
             wrtr.endObject();
@@ -239,7 +247,7 @@ import static ru.Main.datas;
                 .name("days").beginObject();
             for (String dat : marksByDay.keySet()) {
                 //Уточняет по отдельному ученику и периоду обучения из оценок всей группы
-                final List<Mark> marksOfKid = datas.getDbService().getMarkRepository()
+                final List<Mark> marksOfKid = markRepository
                     .findByIdInAndUsrIdAndPeriodId(marksByDay.get(dat), kid.getId(), actPeriod.getId());
                 log.trace(dat);
                 log.trace(marksOfKid + "");
@@ -257,7 +265,7 @@ import static ru.Main.datas;
 
             wrtr.endObject()
                 .name("avg").beginObject();
-            final List<Mark> periodMarksOfKid = datas.getDbService().getMarkRepository()
+            final List<Mark> periodMarksOfKid = markRepository
                 .findByPeriodInAndTypeAndStyleAndUsrId(school.getPeriods(), "per", nameSubject, kid.getId());
             log.trace("perU " + periodMarksOfKid);
             for (Mark marksM : periodMarksOfKid) {
@@ -270,7 +278,7 @@ import static ru.Main.datas;
 
     /** RU: получает оценки всей группы в рамках дисциплины по дням */
     private Map<String, List<Long>> getMarksByDay(Long schoolId, Long userId, Long groupId, String nameSubject) {
-        final List<Object[]> marksByDay = datas.getDbService().getDayRepository()
+        final List<Object[]> marksByDay = dayRepository
             .uniqDatAndMarksByParams(schoolId, userId, groupId, nameSubject);
         if (ObjectUtils.isEmpty(marksByDay)) return null;
         return marksByDay.stream().collect(Collectors.groupingBy(
@@ -288,14 +296,14 @@ import static ru.Main.datas;
     /** RU: [start] отправляет данные о группах учебного центра подчинённые преподавателю на дисциплине
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
     @GetMapping("/getInfoP2/{nameSubject}")
-    public ResponseEntity<JsonObject> getInfoPart2(CustomToken auth, @PathVariable String nameSubject, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfoP2");
+    public ResponseEntity<JsonObject> getInfoPart2(CustomToken auth, @PathVariable String nameSubject, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getInfoP2");
         final School school = user.getSelecRole().getYO();
-        final List<Long> groupsL = datas.getDbService().getLessonRepository()
+        final List<Long> groupsL = lessonRepository
             .uniqGroupsBySchoolAndSubNameAndTeacher(school.getId(), nameSubject, user.getId());
         if (ObjectUtils.isEmpty(groupsL)) {
             return ResponseEntity.notFound().build();
@@ -303,12 +311,12 @@ import static ru.Main.datas;
         log.trace(groupsL + "");
         wrtr.name("bodyG").beginObject();
         for (Long i : groupsL) {
-            final Group gr = datas.getDbService().groupById(i);
+            final Group gr = dbService.groupById(i);
             wrtr.name(i + "").value(gr.getName());
         }
         wrtr.endObject()
             .name("firstG").value(groupsL.get(0));
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PJOURNAL, null, null, null, nameSubject);
         }, wrtr, HttpStatus.OK, false);
     }
@@ -316,14 +324,14 @@ import static ru.Main.datas;
     /** RU: [start] отправляет данные о расписании, периодах обучения и дисциплинах преподавателя
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
     @GetMapping("/getInfoP1")
-    public ResponseEntity<JsonObject> getInfoPart1(CustomToken auth, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfoP1");
+    public ResponseEntity<JsonObject> getInfoPart1(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getInfoP1");
         final School school = user.getSelecRole().getYO();
-        final List<String> subjs = datas.getDbService().getLessonRepository()
+        final List<String> subjs = lessonRepository
             .uniqSubNameBySchoolAndTeacher(school.getId(), user.getId());
         if (!ObjectUtils.isEmpty(subjs)){
             log.trace(String.valueOf(subjs));
@@ -343,11 +351,11 @@ import static ru.Main.datas;
             }
             wrtr.endObject();
         }
-        final Period actPeriod = datas.getActualPeriodBySchool(school);
+        final Period actPeriod = mainService.getActualPeriodBySchool(school);
         wrtr.name("min").value(actPeriod.getDateN());
         wrtr.name("max").value(actPeriod.getDateK());
-        datas.getShedule("bodyS", user, wrtr, null);
-        return datas.getObjR(ans -> {
+        mainService.getShedule("bodyS", user, wrtr, null);
+        return mainService.getObjR(ans -> {
             SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }

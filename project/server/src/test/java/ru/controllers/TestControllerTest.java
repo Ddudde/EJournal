@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -193,36 +192,16 @@ public class TestControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class TestControllerConfig {
-
-    @Mock
-    private SettingUserRepository settingUserRepository;
-
-    @Mock
-    private RoleRepository roleRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private NewsRepository newsRepository;
-
-    @Mock
-    private ContactsRepository contactsRepository;
-
-    @Mock
-    private DayRepository dayRepository;
-
-    @Mock
-    private MarkRepository markRepository;
-
-    @Mock
-    private GroupRepository groupRepository;
-
-    @Mock
-    private PeriodRepository periodRepository;
-
-    @Mock
-    private RequestRepository requestRepository;
+    private final SettingUserRepository settingUserRepository = mock(SettingUserRepository.class);
+    private final RoleRepository roleRepository = mock(RoleRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final NewsRepository newsRepository = mock(NewsRepository.class);
+    private final ContactsRepository contactsRepository = mock(ContactsRepository.class);
+    private final DayRepository dayRepository = mock(DayRepository.class);
+    private final MarkRepository markRepository = mock(MarkRepository.class);
+    private final GroupRepository groupRepository = mock(GroupRepository.class);
+    private final PeriodRepository periodRepository = mock(PeriodRepository.class);
+    private final RequestRepository requestRepository = mock(RequestRepository.class);
 
     @Bean
     public SystRepository systRepository() {
@@ -246,7 +225,7 @@ class TestControllerConfig {
 
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
@@ -259,11 +238,11 @@ class TestControllerConfig {
          SchoolRepository schoolRepository, SystRepository systRepository, LessonRepository lessonRepository) {
         return spy(new IniDBService(passwordEncoder, settingUserRepository, roleRepository, userRepository,
             schoolRepository, dbService, newsRepository, contactsRepository, systRepository, dayRepository,
-            lessonRepository, markRepository, groupRepository, periodRepository, requestRepository));
+            lessonRepository, markRepository, groupRepository, periodRepository, requestRepository, mainService));
     }
 
     @Bean
-    public TestController testController(IniDBService iniDBService) {
-        return spy(new TestController(iniDBService));
+    public TestController testController(IniDBService iniDBService, MainService mainService) {
+        return spy(new TestController(iniDBService, mainService));
     }
 }

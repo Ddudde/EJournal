@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
 import ru.security.CustomProvider;
 
 import java.util.Collection;
@@ -12,10 +12,10 @@ import java.util.Set;
 
 @Getter @Setter
 public class CustomToken extends UsernamePasswordAuthenticationToken {
-    private Subscriber sub;
+    private SubscriberDTO sub;
     private String UUID;
 
-    public CustomToken(Object credentials, Collection<? extends GrantedAuthority> authorities, Subscriber sub, String UUID) {
+    public CustomToken(Object credentials, Collection<? extends GrantedAuthority> authorities, SubscriberDTO sub, String UUID) {
         super(sub, credentials, authorities);
         this.sub = sub;
         this.UUID = UUID;
@@ -25,7 +25,7 @@ public class CustomToken extends UsernamePasswordAuthenticationToken {
         super("anonymousUser", "", CustomProvider.getAuthorities(Set.of("ANONYMOUS")));
     }
 
-    public CustomToken(Subscriber sub, String UUID) {
+    public CustomToken(SubscriberDTO sub, String UUID) {
         super(sub, "", CustomProvider.getAuthorities(Set.of("ANONYMOUS")));
         this.sub = sub;
         this.UUID = UUID;

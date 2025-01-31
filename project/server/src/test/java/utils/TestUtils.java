@@ -9,7 +9,7 @@ import ru.data.DAO.News;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.*;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 
@@ -106,7 +106,7 @@ public class TestUtils {
         new Mark(usersTest.get(1), periods.get(0), "Н", 1, "per", null)
     ));
 
-    public static Subscriber getSub(){
+    public static SubscriberDTO getSub(){
         return ((CustomToken) SecurityContextHolder.getContext()
             .getAuthentication()).getSub();
     }
@@ -152,9 +152,9 @@ public class TestUtils {
         final List<User> tea = new ArrayList<>(usersTest);
         int day, les;
         for(day = 0; day < 5; day++) {
-            if(fakerEn.bool().bool()) continue;
+            if(random.nextBoolean()) continue;
             for(les = 0; les < 6; les++) {
-                if(fakerEn.bool().bool()) continue;
+                if(random.nextBoolean()) continue;
                 final String kab = (random.nextInt(2000) + 1) + "",
                     nameSubj = namesSubj[random.nextInt(5)],
                     nameGroup = namesGroup[random.nextInt(3)];

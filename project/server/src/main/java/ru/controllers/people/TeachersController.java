@@ -12,15 +12,20 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSEController;
+import ru.controllers.TypesConnect;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.GroupRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
+import ru.services.db.DBService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,41 +33,45 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-import static ru.Main.datas;
-
 /** RU: Контроллер для управления/просмотра преподавателей учебных центров + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/TeachersController">http://localhost:9001/swagger/htmlSwag/#/TeachersController</a>
  * </pre>
- * @see Subscriber */
+ * @see SubscriberDTO */
 @RequestMapping("/teachers")
 @RequiredArgsConstructor
 @RestController public class TeachersController {
+    private final UserRepository userRepository;
+    private final DBService dbService;
+    private final GroupRepository groupRepository;
+    private final MainService mainService;
+    private final RoleRepository roleRepository;
+    private final SchoolRepository schoolRepository;
 
     /** RU: удаление роли преподавателя
      * Не реализовано в клиенте.
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataTeachers body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final JsonTreeWriter wrtr = datas.init("", "[DELETE] /remPep");
-        final User user1 = datas.getDbService().userById(body.id);
-        final Group group = datas.getDbService().groupById(Long.parseLong(sub.getLvlGr()));
+    public ResponseEntity<Void> remPep(@RequestBody DataTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final JsonTreeWriter wrtr = mainService.init("", "[DELETE] /remPep");
+        final User user1 = dbService.userById(body.id);
+        final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
         if(user1 == null || group == null) {
             return ResponseEntity.notFound().build();
         }
 
         user1.getRoles().remove(Roles.HTEACHER);
-        datas.getDbService().getUserRepository().saveAndFlush(user1);
+        userRepository.saveAndFlush(user1);
         if (!ObjectUtils.isEmpty(group.getKids())) {
             group.getKids().remove(user1);
         }
-        datas.getDbService().getGroupRepository().saveAndFlush(group);
+        groupRepository.saveAndFlush(group);
 
         wrtr.name("id").value(user1.getId());
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("remPepC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
@@ -71,20 +80,20 @@ import static ru.Main.datas;
      * Не реализовано в клиенте.
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataTeachers body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final JsonTreeWriter wrtr = datas.init("", "[PATCH] /chPep");
-        final User user1 = datas.getDbService().userById(body.id);
+    public ResponseEntity<Void> chPep(@RequestBody DataTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final JsonTreeWriter wrtr = mainService.init("", "[PATCH] /chPep");
+        final User user1 = dbService.userById(body.id);
         if(user1 == null) return ResponseEntity.notFound().build();
 
         user1.setFio(body.name);
-        datas.getDbService().getUserRepository().saveAndFlush(user1);
+        userRepository.saveAndFlush(user1);
 
         wrtr.name("id").value(user1.getId())
             .name("name").value(body.name);
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("chPepC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         }, wrtr, HttpStatus.OK);
     }
@@ -92,44 +101,43 @@ import static ru.Main.datas;
     /** RU: создаёт нового учителя для учебного центра
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addTea")
-    public ResponseEntity<Void> addTea(@RequestBody DataTeachers body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final JsonTreeWriter wrtr = datas.init("", "[POST] /addTea");
-        final School school = datas.getDbService().schoolById(Long.parseLong(sub.getLvlSch()));
+    public ResponseEntity<Void> addTea(@RequestBody DataTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final JsonTreeWriter wrtr = mainService.init("", "[POST] /addTea");
+        final School school = dbService.schoolById(Long.parseLong(sub.getLvlSch()));
         if(school == null) return ResponseEntity.notFound().build();
 
         final Instant after = Instant.now().plus(Duration.ofDays(30));
         final Date dateAfter = Date.from(after);
-        final Role role = datas.getDbService().getRoleRepository()
-            .saveAndFlush(new Role(null, Set.of(), school));
+        final Role role = roleRepository.saveAndFlush(new Role(null, Set.of(), school));
         final User inv = new User(body.name, Map.of(
             Roles.TEACHER, role
             ), MainService.df.format(dateAfter));
-        datas.getDbService().getUserRepository().saveAndFlush(inv);
+        userRepository.saveAndFlush(inv);
         school.getTeachers().add(inv);
-        datas.getDbService().getSchoolRepository().saveAndFlush(school);
+        schoolRepository.saveAndFlush(school);
 
         wrtr.name("id").value(inv.getId());
         wrtr.name("name").value(body.name);
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("addTeaC", ans, TypesConnect.TEACHERS, sub.getLvlSch(), "main", "ht", "main");
         }, wrtr, HttpStatus.CREATED);
     }
 
     /** RU: [start] отправка списка учителей учебного центра
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @GetMapping("/getTeachers")
-    public ResponseEntity<JsonObject> getTeachers(CustomToken auth, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getTeachers");
+    public ResponseEntity<JsonObject> getTeachers(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getTeachers");
         final School school = user.getSelecRole().getYO();
         if(school == null) return ResponseEntity.notFound().build();
 
-        datas.teachersBySchool(school, wrtr);
-        return datas.getObjR(ans -> {
+        mainService.teachersBySchool(school, wrtr);
+        return mainService.getObjR(ans -> {
             String role = "main";
             if(user.getRoles().containsKey(Roles.HTEACHER)) {
                 role = "ht";

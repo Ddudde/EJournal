@@ -13,52 +13,60 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSEController;
+import ru.controllers.TypesConnect;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-
-import static ru.Main.datas;
+import ru.services.MainService;
+import ru.services.PushService;
+import ru.services.db.DBService;
 
 /** RU: Контроллер для раздела профиля и частично управлением аккаунтом + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ProfileController">http://localhost:9001/swagger/htmlSwag/#/ProfileController</a>
  * </pre>
- * @see Subscriber */
+ * @see SubscriberDTO */
 @Slf4j
 @RequestMapping("/profiles")
 @RequiredArgsConstructor
 @RestController public class ProfileController {
+    private final UserRepository userRepository;
+    private final MainService mainService;
+    private final PushService pushService;
+    private final SettingUserRepository settingUserRepository;
+    private final DBService dbService;
 
     /** RU: изменение контроллируемого ученика у родителя
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('PARENT')""")
     @PatchMapping("/chKid")
-    public ResponseEntity<JsonObject> chKid(@RequestBody DataProfile body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chKid");
+    public ResponseEntity<JsonObject> chKid(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chKid");
         if(body.idL == null) return ResponseEntity.notFound().build();
 
         user.setSelKid(body.idL);
         wrtr.name("kid").value(user.getSelKid());
-        datas.getDbService().getUserRepository().saveAndFlush(user);
-        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+        userRepository.saveAndFlush(user);
+        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: изменение роли на следующую по иерархии из имеющихся у пользователя
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chRole")
-    public ResponseEntity<JsonObject> chRole(final @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[PATCH] /chRole");
+    public ResponseEntity<JsonObject> chRole(final @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[PATCH] /chRole");
         final Roles curRol = user.getSelRole();
         int i = curRol.i+1;
         Roles roleI;
@@ -73,7 +81,7 @@ import static ru.Main.datas;
         }
         wrtr.name("role").value(i);
         user.setSelRole(roleI);
-        datas.getDbService().getUserRepository().saveAndFlush(user);
+        userRepository.saveAndFlush(user);
         final Role role = user.getRoles().get(roleI);
         if(roleI == Roles.PARENT) {
             wrtr.name("kid").value(user.getSelKid())
@@ -85,20 +93,20 @@ import static ru.Main.datas;
             }
             wrtr.endObject();
         }
-        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: выход с аккаунта
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/exit")
-    public ResponseEntity<Void> exit(@RequestBody DataProfile body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+    public ResponseEntity<Void> exit(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         log.info("[PATCH] /exit ! " + body);
-        final User user = sub.getUser();
+        final User user = dbService.userById(sub.getUserId());
         if (!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();
-            datas.getPushService().remToken(settingUser, body.notifToken);
-            datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+            pushService.remToken(settingUser, body.notifToken);
+            settingUserRepository.saveAndFlush(settingUser);
         }
         sub.setLogin(null);
         sub.setLvlSch(null);
@@ -108,59 +116,59 @@ import static ru.Main.datas;
 
     /** RU: изменение/добавление электронной почты определённой роли пользователя + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chEmail")
-    public ResponseEntity<Void> chEmail(@RequestBody DataProfile body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chEmail");
+    public ResponseEntity<Void> chEmail(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chEmail");
         user.getSelecRole().setEmail(body.email);
-        datas.getDbService().getUserRepository().saveAndFlush(user);
+        userRepository.saveAndFlush(user);
         wrtr.name("body").beginObject()
             .name("email").value(body.email)
             .name("role").value(user.getSelRole().i)
             .endObject();
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("chEmail", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, wrtr, HttpStatus.OK);
     }
 
     /** RU: изменение/добавление дополнительной информации о пользователе + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chInfo")
-    public ResponseEntity<Void> chInfo(@RequestBody DataProfile body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chInfo");
+    public ResponseEntity<Void> chInfo(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chInfo");
         final SettingUser settingUser = user.getSettings();
         settingUser.setInfo(body.info);
-        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        settingUserRepository.saveAndFlush(settingUser);
         wrtr.name("body").beginObject()
             .name("more").value(settingUser.getInfo())
             .endObject();
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("chInfo", ans, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, wrtr, HttpStatus.OK);
     }
 
     /** RU: изменение логина пользователя + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chLogin")
-    public ResponseEntity<Void> chLogin(@RequestBody DataProfile body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final User userN = datas.getDbService().userByLogin(body.nLogin);
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chLogin");
+    public ResponseEntity<Void> chLogin(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final User userN = dbService.userByLogin(body.nLogin);
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chLogin");
         if (userN != null) return ResponseEntity.status(HttpStatus.CONFLICT).build();
 
         user.setUsername(body.nLogin);
         sub.setLogin(body.nLogin);
-        datas.getDbService().getUserRepository().saveAndFlush(user);
+        userRepository.saveAndFlush(user);
         wrtr.name("body").beginObject()
             .name("oLogin").value(sub.getLvlMore2())
             .name("nLogin").value(user.getUsername())
             .endObject();
         sub.setLvlMore2(body.nLogin);
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("chLogin", ans, TypesConnect.PROFILES, "main", "main", "main", body.nLogin);
         }, wrtr, HttpStatus.OK);
     }
@@ -168,14 +176,14 @@ import static ru.Main.datas;
     /** RU: [start] отправляет инфу профиля либо другого пользователя либо личную
      * @see DocsHelpController#point(Object, Object) Описание */
     @GetMapping({"/getProfile", "/getProfile/{login}"})
-    public ResponseEntity<JsonObject> getProfile(@PathVariable(required = false) String login, CustomToken auth, @AuthenticationPrincipal Subscriber sub) throws Exception {
+    public ResponseEntity<JsonObject> getProfile(@PathVariable(required = false) String login, CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         User user;
         if(ObjectUtils.isEmpty(login)) {
-            user = sub.getUser();
+            user = dbService.userById(sub.getUserId());
         } else {
-            user = datas.getDbService().userByLogin(login);
+            user = dbService.userByLogin(login);
         }
-        final JsonTreeWriter wrtr = datas.init(login, "[GET] /getProfile");
+        final JsonTreeWriter wrtr = mainService.init(login, "[GET] /getProfile");
         if(user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         final SettingUser settingUser = user.getSettings();
@@ -218,19 +226,19 @@ import static ru.Main.datas;
             }
             if(!ObjectUtils.isEmpty(role.getKids())) {
                 wrtr.name("kids").beginObject();
-                datas.usersByList(role.getKids(), false, wrtr);
+                mainService.usersByList(role.getKids(), false, wrtr);
                 wrtr.endObject();
             }
             if(!ObjectUtils.isEmpty(role.getParents())) {
                 wrtr.name("parents").beginObject();
-                datas.usersByList(role.getParents(), false, wrtr);
+                mainService.usersByList(role.getParents(), false, wrtr);
                 wrtr.endObject();
             }
             wrtr.endObject();
         }
         wrtr.endObject();
-        return datas.getObjR(ans -> {
-            SSEController.changeSubscriber(auth.getUUID(), sub.getLogin(), TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
+        return mainService.getObjR(ans -> {
+            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, wrtr, HttpStatus.OK, false);
     }
 

@@ -88,7 +88,7 @@ public class IniDBServiceTest {
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
 
     @Spy
-    private MainService mainService = new MainService(null, dbService, null);
+    private MainService mainService = new MainService(dbService, lessonRepository);
 
     @InjectMocks
     private IniDBService iniDBService;

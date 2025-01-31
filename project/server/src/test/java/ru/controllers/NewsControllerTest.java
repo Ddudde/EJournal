@@ -274,7 +274,7 @@ public class NewsControllerTest {
     @Test @Tag("addNewsYO")
     @CustomUser(roles = Roles.HTEACHER)
     void addNewsYO_whenGood_HTeacher() throws Exception {
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         user.getSelecRole().setYO(mock(School.class));
 
         addNews_run("addNewsYO_whenGood_HTeacher", """
@@ -352,7 +352,7 @@ public class NewsControllerTest {
     @Test @Tag("getNews")
     @CustomUser
     void getNews_whenGood_YO_HTeacher() throws Exception {
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         user.getSelecRole().setYO(mock(School.class));
         when(user.getSelecRole().getYO().getNews())
             .thenReturn(testUtils.newsTest);
@@ -412,13 +412,15 @@ class NewsControllerConfig {
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService, PushService pushService) {
-        return new MainService(pushService, dbService, null);
+    public MainService mainService(DBService dbService) {
+        return new MainService(dbService, null);
     }
 
     @Bean
     public NewsController newsController(DBService dbService, PushService pushService,
-         SystRepository systRepository, NewsRepository newsRepository, SchoolRepository schoolRepository) {
-        return spy(new NewsController(dbService, pushService, systRepository, newsRepository, schoolRepository));
+         SystRepository systRepository, NewsRepository newsRepository,
+         SchoolRepository schoolRepository, MainService mainService) {
+        return spy(new NewsController(dbService, pushService, systRepository, newsRepository, schoolRepository,
+            mainService));
     }
 }

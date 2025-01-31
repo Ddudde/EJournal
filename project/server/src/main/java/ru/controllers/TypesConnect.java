@@ -1,4 +1,4 @@
-package ru.data.SSE;
+package ru.controllers;
 
 public enum TypesConnect {
     MAIN, REQUESTS, AUTH, PROFILES, SETTINGS, TUTOR, NEWS, CONTACTS,

@@ -18,7 +18,7 @@ import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.*;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
 import ru.data.reps.ContactsRepository;
 import ru.data.reps.NewsRepository;
 import ru.data.reps.SystRepository;
@@ -41,13 +41,28 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static ru.Main.datas;
 
 /** RU: Класс для рандомизация данных, тестовые данные для БД */
 @Slf4j
 @Getter @Setter
 @RequiredArgsConstructor
 @Service public class IniDBService {
+    private final PasswordEncoder passwordEncoder;
+    private final SettingUserRepository settingUserRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final SchoolRepository schoolRepository;
+    private final DBService dbService;
+    private final NewsRepository newsRepository;
+    private final ContactsRepository contactsRepository;
+    private final SystRepository systRepository;
+    private final DayRepository dayRepository;
+    private final LessonRepository lessonRepository;
+    private final MarkRepository markRepository;
+    private final GroupRepository groupRepository;
+    private final PeriodRepository periodRepository;
+    private final RequestRepository requestRepository;
+    private final MainService mainService;
     private final Set<Long> setts = new HashSet<>();
     private Set<Long> newsSet = new HashSet<>();
     private final Set<Long> contactsSet = new HashSet<>();
@@ -66,22 +81,7 @@ import static ru.Main.datas;
     private final String[] namesSch = {"Гимназия №", "Школа №", "Лицей №"};
     private final String[] namesGrp = {"А", "Б", "В", "Г", "Д"};
     private final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
-    private final PasswordEncoder passwordEncoder;
     private final Random random = new Random();
-    private final SettingUserRepository settingUserRepository;
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
-    private final SchoolRepository schoolRepository;
-    private final DBService dbService;
-    private final NewsRepository newsRepository;
-    private final ContactsRepository contactsRepository;
-    private final SystRepository systRepository;
-    private final DayRepository dayRepository;
-    private final LessonRepository lessonRepository;
-    private final MarkRepository markRepository;
-    private final GroupRepository groupRepository;
-    private final PeriodRepository periodRepository;
-    private final RequestRepository requestRepository;
 
     /** RU: дата: +30 дней от актуальной */
     private Date dateAfter;
@@ -254,7 +254,7 @@ import static ru.Main.datas;
      * Возможный вес оценки: от 1 до 5, "3" - самостоятельная работа, "5" - контрольная работа
      * </pre> */
     private void getRandomMark(Group group, School school, String nameSubj, int dayOfWeek, User teaU) {
-        final Period period = datas.getActualPeriodBySchool(school);
+        final Period period = mainService.getActualPeriodBySchool(school);
         final LocalDate startDate = LocalDate.parse(period.getDateN(), MainService.dateFormat);
         dayOfWeek++;
         final TemporalAdjuster adjuster = TemporalAdjusters.nextOrSame(DayOfWeek.of(dayOfWeek));
@@ -575,7 +575,7 @@ import static ru.Main.datas;
      * }
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see TestController#getInfo(Subscriber, CustomToken)  Пример использования */
+     * @see TestController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public void getTestInfo(JsonTreeWriter wrtr) throws Exception {
         wrtr.name("bodyT").beginObject();

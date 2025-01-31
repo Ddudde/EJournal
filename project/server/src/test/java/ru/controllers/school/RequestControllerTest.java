@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.SSEController;
+import ru.data.reps.school.RequestRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.services.MainService;
@@ -331,6 +332,7 @@ public class RequestControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class RequestControllerConfig {
+    private final RequestRepository requestRepository = mock(RequestRepository.class);
 
     @Bean
     public DBService dbService() {
@@ -339,7 +341,7 @@ class RequestControllerConfig {
 
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
@@ -348,7 +350,7 @@ class RequestControllerConfig {
     }
 
     @Bean
-    public RequestController requestController() {
-        return spy(new RequestController());
+    public RequestController requestController(MainService mainService, DBService dbService) {
+        return spy(new RequestController(requestRepository, mainService, dbService));
     }
 }

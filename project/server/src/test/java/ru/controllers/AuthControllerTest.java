@@ -35,11 +35,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.CustomToken;
-import ru.services.EmailService;
 import ru.services.MainService;
 import ru.services.PushService;
 import ru.services.db.DBService;
@@ -167,10 +168,10 @@ public class AuthControllerTest {
     @Test @Tag("auth")
     @CustomUser
     void auth_whenWrong_AdminUser() throws Exception {
-        final User user = getSub().getUser();
-        final CustomToken newAuth = new CustomToken(new Subscriber(), UUID.randomUUID().toString());
-        when(dbService.userByLogin("nm12")).thenReturn(user);
-        when(dbService.userByLogin(any())).thenReturn(null);
+        final User user = dbService.userById(getSub().getUserId());
+        final CustomToken newAuth = new CustomToken(new SubscriberDTO(), UUID.randomUUID().toString());
+//        when(dbService.userByLogin("nm12")).thenReturn(user);
+        when(dbService.existUserBySubscription(any())).thenReturn(false);
         when(user.getPassword()).thenReturn("passTest1");
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
@@ -218,7 +219,7 @@ public class AuthControllerTest {
     @Test @Tag("reg")
     @CustomUser
     void reg_whenWrongLogin_Anonim() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
         mockMvc.perform(post("/auth/reg/")
@@ -264,7 +265,7 @@ public class AuthControllerTest {
     @Test @Tag("reg")
     @CustomUser
     void reg_whenGood_Anonim() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         when(dbService.userByCode("uuidTest")).thenReturn(user);
         when(dbService.userByLogin("nm")).thenReturn(null);
 
@@ -306,7 +307,7 @@ public class AuthControllerTest {
     @Test @Tag("checkInvCode")
     @CustomUser
     void checkInvCode_whenGood_AdminUser() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
         mockMvc.perform(post("/auth/checkInvCode/")
@@ -344,7 +345,7 @@ public class AuthControllerTest {
     @Test @Tag("setCodePep")
     @CustomUser
     void setCodePep_whenGood_AdminUser() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
 
         mockMvc.perform(patch("/auth/setCodePep/")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -368,25 +369,18 @@ public class AuthControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class AuthControllerConfig {
+    private final SettingUserRepository settingUserRepository = mock(SettingUserRepository.class);
+    private final PushService pushService = mock(PushService.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
 
     @Bean
     public DBService dbService() {
         return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
-    @Bean
-    public EmailService emailService() {
-        return mock(EmailService.class);
-    }
-
-    @Bean
-    public PushService pushService() {
-        return mock(PushService.class);
-    }
-
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService, EmailService emailService, PushService pushService) {
-        return new MainService(pushService, dbService, emailService);
+    public MainService mainService(DBService dbService) {
+        return new MainService(dbService, null);
     }
 
     @Bean
@@ -400,7 +394,8 @@ class AuthControllerConfig {
     }
 
     @Bean
-    public AuthController authController(PasswordEncoder passwordEncoder) {
-        return spy(new AuthController(passwordEncoder));
+    public AuthController authController(PasswordEncoder passwordEncoder, DBService dbService, MainService mainService) {
+        return spy(new AuthController(passwordEncoder, settingUserRepository, dbService, mainService, pushService,
+            userRepository));
     }
 }

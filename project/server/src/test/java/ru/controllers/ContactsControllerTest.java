@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
+import ru.data.reps.ContactsRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -127,7 +128,7 @@ public class ContactsControllerTest {
     @CustomUser(roles = Roles.HTEACHER)
     void chContact_whenGood_YO_HTeacher() throws Exception {
         getSub().setLvlMore2("Yo");
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(dbService.getSyst().getContacts())
@@ -216,7 +217,7 @@ public class ContactsControllerTest {
     @Test @Tag("getContacts")
     @CustomUser(roles = Roles.HTEACHER)
     void getContacts_whenGood_YO_HTeacher() throws Exception {
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(school.getContacts())
@@ -250,6 +251,7 @@ public class ContactsControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class ContactsControllerConfig {
+    private final ContactsRepository contactsRepository = mock(ContactsRepository.class);
 
     @Bean
     public DBService dbService() {
@@ -258,11 +260,11 @@ class ContactsControllerConfig {
 
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public ContactsController contactsController() {
-        return spy(new ContactsController());
+    public ContactsController contactsController(DBService dbService, MainService mainService) {
+        return spy(new ContactsController(dbService, mainService, contactsRepository));
     }
 }

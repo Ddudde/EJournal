@@ -24,9 +24,6 @@ public class Main {
     /** RU: Контекст */
     public static ConfigurableApplicationContext ctx;
 
-    /** RU: Часто используемый сервис */
-    public static MainService datas;
-
     /** RU: Входная точка, запускает спринг */
     public static void main(String... args) {
         ctx = SpringApplication.run(Main.class);

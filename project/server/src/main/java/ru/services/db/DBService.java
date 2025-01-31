@@ -1,7 +1,6 @@
 package ru.services.db;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.data.DAO.News;
@@ -13,13 +12,15 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.Request;
 import ru.data.DAO.school.School;
-import ru.data.reps.ContactsRepository;
+import ru.data.DTO.SubscriberDTO;
 import ru.data.reps.NewsRepository;
 import ru.data.reps.SystRepository;
-import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
-import ru.data.reps.school.*;
+import ru.data.reps.school.GroupRepository;
+import ru.data.reps.school.PeriodRepository;
+import ru.data.reps.school.RequestRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.user.Roles;
 
 import java.util.List;
@@ -27,22 +28,17 @@ import java.util.Map;
 
 /** RU: сервис с различными геттерами к БД */
 @Slf4j
-@Getter
 @AllArgsConstructor
-@Service public class DBService {
+@Service(value = "dbService")
+public class DBService {
     private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
     private final RequestRepository requestRepository;
     private final SystRepository systRepository;
     private final NewsRepository newsRepository;
-    private final ContactsRepository contactsRepository;
     private final GroupRepository groupRepository;
-    private final DayRepository dayRepository;
-    private final LessonRepository lessonRepository;
-    private final MarkRepository markRepository;
     private final SettingUserRepository settingUserRepository;
     private final PeriodRepository periodRepository;
-    private final RoleRepository roleRepository;
 
     public SettingUser createSettingUser(SettingUser settingUser) {
         SettingUser savedSettingUser = settingUserRepository.saveAndFlush(settingUser);
@@ -52,6 +48,7 @@ import java.util.Map;
 
     public User userByLogin(String login) {
         if(login == null) return null;
+
         return userRepository.findByUsername(login);
     }
 
@@ -59,8 +56,20 @@ import java.util.Map;
         return userRepository.findByCode(code);
     }
 
+    public boolean existUserById(Long id) {
+        if(id == null) return false;
+
+        return userRepository.existsById(id);
+    }
+
+    public boolean existUserBySubscription(SubscriberDTO subscriberDTO) {
+        return existUserById(subscriberDTO.getUserId());
+    }
+
     public User userById(Long id) {
-        return id == null ? null : userRepository.findById(id).orElse(null);
+        if(id == null) return null;
+
+        return userRepository.findById(id).orElse(null);
     }
 
     public Roles getFirstRoleId(Map<Roles, Role> map) {
@@ -76,7 +85,9 @@ import java.util.Map;
     }
 
     public Request requestById(Long id) {
-        return id == null ? null : requestRepository.findById(id).orElse(null);
+        if(id == null) return null;
+
+        return requestRepository.findById(id).orElse(null);
     }
 
     public List<School> getSchools() {
@@ -84,7 +95,9 @@ import java.util.Map;
     }
 
     public School schoolById(Long id) {
-        return id == null ? null : schoolRepository.findById(id).orElse(null);
+        if(id == null) return null;
+
+        return schoolRepository.findById(id).orElse(null);
     }
 
     public Syst createSyst(Syst syst) {
@@ -99,14 +112,20 @@ import java.util.Map;
     }
 
     public News newsById(Long id) {
-        return id == null ? null : newsRepository.findById(id).orElse(null);
+        if(id == null) return null;
+
+        return newsRepository.findById(id).orElse(null);
     }
 
     public Group groupById(Long id) {
-        return id == null ? null : groupRepository.findById(id).orElse(null);
+        if(id == null) return null;
+
+        return groupRepository.findById(id).orElse(null);
     }
 
     public Period periodById(Long id) {
-        return id == null ? null : periodRepository.findById(id).orElse(null);
+        if(id == null) return null;
+
+        return periodRepository.findById(id).orElse(null);
     }
 }

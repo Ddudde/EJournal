@@ -15,16 +15,19 @@ import org.springframework.web.bind.annotation.*;
 import ru.controllers.DocsHelpController;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.services.EmailService;
 import ru.services.MainService;
+import ru.services.PushService;
+import ru.services.db.DBService;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
-
-import static ru.Main.datas;
 
 /** RU: Контроллер для раздела настроек
  * <pre>
@@ -35,17 +38,23 @@ import static ru.Main.datas;
 @RequiredArgsConstructor
 @RestController public class SettingsController {
     private final PasswordEncoder passwordEncoder;
+    private final MainService mainService;
+    private final SettingUserRepository settingUserRepository;
+    private final EmailService emailService;
+    private final PushService pushService;
+    private final UserRepository userRepository;
+    private final DBService dbService;
 
     /** RU: подтверждение емэйла
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/checkCodeEmail")
-    public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+    public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         log.info("[PATCH] /checkCodeEmail ! " + body);
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
-            user = datas.getDbService().userByCode(body.invCod);
+            user = dbService.userByCode(body.invCod);
         } else {
-            user = sub.getUser();
+            user = dbService.userById(sub.getUserId());
         }
         if(user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         final SettingUser settingUser = user.getSettings();
@@ -55,71 +64,71 @@ import static ru.Main.datas;
         settingUser.setEmail(body.email);
         settingUser.setEmailCode(null);
         settingUser.setExpDateEC(null);
-        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        settingUserRepository.saveAndFlush(settingUser);
         return ResponseEntity.ok().build();
     }
 
     /** RU: изменение электронной почты пользователя или добавление при регистрации
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/startEmail")
-    public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+    public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         log.info("[PATCH] /startEmail ! " + body);
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
-            user = datas.getDbService().userByCode(body.invCod);
+            user = dbService.userByCode(body.invCod);
         } else {
-            user = sub.getUser();
+            user = dbService.userById(sub.getUserId());
         }
         if(user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(ObjectUtils.isEmpty(body.email)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
         final String code = UUID.randomUUID().toString();
-        datas.getEmailService().sendRegCode(body.email, code);
+        emailService.sendRegCode(body.email, code);
         settingUser.setEmailCode(code);
         final Instant after = Instant.now().plus(Duration.ofDays(1));
         final Date dateAfter = Date.from(after);
         settingUser.setExpDateEC(MainService.df.format(dateAfter));
-        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        settingUserRepository.saveAndFlush(settingUser);
         return ResponseEntity.ok().build();
     }
 
     /** RU: удаление токена уведомлений
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PostMapping("/remNotifToken")
-    public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
+    public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
         log.info("[POST] /remNotifToken ! " + body);
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
-        datas.getPushService().remToken(settingUser, body.notifToken);
-        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        pushService.remToken(settingUser, body.notifToken);
+        settingUserRepository.saveAndFlush(settingUser);
         return ResponseEntity.ok().build();
     }
 
     /** RU: установка токена уведомлений
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PostMapping("/addNotifToken")
-    public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
+    public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
         log.info("[POST] /addNotifToken ! " + body);
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
 
         final SettingUser settingUser = user.getSettings();
-        datas.getPushService().addToken(settingUser, body.notifToken);
-        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        pushService.addToken(settingUser, body.notifToken);
+        settingUserRepository.saveAndFlush(settingUser);
         return ResponseEntity.ok().build();
     }
 
     /** RU: Вкл/выкл подсказки или ряд уведомлений
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chSettings")
-    public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
+    public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
         log.info("[PATCH] /chBool ! " + body);
         if(ObjectUtils.isEmpty(body.id)) return ResponseEntity.notFound().build();
 
@@ -136,37 +145,37 @@ import static ru.Main.datas;
             case "checkbox_notify_new_sch" -> settingUser.setNNewReqSch(body.val);
             default -> {}
         }
-        datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+        settingUserRepository.saveAndFlush(settingUser);
         return ResponseEntity.ok().build();
     }
 
     /** RU: изменяет пароль пользователя при помощи емэйла
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/checkPasCodeEmail")
-    public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+    public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
         log.info("[PATCH] /checkPasCodeEmail ! " + body);
-        final User user = empLogin ? sub.getUser() : datas.getDbService().userByLogin(body.login);
+        final User user = empLogin ? dbService.userById(sub.getUserId()) : dbService.userByLogin(body.login);
         if(!Objects.equals(user.getSettings().getEmailCode(), body.emailCode)) {
             return ResponseEntity.notFound().build();
         }
         user.getSettings().setEmailCode(null);
         user.getSettings().setExpDateEC(null);
-        datas.getDbService().getSettingUserRepository().saveAndFlush(user.getSettings());
+        settingUserRepository.saveAndFlush(user.getSettings());
         user.setPassword(passwordEncoder.encode(body.nPar));
-        datas.getDbService().getUserRepository().saveAndFlush(user);
+        userRepository.saveAndFlush(user);
         return ResponseEntity.ok().build();
     }
 
     /** RU: изменяет пароль пользователя при помощи емэйла/секретной фразы
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chPass")
-    public ResponseEntity<JsonObject> chPass(@RequestBody DataSettings body, @AuthenticationPrincipal Subscriber sub) throws Exception {
+    public ResponseEntity<JsonObject> chPass(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
-        final User user = empLogin ? sub.getUser() : datas.getDbService().userByLogin(body.login);
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /chPass");
+        final User user = empLogin ? dbService.userById(sub.getUserId()) : dbService.userByLogin(body.login);
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chPass");
         HttpStatus stat = HttpStatus.ACCEPTED;
         final SettingUser settingUser = user.getSettings();
         if(!body.emailSt && !Objects.equals(settingUser.getSecFr(), body.secFR)){
@@ -176,28 +185,28 @@ import static ru.Main.datas;
         } else {
             if(body.emailSt) {
                 final String code = UUID.randomUUID().toString();
-                datas.getEmailService().sendRecCode(body.email, code, empLogin ? "Изменение пароля в EJournal" : "Восстановление пароля в EJournal");
+                emailService.sendRecCode(body.email, code, empLogin ? "Изменение пароля в EJournal" : "Восстановление пароля в EJournal");
                 settingUser.setEmailCode(code);
                 final Instant after = Instant.now().plus(Duration.ofDays(1));
                 final Date dateAfter = Date.from(after);
                 settingUser.setExpDateEC(MainService.df.format(dateAfter));
-                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+                settingUserRepository.saveAndFlush(settingUser);
             } else {
                 user.setPassword(passwordEncoder.encode(body.nPar));
-                datas.getDbService().getUserRepository().saveAndFlush(user);
+                userRepository.saveAndFlush(user);
             }
             stat = HttpStatus.OK;
         }
-        return datas.getObjR(ans -> {}, wrtr, stat, false);
+        return mainService.getObjR(ans -> {}, wrtr, stat, false);
     }
 
     /** RU: отправляет настройки клиенту
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @GetMapping("/getSettings")
-    public ResponseEntity<JsonObject> getSettings(@AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getSettings");
+    public ResponseEntity<JsonObject> getSettings(@AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getSettings");
         final SettingUser settingUser = user.getSettings();
         if(settingUser == null) return ResponseEntity.notFound().build();
 
@@ -208,7 +217,7 @@ import static ru.Main.datas;
             .name("checkbox_notify_yo").value(settingUser.getNNewNewsYO())
             .name("checkbox_notify_por").value(settingUser.getNNewNewsPor())
             .name("checkbox_notify_new_sch").value(settingUser.getNNewReqSch());
-        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: Данные клиента используемые SettingsController в методах
