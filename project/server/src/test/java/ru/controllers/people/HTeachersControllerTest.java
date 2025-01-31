@@ -35,6 +35,10 @@ import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.GroupRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -54,7 +58,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.Main.datas;
 import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
@@ -71,6 +74,9 @@ public class HTeachersControllerTest {
 
     @Autowired
     private DBService dbService;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private HTeachersController hTeachersController;
@@ -130,7 +136,7 @@ public class HTeachersControllerTest {
     void remGroup_whenGood_Hteacher() throws Exception {
         final ResultMatcher statusCode = status().isOk();
         final School school = mock(School.class);
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final Group group = mock(Group.class);
         user.getRoles().get(Roles.HTEACHER).setYO(school);
         when(dbService.groupById(20L)).thenReturn(group);
@@ -172,7 +178,7 @@ public class HTeachersControllerTest {
     void addGroup_whenGood_Hteacher() throws Exception {
         final ResultMatcher statusCode = status().isOk();
         final School school = mock(School.class);
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         user.getRoles().get(Roles.HTEACHER).setYO(school);
 
         mockMvc.perform(post("/hteachers/addGroup")
@@ -211,7 +217,7 @@ public class HTeachersControllerTest {
     void chGroup_whenGood_Hteacher() throws Exception {
         final ResultMatcher statusCode = status().isOk();
         final School school = mock(School.class);
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final Group group = mock(Group.class);
         user.getRoles().get(Roles.HTEACHER).setYO(school);
         when(dbService.groupById(20L)).thenReturn(group);
@@ -253,7 +259,7 @@ public class HTeachersControllerTest {
     @CustomUser
     void chPep_whenGood_Admin() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School school = mock(School.class);
         final Role role = mock(Role.class);
         user.getRoles().put(Roles.HTEACHER, role);
@@ -297,7 +303,7 @@ public class HTeachersControllerTest {
     @CustomUser
     void remPep_whenGood_Admin() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School school = mock(School.class);
         final Role role = mock(Role.class);
         user.getRoles().put(Roles.HTEACHER, role);
@@ -340,7 +346,7 @@ public class HTeachersControllerTest {
     @CustomUser
     void addPep_whenGood_Admin() throws Exception {
         final ResultMatcher statusCode = status().isCreated();
-        when(dbService.getRoleRepository().saveAndFlush(any()))
+        when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         when(dbService.schoolById(any()).getId()).thenReturn(20L);
 
@@ -493,7 +499,7 @@ public class HTeachersControllerTest {
     @CustomUser(roles = Roles.HTEACHER)
     void getInfo_whenGood_HTEACHER() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getHteachers()).thenReturn(usersTest);
         user.getSelecRole().setYO(sch1);
@@ -525,7 +531,7 @@ public class HTeachersControllerTest {
         final School sch2 = mock(School.class);
         when(sch1.getHteachers()).thenReturn(usersTest);
         when(sch2.getHteachers()).thenReturn(usersTest);
-        when(datas.getDbService().getSchools()).thenReturn(List.of(sch1, sch2));
+        when(dbService.getSchools()).thenReturn(List.of(sch1, sch2));
 
         mockMvc.perform(get("/hteachers/getInfoFA")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -540,19 +546,29 @@ public class HTeachersControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class HTeachersControllerConfig {
+    private final SchoolRepository schoolRepository = mock(SchoolRepository.class);
+    private final GroupRepository groupRepository = mock(GroupRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
 
     @Bean
     public DBService dbService() {
         return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
+    @Bean
+    public RoleRepository roleRepository() {
+        return mock(RoleRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public HTeachersController hTeachersController() {
-        return spy(new HTeachersController());
+    public HTeachersController hTeachersController(RoleRepository roleRepository, DBService dbService,
+       MainService mainService) {
+        return spy(new HTeachersController(schoolRepository, groupRepository, dbService, mainService, userRepository,
+            roleRepository));
     }
 }

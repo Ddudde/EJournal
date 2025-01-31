@@ -18,7 +18,14 @@ import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.*;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.ContactsRepository;
+import ru.data.reps.NewsRepository;
+import ru.data.reps.SystRepository;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.*;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.MainService;
@@ -31,50 +38,63 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static ru.Main.datas;
 
 /** RU: Класс для рандомизация данных, тестовые данные для БД */
 @Slf4j
 @Getter @Setter
 @RequiredArgsConstructor
 @Service public class IniDBService {
-    private final List<SettingUser> setts = new ArrayList<>();
-    private List<News> newsList = new ArrayList<>();
-    private List<Contacts> contactsList = new ArrayList<>();
-    private final List<Period> periods = new ArrayList<>();
-    private final List<Group> groups = new ArrayList<>();
-    private final List<School> schools = new ArrayList<>();
-    private final List<Lesson> lessons = new ArrayList<>();
-    private final List<Role> roles = new ArrayList<>();
-    private List<User> users = new ArrayList<>();
+    private final PasswordEncoder passwordEncoder;
+    private final SettingUserRepository settingUserRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final SchoolRepository schoolRepository;
+    private final DBService dbService;
+    private final NewsRepository newsRepository;
+    private final ContactsRepository contactsRepository;
+    private final SystRepository systRepository;
+    private final DayRepository dayRepository;
+    private final LessonRepository lessonRepository;
+    private final MarkRepository markRepository;
+    private final GroupRepository groupRepository;
+    private final PeriodRepository periodRepository;
+    private final RequestRepository requestRepository;
+    private final MainService mainService;
+    private final Set<Long> setts = new HashSet<>();
+    private Set<Long> newsSet = new HashSet<>();
+    private final Set<Long> contactsSet = new HashSet<>();
+    private final Set<Long> periods = new HashSet<>();
+    private final Set<Long> groups = new HashSet<>();
+    private final Set<Long> schools = new HashSet<>();
+    private final Set<Long> lessons = new HashSet<>();
+    private final Set<Long> roles = new HashSet<>();
+    private Set<Long> users = new HashSet<>();
     private Request request;
     private Syst syst;
-    private final List<Mark> marks = new ArrayList<>();
-    private final List<Day> days = new ArrayList<>();
+    private final Set<Long> marks = new HashSet<>();
+    private final Set<Long> days = new HashSet<>();
     private final Faker fakerRu = new Faker(new Locale("ru"));
     private final Faker fakerEn = new Faker();
     private final String[] namesSch = {"Гимназия №", "Школа №", "Лицей №"};
     private final String[] namesGrp = {"А", "Б", "В", "Г", "Д"};
     private final String[] namesSubj = {"Англ. Яз.", "Математика", "Русский Яз.", "Химия", "Физика"};
-    private final PasswordEncoder passwordEncoder;
     private final Random random = new Random();
 
     /** RU: дата: +30 дней от актуальной */
     private Date dateAfter;
 
     private void postConstruct() {
-        final SettingUser setts = datas.getDbService().getSettingUserRepository()
-            .saveAndFlush(new SettingUser(1));
-        final Role role = datas.getDbService().getRoleRepository()
-            .saveAndFlush(new Role("ex@ya.ru"));
-        final User user = datas.getDbService().getUserRepository()
+        final SettingUser setts = settingUserRepository.saveAndFlush(new SettingUser(1));
+        final Role role = roleRepository.saveAndFlush(new Role("ex@ya.ru"));
+        final User user = userRepository
             .saveAndFlush(new User("nm12", passwordEncoder.encode("1111"),
             "Петров В.В.", Map.of(
             Roles.ADMIN, role
         ), Roles.ADMIN, setts));
-        if(Main.test) testOn();
+        if(MainService.test) testOn();
         checkDates();
     }
 
@@ -83,26 +103,27 @@ import static ru.Main.datas;
         if(user != null){
             user.setCode(null);
             user.setExpDate(null);
-            datas.getDbService().getUserRepository().saveAndFlush(user);
+            userRepository.saveAndFlush(user);
         }
     }
 
     /** RU: удаление инвайта для регистрации нового пользователя */
     private void delInv(User inv) {
         if(inv != null) {
-            School school = datas.getDbService().getFirstRole(inv.getRoles()).getYO();
+            final School school = dbService.getFirstRole(inv.getRoles()).getYO();
             school.getHteachers().remove(inv);
-            datas.getDbService().getSchoolRepository().saveAndFlush(school);
-            datas.getDbService().getUserRepository().delete(inv);
+            schoolRepository.saveAndFlush(school);
+            userRepository.delete(inv);
         }
     }
 
     /** RU: проверяет коды подтверждений электронных почт и инвайтов на истечение срока */
     private void checkDates() {
         try {
-            long now = Main.df.parse(Main.df.format(new Date())).getTime();
-            for(User user : getUsers()){
-                if(!ObjectUtils.isEmpty(user.getExpDate()) && now >= Main.df.parse(user.getExpDate()).getTime()){
+            final long now = MainService.df.parse(MainService.df.format(new Date())).getTime();
+            final List<User> listUsers = userRepository.findAllById(users);
+            for(User user : listUsers) {
+                if(!ObjectUtils.isEmpty(user.getExpDate()) && now >= MainService.df.parse(user.getExpDate()).getTime()){
                     log.debug("Удалён код " + user.getCode() + " по истечению срока действия");
                     if(user.getUsername() == null) {
                         delInv(user);
@@ -110,12 +131,12 @@ import static ru.Main.datas;
                         delCodeUser(user);
                     }
                 }
-                SettingUser settingUser = user.getSettings();
-                if(settingUser != null && !ObjectUtils.isEmpty(settingUser.getExpDateEC()) && now >= Main.df.parse(settingUser.getExpDateEC()).getTime()){
+                final SettingUser settingUser = user.getSettings();
+                if(settingUser != null && !ObjectUtils.isEmpty(settingUser.getExpDateEC()) && now >= MainService.df.parse(settingUser.getExpDateEC()).getTime()){
                     log.debug("Удалён код email" + settingUser.getEmailCode() + " по истечению срока действия");
                     settingUser.setEmailCode(null);
                     settingUser.setExpDateEC(null);
-                    datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+                    settingUserRepository.saveAndFlush(settingUser);
                 }
             }
         } catch (ParseException e) {
@@ -128,29 +149,29 @@ import static ru.Main.datas;
      * @param roleN Роль пользователя
      * @param selRole Выбранная роль пользователя */
     private User getNUser(Role roleN, Roles selRole, String testPassword) {
-        final SettingUser settingUser = datas.getDbService().getSettingUserRepository()
+        final SettingUser settingUser = settingUserRepository
             .saveAndFlush(new SettingUser(random.nextInt(2) + 1));
-        setts.add(settingUser);
-        final Role role = datas.getDbService().getRoleRepository().saveAndFlush(roleN);
-        roles.add(role);
+        setts.add(settingUser.getId());
+        final Role role = roleRepository.saveAndFlush(roleN);
+        roles.add(role.getId());
         final String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
         if(random.nextBoolean()) {
             final String uuid = UUID.randomUUID().toString();
-            final User user = datas.getDbService().getUserRepository()
+            final User user = userRepository
                 .saveAndFlush(new User(fio, Map.of(
                     selRole, role
-                ), selRole, Main.df.format(dateAfter), uuid));
-            users.add(user);
+                ), selRole, MainService.df.format(dateAfter), uuid));
+            users.add(user.getId());
             return user;
         } else {
             final String login = MainService.getRandomUsername(fakerEn);
             final String password = passwordEncoder.encode(testPassword);
-            final User user = datas.getDbService().getUserRepository()
+            final User user = userRepository
                 .saveAndFlush(new User(login, password,
                     fio, Map.of(
                     selRole, role
                 ), selRole, settingUser));
-            users.add(user);
+            users.add(user.getId());
             return user;
         }
     }
@@ -160,20 +181,20 @@ import static ru.Main.datas;
     private void getRandSystem(String testPassword) {
         final Instant after = Instant.now().plus(Duration.ofDays(30));
         dateAfter = Date.from(after);
-        newsList = datas.getDbService().getNewsRepository().saveAllAndFlush(asList(
+        newsSet = newsRepository.saveAllAndFlush(asList(
             new News("День рождения портала!","25.04.2022", "Начались первые работы"),
             new News("А проект вышел большим...","02.12.2022", "/static/media/tuman.jpg", "Да-да, всё ещё не конец...")
-        ));
+        )).stream()
+            .map(News::getId).collect(Collectors.toCollection(HashSet::new));
 
-        contactsList = datas.getDbService().getContactsRepository()
-            .saveAllAndFlush(asList(new Contacts("8 (800) 555 35 37\n5 (353) 555 00 88",
-                "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
-                "/static/media/map.jpg")
-        ));
-        final Syst systM = new Syst(newsList, contactsList.get(0));
+        final Contacts contacts = new Contacts("8 (800) 555 35 37\n5 (353) 555 00 88",
+            "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
+            "/static/media/map.jpg");
+        contactsSet.add(contactsRepository.saveAndFlush(contacts).getId());
+        final Syst systM = new Syst(newsRepository.findAllById(newsSet), contacts);
         systM.setTestPassword(testPassword);
-        syst = datas.getDbService().createSyst(systM);
-        log.trace(getSyst() + "");
+        syst = dbService.createSyst(systM);
+        log.trace(syst + "");
 
         users.clear();
         setts.clear();
@@ -185,7 +206,7 @@ import static ru.Main.datas;
             final User user = getNUser(role, Roles.ADMIN, testPassword);
             syst.getAdmins().add(user);
         }
-        syst = datas.getDbService().getSystRepository().saveAndFlush(syst);
+        syst = systRepository.saveAndFlush(syst);
     }
 
     /** RU: рандомит расписание, запускает рандом оценок и домашних заданий:
@@ -212,12 +233,11 @@ import static ru.Main.datas;
                 }
                 if(!teaU.getRole(Roles.TEACHER).getSubjects().contains(nameSubj)) {
                     teaU.getRole(Roles.TEACHER).getSubjects().add(nameSubj);
-                    datas.getDbService().getRoleRepository()
-                        .saveAndFlush(teaU.getRole(Roles.TEACHER));
+                    roleRepository.saveAndFlush(teaU.getRole(Roles.TEACHER));
                 }
-                lesson = datas.getDbService().getLessonRepository()
+                lesson = lessonRepository
                     .saveAndFlush(new Lesson(school, group, day, les, kab, nameSubj, teaU));
-                lessons.add(lesson);
+                lessons.add(lesson.getId());
 
                 nameSubjects.add(nameSubj);
 
@@ -234,14 +254,14 @@ import static ru.Main.datas;
      * Возможный вес оценки: от 1 до 5, "3" - самостоятельная работа, "5" - контрольная работа
      * </pre> */
     private void getRandomMark(Group group, School school, String nameSubj, int dayOfWeek, User teaU) {
-        final Period period = datas.getActualPeriodBySchool(school);
-        final LocalDate startDate = LocalDate.parse(period.getDateN(), Main.dateFormat);
+        final Period period = mainService.getActualPeriodBySchool(school);
+        final LocalDate startDate = LocalDate.parse(period.getDateN(), MainService.dateFormat);
         dayOfWeek++;
         final TemporalAdjuster adjuster = TemporalAdjusters.nextOrSame(DayOfWeek.of(dayOfWeek));
         LocalDate nextOrSameDayOfWeek = startDate.with(adjuster);
         int plusWeek;
         for(plusWeek = 1; plusWeek < 5; plusWeek++) {
-            final String dayInFormat = nextOrSameDayOfWeek.format(Main.dateFormat);
+            final String dayInFormat = nextOrSameDayOfWeek.format(MainService.dateFormat);
             nextOrSameDayOfWeek = nextOrSameDayOfWeek.plusWeeks(plusWeek);
             final Day day = new Day();
             day.setDat(dayInFormat);
@@ -255,18 +275,18 @@ import static ru.Main.datas;
             for(User kid : group.getKids()) {
                 if(!getRandomInPercent(10)) continue;
 
-                int mark = random.nextInt(1, 7);
-                int weight = random.nextInt(1, 6);
+                final int mark = random.nextInt(1, 7);
+                final int weight = random.nextInt(1, 6);
                 String markStr = mark + "";
                 if(mark == 6) markStr = "Н";
                 String style = "Ответ на уроке";
                 if(weight == 3) style = "Самостоятельная работа";
                 if(weight == 5) style = "Контрольная работа";
                 final Mark markDAO = new Mark(kid, period, markStr, weight, "norm", style);
-                datas.getDbService().getMarkRepository().saveAndFlush(markDAO);
+                markRepository.saveAndFlush(markDAO);
                 day.getMarks().add(markDAO);
             }
-            datas.getDbService().getDayRepository().saveAndFlush(day);
+            days.add(dayRepository.saveAndFlush(day).getId());
         }
     }
 
@@ -304,8 +324,7 @@ import static ru.Main.datas;
                 namI++;
                 maxGrI--;
             }
-            Group group = datas.getDbService().getGroupRepository()
-                .saveAndFlush(new Group(nameGrp));
+            Group group = groupRepository.saveAndFlush(new Group(nameGrp));
 
             final int countOfIterationsCreatePeople = random.nextInt(3) + 2;
             for(i1 = 0; i1 < countOfIterationsCreatePeople; i1++) {
@@ -325,12 +344,12 @@ import static ru.Main.datas;
                 roleP = userP.getRole(Roles.PARENT);
                 roleP.getKids().add(userK1);
                 roleP.getKids().add(userK2);
-                datas.getDbService().getRoleRepository().saveAndFlush(roleP);
+                roleRepository.saveAndFlush(roleP);
                 userP.setSelKid(userK1.getId());
-                datas.getDbService().getUserRepository().saveAndFlush(userP);
+                userRepository.saveAndFlush(userP);
             }
 
-            group = datas.getDbService().getGroupRepository().saveAndFlush(group);
+            group = groupRepository.saveAndFlush(group);
             groupsPerSch.add(group);
 
             final List<String> nameSubjects = getRandSchedule(school, group, tea);
@@ -350,11 +369,13 @@ import static ru.Main.datas;
                 for(User kid : group.getKids()) {
                     if (!getRandomInPercent(25)) continue;
 
-                    int mark = random.nextInt(1, 6);
-                    String markStr = mark + "";
-                    Mark markDAO = datas.getDbService().getMarkRepository()
+                    final int mark = random.nextInt(1, 6);
+                    final String markStr = mark + "";
+                    boolean isExist = true;
+                    Mark markDAO = markRepository
                         .findByTypeAndStyleAndPeriodIdAndUsrId("per", nameSubject, period.getId(), kid.getId());
                     if(markDAO == null) {
+                        isExist = false;
                         markDAO = new Mark();
                         markDAO.setUsr(kid);
                         markDAO.setPeriod(period);
@@ -363,7 +384,10 @@ import static ru.Main.datas;
                         markDAO.setStyle(nameSubject);
                     }
                     markDAO.setMark(markStr);
-                    datas.getDbService().getMarkRepository().saveAndFlush(markDAO);
+                    markRepository.saveAndFlush(markDAO);
+                    if(!isExist) {
+                        marks.add(markDAO.getId());
+                    }
                 }
             }
         }
@@ -377,33 +401,34 @@ import static ru.Main.datas;
         schools.clear();
         periods.clear();
         lessons.clear();
+        days.clear();
+        marks.clear();
 
         final int countOfSchool = random.nextInt(3) + 2;
         int i, i1;
         School school = null;
         for(i = 0; i < countOfSchool; i++) {
             final String nameSch = namesSch[random.nextInt(3)] + (random.nextInt(5000) + 1);
-            final News news = datas.getDbService().getNewsRepository()
+            final News news = newsRepository
                 .saveAndFlush(new News("Мы(" + nameSch + ") перешли на этот сервис","11.11.2022", "Всем своим дружным коллективом мы остановились на данном варианте."));
-            newsList.add(news);
+            newsSet.add(news.getId());
 
-            final Contacts contacts = datas.getDbService().getContactsRepository()
-                .saveAndFlush(new Contacts(
-                    "8 (800) 555 35 36\n5 (353) 555 00 88",
-                    nameSch + "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
-                    "/static/media/map.jpg"));
-            contactsList.add(contacts);
+            final Contacts contacts = contactsRepository.saveAndFlush(new Contacts(
+                "8 (800) 555 35 36\n5 (353) 555 00 88",
+                nameSch + "Ближайшие станции метро:\nАлександровский сад, 610 м (Филёвская линия, выход 5)\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)",
+                "/static/media/map.jpg"));
+            contactsSet.add(contacts.getId());
 
-            final List<Period> periodsPerSch = datas.getDbService().getPeriodRepository()
-                .saveAllAndFlush(asList(
-                    new Period("I четверть", "01.09.24", "03.11.24"),
-                    new Period("II четверть", "12.11.24", "29.12.24"),
-                    new Period("III четверть", "12.01.25", "29.03.25"),
-                    new Period("IV четверть", "01.04.25", "30.08.25")
-                ));
-            periods.addAll(periodsPerSch);
+            final List<Period> periodsPerSch = periodRepository.saveAllAndFlush(asList(
+                new Period("I четверть", "01.09.24", "03.11.24"),
+                new Period("II четверть", "12.11.24", "29.12.24"),
+                new Period("III четверть", "12.01.25", "29.03.25"),
+                new Period("IV четверть", "01.04.25", "30.08.25")
+            ));
+            periods.addAll(periodsPerSch.stream()
+                    .map(Period::getId).collect(Collectors.toCollection(HashSet::new)));
 
-            school = datas.getDbService().getSchoolRepository()
+            school = schoolRepository
                 .saveAndFlush(new School(nameSch, asList(news), contacts, periodsPerSch));
 
             final int countIterationsCreateHteachers = random.nextInt(3) + 2;
@@ -432,7 +457,7 @@ import static ru.Main.datas;
 
             school.setGroups(getRandGroups(school, new ArrayList<>(school.getTeachers()), testPassword));
 
-            schools.add(datas.getDbService().getSchoolRepository().saveAndFlush(school));
+            schools.add(schoolRepository.saveAndFlush(school).getId());
         }
     }
 
@@ -444,64 +469,67 @@ import static ru.Main.datas;
         getRandSchools(testPassword);
     }
 
-    /** RU: очищаются/удаляются все данные */
+    /** RU: очищаются/удаляются все тестовые данные */
     public void testOff(){
         if(!ObjectUtils.isEmpty(days)) {
-            datas.getDbService().getDayRepository().deleteAll(days);
+            dayRepository.deleteAllById(days);
             days.clear();
         }
         if(!ObjectUtils.isEmpty(marks)) {
-            datas.getDbService().getMarkRepository().deleteAll(marks);
+            markRepository.deleteAllById(marks);
             marks.clear();
         }
         if(syst != null) {
-            datas.getDbService().getSystRepository().delete(syst);
+            systRepository.delete(syst);
             syst = null;
         }
         if(!ObjectUtils.isEmpty(lessons)) {
-            datas.getDbService().getLessonRepository().deleteAll(lessons);
+            lessonRepository.deleteAllById(lessons);
             lessons.clear();
         }
-        if(!ObjectUtils.isEmpty(users)) {
-            for(User user : users) {
-                user.rem();
+        if(!ObjectUtils.isEmpty(users) && !ObjectUtils.isEmpty(roles)) {
+            final List<User> listUsers = userRepository.findAllById(users);
+            for(User user : listUsers) {
+                user.getRoles().clear();
             }
-            users = datas.getDbService().getUserRepository().saveAllAndFlush(users);
-        }
-        if(!ObjectUtils.isEmpty(roles)) {
-            datas.getDbService().getRoleRepository().deleteAll(roles);
+            userRepository.saveAllAndFlush(listUsers);
+            roleRepository.deleteAllById(roles);
             roles.clear();
         }
+//        if(!ObjectUtils.isEmpty(roles)) {
+//            roleRepository.deleteAllById(roles);
+//            roles.clear();
+//        }
         if(!ObjectUtils.isEmpty(groups)) {
-            datas.getDbService().getGroupRepository().deleteAll(groups);
+//            groupRepository.deleteAll(groups);
             groups.clear();
         }
         if(!ObjectUtils.isEmpty(schools)) {
-            datas.getDbService().getSchoolRepository().deleteAll(schools);
+            schoolRepository.deleteAllById(schools);
             schools.clear();
         }
         if(!ObjectUtils.isEmpty(users)) {
-            datas.getDbService().getUserRepository().deleteAll(users);
+            userRepository.deleteAllById(users);
             users.clear();
         }
         if(request != null) {
-            datas.getDbService().getRequestRepository().delete(request);
+            requestRepository.delete(request);
             request = null;
         }
         if(!ObjectUtils.isEmpty(periods)) {
-            datas.getDbService().getPeriodRepository().deleteAll(periods);
+//            periodRepository.deleteAll(periods);
             periods.clear();
         }
-        if(!ObjectUtils.isEmpty(contactsList)) {
-            datas.getDbService().getContactsRepository().deleteAll(contactsList);
-            contactsList.clear();
+        if(!ObjectUtils.isEmpty(contactsSet)) {
+//            contactsRepository.deleteAll(contactsList);
+            contactsSet.clear();
         }
-        if(!ObjectUtils.isEmpty(newsList)) {
-            datas.getDbService().getNewsRepository().deleteAll(newsList);
-            newsList.clear();
+        if(!ObjectUtils.isEmpty(newsSet)) {
+//            newsRepository.deleteAll(newsList);
+            newsSet.clear();
         }
         if(!ObjectUtils.isEmpty(setts)) {
-            datas.getDbService().getSettingUserRepository().deleteAll(setts);
+//            settingUserRepository.deleteAll(setts);
             setts.clear();
         }
     }
@@ -547,28 +575,29 @@ import static ru.Main.datas;
      * }
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see TestController#getInfo(Subscriber, CustomToken)  Пример использования */
+     * @see TestController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public void getTestInfo(JsonTreeWriter wrtr) throws Exception {
         wrtr.name("bodyT").beginObject();
-        if(getSyst() != null) {
-            wrtr.name("testPassword").value(getSyst().getTestPassword());
+        if(syst != null) {
+            wrtr.name("testPassword").value(syst.getTestPassword());
         }
         wrtr.name("admins").beginObject();
-        if(getSyst() != null) {
-            getUsersT(wrtr, getSyst().getAdmins());
+        if(syst != null) {
+            getUsersT(wrtr, syst.getAdmins());
         }
         wrtr.endObject()
             .name("schools").beginObject();
-        if(getSchools() != null) {
-            for (School school : getSchools()) {
+        if(!ObjectUtils.isEmpty(schools)) {
+            final List<School> listSchools = schoolRepository.findAllById(schools);
+            for (School school : listSchools) {
                 wrtr.name(school.getId()+"").beginObject()
                     .name("name").value(school.getName())
                     .name("hteachers").beginObject();
                 getUsersT(wrtr, school.getHteachers());
                 wrtr.endObject()
                     .name("teachers").beginObject();
-                List<User> teachersUBySchool = datas.getDbService().getLessonRepository().uniqTeachersUBySchool(school.getId());
+                final List<User> teachersUBySchool = lessonRepository.uniqTeachersUBySchool(school.getId());
                 getUsersT(wrtr, teachersUBySchool);
                 wrtr.endObject()
                     .name("groups").beginObject();

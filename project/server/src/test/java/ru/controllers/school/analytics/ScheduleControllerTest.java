@@ -33,6 +33,9 @@ import ru.controllers.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.LessonRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -68,6 +71,9 @@ public class ScheduleControllerTest {
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
     private MockedStatic theMock;
+
+    @Autowired
+    private LessonRepository lessonRepository;
 
     @Autowired
     private DBService dbService;
@@ -195,7 +201,7 @@ public class ScheduleControllerTest {
 
     /** RU: создаём уроки для учеников */
     private void prepareLessons() {
-        when(dbService.getLessonRepository()
+        when(lessonRepository
             .findBySchoolIdAndGrpId(20L, 20L)).thenReturn(testUtils.lessons);
     }
 
@@ -216,7 +222,7 @@ public class ScheduleControllerTest {
     @Test @Tag("getInfo")
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getHteachers()).thenReturn(usersTest);
         user.getSelecRole().setYO(sch1);
@@ -267,8 +273,7 @@ public class ScheduleControllerTest {
         when(dbService.userById(23L)).thenReturn(usersTest.get(1));
         when(dbService.userById(24L)).thenReturn(usersTest.get(2));
         when(dbService.userById(25L)).thenReturn(usersTest.get(3));
-        when(dbService.getLessonRepository()
-            .uniqTeachersLBySchool(20L)).thenReturn(lessons);
+        when(lessonRepository.uniqTeachersLBySchool(20L)).thenReturn(lessons);
     }
 }
 
@@ -277,6 +282,13 @@ public class ScheduleControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class ScheduleControllerConfig {
+    private final SchoolRepository schoolRepository = mock(SchoolRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
+
+    @Bean
+    public LessonRepository lessonRepository() {
+        return mock(LessonRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
 
     @Bean
     public DBService dbService() {
@@ -284,12 +296,13 @@ class ScheduleControllerConfig {
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+    public MainService mainService(DBService dbService, LessonRepository lessonRepository) {
+        return new MainService(dbService, lessonRepository);
     }
 
     @Bean
-    public ScheduleController scheduleController() {
-        return spy(new ScheduleController());
+    public ScheduleController scheduleController(MainService mainService, DBService dbService,
+        LessonRepository lessonRepository) {
+        return spy(new ScheduleController(mainService, dbService, schoolRepository, lessonRepository, userRepository));
     }
 }

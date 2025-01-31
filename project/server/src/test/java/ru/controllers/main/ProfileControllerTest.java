@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -32,6 +33,8 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.SSEController;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -56,6 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static utils.TestUtils.defaultDescription;
 import static utils.TestUtils.getSub;
 
+@Slf4j
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import({ProfileControllerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -166,7 +170,7 @@ public class ProfileControllerTest {
     @CustomUser
     void chRole_whenGood_Kid() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        getSub().getUser().setSelRole(Roles.KID);
+        dbService.userById(getSub().getUserId()).setSelRole(Roles.KID);
 
         mockMvc.perform(patch("/profiles/chRole")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -385,6 +389,8 @@ public class ProfileControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class ProfileControllerConfig {
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final SettingUserRepository settingUserRepository = mock(SettingUserRepository.class);
 
     @Bean
     public PushService pushService() {
@@ -397,12 +403,12 @@ class ProfileControllerConfig {
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService, PushService pushService) {
-        return spy(new MainService(pushService, dbService, null));
+    public MainService mainService(DBService dbService) {
+        return spy(new MainService(dbService, null));
     }
 
     @Bean
-    public ProfileController profileController() {
-        return spy(new ProfileController());
+    public ProfileController profileController(MainService mainService, PushService pushService, DBService dbService) {
+        return spy(new ProfileController(userRepository, mainService, pushService, settingUserRepository, dbService));
     }
 }

@@ -29,9 +29,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.AuthController;
 import ru.controllers.SSEController;
 import ru.data.DAO.auth.User;
+import ru.data.reps.SystRepository;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.UserRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.services.MainService;
@@ -67,6 +69,9 @@ public class AdminsControllerTest {
 
     @Autowired
     private DBService dbService;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private AdminsController adminsController;
@@ -125,7 +130,7 @@ public class AdminsControllerTest {
     @Test @Tag("remPep")
     @CustomUser
     void remPep_whenGood_Admin() throws Exception {
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
         mockMvc.perform(delete("/admins/remPep")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -162,7 +167,7 @@ public class AdminsControllerTest {
     @Test @Tag("chPep")
     @CustomUser
     void chPep_whenGood_Admin() throws Exception {
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
         mockMvc.perform(patch("/admins/chPep")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -200,7 +205,7 @@ public class AdminsControllerTest {
     @Test @Tag("addPep")
     @CustomUser
     void addPep_whenGood_Admin() throws Exception {
-        when(dbService.getRoleRepository().saveAndFlush(any()))
+        when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         mockMvc.perform(post("/admins/addPep")
                 .header(SecurityConfig.authTokenHeader, bearerToken)
@@ -251,24 +256,27 @@ public class AdminsControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class AdminsControllerConfig {
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final SystRepository systRepository = mock(SystRepository.class);
 
     @Bean
     public DBService dbService() {
         return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
+
+    @Bean
+    public RoleRepository roleRepository() {
+        return mock(RoleRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public AuthController authController() {
-        return mock(AuthController.class);
-    }
-
-    @Bean
-    public AdminsController adminsController() {
-        return spy(new AdminsController());
+    public AdminsController adminsController(DBService dbService, MainService mainService, RoleRepository roleRepository) {
+        return spy(new AdminsController(userRepository, systRepository, dbService, mainService, roleRepository));
     }
 }

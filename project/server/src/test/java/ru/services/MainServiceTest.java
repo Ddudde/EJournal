@@ -11,6 +11,7 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Lesson;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.School;
+import ru.data.reps.school.LessonRepository;
 import ru.security.user.Roles;
 import ru.services.db.DBService;
 import ru.services.db.IniDBService;
@@ -35,6 +36,9 @@ public class MainServiceTest {
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DBService dbService;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private LessonRepository lessonRepository;
 
     @InjectMocks
     private MainService mainService;
@@ -78,7 +82,8 @@ public class MainServiceTest {
     @Test @Tag("teachersBySchool")
     void teachersBySchool_whenEmpty(@Mock School school) throws Exception {
         when(school.getTeachers()).thenReturn(new ArrayList<>());
-        when(dbService.getLessonRepository().uniqTeachersLBySchool(anyLong())).thenReturn(new ArrayList<>());
+        when(lessonRepository
+            .uniqTeachersLBySchool(anyLong())).thenReturn(new ArrayList<>());
 
         teachersBySchool_run("{\"nt\":{\"tea\":{}}}", school);
     }
@@ -97,7 +102,8 @@ public class MainServiceTest {
             new Object[] {namesSubj[4], 4L}
         ));
         when(school.getTeachers()).thenReturn(usersTest);
-        when(dbService.getLessonRepository().uniqTeachersLBySchool(anyLong())).thenReturn(teachersBySchool);
+        when(lessonRepository
+            .uniqTeachersLBySchool(anyLong())).thenReturn(teachersBySchool);
         when(dbService.userById(0L)).thenReturn(usersTest.get(0));
         when(dbService.userById(1L)).thenReturn(usersTest.get(1));
         when(dbService.userById(2L)).thenReturn(usersTest.get(2));
@@ -123,7 +129,8 @@ public class MainServiceTest {
     void getShedule_whenEmpty(@Mock(answer = Answers.RETURNS_DEEP_STUBS) User user) throws Exception {
         List<Lesson> lessons = new ArrayList<>();
         when(user.getSelRole()).thenReturn(Roles.PARENT);
-        when(dbService.getLessonRepository().findBySchoolIdAndGrpId(anyLong(), anyLong())).thenReturn(lessons);
+        when(lessonRepository
+            .findBySchoolIdAndGrpId(anyLong(), anyLong())).thenReturn(lessons);
         getShedule_run("{\"testShedule\":{}}",
             user);
     }
@@ -143,7 +150,8 @@ public class MainServiceTest {
             new Lesson(null, null, 4, 4, "394", "Физика", usersTest.get(3))
         ));
         when(user.getSelRole()).thenReturn(Roles.PARENT);
-        when(dbService.getLessonRepository().findBySchoolIdAndGrpId(anyLong(), anyLong())).thenReturn(lessons);
+        when(lessonRepository
+            .findBySchoolIdAndGrpId(anyLong(), anyLong())).thenReturn(lessons);
         getShedule_run("{\"testShedule\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}}}",
             user);
     }
@@ -163,7 +171,8 @@ public class MainServiceTest {
             new Lesson(null, new Group("1Б"), 4, 4, "394", "Физика", null)
         ));
         when(user.getSelRole()).thenReturn(Roles.TEACHER);
-        when(dbService.getLessonRepository().findBySchoolIdAndTeacherId(anyLong(), anyLong())).thenReturn(lessons);
+        when(lessonRepository
+            .findBySchoolIdAndTeacherId(anyLong(), anyLong())).thenReturn(lessons);
         getShedule_run("{\"testShedule\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"group\":\"1В\"},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"group\":\"1А\"},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"group\":\"1В\"},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"group\":\"1Б\"}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"group\":\"1В\"},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"group\":\"1А\"},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"group\":\"1В\"}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"group\":\"1Б\"},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"group\":\"1Б\"}}}}}",
             user);
     }

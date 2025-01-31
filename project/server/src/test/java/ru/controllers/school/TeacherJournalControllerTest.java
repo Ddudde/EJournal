@@ -35,6 +35,9 @@ import ru.data.DAO.school.Day;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Mark;
 import ru.data.DAO.school.School;
+import ru.data.reps.school.DayRepository;
+import ru.data.reps.school.LessonRepository;
+import ru.data.reps.school.MarkRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -56,7 +59,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.Main.datas;
 import static utils.TestUtils.*;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
@@ -73,7 +75,19 @@ public class TeacherJournalControllerTest {
     private MockedStatic theMock;
 
     @Autowired
+    private DayRepository dayRepository;
+
+    @Autowired
+    private MarkRepository markRepository;
+
+    @Autowired
     private DBService dbService;
+
+    @Autowired
+    private MainService mainService;
+
+    @Autowired
+    private LessonRepository lessonRepository;
 
     @Autowired
     private TeacherJournalController teacherJournalController;
@@ -130,7 +144,7 @@ public class TeacherJournalControllerTest {
     @Test @Tag("addHomework")
     @CustomUser(roles = Roles.TEACHER)
     void addHomework_whenGood_TEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -175,7 +189,7 @@ public class TeacherJournalControllerTest {
     @Test @Tag("addMark")
     @CustomUser(roles = Roles.TEACHER)
     void addMark_whenPeriodMark_TEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -209,14 +223,14 @@ public class TeacherJournalControllerTest {
     }
 
     private void prepareMarkPeriod() {
-        when(dbService.getMarkRepository()
+        when(markRepository
             .findByTypeAndStyleAndPeriodIdAndUsrId("per", "Химия", 20L, 20L)).thenReturn(null);
     }
 
     @Test @Tag("addMark")
     @CustomUser(roles = Roles.TEACHER)
     void addMark_whenExistMark_TEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -252,20 +266,19 @@ public class TeacherJournalControllerTest {
 
     private void prepareMarksForExistMark() {
         final List<Mark> marks = List.of(new Mark(), new Mark(), new Mark());
-        when(dbService.getMarkRepository()
-            .findByIdInAndUsrId(any(), eq(20L))).thenReturn(marks);
+        when(markRepository.findByIdInAndUsrId(any(), eq(20L))).thenReturn(marks);
     }
 
     private void prepareDaysForExistMark() {
         final List<Day> days = List.of(mock(Day.class), mock(Day.class), mock(Day.class));
-        when(dbService.getDayRepository()
+        when(dayRepository
             .findBySchoolIdAndTeacherIdAndGrpIdAndNameSubject(20L, 20L, 20L, "Химия")).thenReturn(days);
     }
 
     @Test @Tag("addMark")
     @CustomUser(roles = Roles.TEACHER)
     void addMark_whenGood_TEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -312,7 +325,7 @@ public class TeacherJournalControllerTest {
     @Test @Tag("getInfoPart3")
     @CustomUser(roles = Roles.TEACHER)
     void getInfoPart3_whenGood_TEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -336,12 +349,12 @@ public class TeacherJournalControllerTest {
 
     /** RU: создаёт обычные оценки и за период, нескольким ученикам */
     private void prepareMarksByKid() {
-        when(dbService.getMarkRepository().findByIdInAndUsrIdAndPeriodId(any(), eq(3872L), eq(9764L))).thenReturn(testUtils.marks);
-        when(dbService.getMarkRepository()
+        when(markRepository.findByIdInAndUsrIdAndPeriodId(any(), eq(3872L), eq(9764L))).thenReturn(testUtils.marks);
+        when(markRepository
             .findByIdInAndUsrIdAndPeriodId(any(), eq(1705L), eq(9764L))).thenReturn(testUtils.marks);
-        when(dbService.getMarkRepository()
+        when(markRepository
             .findByPeriodInAndTypeAndStyleAndUsrId(testUtils.periods, "per", "Химия", 3872L)).thenReturn(testUtils.marksPeriod);
-        when(dbService.getMarkRepository()
+        when(markRepository
             .findByPeriodInAndTypeAndStyleAndUsrId(testUtils.periods, "per", "Химия", 1705L)).thenReturn(testUtils.marksPeriod);
     }
 
@@ -353,7 +366,7 @@ public class TeacherJournalControllerTest {
             new Object[]{"11.06.22", 14L},
             new Object[]{"12.06.22", 15L}
         );
-        when(dbService.getDayRepository()
+        when(dayRepository
             .uniqDatAndMarksByParams(20L, 20L, 20L, "Химия")).thenReturn(marksByDay);
     }
 
@@ -364,7 +377,7 @@ public class TeacherJournalControllerTest {
             new Object[]{"11.06.22", "Упр. 7Стр. 103"},
             new Object[]{"12.06.22", "Упр. 5Стр. 103"}
         );
-        when(dbService.getDayRepository()
+        when(dayRepository
             .uniqDatAndHomeworkByParams(20L, 20L, "Химия")).thenReturn(homeworks);
     }
 
@@ -384,7 +397,7 @@ public class TeacherJournalControllerTest {
     @Test @Tag("getInfoPart2")
     @CustomUser(roles = Roles.TEACHER)
     void getInfoPart2_whenGood_TEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         user.getSelecRole().setYO(sch1);
         when(user.getId()).thenReturn(20L);
@@ -400,7 +413,7 @@ public class TeacherJournalControllerTest {
 
     private void prepareGroup() {
         final List<Long> groupsL = List.of(21L, 22L, 23L);
-        when(dbService.getLessonRepository()
+        when(lessonRepository
             .uniqGroupsBySchoolAndSubNameAndTeacher(20L, "Math", 20L)).thenReturn(groupsL);
         when(dbService.groupById(21L)).thenReturn(groups.get(0));
         when(dbService.groupById(22L)).thenReturn(groups.get(1));
@@ -423,7 +436,7 @@ public class TeacherJournalControllerTest {
     @Test @Tag("getInfoPart1")
     @CustomUser(roles = Roles.TEACHER)
     void getInfoPart1_whenGood_TEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         user.getSelecRole().setYO(sch1);
         when(user.getId()).thenReturn(20L);
@@ -441,19 +454,19 @@ public class TeacherJournalControllerTest {
 
     /** RU: создаём уроки для учеников */
     private void prepareLessons() {
-        when(dbService.getLessonRepository()
+        when(lessonRepository
             .findBySchoolIdAndTeacherId(20L, 20L)).thenReturn(testUtils.lessons);
     }
 
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void preparePeriods(School school) {
         when(school.getPeriods()).thenReturn(testUtils.periods);
-        doReturn(testUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
+        doReturn(testUtils.periods.get(2)).when(mainService).getActualPeriodBySchool(any());
     }
 
     private void prepareUniqSubjectsName() {
         final List<String> subjs = List.of("Англ.Яз.", "Химия", "Физика");
-        when(dbService.getLessonRepository()
+        when(lessonRepository
             .uniqSubNameBySchoolAndTeacher(20L, 20L)).thenReturn(subjs);
     }
 }
@@ -465,17 +478,33 @@ public class TeacherJournalControllerTest {
 class TeacherJournalControllerConfig {
 
     @Bean
+    public DayRepository dayRepository() {
+        return mock(DayRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public MarkRepository markRepository() {
+        return mock(MarkRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public LessonRepository lessonRepository() {
+        return mock(LessonRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
     public DBService dbService() {
         return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService) {
-        return spy(new MainService(null, dbService, null));
+    public MainService mainService(DBService dbService, LessonRepository lessonRepository) {
+        return spy(new MainService(dbService, lessonRepository));
     }
 
     @Bean
-    public TeacherJournalController teacherJournalController() {
-        return spy(new TeacherJournalController());
+    public TeacherJournalController teacherJournalController(LessonRepository lessonRepository,
+         DayRepository dayRepository, MarkRepository markRepository, DBService dbService, MainService mainService) {
+        return spy(new TeacherJournalController(dayRepository, markRepository, dbService, mainService, lessonRepository));
     }
 }

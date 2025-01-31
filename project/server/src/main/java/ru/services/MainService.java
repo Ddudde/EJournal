@@ -11,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.Main;
 import ru.controllers.CallInterface;
+import ru.controllers.SSEController;
 import ru.controllers.main.SettingsController;
 import ru.controllers.people.StudentsController;
 import ru.controllers.people.TeachersController;
@@ -23,13 +25,17 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Lesson;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.School;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.school.LessonRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.db.DBService;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.DAYS;
-import static ru.Main.datas;
 
 /** RU: главный сервис. Позволяет получить доступ к другим сервисам,
  * также имеет некоторый функционал в основном связанный с работой JSON */
@@ -46,29 +51,33 @@ import static ru.Main.datas;
 @RequiredArgsConstructor
 @Getter
 @Service public class MainService {
-
-    /** RU: объект отправляемый при ошибках. {"error":true}*/
-    private final JsonObject errObj = new JsonObject();
-
-    /** RU: объект отправляемый при пустых телах. {}*/
-    private final JsonObject nullObj = new JsonObject();
-
-    private final PushService pushService;
-
     private final DBService dbService;
+    private final LessonRepository lessonRepository;
 
-    private final EmailService emailService;
+    /** RU: Формат даты, к которой легко обратиться */
+    public final static DateFormat df = new SimpleDateFormat("dd.MM.yy");
+
+    /** RU: Формат даты, к которой легко обратиться */
+    public final static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy");
+
+    /** RU: Вкл/выкл режима подробного описания ошибок */
+    public static boolean debug = true;
+
+    /** RU: Вкл/выкл режима генерации тестовых данных */
+    public static boolean test = true;
 
     /** RU: Глобальные подписки, для авторизации и Server Sent Events*/
-    public final Map<UUID, Subscriber> subscriptions = new ConcurrentHashMap<>();
+    public static final Map<UUID, SubscriberDTO> subscriptions = new ConcurrentHashMap<>();
 
     /** RU: инициирует побочные сервисы */
     public void postConstruct() {
-        datas = this;
-        errObj.addProperty("error", true);
-        if(Main.test) {
-            subscriptions.put(UUID.fromString("9693b2a1-77bb-4426-8045-9f9b4395d454"), new Subscriber("nm12"));
+        if(test) {
+            subscriptions.put(UUID.fromString("9693b2a1-77bb-4426-8045-9f9b4395d454"), new SubscriberDTO("nm12"));
         }
+    }
+
+    public void getDbService() {
+//        return dbService;
     }
 
     /** RU: готовит JSON с данными списка пользователей.
@@ -134,7 +143,7 @@ import static ru.Main.datas;
      * </pre>
      * @return ID первой группы
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see StudentsController#getInfo(Subscriber, CustomToken)  Пример использования */
+     * @see StudentsController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public Long groupsBySchoolOfUser(User user, JsonWriter wrtr) throws Exception {
         Long first = null;
@@ -164,13 +173,13 @@ import static ru.Main.datas;
      * Дальше определённая дисциплина и учителя, которые её преподают
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see TeachersController#getTeachers(CustomToken, Subscriber)   Пример использования */
+     * @see TeachersController#getTeachers(CustomToken, SubscriberDTO)   Пример использования */
     @SuppressWarnings("JavadocReference")
     public void teachersBySchool(School school, JsonWriter wrtr) throws Exception {
         wrtr.name("nt").beginObject().name("tea").beginObject();
         usersByList(school.getTeachers(), true, wrtr);
         wrtr.endObject().endObject();
-        List<Object[]> lessU = dbService.getLessonRepository().uniqTeachersLBySchool(school.getId());
+        List<Object[]> lessU = lessonRepository.uniqTeachersLBySchool(school.getId());
         if (!ObjectUtils.isEmpty(lessU)) {
             Map<String, List<Long>> mapU = lessU.stream().collect(Collectors.groupingBy(
                 obj -> (String) obj[0],
@@ -190,18 +199,18 @@ import static ru.Main.datas;
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Новая версия с пустым JSON
-     * @see SettingsController#getSettings(Subscriber)  Пример использования */
+     * @see SettingsController#getSettings(SubscriberDTO)  Пример использования */
     public ResponseEntity getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat) {
         return getObjR(callable, wrtr, stat, true);
     }
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Новая версия с не пустым JSON
-     * @see SettingsController#getSettings(Subscriber)  Пример использования */
+     * @see SettingsController#getSettings(SubscriberDTO)  Пример использования */
     public ResponseEntity getObjR(CallInterface callable, JsonTreeWriter wrtr, HttpStatus stat, boolean nul) {
         var obj = getObj(callable, wrtr, !stat.isError());
         ResponseEntity.BodyBuilder build;
-        if(obj == errObj && !stat.isError()) {
+        if(obj == null && !stat.isError()) {
             build = ResponseEntity.internalServerError();
         } else {
             build = ResponseEntity.status(stat);
@@ -211,8 +220,8 @@ import static ru.Main.datas;
 
     /** RU: завершает JSON и выводит его в консоль, выполняя функцию.<br>
      * Старая версия
-     * @see SettingsController#getSettings(Subscriber)  Пример использования */
-    private JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, boolean bol) {
+     * @see SettingsController#getSettings(SubscriberDTO)  Пример использования */
+    private JsonObject getObj(CallInterface callable, JsonTreeWriter wrtr, boolean isNotError) {
         JsonObject ans = null;
         try {
             wrtr.endObject();
@@ -220,13 +229,12 @@ import static ru.Main.datas;
             log.debug("dsf" + ans);
             wrtr.close();
         } catch (Exception e) {
-            bol = Main.excp(e);
+            isNotError = Main.excp(e);
         }
-        if (ans != null && bol) {
-            callable.call(ans);
-        } else {
-            ans = errObj;
+        if (ans == null || !isNotError) {
+            return null;
         }
+        callable.call(ans);
         return ans;
     }
 
@@ -235,10 +243,10 @@ import static ru.Main.datas;
      * @param data JSON данные клиента
      * @param type POST/GET/PATCH...
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see SettingsController#getSettings(Subscriber)  Пример использования */
+     * @see SettingsController#getSettings(SubscriberDTO)  Пример использования */
     public JsonTreeWriter init(String data, String type) throws Exception {
         log.info(type + "! " + data);
-        JsonTreeWriter wrtr = new JsonTreeWriter();
+        final JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();
         return wrtr;
     }
@@ -262,15 +270,15 @@ import static ru.Main.datas;
      * }
      * </pre>
      * @exception Exception Исключение вызывается при ошибках с Json
-     * @see ScheduleController#getSchedule(Long, Subscriber, CustomToken)  Пример использования */
+     * @see ScheduleController#getSchedule(Long, SubscriberDTO, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public void getShedule(String nameWrtr, User user, JsonTreeWriter wrtr, Long gId) throws Exception {
-        Long schId = dbService.getFirstRole(user.getRoles()).getYO().getId();
+        final Long schId = dbService.getFirstRole(user.getRoles()).getYO().getId();
         List<Lesson> lessons;
         if (user.getSelRole() == Roles.TEACHER) {
-            lessons = dbService.getLessonRepository().findBySchoolIdAndTeacherId(schId, user.getId());
+            lessons = lessonRepository.findBySchoolIdAndTeacherId(schId, user.getId());
         } else {
-            lessons = dbService.getLessonRepository().findBySchoolIdAndGrpId(schId, gId);
+            lessons = lessonRepository.findBySchoolIdAndGrpId(schId, gId);
         }
         wrtr.name(nameWrtr).beginObject();
         lessons.sort(Comparator.comparing(Lesson::getDayWeek).thenComparing(Lesson::getNumLesson));
@@ -307,13 +315,13 @@ import static ru.Main.datas;
 
     /** RU: исходя из заданных периодов в школе и актуальной даты
      * выбирается активный период
-     * @see KidJournalController#getInfo(Subscriber, CustomToken)  Пример использования */
+     * @see KidJournalController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
     @SuppressWarnings("JavadocReference")
     public Period getActualPeriodBySchool(School school) {
         try {
             long now = DAYS.toMillis(LocalDate.now().toEpochDay());
             for (Period per : school.getPeriods()) {
-                if (now >= Main.df.parse(per.getDateN()).getTime() && now <= Main.df.parse(per.getDateK()).getTime()) {
+                if (now >= df.parse(per.getDateN()).getTime() && now <= df.parse(per.getDateK()).getTime()) {
                     return per;
                 }
             }
@@ -326,5 +334,31 @@ import static ru.Main.datas;
     /** @return В оригинале рандомится с нижним подчёркиванием, заменяем на дефис*/
     public static String getRandomUsername(Faker faker){
         return faker.internet().slug().replace('_', '-');
+    }
+
+    /** RU: изменияет Server Sent Events пользователя и устанавливает ему UUID
+     * @see SSEController#start(String)   */
+    public static void setSSE(SubscriberDTO subscriber, SseEmitter SSE, UUID uuid) {
+        subscriber.setSSE(SSE);
+        if(SSE == null) return;
+
+        subscriber.setSSEComplete(false);
+        SSE.onCompletion(() -> {
+            onCloseSSE(subscriber, uuid, "onCompletion");
+        });
+        SSE.onTimeout(() -> {
+            SSE.complete();
+            onCloseSSE(subscriber, uuid, "onTimeout");
+        });
+    }
+
+    private static void onCloseSSE(SubscriberDTO subscriber, UUID uuid, String reason) {
+        if(subscriber.getLogin() == null) {
+            subscriptions.remove(uuid);
+            log.debug("subscription " + uuid + " was closed from " + reason);
+        } else {
+            subscriber.setSSEComplete(true);
+            log.debug("subscription " + uuid + " was noclosed from " + reason + " " + subscriber.getLogin());
+        }
     }
 }

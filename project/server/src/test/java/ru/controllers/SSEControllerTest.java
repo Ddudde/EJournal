@@ -5,11 +5,14 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.epages.restdocs.apispec.SimpleType;
 import config.CustomUser;
 import config.SubscriberMethodArgumentResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +29,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.CustomToken;
@@ -57,6 +60,7 @@ public class SSEControllerTest {
     private final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+    private MockedStatic theMock;
 
     @Autowired
     private MainService mainService;
@@ -64,8 +68,14 @@ public class SSEControllerTest {
     @Autowired
     private SSEController sseController;
 
+    @AfterEach
+    void afterEach() {
+        theMock.close();
+    }
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
+        theMock = Mockito.mockStatic(MainService.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(sseController)
             .setMessageConverters(converter)
@@ -98,7 +108,7 @@ public class SSEControllerTest {
         mockMvc.perform(get("/sse/start"))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs("start_whenGoodNext_Anonim"));
-        assertNotEquals(0, mainService.subscriptions.size());
+        assertNotEquals(0, MainService.subscriptions.size());
     }
 
     /** RU: стартует со старой подпиской */
@@ -108,14 +118,14 @@ public class SSEControllerTest {
         final CustomToken cu = ((CustomToken) SecurityContextHolder.getContext()
             .getAuthentication());
         final String uuid = cu.getUUID();
-        final Subscriber sub = mock(Subscriber.class, Answers.RETURNS_DEEP_STUBS);
+        final SubscriberDTO sub = mock(SubscriberDTO.class, Answers.RETURNS_DEEP_STUBS);
         when(sub.getLogin()).thenReturn("nm12");
-        mainService.subscriptions.put(UUID.fromString(uuid), sub);
+        MainService.subscriptions.put(UUID.fromString(uuid), sub);
 
         mockMvc.perform(get("/sse/start/{uuidAuth}", uuid))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs("start_whenGood_AdminUser"));
-        verify(sub).setSSE(any(), eq(UUID.fromString(uuid)));
+        theMock.verify(() -> MainService.setSSE(eq(sub), any(), eq(UUID.fromString(uuid))));
     }
 }
 
@@ -132,11 +142,11 @@ class SSEControllerConfig {
 
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public SSEController sseController() {
-        return spy(new SSEController());
+    public SSEController sseController(MainService mainService) {
+        return spy(new SSEController(mainService));
     }
 }

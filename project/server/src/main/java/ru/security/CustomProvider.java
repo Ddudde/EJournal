@@ -32,7 +32,6 @@ public class CustomProvider implements AuthenticationProvider {
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(Set<String> roles) {
-        return roles.stream()
-            .map(SimpleGrantedAuthority::new).toList();
+        return roles.stream().map(SimpleGrantedAuthority::new).toList();
     }
 }

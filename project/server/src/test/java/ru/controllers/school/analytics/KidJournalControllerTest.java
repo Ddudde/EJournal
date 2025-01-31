@@ -28,6 +28,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
+import ru.data.reps.school.DayRepository;
+import ru.data.reps.school.LessonRepository;
+import ru.data.reps.school.MarkRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -47,7 +50,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.Main.datas;
 import static utils.TestUtils.defaultDescription;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
@@ -61,6 +63,18 @@ public class KidJournalControllerTest {
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+
+    @Autowired
+    private MarkRepository markRepository;
+
+    @Autowired
+    private LessonRepository lessonRepository;
+
+    @Autowired
+    private MainService mainService;
+
+    @Autowired
+    private DayRepository dayRepository;
 
     @Autowired
     private DBService dbService;
@@ -138,7 +152,7 @@ public class KidJournalControllerTest {
             new Object[]{"Математика", testUtils.marksPeriod.get(4)},
             new Object[]{"Англ. Яз", testUtils.marksPeriod.get(5)}
         );
-        when(dbService.getMarkRepository()
+        when(markRepository
             .uniqNameSubjectAndMarksByParams(any(), eq("per"), any())).thenReturn(marksPers);
     }
 
@@ -180,7 +194,7 @@ public class KidJournalControllerTest {
     /** RU: создаём обычные случайные оценки */
     private void prepareListLessons() {
         final List<String> lessons = List.of("Англ. Яз", "Математика", "Химия");
-        when(dbService.getLessonRepository()
+        when(lessonRepository
             .uniqSubNameBySchoolAndGrp(eq(20L), eq(20L))).thenReturn(lessons);
     }
 
@@ -194,14 +208,14 @@ public class KidJournalControllerTest {
             new Object[]{"Математика", "11.06.22", testUtils.marks.get(4)},
             new Object[]{"Англ. Яз", "12.06.22", testUtils.marks.get(5)}
         );
-        when(dbService.getDayRepository()
+        when(dayRepository
             .uniqNameSubjectAndDatAndMarksByParams(eq(20L), eq(20L), any())).thenReturn(marks);
     }
 
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void prepareActualPeriod(School school) {
         when(school.getPeriods()).thenReturn(testUtils.periods);
-        doReturn(testUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
+        doReturn(testUtils.periods.get(2)).when(mainService).getActualPeriodBySchool(any());
     }
 }
 
@@ -212,17 +226,33 @@ public class KidJournalControllerTest {
 class KidJournalControllerConfig {
 
     @Bean
+    public MarkRepository markRepository() {
+        return mock(MarkRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public LessonRepository lessonRepository() {
+        return mock(LessonRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public DayRepository dayRepository() {
+        return mock(DayRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
     public DBService dbService() {
         return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService) {
-        return spy(new MainService(null, dbService, null));
+    public MainService mainService(DBService dbService, LessonRepository lessonRepository) {
+        return spy(new MainService(dbService, lessonRepository));
     }
 
     @Bean
-    public KidJournalController kidJournalController() {
-        return spy(new KidJournalController());
+    public KidJournalController kidJournalController(DayRepository dayRepository, MarkRepository markRepository,
+        LessonRepository lessonRepository, DBService dbService, MainService mainService) {
+        return spy(new KidJournalController(markRepository, lessonRepository, dbService, mainService, dayRepository));
     }
 }

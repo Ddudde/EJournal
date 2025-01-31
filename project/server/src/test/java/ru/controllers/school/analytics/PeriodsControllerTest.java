@@ -32,6 +32,8 @@ import ru.configs.SecurityConfig;
 import ru.controllers.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
+import ru.data.reps.school.PeriodRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -127,7 +129,7 @@ public class PeriodsControllerTest {
     @Test @Tag("addPer")
     @CustomUser(roles = Roles.HTEACHER)
     void addPer_whenGood_HTEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getPeriods()).thenReturn(new ArrayList<>(testUtils.periods));
         user.getSelecRole().setYO(sch1);
@@ -165,7 +167,7 @@ public class PeriodsControllerTest {
     @Test @Tag("getInfo")
     @CustomUser(roles = Roles.HTEACHER)
     void getInfo_whenGood_HTEACHER() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getPeriods()).thenReturn(testUtils.periods);
         user.getSelecRole().setYO(sch1);
@@ -183,6 +185,8 @@ public class PeriodsControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class PeriodsControllerConfig {
+    private final SchoolRepository schoolRepository = mock(SchoolRepository.class);
+    private final PeriodRepository periodRepository = mock(PeriodRepository.class);
 
     @Bean
     public DBService dbService() {
@@ -191,11 +195,11 @@ class PeriodsControllerConfig {
 
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public PeriodsController periodsController() {
-        return spy(new PeriodsController());
+    public PeriodsController periodsController(DBService dbService, MainService mainService) {
+        return spy(new PeriodsController(periodRepository, schoolRepository, mainService, dbService));
     }
 }

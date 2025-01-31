@@ -9,13 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.Main;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
+import ru.services.MainService;
 import ru.services.db.IniDBService;
-
-import static ru.Main.datas;
 
 /** RU: Контроллер для раздела тестирования
  * <pre>
@@ -25,20 +22,21 @@ import static ru.Main.datas;
 @RequiredArgsConstructor
 @RestController public class TestController {
     private final IniDBService iniDBService;
+    private final MainService mainService;
 
     /** RU: изменяет параметры тестирования
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PutMapping("/chTests")
-    public ResponseEntity<JsonObject> chTests(@RequestBody DataTest body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PUT] /chTests");
+    public ResponseEntity<JsonObject> chTests(@RequestBody DataTest body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PUT] /chTests");
         switch (body.id) {
-            case "checkbox_debug" -> Main.debug = body.val;
+            case "checkbox_debug" -> MainService.debug = body.val;
             case "checkbox_test" -> {
-                Main.test = body.val;
-                if(Main.test) {
+                MainService.test = body.val;
+                if(MainService.test) {
                     iniDBService.testOn();
                 } else {
                     iniDBService.testOff();
@@ -47,23 +45,23 @@ import static ru.Main.datas;
             }
             default -> {}
         }
-        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: [start] отправка инфы для тестов
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @GetMapping("/getInfo")
-    public ResponseEntity<JsonObject> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
+    public ResponseEntity<JsonObject> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getInfo");
         wrtr.name("bodyS").beginObject()
-            .name("checkbox_debug").value(Main.debug)
-            .name("checkbox_test").value(Main.test)
+            .name("checkbox_debug").value(MainService.debug)
+            .name("checkbox_test").value(MainService.test)
             .endObject();
         iniDBService.getTestInfo(wrtr);
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.TEST, "main", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }

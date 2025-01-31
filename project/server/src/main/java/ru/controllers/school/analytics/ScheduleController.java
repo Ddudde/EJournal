@@ -13,68 +13,76 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSEController;
+import ru.controllers.TypesConnect;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Lesson;
 import ru.data.DAO.school.School;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.LessonRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
+import ru.services.MainService;
+import ru.services.db.DBService;
 
 import java.util.Comparator;
 import java.util.List;
-
-import static ru.Main.datas;
 
 /** RU: Контроллер для управления/просмотра расписания + Server Sent Events
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ScheduleController">http://localhost:9001/swagger/htmlSwag/#/ScheduleController</a>
  * </pre>
- * @see Subscriber */
+ * @see SubscriberDTO */
 @Slf4j
 @RequestMapping("/schedule")
 @RequiredArgsConstructor
 @RestController public class ScheduleController {
+    private final MainService mainService;
+    private final DBService dbService;
+    private final SchoolRepository schoolRepository;
+    private final LessonRepository lessonRepository;
+    private final UserRepository userRepository;
 
     /** RU: добавление урока + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addLesson")
-    public ResponseEntity<Void> addLesson(@RequestBody DataSchedule body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final JsonTreeWriter wrtr = datas.init("", "[POST] /addLesson");
-        final Group group = datas.getDbService().groupById(body.group);
+    public ResponseEntity<Void> addLesson(@RequestBody DataSchedule body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final JsonTreeWriter wrtr = mainService.init("", "[POST] /addLesson");
+        final Group group = dbService.groupById(body.group);
         if(group == null) return ResponseEntity.notFound().build();
 
         final Long schId = Long.parseLong(sub.getLvlSch()),
             teaId = body.obj.getAsJsonObject("prepod").get("id").getAsLong();
-        final School school = datas.getDbService().schoolById(schId);
+        final School school = dbService.schoolById(schId);
         final Lesson lesson = new Lesson();
-        final User teaU = datas.getDbService().userById(teaId);
+        final User teaU = dbService.userById(teaId);
         applyToTeacher(teaU, lesson, school);
         lesson.setNameSubject(body.obj.get("name").getAsString());
         lesson.setKab(body.obj.get("cabinet").getAsString());
         lesson.setGrp(group);
         lesson.setSchool(school);
         lesson.setDayWeek(body.day);
-        final List<Lesson> lessons = datas.getDbService().getLessonRepository().findBySchoolIdAndGrpIdAndDayWeek(school.getId(), group.getId(), body.day);
+        final List<Lesson> lessons = lessonRepository.findBySchoolIdAndGrpIdAndDayWeek(school.getId(), group.getId(), body.day);
         lessons.sort(Comparator.comparing(Lesson::getDayWeek).thenComparing(Lesson::getNumLesson));
         if(lessons.isEmpty()) {
             lesson.setNumLesson(0);
         } else {
             lesson.setNumLesson(lessons.get(lessons.size()-1).getNumLesson()+1);
         }
-        datas.getDbService().getLessonRepository().saveAndFlush(lesson);
-        datas.getDbService().getSchoolRepository().saveAndFlush(school);
+        lessonRepository.saveAndFlush(lesson);
+        schoolRepository.saveAndFlush(school);
         wrtr.name("bodyT").beginObject();
-        datas.teachersBySchool(school, wrtr);
+        mainService.teachersBySchool(school, wrtr);
         wrtr.endObject();
         body.obj.addProperty("group", group.getName());
         wrtr.name("day").value(body.day)
             .name("les").value(lesson.getNumLesson());
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             ans.add("body", body.obj);
             if(teaU != null) {
                 SSEController.sendEventFor("addLessonC", ans, TypesConnect.SCHEDULE, sub.getLvlSch(), "main", "tea", teaU.getId()+"");
@@ -93,32 +101,32 @@ import static ru.Main.datas;
         }
         if(!teaU.getRole(Roles.TEACHER).getSubjects().contains(lesson.getNameSubject())) {
             teaU.getRole(Roles.TEACHER).getSubjects().add(lesson.getNameSubject());
-            datas.getDbService().getUserRepository().saveAndFlush(teaU);
+            userRepository.saveAndFlush(teaU);
         }
     }
 
     /** RU: отправляет данные о расписании для группы
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @GetMapping("/getSchedule/{grId}")
-    public ResponseEntity<JsonObject> getSchedule(@PathVariable Long grId, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getSchedule");
+    public ResponseEntity<JsonObject> getSchedule(@PathVariable Long grId, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getSchedule");
         final var ref = new Object() {
             Group group = null;
         };
         if(user.getSelRole() == Roles.KID) {
             ref.group = user.getSelecRole().getGrp();
         } else if(user.getSelRole() == Roles.PARENT) {
-            final User kidU = datas.getDbService().userById(user.getSelKid());
+            final User kidU = dbService.userById(user.getSelKid());
             if(kidU != null) {
                 ref.group = kidU.getRole(Roles.KID).getGrp();
             }
         } else if(user.getSelRole() == Roles.HTEACHER) {
-            ref.group = datas.getDbService().groupById(grId);
+            ref.group = dbService.groupById(grId);
         }
-        datas.getShedule("body", user, wrtr, ref.group != null ? ref.group.getId() : null);
-        return datas.getObjR(ans -> {
+        mainService.getShedule("body", user, wrtr, ref.group != null ? ref.group.getId() : null);
+        return mainService.getObjR(ans -> {
             String group = null;
             if(user.getSelRole() == Roles.KID || user.getSelRole() == Roles.PARENT) {
                 group = ref.group.getId()+"";
@@ -130,13 +138,13 @@ import static ru.Main.datas;
     /** RU: [start] подтверждает клиенту права
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfo")
-    public ResponseEntity<Void> getInfo(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
+    public ResponseEntity<Void> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
         log.info("[GET] /getInfo");
-        final User user = sub.getUser();
-        final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
+        final User user = dbService.userById(sub.getUserId());
+        final School school = dbService.getFirstRole(user.getRoles()).getYO();
         SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.SCHEDULE, school.getId() +"", "main", "main", "main");
         return ResponseEntity.ok().build();
     }
@@ -144,20 +152,20 @@ import static ru.Main.datas;
     /** RU: [start] отправляет список групп и учителей учебного центра
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('HTEACHER') OR hasAuthority('TEACHER'))""")
     @GetMapping("/getInfoToHT")
-    public ResponseEntity<JsonObject> getInfoForHTeacherOrTEACHER(@AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfoToHT");
+    public ResponseEntity<JsonObject> getInfoForHTeacherOrTEACHER(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getInfoToHT");
         wrtr.name("bodyG").beginObject();
-        final Long firstG = datas.groupsBySchoolOfUser(user, wrtr);
-        final School school = datas.getDbService().getFirstRole(user.getRoles()).getYO();
+        final Long firstG = mainService.groupsBySchoolOfUser(user, wrtr);
+        final School school = dbService.getFirstRole(user.getRoles()).getYO();
         wrtr.name("firstG").value(firstG)
             .name("bodyT").beginObject();
-        datas.teachersBySchool(school, wrtr);
+        mainService.teachersBySchool(school, wrtr);
         wrtr.endObject();
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             String role = "main", teacherId = "main";
             if(user.getSelRole() == Roles.HTEACHER) role = "ht";
             if(user.getSelRole() == Roles.TEACHER) {

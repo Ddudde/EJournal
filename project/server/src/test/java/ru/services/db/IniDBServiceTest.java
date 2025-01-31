@@ -8,12 +8,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.data.DAO.Syst;
 import ru.data.DAO.auth.User;
+import ru.data.reps.ContactsRepository;
+import ru.data.reps.NewsRepository;
+import ru.data.reps.SystRepository;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.*;
 import ru.services.MainService;
 import utils.TestUtils;
 
@@ -37,11 +45,50 @@ public class IniDBServiceTest {
     private final TestUtils testUtils = new TestUtils();
     private final DBService dbService = mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
 
+    @Mock
+    private SettingUserRepository settingUserRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private SchoolRepository schoolRepository;
+
+    @Mock
+    private NewsRepository newsRepository;
+
+    @Mock
+    private ContactsRepository contactsRepository;
+
+    @Mock
+    private SystRepository systRepository;
+
+    @Mock
+    private DayRepository dayRepository;
+
+    @Mock
+    private LessonRepository lessonRepository;
+
+    @Mock
+    private MarkRepository markRepository;
+
+    @Mock
+    private GroupRepository groupRepository;
+
+    @Mock
+    private PeriodRepository periodRepository;
+
+    @Mock
+    private RequestRepository requestRepository;
+
     @Spy
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
 
     @Spy
-    private MainService mainService = new MainService(null, dbService, null);
+    private MainService mainService = new MainService(dbService, lessonRepository);
 
     @InjectMocks
     private IniDBService iniDBService;
@@ -59,74 +106,80 @@ public class IniDBServiceTest {
 
     @Test
     void testOff_whenGood() {
-        when(dbService.getNewsRepository().saveAllAndFlush(any()))
+        when(newsRepository.saveAllAndFlush(any()))
             .then(invocation -> new ArrayList<>((List)invocation.getArguments()[0]));
-        when(dbService.getContactsRepository().saveAllAndFlush(any()))
-            .then(invocation -> new ArrayList<>((List)invocation.getArguments()[0]));
-        when(dbService.getPeriodRepository().saveAllAndFlush(any()))
+        when(periodRepository.saveAllAndFlush(any()))
             .then(invocation -> new ArrayList<>((List)invocation.getArguments()[0]));
         when(dbService.createSyst(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getSystRepository().saveAndFlush(any()))
+        when(systRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getSettingUserRepository().saveAndFlush(any()))
+        when(settingUserRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getRoleRepository().saveAndFlush(any()))
+        when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getUserRepository().saveAndFlush(any()))
+        when(userRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getNewsRepository().saveAndFlush(any()))
+        when(newsRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getContactsRepository().saveAndFlush(any()))
+        when(contactsRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getSchoolRepository().saveAndFlush(any()))
+        when(schoolRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getGroupRepository().saveAndFlush(any()))
+        when(groupRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getLessonRepository().saveAndFlush(any()))
+        when(lessonRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
+        when(markRepository.saveAndFlush(any()))
+                .then(invocation -> invocation.getArguments()[0]);
+        when(dayRepository.saveAndFlush(any()))
+                .then(invocation -> invocation.getArguments()[0]);
+
         iniDBService.testOn();
         iniDBService.testOff();
+
         assertNull(iniDBService.getSyst());
     }
 
     @Test
     void testOn_whenGood() {
-        when(dbService.getNewsRepository().saveAllAndFlush(any()))
+        when(newsRepository.saveAllAndFlush(any()))
             .then(invocation -> new ArrayList<>((List)invocation.getArguments()[0]));
-        when(dbService.getContactsRepository().saveAllAndFlush(any()))
-            .then(invocation -> new ArrayList<>((List)invocation.getArguments()[0]));
-        when(dbService.getPeriodRepository().saveAllAndFlush(any()))
+        when(periodRepository.saveAllAndFlush(any()))
             .then(invocation -> new ArrayList<>((List)invocation.getArguments()[0]));
         when(dbService.createSyst(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getSystRepository().saveAndFlush(any()))
+        when(systRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getSettingUserRepository().saveAndFlush(any()))
+        when(settingUserRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getRoleRepository().saveAndFlush(any()))
+        when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getUserRepository().saveAndFlush(any()))
+        when(userRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getNewsRepository().saveAndFlush(any()))
+        when(newsRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getContactsRepository().saveAndFlush(any()))
+        when(contactsRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getSchoolRepository().saveAndFlush(any()))
+        when(schoolRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getGroupRepository().saveAndFlush(any()))
+        when(groupRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        when(dbService.getLessonRepository().saveAndFlush(any()))
+        when(lessonRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
+        when(markRepository.saveAndFlush(any()))
+            .then(invocation -> invocation.getArguments()[0]);
+        when(dayRepository.saveAndFlush(any()))
+            .then(invocation -> invocation.getArguments()[0]);
+
         iniDBService.testOn();
+
         assertNotNull(iniDBService.getSyst());
     }
 
     /** RU: общий сценарий тестирования */
     private void getTestInfo_run(String expected) throws Exception {
-        when(dbService.getLessonRepository()
-            .uniqTeachersUBySchool(anyLong())).thenReturn(usersTest);
-        JsonTreeWriter wrtr = new JsonTreeWriter();
+        final JsonTreeWriter wrtr = new JsonTreeWriter();
         wrtr.beginObject();
         iniDBService.getTestInfo(wrtr);
         wrtr.endObject();
@@ -145,7 +198,10 @@ public class IniDBServiceTest {
         Syst syst = mock(Syst.class, Answers.RETURNS_DEEP_STUBS);
         iniDBService.setSyst(syst);
         when(syst.getAdmins()).thenReturn(usersTest);
-        iniDBService.getSchools().addAll(schools);
+        when(lessonRepository.uniqTeachersUBySchool(anyLong())).thenReturn(usersTest);
+        when(schoolRepository.findAllById(any())).thenReturn(schools);
+        iniDBService.getSchools().add(0L);
+
         getTestInfo_run("{\"bodyT\":{\"testPassword\":null,\"admins\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"schools\":{\"9600\":{\"name\":\"Лицей №3293\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"groups\":{\"2323\":{\"name\":\"1А\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}},\"3456\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}},\"4354\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}}}},\"1137\":{\"name\":\"Гимназия №2246\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"groups\":{\"2323\":{\"name\":\"1А\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}},\"3456\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}},\"4354\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}}}},\"2903\":{\"name\":\"Школа №217\",\"hteachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"teachers\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"groups\":{\"2323\":{\"name\":\"1А\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}},\"3456\":{\"name\":\"1Б\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}},\"4354\":{\"name\":\"1В\",\"kids\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null},\"1705\":{\"fio\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"code\":null},\"1840\":{\"fio\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"code\":null},\"3225\":{\"fio\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"code\":null},\"9764\":{\"fio\":\"Силин А.К.\",\"login\":\"facere_a\",\"code\":null}},\"parents\":{\"3872\":{\"fio\":\"Якушева А.О.\",\"login\":\"esse_et\",\"code\":null}}}}}}}}");
     }
 

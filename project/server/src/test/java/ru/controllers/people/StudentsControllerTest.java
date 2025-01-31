@@ -33,6 +33,9 @@ import ru.controllers.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.GroupRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -68,6 +71,9 @@ public class StudentsControllerTest {
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
     private MockedStatic theMock;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private DBService dbService;
@@ -208,7 +214,7 @@ public class StudentsControllerTest {
         final Group group = mock(Group.class);
         getSub().setLvlGr(20L+"");
         getSub().setLvlSch(20L+"");
-        when(dbService.getRoleRepository().saveAndFlush(any()))
+        when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         when(dbService.groupById(20L)).thenReturn(group);
         when(dbService.schoolById(20L)).thenReturn(school);
@@ -313,6 +319,13 @@ public class StudentsControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class StudentsControllerConfig {
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final GroupRepository groupRepository = mock(GroupRepository.class);
+
+    @Bean
+    public RoleRepository roleRepository() {
+        return mock(RoleRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
 
     @Bean
     public DBService dbService() {
@@ -321,11 +334,11 @@ class StudentsControllerConfig {
 
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public StudentsController studentsController() {
-        return spy(new StudentsController());
+    public StudentsController studentsController(RoleRepository roleRepository, DBService dbService, MainService mainService) {
+        return spy(new StudentsController(userRepository, dbService, groupRepository, mainService, roleRepository));
     }
 }

@@ -30,10 +30,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.controllers.SSEController;
+import ru.controllers.TypesConnect;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
-import ru.data.SSE.TypesConnect;
+import ru.data.reps.auth.RoleRepository;
+import ru.data.reps.auth.UserRepository;
+import ru.data.reps.school.GroupRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -69,6 +72,9 @@ public class ParentsControllerTest {
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
     private MockedStatic theMock;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private DBService dbService;
@@ -210,7 +216,7 @@ public class ParentsControllerTest {
     @CustomUser(roles = Roles.HTEACHER)
     void addPar_whenGood_HTEACHER() throws Exception {
         final School sch1 = mock(School.class);
-        when(dbService.getRoleRepository().saveAndFlush(any()))
+        when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         when(dbService.userById(20L)).thenReturn(getCloneUsers(usersTest.get(0)));
         getSub().setLvlSch("20");
@@ -330,6 +336,13 @@ public class ParentsControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class ParentsControllerConfig {
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final GroupRepository groupRepository = mock(GroupRepository.class);
+
+    @Bean
+    public RoleRepository roleRepository() {
+        return mock(RoleRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
 
     @Bean
     public DBService dbService() {
@@ -338,11 +351,11 @@ class ParentsControllerConfig {
 
     @Bean(initMethod = "postConstruct")
     public MainService mainService(DBService dbService) {
-        return new MainService(null, dbService, null);
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public ParentsController parentsController() {
-        return spy(new ParentsController());
+    public ParentsController parentsController(RoleRepository roleRepository, DBService dbService, MainService mainService) {
+        return spy(new ParentsController(userRepository, dbService, groupRepository, mainService, roleRepository));
     }
 }

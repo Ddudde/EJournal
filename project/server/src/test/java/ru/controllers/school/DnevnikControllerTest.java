@@ -29,6 +29,8 @@ import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
+import ru.data.reps.school.DayRepository;
+import ru.data.reps.school.LessonRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -48,7 +50,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.Main.datas;
 import static utils.TestUtils.defaultDescription;
 import static utils.TestUtils.getSub;
 
@@ -63,6 +64,15 @@ public class DnevnikControllerTest {
     private final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+
+    @Autowired
+    private DayRepository dayRepository;
+
+    @Autowired
+    private LessonRepository lessonRepository;
+
+    @Autowired
+    private MainService mainService;
 
     @Autowired
     private DBService dbService;
@@ -113,7 +123,7 @@ public class DnevnikControllerTest {
     @Test @Tag("getDnevnik")
     @CustomUser(roles = Roles.KID)
     void getDnevnik_whenGood_KID_onlyHomework() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final Group group = mock(Group.class);
         final School school = mock(School.class);
         when(group.getId()).thenReturn(20L);
@@ -136,7 +146,7 @@ public class DnevnikControllerTest {
     @Test @Tag("getDnevnik")
     @CustomUser(roles = Roles.KID)
     void getDnevnik_whenGood_KID_withHomework() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final Group group = mock(Group.class);
         final School school = mock(School.class);
         when(group.getId()).thenReturn(20L);
@@ -160,7 +170,7 @@ public class DnevnikControllerTest {
     @Test @Tag("getDnevnik")
     @CustomUser(roles = Roles.KID)
     void getDnevnik_whenGood_KID() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final Group group = mock(Group.class);
         final School school = mock(School.class);
         when(group.getId()).thenReturn(20L);
@@ -187,7 +197,7 @@ public class DnevnikControllerTest {
             new Object[]{"Математика", "11.06.22", "Упр. 7Стр. 103"},
             new Object[]{"Англ. Яз", "12.06.22", "Упр. 5Стр. 103"}
         );
-        when(dbService.getDayRepository()
+        when(dayRepository
             .uniqNameSubAndDatAndHomeworkByParams(eq(20L), eq(20L))).thenReturn(homeworks);
     }
 
@@ -201,20 +211,19 @@ public class DnevnikControllerTest {
             new Object[]{"Математика", "11.06.22", testUtils.marks.get(4)},
             new Object[]{"Англ. Яз", "12.06.22", testUtils.marks.get(5)}
         );
-        when(dbService.getDayRepository()
+        when(dayRepository
             .uniqNameSubjectAndDatAndMarksByParams(eq(20L), eq(20L), any())).thenReturn(marks);
     }
 
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void prepareActualPeriod(School school) {
         when(school.getPeriods()).thenReturn(testUtils.periods);
-        doReturn(testUtils.periods.get(2)).when(datas).getActualPeriodBySchool(any());
+        doReturn(testUtils.periods.get(2)).when(mainService).getActualPeriodBySchool(any());
     }
 
     /** RU: создаём уроки для учеников */
     private void prepareLessons() {
-        when(dbService.getLessonRepository()
-            .findBySchoolIdAndGrpId(20L, 20L)).thenReturn(testUtils.lessons);
+        when(lessonRepository.findBySchoolIdAndGrpId(20L, 20L)).thenReturn(testUtils.lessons);
     }
 
     private final String getInfo_Summary = "[start] запускает клиента в раздел дневника и подтверждает клиенту права";
@@ -233,7 +242,7 @@ public class DnevnikControllerTest {
     @Test @Tag("getInfo")
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
-        final User user = getSub().getUser();
+        final User user = dbService.userById(getSub().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getId()).thenReturn(20L);
         user.getSelecRole().setYO(sch1);
@@ -253,17 +262,27 @@ public class DnevnikControllerTest {
 class DnevnikControllerConfig {
 
     @Bean
+    public DayRepository dayRepository() {
+        return mock(DayRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
+    public LessonRepository lessonRepository() {
+        return mock(LessonRepository.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    @Bean
     public DBService dbService() {
         return mock(DBService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService) {
-        return spy(new MainService(null, dbService, null));
+    public MainService mainService(DBService dbService, LessonRepository lessonRepository) {
+        return spy(new MainService(dbService, lessonRepository));
     }
 
     @Bean
-    public DnevnikController dnevnikController() {
-        return spy(new DnevnikController());
+    public DnevnikController dnevnikController(MainService mainService, DayRepository dayRepository, DBService dbService) {
+        return spy(new DnevnikController(dayRepository, dbService, mainService));
     }
 }

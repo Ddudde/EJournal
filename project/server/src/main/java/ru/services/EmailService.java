@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import ru.controllers.main.SettingsController;
-import ru.data.SSE.Subscriber;
+import ru.data.DTO.SubscriberDTO;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -15,7 +15,6 @@ import javax.mail.internet.MimeMessage;
 @Getter
 @RequiredArgsConstructor
 @Service public class EmailService {
-
     private final JavaMailSender emailSender;
 
     /** RU: адрес электронной почты с которой ведётся рассылка */
@@ -25,22 +24,26 @@ import javax.mail.internet.MimeMessage;
      * @param subject заголовок письма */
     private void sendHTMLMessage(String to, String subject, String text) {
         try {
-            MimeMessage mimeMessage = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setFrom(from);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(text, true);
-            emailSender.send(mimeMessage);
+            createAndSendMessage(to, subject, text);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private void createAndSendMessage(String to, String subject, String text) throws MessagingException {
+        MimeMessage mimeMessage = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(text, true);
+        emailSender.send(mimeMessage);
+    }
+
     /** RU: посылает на указанную почту код подтверждения для регистрации
      * @param to адрес электронной почты
      * @param code код восстановления
-     * @see SettingsController#startEmail(SettingsController.DataSettings, Subscriber)   Пример использования */
+     * @see SettingsController#startEmail(SettingsController.DataSettings, SubscriberDTO)   Пример использования */
     @SuppressWarnings("JavadocReference")
     public void sendRegCode(String to, String code) {
         String text = """
@@ -60,7 +63,7 @@ import javax.mail.internet.MimeMessage;
      * @param to адрес электронной почты
      * @param code код восстановления
      * @param title заголовок письма
-     * @see SettingsController#chPass(SettingsController.DataSettings, Subscriber)   Пример использования */
+     * @see SettingsController#chPass(SettingsController.DataSettings, SubscriberDTO)   Пример использования */
     @SuppressWarnings("JavadocReference")
     public void sendRecCode(String to, String code, String title) {
         String text = """

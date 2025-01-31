@@ -32,6 +32,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
+import ru.data.reps.NewsRepository;
+import ru.data.reps.SystRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.security.user.Roles;
@@ -50,7 +53,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.Main.datas;
 import static utils.TestUtils.defaultDescription;
 import static utils.TestUtils.getSub;
 
@@ -66,6 +68,9 @@ public class NewsControllerTest {
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
     private final String bearerToken = "9693b2a1-77bb-4426-8045-9f9b4395d454";
     private MockedStatic theMock;
+
+    @Autowired
+    private NewsRepository newsRepository;
 
     @Autowired
     private DBService dbService;
@@ -249,7 +254,7 @@ public class NewsControllerTest {
 
     /** RU: общий сценарий тестирования */
     private void addNews_run(String methodName, String body, String type, int timesSSE, ResultMatcher status) throws Exception {
-        when(dbService.getNewsRepository().saveAndFlush(any()))
+        when(newsRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         getSub().setLvlMore2(type);
 
@@ -269,7 +274,7 @@ public class NewsControllerTest {
     @Test @Tag("addNewsYO")
     @CustomUser(roles = Roles.HTEACHER)
     void addNewsYO_whenGood_HTeacher() throws Exception {
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         user.getSelecRole().setYO(mock(School.class));
 
         addNews_run("addNewsYO_whenGood_HTeacher", """
@@ -347,7 +352,7 @@ public class NewsControllerTest {
     @Test @Tag("getNews")
     @CustomUser
     void getNews_whenGood_YO_HTeacher() throws Exception {
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         user.getSelecRole().setYO(mock(School.class));
         when(user.getSelecRole().getYO().getNews())
             .thenReturn(testUtils.newsTest);
@@ -364,7 +369,7 @@ public class NewsControllerTest {
     @Test @Tag("getNews")
     @CustomUser
     void getNews_whenGood_Portal_AdminUser() throws Exception {
-        when(datas.getDbService().getSyst().getNews())
+        when(dbService.getSyst().getNews())
             .thenReturn(testUtils.newsTest);
 
         mockMvc.perform(get("/news/getNews/{type}", "Por")
@@ -382,8 +387,23 @@ public class NewsControllerTest {
 class NewsControllerConfig {
 
     @Bean
+    public SchoolRepository schoolRepository() {
+        return mock(SchoolRepository.class);
+    }
+
+    @Bean
+    public NewsRepository newsRepository() {
+        return mock(NewsRepository.class);
+    }
+
+    @Bean
+    public SystRepository systRepository() {
+        return mock(SystRepository.class);
+    }
+
+    @Bean
     public PushService pushService() {
-        return mock(PushService.class, Answers.RETURNS_DEEP_STUBS);
+        return mock(PushService.class);
     }
 
     @Bean
@@ -392,12 +412,15 @@ class NewsControllerConfig {
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService, PushService pushService) {
-        return new MainService(pushService, dbService, null);
+    public MainService mainService(DBService dbService) {
+        return new MainService(dbService, null);
     }
 
     @Bean
-    public NewsController newsController() {
-        return spy(new NewsController());
+    public NewsController newsController(DBService dbService, PushService pushService,
+         SystRepository systRepository, NewsRepository newsRepository,
+         SchoolRepository schoolRepository, MainService mainService) {
+        return spy(new NewsController(dbService, pushService, systRepository, newsRepository, schoolRepository,
+            mainService));
     }
 }

@@ -32,6 +32,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
 import ru.services.EmailService;
@@ -127,7 +129,7 @@ public class SettingsControllerTest {
     @CustomUser
     void checkCodeEmail_whenGood_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(dbService.userByCode("uuid")).thenReturn(user);
         user.getSettings().setEmailCode("code");
 
@@ -165,7 +167,7 @@ public class SettingsControllerTest {
     @CustomUser
     void startEmail_whenGood_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(dbService.userByCode("uuid")).thenReturn(user);
 
         mockMvc.perform(patch("/settings/startEmail/")
@@ -278,7 +280,7 @@ public class SettingsControllerTest {
     void chSettings_whenGood_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = mock(SettingUser.class);
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chSettings/")
@@ -304,7 +306,7 @@ public class SettingsControllerTest {
         final ResultMatcher statusCode = status().isNotFound();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmailCode("11112");
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/checkPasCodeEmail/")
@@ -329,7 +331,7 @@ public class SettingsControllerTest {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmailCode("1111");
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
 
@@ -358,7 +360,7 @@ public class SettingsControllerTest {
         final ResultMatcher statusCode = status().isAccepted();
         SettingUser settingUser = new SettingUser();
         settingUser.setSecFr("victoria_secret1");
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chPass/")
@@ -382,7 +384,7 @@ public class SettingsControllerTest {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setSecFr("victoria_secret");
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
 
@@ -411,7 +413,7 @@ public class SettingsControllerTest {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmail("test@mail.com");
-        User user = getSub().getUser();
+        User user = dbService.userById(getSub().getUserId());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
 
@@ -438,7 +440,7 @@ public class SettingsControllerTest {
     @CustomUser
     void getSettings_whenEmpty_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isNotFound();
-        when(getSub().getUser().getSettings()).thenReturn(null);
+        when(dbService.userById(getSub().getUserId()).getSettings()).thenReturn(null);
 
         mockMvc.perform(get("/settings/getSettings/")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -454,7 +456,7 @@ public class SettingsControllerTest {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setNNewReqSch(true);
-        when(getSub().getUser().getSettings()).thenReturn(settingUser);
+        when(dbService.userById(getSub().getUserId()).getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(get("/settings/getSettings/")
                 .header(SecurityConfig.authTokenHeader, bearerToken))
@@ -469,6 +471,8 @@ public class SettingsControllerTest {
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 class SettingsControllerConfig {
+    private final SettingUserRepository settingUserRepository = mock(SettingUserRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
 
     @Bean
     public EmailService emailService() {
@@ -486,8 +490,8 @@ class SettingsControllerConfig {
     }
 
     @Bean(initMethod = "postConstruct")
-    public MainService mainService(DBService dbService, EmailService emailService, PushService pushService) {
-        return spy(new MainService(pushService, dbService, emailService));
+    public MainService mainService(DBService dbService) {
+        return spy(new MainService(dbService, null));
     }
 
     @Bean
@@ -501,7 +505,9 @@ class SettingsControllerConfig {
     }
 
     @Bean
-    public SettingsController settingsController(PasswordEncoder passwordEncoder) {
-        return spy(new SettingsController(passwordEncoder));
+    public SettingsController settingsController(PasswordEncoder passwordEncoder, MainService mainService,
+         EmailService emailService, PushService pushService, DBService dbService) {
+        return spy(new SettingsController(passwordEncoder, mainService, settingUserRepository, emailService,
+            pushService, userRepository, dbService));
     }
 }

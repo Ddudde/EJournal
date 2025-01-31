@@ -22,6 +22,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.security.AuthenticationFilter;
 import ru.security.CustomProvider;
+import ru.services.db.DBService;
 
 /** RU: Начало описания security.
  * В БД пароли хранятся зашифрованно(BCryptPasswordEncoder).
@@ -42,6 +43,7 @@ import ru.security.CustomProvider;
     private static final RequestMatcher PROTECTED_URLS = new NegatedRequestMatcher(PUBLIC_URLS);
     public static final String authTokenHeader = "x-access-token";
     private final AuthenticationConfiguration authConfig;
+    private final DBService dbService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(8);
 
     private AuthenticationEntryPoint forbiddenEntryPoint() {
@@ -49,7 +51,7 @@ import ru.security.CustomProvider;
     }
 
     private AuthenticationFilter authenticationFilter() throws Exception {
-        return new AuthenticationFilter(PROTECTED_URLS, authConfig.getAuthenticationManager(), bCryptPasswordEncoder);
+        return new AuthenticationFilter(PROTECTED_URLS, authConfig.getAuthenticationManager(), bCryptPasswordEncoder, dbService);
     }
 
     @Bean

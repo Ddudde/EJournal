@@ -13,14 +13,16 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSEController;
+import ru.controllers.TypesConnect;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.School;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.school.PeriodRepository;
+import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
-
-import static ru.Main.datas;
+import ru.services.MainService;
+import ru.services.db.DBService;
 
 /** RU: Контроллер для просмотра и редактирования периодов обучения учебного центра
  * <pre>
@@ -30,31 +32,35 @@ import static ru.Main.datas;
 @RequestMapping("/periods")
 @RequiredArgsConstructor
 @RestController public class PeriodsController {
+    private final PeriodRepository periodRepository;
+    private final SchoolRepository schoolRepository;
+    private final MainService mainService;
+    private final DBService dbService;
 
     /** RU: создаёт новый период обучения учебного центра
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addPer")
-    public ResponseEntity<Void> addPer(@RequestBody DataPeriods body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /addPer");
+    public ResponseEntity<Void> addPer(@RequestBody DataPeriods body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addPer");
         final School school = user.getSelecRole().getYO();
         final Period period = new Period();
         period.setName(body.name);
         period.setDateN(body.perN);
         period.setDateK(body.perK);
-        datas.getDbService().getPeriodRepository().saveAndFlush(period);
+        periodRepository.saveAndFlush(period);
         school.getPeriods().add(period);
-        datas.getDbService().getSchoolRepository().saveAndFlush(school);
+        schoolRepository.saveAndFlush(school);
         wrtr.name("id").value(period.getId())
             .name("body").beginObject()
             .name("name").value(period.getName())
             .name("perN").value(period.getDateN())
             .name("perK").value(period.getDateK())
             .endObject();
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("addPerC", ans, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
         }, wrtr, HttpStatus.CREATED);
     }
@@ -62,12 +68,12 @@ import static ru.Main.datas;
     /** RU: [start] отправляет данные о расписании периодов обучения учебного центра
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @GetMapping("/getInfo")
-    public ResponseEntity<JsonObject> getInfo(CustomToken auth, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init("", "[GET] /getInfo");
+    public ResponseEntity<JsonObject> getInfo(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getInfo");
         final School school = user.getSelecRole().getYO();
         if (ObjectUtils.isEmpty(school.getPeriods())) {
             return ResponseEntity.notFound().build();
@@ -85,7 +91,7 @@ import static ru.Main.datas;
             i++;
         }
         wrtr.endObject();
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PERIODS, school.getId() +"", "main", "main", "main");
         }, wrtr, HttpStatus.OK, false);
     }

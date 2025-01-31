@@ -12,15 +12,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.Main;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
-import ru.data.SSE.Subscriber;
-import ru.data.SSE.TypesConnect;
+import ru.data.DTO.SubscriberDTO;
+import ru.data.reps.auth.SettingUserRepository;
+import ru.data.reps.auth.UserRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
+import ru.services.MainService;
+import ru.services.PushService;
+import ru.services.db.DBService;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -29,37 +32,41 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
-import static ru.Main.datas;
-
 /** RU: Контроллер для раздела авторизации
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/AuthController">http://localhost:9001/swagger/htmlSwag/#/AuthController</a>
  * </pre>
- * @see Subscriber */
+ * @see SubscriberDTO */
 @Slf4j
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @RestController public class AuthController {
     private final PasswordEncoder passwordEncoder;
+    private final SettingUserRepository settingUserRepository;
+    private final DBService dbService;
+    private final MainService mainService;
+    private final PushService pushService;
+    private final UserRepository userRepository;
 
     /** RU: [start] изменение подписки
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/infCon")
-    public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /infCon");
-        final User user = sub.getUser();
+    public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /infCon");
+        final User user = dbService.userByLogin(body.login);
         SSEController.changeSubscriber(auth.getUUID(), body.login, body.type, null, null, null, null);
         if(user == null) return ResponseEntity.ok().build();
 
+        sub.setUserId(user.getId());
         if (!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();
             if(body.permis && !settingUser.getTokens().contains(body.notifToken)) {
-                datas.getPushService().addToken(settingUser, body.notifToken);
-                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+                pushService.addToken(settingUser, body.notifToken);
+                settingUserRepository.saveAndFlush(settingUser);
             }
             if(!body.permis && settingUser.getTokens().contains(body.notifToken)){
-                datas.getPushService().remToken(settingUser, body.notifToken);
-                datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+                pushService.remToken(settingUser, body.notifToken);
+                settingUserRepository.saveAndFlush(settingUser);
             }
         }
         wrtr.name("role").value(user.getSelRole().i);
@@ -74,19 +81,19 @@ import static ru.Main.datas;
             }
             wrtr.endObject();
         }
-        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: завершение сеанса
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(#sub != null)")
     @PatchMapping("/remCon")
-    public ResponseEntity<Void> remCon(@AuthenticationPrincipal Subscriber sub, CustomToken auth) {
+    public ResponseEntity<Void> remCon(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         log.info("[PATCH] /remCon");
         if(sub.getLogin() != null) {
             log.debug("subscription remCon " + auth.getUUID() + " was noclosed " + sub.getLogin());
         } else {
-            datas.subscriptions.remove(UUID.fromString(auth.getUUID()));
+            MainService.subscriptions.remove(UUID.fromString(auth.getUUID()));
             log.debug("subscription remCon " + auth.getUUID() + " was closed");
         }
         sub.getSSE().complete();
@@ -95,19 +102,19 @@ import static ru.Main.datas;
 
     /** RU: авторизация пользователя
      * @see DocsHelpController#point(Object, Object) Описание */
-    @PreAuthorize("@code401.check(#sub.getUser() != null)")
+    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PostMapping("/auth")
-    public ResponseEntity<JsonObject> auth(@RequestBody DataAuth body, @AuthenticationPrincipal Subscriber sub, CustomToken auth) throws Exception {
-        final User user = sub.getUser();
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /auth");
+    public ResponseEntity<JsonObject> auth(@RequestBody DataAuth body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+        final User user = dbService.userById(sub.getUserId());
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /auth");
         if(!ObjectUtils.isEmpty(body.notifToken)) {
             final SettingUser settingUser = user.getSettings();
             if(body.permis) {
-                datas.getPushService().addToken(settingUser, body.notifToken);
+                pushService.addToken(settingUser, body.notifToken);
             } else {
-                datas.getPushService().remToken(settingUser, body.notifToken);
+                pushService.remToken(settingUser, body.notifToken);
             }
-            datas.getDbService().getSettingUserRepository().saveAndFlush(settingUser);
+            settingUserRepository.saveAndFlush(settingUser);
         }
         wrtr.name("auth").value(true)
             .name("login").value(user.getUsername())
@@ -128,18 +135,18 @@ import static ru.Main.datas;
             }
             wrtr.endObject();
         }
-        return datas.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
     /** RU: регистрация пользователя
      * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/reg")
     public ResponseEntity<JsonObject> reg(@RequestBody DataAuth body) throws Exception {
-        final User user = datas.getDbService().userByLogin(body.login),
-            user1 = datas.getDbService().userByCode(body.code);
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[POST] /reg");
+        final User user = dbService.userByLogin(body.login),
+            user1 = dbService.userByCode(body.code);
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /reg");
         final HttpStatus stat = createUser(wrtr, user, user1, body);
-        return datas.getObjR(ans -> {}, wrtr, stat, false);
+        return mainService.getObjR(ans -> {}, wrtr, stat, false);
     }
 
     private HttpStatus createUser(JsonTreeWriter wrtr, User existLogin, User invitedUser, DataAuth body) throws IOException {
@@ -151,11 +158,11 @@ import static ru.Main.datas;
 
         if(Objects.equals(body.mod, "inv")) {
             if(invitedUser.getSettings() == null) {
-                invitedUser.setSettings(datas.getDbService().createSettingUser(new SettingUser(body.ico)));
+                invitedUser.setSettings(dbService.createSettingUser(new SettingUser(body.ico)));
             }
-            invitedUser.setSelRole(datas.getDbService().getFirstRoleId(invitedUser.getRoles()));
-            if(invitedUser.getRoles().containsKey(Roles.PARENT) && !ObjectUtils.isEmpty(invitedUser.getRoles().get(Roles.PARENT).getKids())) {
-                invitedUser.setSelKid(invitedUser.getRoles().get(Roles.PARENT).getKids().get(0).getId());
+            invitedUser.setSelRole(dbService.getFirstRoleId(invitedUser.getRoles()));
+            if(invitedUser.getRoles().containsKey(Roles.PARENT) && !ObjectUtils.isEmpty(invitedUser.getRole(Roles.PARENT).getKids())) {
+                invitedUser.setSelKid(invitedUser.getRole(Roles.PARENT).getKids().get(0).getId());
             }
         } else if(Objects.equals(body.mod, "rea")){
             invitedUser.setCode(null);
@@ -164,14 +171,14 @@ import static ru.Main.datas;
         invitedUser.setUsername(body.login);
         invitedUser.setPassword(passwordEncoder.encode(body.par));
         invitedUser.getSettings().setIco(body.ico);
-        datas.getDbService().getUserRepository().saveAndFlush(invitedUser);
+        userRepository.saveAndFlush(invitedUser);
         if(invitedUser.getSettings() != null) {
-            final School school = datas.getDbService().getFirstRole(invitedUser.getRoles()).getYO();
+            final School school = dbService.getFirstRole(invitedUser.getRoles()).getYO();
             if (school != null) {
-                datas.getPushService().addTopic(invitedUser.getSettings(), school.getId() + "News");
+                pushService.addTopic(invitedUser.getSettings(), school.getId() + "News");
             }
-            datas.getPushService().addTopic(invitedUser.getSettings(), "news");
-            datas.getDbService().getSettingUserRepository().saveAndFlush(invitedUser.getSettings());
+            pushService.addTopic(invitedUser.getSettings(), "news");
+            settingUserRepository.saveAndFlush(invitedUser.getSettings());
             if(!ObjectUtils.isEmpty(body.secFr)) {
                 invitedUser.getSettings().setSecFr(body.secFr);
             }
@@ -183,7 +190,7 @@ import static ru.Main.datas;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/checkInvCode")
     public ResponseEntity<Void> checkInvCode(@RequestBody DataAuth body) {
-        final User user = datas.getDbService().userByCode(body.code);
+        final User user = dbService.userByCode(body.code);
         log.info("[POST] /checkInvCode ! " + body);
         if(user == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().build();
@@ -192,28 +199,28 @@ import static ru.Main.datas;
     /** RU: установка/обновление инвайта для регистрации + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("""
-        @code401.check(#sub.getUser() != null)
+        @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @PatchMapping("/setCodePep")
-    public ResponseEntity<JsonObject> setCodePep(@RequestBody DataAuth body, @AuthenticationPrincipal Subscriber sub) throws Exception {
-        final User user1 = datas.getDbService().userByLogin(body.id);
-        final JsonTreeWriter wrtr = datas.init(body.toString(), "[PATCH] /setCodePep");
+    public ResponseEntity<JsonObject> setCodePep(@RequestBody DataAuth body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+        final User user1 = dbService.userByLogin(body.id);
+        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /setCodePep");
         if(user1 == null) return ResponseEntity.notFound().build();
 
         final UUID uuid = UUID.randomUUID();
         final Instant after = Instant.now().plus(Duration.ofDays(30));
         final Date dateAfter = Date.from(after);
         user1.setCode(uuid.toString());
-        user1.setExpDate(Main.df.format(dateAfter));
-        datas.getDbService().getUserRepository().saveAndFlush(user1);
-        final Long schId = datas.getDbService().getFirstRole(user1.getRoles()).getYO().getId();
+        user1.setExpDate(MainService.df.format(dateAfter));
+        userRepository.saveAndFlush(user1);
+        final Long schId = dbService.getFirstRole(user1.getRoles()).getYO().getId();
 
         wrtr.name("id").value(user1.getId());
         log.debug("setCode " + uuid);
 
         wrtr.name("code").value(uuid.toString())
             .name("id1").value(schId);
-        return datas.getObjR(ans -> {
+        return mainService.getObjR(ans -> {
             SSEController.sendEventFor("codPepL2C", ans, sub.getType(), "null", sub.getLvlGr(), "adm", "main");
             SSEController.sendEventFor("codPepL1C", ans, sub.getType(), schId +"", sub.getLvlGr(), "ht", "main");
         }, wrtr, HttpStatus.OK, false);
