@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.api.grpc:proto-google-cloud-storage-v2:2.14.0-alpha" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.google.api.grpc" artifactId="proto-google-cloud-storage-v2" version="2.14.0-alpha" baseVersion="2.14.0-alpha" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.api.grpc/proto-google-cloud-storage-v2/2.14.0-alpha/b4793fb729340040663c2bc5760becbc25e1351a/proto-google-cloud-storage-v2-2.14.0-alpha.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51276272-a7b7-439a-8643-2e2974cc4bae" name="Changes" comment="Рефакторинг&#10;Апгрейд версии Gradle с 8.8 до 8.14.3&#10;Апгрейд Spring Boot с 2.7.15 до 2.7.18&#10;Разбитие на несколько файлов build.gradle">
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Рефакторинг/shelved.patch" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -194,6 +192,7 @@
       <workItem from="1764090916565" duration="3532000" />
       <workItem from="1764140787136" duration="6732000" />
       <workItem from="1764168609671" duration="1757000" />
+      <workItem from="1764178492497" duration="149000" />
     </task>
     <task id="LOCAL-00001" summary="Рефакторинг&#10;Апгрейд версии Gradle с 8.8 до 8.14.3&#10;Апгрейд Spring Boot с 2.7.15 до 2.7.18&#10;Разбитие на несколько файлов build.gradle">
       <option name="closed" value="true" />
