@@ -420,10 +420,10 @@ import static java.util.Arrays.asList;
             contactsSet.add(contacts.getId());
 
             final List<Period> periodsPerSch = periodRepository.saveAllAndFlush(asList(
-                new Period("I четверть", "01.09.24", "03.11.24"),
-                new Period("II четверть", "12.11.24", "29.12.24"),
-                new Period("III четверть", "12.01.25", "29.03.25"),
-                new Period("IV четверть", "01.04.25", "30.08.25")
+                new Period("I четверть", "01.09.25", "03.11.25"),
+                new Period("II четверть", "12.11.25", "29.12.25"),
+                new Period("III четверть", "12.01.26", "29.03.26"),
+                new Period("IV четверть", "01.04.26", "30.08.26")
             ));
             periods.addAll(periodsPerSch.stream()
                     .map(Period::getId).collect(Collectors.toCollection(HashSet::new)));

@@ -14,7 +14,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.Main;
 import ru.controllers.CallInterface;
-import ru.controllers.SSEController;
+import ru.controllers.SSE.SSEController;
 import ru.controllers.main.SettingsController;
 import ru.controllers.people.StudentsController;
 import ru.controllers.people.TeachersController;

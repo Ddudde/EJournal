@@ -1,0 +1,56 @@
+javadoc {
+    destinationDir = file("../../docs/EJournal/javaDoc")
+    options.encoding = 'UTF-8'
+    options.memberLevel = JavadocMemberLevel.PACKAGE
+    options.overview = 'src/docs/docDescriptionJavaDoc.html'
+}
+
+asciidoctorPdf {
+    sourceDir '../../'
+    outputDir '../../docs/EJournal/asciiDoc'
+    asciidoctorj {
+        attributes \
+            'icons': 'font',
+                'idseparator': '-',
+                'docinfo': 'shared',
+                'source-highlighter' : 'rouge'
+    }
+}
+
+asciidoctor {
+    sourceDir '../../'
+    sources {
+        exclude '/project/', '/release/', '/docs/', '/imgAsciiDoc/'
+    }
+    outputDir '../../docs/EJournal/asciiDoc'
+    baseDirFollowsSourceFile()
+    resources {
+        from(sourceDir) {
+            include 'imgAsciiDoc/**'
+        }
+    }
+    attributes \
+        'icons': 'font',
+//        'snippets': file("build/generated-snippets"),
+            'idseparator': '-',
+            'docinfo': 'shared'
+//    dependsOn asciidoctorPdf
+}
+
+openapi3 {
+    servers = [ { url = "http://localhost:8080" } ]
+    title = 'EJournal'
+    description = file('src/docs/docDescriptionSwagger.html').text
+    tagDescriptionsPropertiesFile = 'src/docs/swagger/tags.yaml'
+    version = '1.0'
+    format = 'json'
+    outputDirectory = '../../docs/EJournal/swagger/htmlSwag'
+    outputFileNamePrefix = 'swagger'
+    snippetsDirectory = "build/generated-snippets"
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(':openapi3')) {
+        test.enabled = false
+    }
+}

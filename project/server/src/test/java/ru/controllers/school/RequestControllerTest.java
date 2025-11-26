@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSEController;
+import ru.controllers.SSE.SSEController;
 import ru.data.reps.school.RequestRepository;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;

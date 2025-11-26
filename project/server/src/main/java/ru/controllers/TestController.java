@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.controllers.SSE.SSEController;
+import ru.controllers.SSE.TypesConnect;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
 import ru.services.MainService;

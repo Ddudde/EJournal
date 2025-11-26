@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
-import ru.controllers.TypesConnect;
+import ru.controllers.SSE.TypesConnect;
 import ru.security.user.Roles;
 import ru.services.MainService;
 

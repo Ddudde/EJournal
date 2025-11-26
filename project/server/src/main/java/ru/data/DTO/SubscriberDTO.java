@@ -2,7 +2,7 @@ package ru.data.DTO;
 
 import lombok.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import ru.controllers.TypesConnect;
+import ru.controllers.SSE.TypesConnect;
 
 /** RU: Подписка, используется для Server Sent Events и иногда в других местах */
 @Getter @Setter

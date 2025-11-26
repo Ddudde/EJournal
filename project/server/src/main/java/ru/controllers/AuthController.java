@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.controllers.SSE.SSEController;
+import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;

@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.controllers.SSE.SSEController;
+import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.News;
 import ru.data.DAO.Syst;
 import ru.data.DAO.auth.User;
