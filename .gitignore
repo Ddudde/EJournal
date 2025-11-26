@@ -6,6 +6,7 @@
 /project/server/exe/
 /project/server/mark/
 /project/server/.idea/sonarlint/
+/project/server/.idea/shelf/
 /project/server/.gradle/
 /project/server/gradle/
 /project/server/bin/
