@@ -1,7 +1,7 @@
 = Asciidoc
 Natik Muradov <myratoff25@gmail.com>
-:revnumber: v0.2
-:revdate: 16.01.2025
+:revnumber: v0.3
+:revdate: 26.11.2025
 :revremark: Основное описание
 :sectnums:
 :hardbreaks-option:
@@ -21,6 +21,7 @@ Github: https://github.com/Ddudde/EJournal
 * AsciiDoc: link:/EJournal/asciiDoc/[]
 
 Сервер:
+Выполнен в классическом монолите
 Находится в /project/server
 http://localhost:8080
 Java, Spring, REST + Server Sent Events
@@ -29,32 +30,41 @@ Java, Spring, REST + Server Sent Events
 Находится в /project/client
 http://localhost:3000/EJournal
 Github Pages: https://ddudde.github.io/EJournal/
-JS, React, Redux
+JS, React, Redux, PWA
 ====
 
-== Зависимости сервера
+== Технологии сервера
 ====
 NOTE: БД H2 для тестирования, а PostgreSQL для остального.
 Intellij IDEA в качестве IDE
 BD: H2
 http://localhost:8080/console_db
+JDK: GraalVM 21
+Сборка: Gradle 8.14.3
+БД: PostgreSQL 15 / H2
 
-. H2
-. PostgreSQL
-. Gradle
-. Spring Boot
-. Spring Boot Test
+Фреймворки:
+
+. Spring Boot 2.7.18
 . Spring Security
+. JUnit 5
+. Hibernate
+. Spring Data JPA
+
+Библиотеки/Технологии:
+
+. Spring REST Docs
 . JavaMail API
 . JavaFaker
-. JUnit
+. Firebase
+. GSON
+. Spring Boot Test
 . Mockito
 . Asciidoctor Gradle Plugin
 . Launch4j
 . Server-Sent Events
-. Hibernate
 . Lombok
-. Spring Data JPA
+. Logback
 ====
 == Зависимости клиента
 ====
