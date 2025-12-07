@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.configs.AppConfig;
 import ru.data.DAO.auth.SettingUser;
 
 import java.io.IOException;
@@ -27,8 +28,8 @@ import static java.util.Arrays.asList;
     private FirebaseMessaging firebase;
 
     public PushService() throws IOException {
-        InputStream config = getClass().getResourceAsStream("/e-journalfcm-firebase-auth.json");
-        FirebaseOptions options = FirebaseOptions.builder()
+        final InputStream config = PushService.class.getResourceAsStream(AppConfig.PATH_FIREBASE);
+        final FirebaseOptions options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(config))
             .build();
         if (!FirebaseApp.getApps().isEmpty()) return;

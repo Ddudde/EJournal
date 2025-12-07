@@ -3,7 +3,6 @@ package ru.controllers.school.analytics;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.school.analytics.PeriodsInnerDTO;
 import ru.data.reps.school.PeriodRepository;
 import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
@@ -43,7 +43,7 @@ import ru.services.db.DBService;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addPer")
-    public ResponseEntity<Void> addPer(@RequestBody DataPeriods body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addPer(@RequestBody PeriodsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addPer");
         final School school = user.getSelecRole().getYO();
@@ -96,11 +96,4 @@ import ru.services.db.DBService;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые PeriodsController в методах
-     * @see PeriodsController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataPeriods {
-        public final String name, perN, perK;
-    }
 }

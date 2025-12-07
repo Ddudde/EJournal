@@ -1,10 +1,11 @@
-package ru.data.DTO;
+package ru.data.DTO.controller.school;
 
 import lombok.NoArgsConstructor;
 import ru.data.DAO.school.Day;
 import ru.data.DAO.school.Mark;
 import ru.data.DAO.school.Period;
 
+//toDo: превратить в Builder
 @NoArgsConstructor
 public class PrepareMarkDTO {
     public Mark mark;

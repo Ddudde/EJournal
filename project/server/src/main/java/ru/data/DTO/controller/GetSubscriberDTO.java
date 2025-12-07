@@ -1,6 +1,7 @@
-package ru.data.DTO;
+package ru.data.DTO.controller;
 
 import lombok.AllArgsConstructor;
+import ru.data.DTO.SubscriberDTO;
 
 import java.util.UUID;
 

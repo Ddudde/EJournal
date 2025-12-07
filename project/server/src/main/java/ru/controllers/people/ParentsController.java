@@ -3,7 +3,6 @@ package ru.controllers.people;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.configs.AppConfig;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
@@ -19,6 +19,7 @@ import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.people.ParentsInnerDTO;
 import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.GroupRepository;
@@ -53,7 +54,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataParents body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody ParentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user1 = dbService.userById(body.id);
         final JsonTreeWriter wrtr = mainService.init("", "[DELETE] /remPep");
         final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
@@ -78,7 +79,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataParents body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody ParentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user1 = dbService.userById(body.id);
         final JsonTreeWriter wrtr = mainService.init("", "[PATCH] /chPep");
         if (user1 == null) return ResponseEntity.notFound().build();
@@ -100,7 +101,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addPar")
-    public ResponseEntity<Void> addPar(@RequestBody DataParents body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addPar(@RequestBody ParentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init("", "[POST] /addPar");
         final User kidU = dbService.userById(body.id);
         final JsonObject par = body.bod.getAsJsonObject("par");
@@ -118,7 +119,7 @@ import java.util.Map;
             final Role role = roleRepository.saveAndFlush(new Role(null, school));
             final User inv = new User(par.getAsJsonObject(id).get("name").getAsString(), Map.of(
                 Roles.PARENT, role
-            ), MainService.df.format(dateAfter));
+            ), AppConfig.df.format(dateAfter));
             userRepository.saveAndFlush(inv);
 
             wrtr.name(inv.getId() + "").beginObject()
@@ -207,13 +208,4 @@ import java.util.Map;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые ParentsController в методах
-     * @see ParentsController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataParents {
-        public final String name;
-        public final Long id;
-        public final JsonObject bod;
-    }
 }

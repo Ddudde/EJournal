@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import ru.configs.AppConfig;
 import ru.controllers.SSE.TypesConnect;
 import ru.security.user.Roles;
 import ru.services.MainService;
@@ -43,10 +44,10 @@ class ExamplesTest {
 
     @Test
     void testDate() {
-        final LocalDate start = LocalDate.parse("13.01.25", MainService.dateFormat);
+        final LocalDate start = LocalDate.parse("13.01.25", AppConfig.dateFormat);
         LocalDate nextOrSameFriday = start.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
         nextOrSameFriday = nextOrSameFriday.plusWeeks(1);
-        log.trace(nextOrSameFriday.format(MainService.dateFormat));
+        log.trace(nextOrSameFriday.format(AppConfig.dateFormat));
     }
 
     @Test

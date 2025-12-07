@@ -4,7 +4,6 @@ import com.github.javafaker.Faker;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import com.google.gson.stream.JsonWriter;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.Main;
+import ru.configs.AppConfig;
 import ru.controllers.CallInterface;
 import ru.controllers.SSE.SSEController;
 import ru.controllers.main.SettingsController;
@@ -31,11 +31,8 @@ import ru.security.user.CustomToken;
 import ru.security.user.Roles;
 import ru.services.db.DBService;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -49,35 +46,18 @@ import static java.util.concurrent.TimeUnit.DAYS;
  * также имеет некоторый функционал в основном связанный с работой JSON */
 @Slf4j
 @RequiredArgsConstructor
-@Getter
 @Service public class MainService {
     private final DBService dbService;
     private final LessonRepository lessonRepository;
-
-    /** RU: Формат даты, к которой легко обратиться */
-    public final static DateFormat df = new SimpleDateFormat("dd.MM.yy");
-
-    /** RU: Формат даты, к которой легко обратиться */
-    public final static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy");
-
-    /** RU: Вкл/выкл режима подробного описания ошибок */
-    public static boolean debug = true;
-
-    /** RU: Вкл/выкл режима генерации тестовых данных */
-    public static boolean test = true;
 
     /** RU: Глобальные подписки, для авторизации и Server Sent Events*/
     public static final Map<UUID, SubscriberDTO> subscriptions = new ConcurrentHashMap<>();
 
     /** RU: инициирует побочные сервисы */
     public void postConstruct() {
-        if(test) {
-            subscriptions.put(UUID.fromString("9693b2a1-77bb-4426-8045-9f9b4395d454"), new SubscriberDTO("nm12"));
+        if(AppConfig.TEST) {
+            subscriptions.put(UUID.fromString(AppConfig.TEST_BEARER_TOKEN), new SubscriberDTO(AppConfig.TEST_LOGIN));
         }
-    }
-
-    public void getDbService() {
-//        return dbService;
     }
 
     /** RU: готовит JSON с данными списка пользователей.
@@ -321,7 +301,7 @@ import static java.util.concurrent.TimeUnit.DAYS;
         try {
             long now = DAYS.toMillis(LocalDate.now().toEpochDay());
             for (Period per : school.getPeriods()) {
-                if (now >= df.parse(per.getDateN()).getTime() && now <= df.parse(per.getDateK()).getTime()) {
+                if (now >= AppConfig.df.parse(per.getDateN()).getTime() && now <= AppConfig.df.parse(per.getDateK()).getTime()) {
                     return per;
                 }
             }

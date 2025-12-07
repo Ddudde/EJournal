@@ -1,5 +1,6 @@
 package ru.configs;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -19,14 +20,16 @@ import java.util.concurrent.Executors;
 @EnableWebMvc
 @EnableAsync
 public class WebMVCConfig implements WebMvcConfigurer {
-
     private final GsonHttpMessageConverter converter = new GsonHttpMessageConverter();
+
+    @Value("${app.origins}")
+    private String[] origins;
 
     /** RU: настройка CORS */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins("http://localhost:3000", "http://192.168.1.66:3000", "https://ddudde.github.io", "http://localhost:9001")
+            .allowedOrigins(origins)
             .allowedMethods("GET","POST","PATCH","PUT","DELETE");
     }
 

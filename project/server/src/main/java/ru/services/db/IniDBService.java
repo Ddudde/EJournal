@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.Main;
+import ru.configs.AppConfig;
 import ru.controllers.TestController;
 import ru.data.DAO.Contacts;
 import ru.data.DAO.News;
@@ -94,7 +95,7 @@ import static java.util.Arrays.asList;
             "Петров В.В.", Map.of(
             Roles.ADMIN, role
         ), Roles.ADMIN, setts));
-        if(MainService.test) testOn();
+        if(AppConfig.TEST) testOn();
         checkDates();
     }
 
@@ -120,10 +121,10 @@ import static java.util.Arrays.asList;
     /** RU: проверяет коды подтверждений электронных почт и инвайтов на истечение срока */
     private void checkDates() {
         try {
-            final long now = MainService.df.parse(MainService.df.format(new Date())).getTime();
+            final long now = AppConfig.df.parse(AppConfig.df.format(new Date())).getTime();
             final List<User> listUsers = userRepository.findAllById(users);
             for(User user : listUsers) {
-                if(!ObjectUtils.isEmpty(user.getExpDate()) && now >= MainService.df.parse(user.getExpDate()).getTime()){
+                if(!ObjectUtils.isEmpty(user.getExpDate()) && now >= AppConfig.df.parse(user.getExpDate()).getTime()){
                     log.debug("Удалён код " + user.getCode() + " по истечению срока действия");
                     if(user.getUsername() == null) {
                         delInv(user);
@@ -132,7 +133,7 @@ import static java.util.Arrays.asList;
                     }
                 }
                 final SettingUser settingUser = user.getSettings();
-                if(settingUser != null && !ObjectUtils.isEmpty(settingUser.getExpDateEC()) && now >= MainService.df.parse(settingUser.getExpDateEC()).getTime()){
+                if(settingUser != null && !ObjectUtils.isEmpty(settingUser.getExpDateEC()) && now >= AppConfig.df.parse(settingUser.getExpDateEC()).getTime()){
                     log.debug("Удалён код email" + settingUser.getEmailCode() + " по истечению срока действия");
                     settingUser.setEmailCode(null);
                     settingUser.setExpDateEC(null);
@@ -160,7 +161,7 @@ import static java.util.Arrays.asList;
             final User user = userRepository
                 .saveAndFlush(new User(fio, Map.of(
                     selRole, role
-                ), selRole, MainService.df.format(dateAfter), uuid));
+                ), selRole, AppConfig.df.format(dateAfter), uuid));
             users.add(user.getId());
             return user;
         } else {
@@ -255,13 +256,13 @@ import static java.util.Arrays.asList;
      * </pre> */
     private void getRandomMark(Group group, School school, String nameSubj, int dayOfWeek, User teaU) {
         final Period period = mainService.getActualPeriodBySchool(school);
-        final LocalDate startDate = LocalDate.parse(period.getDateN(), MainService.dateFormat);
+        final LocalDate startDate = LocalDate.parse(period.getDateN(), AppConfig.dateFormat);
         dayOfWeek++;
         final TemporalAdjuster adjuster = TemporalAdjusters.nextOrSame(DayOfWeek.of(dayOfWeek));
         LocalDate nextOrSameDayOfWeek = startDate.with(adjuster);
         int plusWeek;
         for(plusWeek = 1; plusWeek < 5; plusWeek++) {
-            final String dayInFormat = nextOrSameDayOfWeek.format(MainService.dateFormat);
+            final String dayInFormat = nextOrSameDayOfWeek.format(AppConfig.dateFormat);
             nextOrSameDayOfWeek = nextOrSameDayOfWeek.plusWeeks(plusWeek);
             final Day day = new Day();
             day.setDat(dayInFormat);

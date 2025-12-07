@@ -3,7 +3,6 @@ package ru.controllers.school;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +15,9 @@ import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.*;
-import ru.data.DTO.PrepareMarkDTO;
+import ru.data.DTO.controller.school.PrepareMarkDTO;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.school.TeacherJournalInnerDTO;
 import ru.data.reps.school.DayRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.MarkRepository;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
     @PostMapping("/addHomework")
-    public ResponseEntity<Void> addHomework(@RequestBody DataPJournal body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addHomework(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addHomework");
         final Group group = dbService.groupById(body.group);
@@ -85,7 +85,7 @@ import java.util.stream.Collectors;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
     @PostMapping("/addMark")
-    public ResponseEntity<Void> addMark(@RequestBody DataPJournal body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addMark(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addMark");
         final Group group = dbService.groupById(body.group);
@@ -124,7 +124,7 @@ import java.util.stream.Collectors;
 
     /**
      * @return PrepareMarkDTO.oldMark.true - оценка существует */
-    private PrepareMarkDTO prepareMarkForCreate(School school, User user, DataPJournal body, Group group, String nameSubject) {
+    private PrepareMarkDTO prepareMarkForCreate(School school, User user, TeacherJournalInnerDTO body, Group group, String nameSubject) {
         final boolean isNotPeriodMark = body.per == null;
         PrepareMarkDTO prepareMarkDTO;
         if(!isNotPeriodMark) {
@@ -152,7 +152,7 @@ import java.util.stream.Collectors;
     }
 
     //toDo: перепроверить #numLes
-    private PrepareMarkDTO getExistMark(DataPJournal body, School school, User user, Group group, String nameSubject, String[] dayAndNumOfMark) {
+    private PrepareMarkDTO getExistMark(TeacherJournalInnerDTO body, School school, User user, Group group, String nameSubject, String[] dayAndNumOfMark) {
         final PrepareMarkDTO prepareMarkDTO = new PrepareMarkDTO();
         prepareMarkDTO.period = mainService.getActualPeriodBySchool(school);
         final Map<String, List<Long>> marksIdByDay = getMarksByDay(school.getId(), user.getId(), group.getId(), nameSubject);
@@ -360,13 +360,4 @@ import java.util.stream.Collectors;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые PJournalController в методах
-     * @see TeacherJournalController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataPJournal {
-        public final String style, day, mark, homework;
-        public final Long group, kid, per;
-        public final int weight;
-    }
 }

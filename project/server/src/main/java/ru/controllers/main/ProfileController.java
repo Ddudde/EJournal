@@ -3,7 +3,6 @@ package ru.controllers.main;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,7 @@ import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
+import ru.data.DTO.controller.main.ProfileInnerDTO;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
@@ -49,7 +49,7 @@ import ru.services.db.DBService;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('PARENT')""")
     @PatchMapping("/chKid")
-    public ResponseEntity<JsonObject> chKid(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<JsonObject> chKid(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chKid");
         if(body.idL == null) return ResponseEntity.notFound().build();
@@ -100,7 +100,7 @@ import ru.services.db.DBService;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/exit")
-    public ResponseEntity<Void> exit(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> exit(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         log.info("[PATCH] /exit ! " + body);
         final User user = dbService.userById(sub.getUserId());
         if (!ObjectUtils.isEmpty(body.notifToken)) {
@@ -118,7 +118,7 @@ import ru.services.db.DBService;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chEmail")
-    public ResponseEntity<Void> chEmail(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chEmail(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chEmail");
         user.getSelecRole().setEmail(body.email);
@@ -136,7 +136,7 @@ import ru.services.db.DBService;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chInfo")
-    public ResponseEntity<Void> chInfo(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chInfo(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chInfo");
         final SettingUser settingUser = user.getSettings();
@@ -154,7 +154,7 @@ import ru.services.db.DBService;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chLogin")
-    public ResponseEntity<Void> chLogin(@RequestBody DataProfile body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chLogin(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final User userN = dbService.userByLogin(body.nLogin);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chLogin");
@@ -240,14 +240,5 @@ import ru.services.db.DBService;
         return mainService.getObjR(ans -> {
             SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.PROFILES, "main", "main", "main", user.getUsername());
         }, wrtr, HttpStatus.OK, false);
-    }
-
-    /** RU: Данные клиента используемые ProfileController в методах
-     * @see ProfileController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataProfile {
-        public final String nLogin, info, email, notifToken;
-        public final Long idL;
     }
 }

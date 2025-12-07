@@ -3,7 +3,6 @@ package ru.controllers.school;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +14,7 @@ import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.school.Request;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.school.RequestInnerDTO;
 import ru.data.reps.school.RequestRepository;
 import ru.security.user.CustomToken;
 import ru.services.MainService;
@@ -35,7 +35,7 @@ import ru.services.db.DBService;
     /** RU: добавляет заявку + Server Sent Events
      * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/addReq")
-    public ResponseEntity<Void> addReq(@RequestBody DataRequest body) throws Exception {
+    public ResponseEntity<Void> addReq(@RequestBody RequestInnerDTO body) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addReq");
         if(ObjectUtils.isEmpty(body.email) || ObjectUtils.isEmpty(body.date) || ObjectUtils.isEmpty(body.fio)) {
             return ResponseEntity.notFound().build();
@@ -60,7 +60,7 @@ import ru.services.db.DBService;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/delReq")
-    public ResponseEntity<Void> delReq(@RequestBody DataRequest body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> delReq(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /delReq");
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -79,7 +79,7 @@ import ru.services.db.DBService;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chTitle")
-    public ResponseEntity<Void> chTitle(@RequestBody DataRequest body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chTitle(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chTitle");
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -100,7 +100,7 @@ import ru.services.db.DBService;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chDate")
-    public ResponseEntity<Void> chDate(@RequestBody DataRequest body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chDate(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chDate");
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -121,7 +121,7 @@ import ru.services.db.DBService;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chText")
-    public ResponseEntity<Void> chText(@RequestBody DataRequest body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chText(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chText");
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -156,12 +156,4 @@ import ru.services.db.DBService;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые RequestController в методах
-     * @see RequestController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataRequest {
-        public final String text, date, title, email, fio;
-        public final Long id;
-    }
 }

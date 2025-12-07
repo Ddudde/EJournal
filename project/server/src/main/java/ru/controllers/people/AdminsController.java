@@ -3,12 +3,12 @@ package ru.controllers.people;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.configs.AppConfig;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
@@ -16,6 +16,7 @@ import ru.data.DAO.Syst;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.people.AdminsInnerDTO;
 import ru.data.reps.SystRepository;
 import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.UserRepository;
@@ -49,7 +50,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataAdmins body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user1 = dbService.userById(body.id);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /remPep");
         final Syst syst = dbService.getSyst();
@@ -74,7 +75,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataAdmins body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user1 = dbService.userById(body.id);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chPep");
         if (user1 == null) return ResponseEntity.notFound().build();
@@ -95,7 +96,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PostMapping("/addPep")
-    public ResponseEntity<Void> addPep(@RequestBody DataAdmins body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final Syst syst = dbService.getSyst();
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addPep");
         if (syst == null) return ResponseEntity.notFound().build();
@@ -105,7 +106,7 @@ import java.util.Map;
         final Role role = roleRepository.saveAndFlush(new Role());
         final User inv = new User(body.name, Map.of(
             Roles.ADMIN, role
-            ), MainService.df.format(dateAfter));
+            ), AppConfig.df.format(dateAfter));
         userRepository.saveAndFlush(inv);
         syst.getAdmins().add(inv);
         systRepository.saveAndFlush(syst);
@@ -138,12 +139,4 @@ import java.util.Map;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые AdminsController в методах
-     * @see AdminsController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataAdmins {
-        public final String name;
-        public final Long id;
-    }
 }

@@ -90,6 +90,15 @@ NOTE: Vs Code в качестве IDE
 Пароль: 1111
 Радуемся!
 ====
+== Секреты(ключи) сервера
+====
+Расположение:
+/secrets.gradle
+/src/main/resources/e-journalfcm-firebase-auth.json
+/src/main/resources/config/application.yaml
+
+Также с большинством ключей есть шаблоны, они расположены вместе с файлами, пример названия: secrets.gradle.template
+====
 == Документы
 ====
 JavaDoc, AsciiDoc и Swagger генерируются при помощи Gradle

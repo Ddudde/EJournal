@@ -3,7 +3,6 @@ package ru.controllers;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +15,7 @@ import ru.data.DAO.Syst;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.ContactsInnerDTO;
 import ru.data.reps.ContactsRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
@@ -39,7 +39,7 @@ import java.util.Objects;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PutMapping("/chContact")
-    public ResponseEntity<Void> chContact(@RequestBody DataContacts body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chContact(@RequestBody ContactsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final Syst syst = dbService.getSyst();
         Contacts contacts = null;
@@ -109,11 +109,4 @@ import java.util.Objects;
         }, wrtr, stat, false);
     }
 
-    /** RU: Данные клиента используемые ContactsController в методах
-     * @see ContactsController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataContacts {
-        public final String p, p1, val;
-    }
 }

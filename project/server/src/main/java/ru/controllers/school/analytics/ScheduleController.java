@@ -3,7 +3,6 @@ package ru.controllers.school.analytics;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,7 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Lesson;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.school.analytics.ScheduleInnerDTO;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
@@ -51,7 +51,7 @@ import java.util.List;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addLesson")
-    public ResponseEntity<Void> addLesson(@RequestBody DataSchedule body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addLesson(@RequestBody ScheduleInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init("", "[POST] /addLesson");
         final Group group = dbService.groupById(body.group);
         if(group == null) return ResponseEntity.notFound().build();
@@ -176,13 +176,4 @@ import java.util.List;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые ScheduleController в методах
-     * @see ScheduleController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataSchedule {
-        public final JsonObject obj;
-        public final Long group;
-        public final int day;
-    }
 }

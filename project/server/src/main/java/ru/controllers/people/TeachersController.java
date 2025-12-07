@@ -3,13 +3,13 @@ package ru.controllers.people;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.configs.AppConfig;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
@@ -18,6 +18,7 @@ import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.people.TeachersInnerDTO;
 import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.GroupRepository;
@@ -55,7 +56,7 @@ import java.util.Set;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init("", "[DELETE] /remPep");
         final User user1 = dbService.userById(body.id);
         final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
@@ -83,7 +84,7 @@ import java.util.Set;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init("", "[PATCH] /chPep");
         final User user1 = dbService.userById(body.id);
         if(user1 == null) return ResponseEntity.notFound().build();
@@ -104,7 +105,7 @@ import java.util.Set;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addTea")
-    public ResponseEntity<Void> addTea(@RequestBody DataTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addTea(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init("", "[POST] /addTea");
         final School school = dbService.schoolById(Long.parseLong(sub.getLvlSch()));
         if(school == null) return ResponseEntity.notFound().build();
@@ -114,7 +115,7 @@ import java.util.Set;
         final Role role = roleRepository.saveAndFlush(new Role(null, Set.of(), school));
         final User inv = new User(body.name, Map.of(
             Roles.TEACHER, role
-            ), MainService.df.format(dateAfter));
+            ), AppConfig.df.format(dateAfter));
         userRepository.saveAndFlush(inv);
         school.getTeachers().add(inv);
         schoolRepository.saveAndFlush(school);
@@ -146,12 +147,4 @@ import java.util.Set;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые TeachersController в методах
-     * @see TeachersController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataTeachers {
-        public final String name;
-        public final Long id;
-    }
 }

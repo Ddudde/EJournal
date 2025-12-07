@@ -3,12 +3,12 @@ package ru.controllers.people;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.configs.AppConfig;
 import ru.controllers.DocsHelpController;
 import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
@@ -17,6 +17,7 @@ import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.people.HTeachersInnerDTO;
 import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.GroupRepository;
@@ -53,7 +54,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @DeleteMapping("/remGroup")
-    public ResponseEntity<Void> remGroup(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remGroup(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /remGroup");
         final School school = user.getSelecRole().getYO();
@@ -76,7 +77,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addGroup")
-    public ResponseEntity<Void> addGroup(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addGroup(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addGroup");
         final School school = user.getSelecRole().getYO();
@@ -100,7 +101,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
     @PatchMapping("/chGroup")
-    public ResponseEntity<Void> chGroup(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chGroup(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chGroup");
         final School school = user.getSelecRole().getYO();
@@ -123,7 +124,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chPep");
         final User user1 = dbService.userById(body.id);
@@ -155,7 +156,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /remPep");
         final User user = dbService.userById(sub.getUserId());
         final User user1 = dbService.userById(body.id);
@@ -188,7 +189,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @PostMapping("/addPep")
-    public ResponseEntity<Void> addPep(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addPep(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addPep");
         final User user = dbService.userById(sub.getUserId());
         Long schId = body.yo;
@@ -203,7 +204,7 @@ import java.util.Map;
         final Role role = roleRepository.saveAndFlush(new Role(null, sch));
         final User inv = new User(body.name, Map.of(
             Roles.HTEACHER, role
-        ), MainService.df.format(dateAfter));
+        ), AppConfig.df.format(dateAfter));
         userRepository.saveAndFlush(inv);
         sch.getHteachers().add(inv);
         schoolRepository.saveAndFlush(sch);
@@ -230,7 +231,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chSch")
-    public ResponseEntity<Void> chSch(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chSch(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final School school = dbService.schoolById(body.schId);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chSch");
         if (school == null) return ResponseEntity.notFound().build();
@@ -251,7 +252,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PostMapping("/addSch")
-    public ResponseEntity<Void> addSch(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addSch(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addSch");
         final School school = new School(body.name);
         schoolRepository.saveAndFlush(school);
@@ -270,7 +271,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/remSch")
-    public ResponseEntity<Void> remSch(@RequestBody DataHTeachers body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remSch(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final School school = dbService.schoolById(body.schId);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /remSch");
         if (school == null) return ResponseEntity.notFound().build();
@@ -319,12 +320,4 @@ import java.util.Map;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые HTeachersController в методах
-     * @see HTeachersController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataHTeachers {
-        public final String name;
-        public final Long schId, yo, id, grId;
-    }
 }

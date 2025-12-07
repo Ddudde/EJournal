@@ -12,6 +12,9 @@
 /project/server/gradle/
 /project/server/bin/
 /project/server/logs/
+/project/server/secrets.gradle
+/project/server/src/main/resources/config/application.yaml
+/project/server/src/main/resources/e-journalfcm-firebase-auth.json
 
 /project/Доки
 /release/

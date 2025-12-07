@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import ru.configs.AppConfig;
 import ru.data.DAO.school.School;
 import ru.services.MainService;
 
@@ -30,10 +31,10 @@ public class Main {
         log.trace("Hello world!");
     }
 
-    /** RU: Показывает исключение и в зависимости от свойства {@link MainService#debug} с подробностью
+    /** RU: Показывает исключение и в зависимости от свойства {@link AppConfig#DEBUG} с подробностью
      * @see MainService#getActualPeriodBySchool(School) Пример использования*/
     public static boolean excp(Exception e) {
-        if(MainService.debug) {
+        if(AppConfig.DEBUG) {
             e.printStackTrace();
         } else {
             log.debug(e.getMessage());

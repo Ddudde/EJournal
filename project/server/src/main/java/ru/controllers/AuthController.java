@@ -3,7 +3,6 @@ package ru.controllers;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +11,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.configs.AppConfig;
 import ru.controllers.SSE.SSEController;
-import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.AuthInnerDTO;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.security.user.CustomToken;
@@ -53,7 +53,7 @@ import java.util.UUID;
     /** RU: [start] изменение подписки
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/infCon")
-    public ResponseEntity<JsonObject> infCon(@RequestBody DataAuth body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> infCon(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /infCon");
         final User user = dbService.userByLogin(body.login);
         SSEController.changeSubscriber(auth.getUUID(), body.login, body.type, null, null, null, null);
@@ -106,7 +106,7 @@ import java.util.UUID;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PostMapping("/auth")
-    public ResponseEntity<JsonObject> auth(@RequestBody DataAuth body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+    public ResponseEntity<JsonObject> auth(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /auth");
         if(!ObjectUtils.isEmpty(body.notifToken)) {
@@ -143,7 +143,7 @@ import java.util.UUID;
     /** RU: регистрация пользователя
      * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/reg")
-    public ResponseEntity<JsonObject> reg(@RequestBody DataAuth body) throws Exception {
+    public ResponseEntity<JsonObject> reg(@RequestBody AuthInnerDTO body) throws Exception {
         final User user = dbService.userByLogin(body.login),
             user1 = dbService.userByCode(body.code);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /reg");
@@ -151,7 +151,7 @@ import java.util.UUID;
         return mainService.getObjR(ans -> {}, wrtr, stat, false);
     }
 
-    private HttpStatus createUser(JsonTreeWriter wrtr, User existLogin, User invitedUser, DataAuth body) throws IOException {
+    private HttpStatus createUser(JsonTreeWriter wrtr, User existLogin, User invitedUser, AuthInnerDTO body) throws IOException {
         if(invitedUser == null) {
             wrtr.name("error").value("noInv");
             return HttpStatus.ACCEPTED;
@@ -191,7 +191,7 @@ import java.util.UUID;
     /** RU: проверка инвайта для регистрации/регистрации новой роли
      * @see DocsHelpController#point(Object, Object) Описание */
     @PostMapping("/checkInvCode")
-    public ResponseEntity<Void> checkInvCode(@RequestBody DataAuth body) {
+    public ResponseEntity<Void> checkInvCode(@RequestBody AuthInnerDTO body) {
         final User user = dbService.userByCode(body.code);
         log.info("[POST] /checkInvCode ! " + body);
         if(user == null) return ResponseEntity.notFound().build();
@@ -204,7 +204,7 @@ import java.util.UUID;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @PatchMapping("/setCodePep")
-    public ResponseEntity<JsonObject> setCodePep(@RequestBody DataAuth body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<JsonObject> setCodePep(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user1 = dbService.userByLogin(body.id);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /setCodePep");
         if(user1 == null) return ResponseEntity.notFound().build();
@@ -213,7 +213,7 @@ import java.util.UUID;
         final Instant after = Instant.now().plus(Duration.ofDays(30));
         final Date dateAfter = Date.from(after);
         user1.setCode(uuid.toString());
-        user1.setExpDate(MainService.df.format(dateAfter));
+        user1.setExpDate(AppConfig.df.format(dateAfter));
         userRepository.saveAndFlush(user1);
         final Long schId = dbService.getFirstRole(user1.getRoles()).getYO().getId();
 
@@ -228,14 +228,4 @@ import java.util.UUID;
         }, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые AuthController в методах
-     * @see AuthController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataAuth {
-        public final TypesConnect type;
-        public final String code, notifToken, login, secFr, par, mod, id;
-        public final int ico;
-        public final boolean permis;
-    }
 }

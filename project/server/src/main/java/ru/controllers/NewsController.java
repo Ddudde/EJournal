@@ -3,7 +3,6 @@ package ru.controllers;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +16,7 @@ import ru.data.DAO.Syst;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.NewsInnerDTO;
 import ru.data.reps.NewsRepository;
 import ru.data.reps.SystRepository;
 import ru.data.reps.school.SchoolRepository;
@@ -51,7 +51,7 @@ import java.util.Objects;
         and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
         or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
     @DeleteMapping("/delNews")
-    public ResponseEntity<Void> delNews(@RequestBody DataNews body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> delNews(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /delNews");
         final News news = dbService.newsById(body.id);
         final Syst syst = dbService.getSyst();
@@ -78,7 +78,7 @@ import java.util.Objects;
         and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
         or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
     @PutMapping("/chNews")
-    public ResponseEntity<Void> chNews(@RequestBody DataNews body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chNews(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PUT] /chNews");
         final News news = dbService.newsById(body.id);
         HttpStatus stat = HttpStatus.NOT_FOUND;
@@ -117,7 +117,7 @@ import java.util.Objects;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and #sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER')""")
     @PostMapping("/addNewsYo")
-    public ResponseEntity<Void> addNewsYO(@RequestBody DataNews body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addNewsYO(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addNewsYo");
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -145,7 +145,7 @@ import java.util.Objects;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and #sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')""")
     @PostMapping("/addNewsPor")
-    public ResponseEntity<Void> addNewsPortal(@RequestBody DataNews body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addNewsPortal(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addNewsPor");
         final Syst syst = dbService.getSyst();
         HttpStatus stat = HttpStatus.NOT_FOUND;
@@ -205,12 +205,4 @@ import java.util.Objects;
         }, wrtr, stat, false);
     }
 
-    /** RU: Данные клиента используемые NewsController в методах
-     * @see NewsController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataNews {
-        public final String type, title, date, img_url, text, val;
-        public final Long id;
-    }
 }

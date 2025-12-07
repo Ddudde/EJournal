@@ -3,7 +3,6 @@ package ru.controllers.main;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +11,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.configs.AppConfig;
 import ru.controllers.DocsHelpController;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
+import ru.data.DTO.controller.main.SettingsInnerDTO;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
@@ -48,7 +49,7 @@ import java.util.UUID;
     /** RU: подтверждение емэйла
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/checkCodeEmail")
-    public ResponseEntity<Void> checkCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> checkCodeEmail(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         log.info("[PATCH] /checkCodeEmail ! " + body);
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
@@ -71,7 +72,7 @@ import java.util.UUID;
     /** RU: изменение электронной почты пользователя или добавление при регистрации
      * @see DocsHelpController#point(Object, Object) Описание */
     @PatchMapping("/startEmail")
-    public ResponseEntity<Void> startEmail(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> startEmail(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         log.info("[PATCH] /startEmail ! " + body);
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
@@ -88,7 +89,7 @@ import java.util.UUID;
         settingUser.setEmailCode(code);
         final Instant after = Instant.now().plus(Duration.ofDays(1));
         final Date dateAfter = Date.from(after);
-        settingUser.setExpDateEC(MainService.df.format(dateAfter));
+        settingUser.setExpDateEC(AppConfig.df.format(dateAfter));
         settingUserRepository.saveAndFlush(settingUser);
         return ResponseEntity.ok().build();
     }
@@ -97,7 +98,7 @@ import java.util.UUID;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PostMapping("/remNotifToken")
-    public ResponseEntity<Void> remNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remNotifToken(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         log.info("[POST] /remNotifToken ! " + body);
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
@@ -112,7 +113,7 @@ import java.util.UUID;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PostMapping("/addNotifToken")
-    public ResponseEntity<Void> addNotifToken(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addNotifToken(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         log.info("[POST] /addNotifToken ! " + body);
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
@@ -127,7 +128,7 @@ import java.util.UUID;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chSettings")
-    public ResponseEntity<Void> chSettings(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chSettings(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         log.info("[PATCH] /chBool ! " + body);
         if(ObjectUtils.isEmpty(body.id)) return ResponseEntity.notFound().build();
@@ -153,7 +154,7 @@ import java.util.UUID;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/checkPasCodeEmail")
-    public ResponseEntity<Void> checkPasCodeEmail(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> checkPasCodeEmail(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
         log.info("[PATCH] /checkPasCodeEmail ! " + body);
         final User user = empLogin ? dbService.userById(sub.getUserId()) : dbService.userByLogin(body.login);
@@ -172,7 +173,7 @@ import java.util.UUID;
      * @see DocsHelpController#point(Object, Object) Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
     @PatchMapping("/chPass")
-    public ResponseEntity<JsonObject> chPass(@RequestBody DataSettings body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<JsonObject> chPass(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
         final User user = empLogin ? dbService.userById(sub.getUserId()) : dbService.userByLogin(body.login);
         final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chPass");
@@ -189,7 +190,7 @@ import java.util.UUID;
                 settingUser.setEmailCode(code);
                 final Instant after = Instant.now().plus(Duration.ofDays(1));
                 final Date dateAfter = Date.from(after);
-                settingUser.setExpDateEC(MainService.df.format(dateAfter));
+                settingUser.setExpDateEC(AppConfig.df.format(dateAfter));
                 settingUserRepository.saveAndFlush(settingUser);
             } else {
                 user.setPassword(passwordEncoder.encode(body.nPar));
@@ -220,14 +221,4 @@ import java.util.UUID;
         return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
     }
 
-    /** RU: Данные клиента используемые SettingsController в методах
-     * @see SettingsController */
-    @ToString
-    @RequiredArgsConstructor
-    static final class DataSettings {
-        public final String secFR, nPar, id, email, emailCode, login,
-            notifToken, invCod, valString;
-        public final int valInt;
-        public final boolean val, emailSt;
-    }
 }

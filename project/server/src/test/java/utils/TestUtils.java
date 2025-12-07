@@ -119,6 +119,10 @@ public class TestUtils {
         return (User) getClone(user, User.class);
     }
 
+    public static Request getCloneRequests(Request request) {
+        return (Request) getClone(request, Request.class);
+    }
+
     private static Object getClone(Object object, Class className) {
         return gson.fromJson(gson.toJson(object),className);
     }

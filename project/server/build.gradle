@@ -1,17 +1,18 @@
 plugins {
     id 'java'
-    id 'com.epages.restdocs-api-spec' version "${restdocs_version}"
     id 'org.springframework.boot' version "${spring_version}"
     id 'io.spring.dependency-management' version "1.1.5"
     id 'war'
     id 'org.asciidoctor.jvm.convert' version "${asciiDocPlugin_version}"
     id 'org.asciidoctor.jvm.pdf' version "${asciiDocPlugin_version}"
+    id 'com.epages.restdocs-api-spec' version "${restdocs_version}"
     id "org.sonarqube" version "5.0.0.4638"
     id 'jacoco'
 }
 
 apply from: "$rootProject.projectDir/test.gradle"
 apply from: "$rootProject.projectDir/docs.gradle"
+apply from: "$rootProject.projectDir/secrets.gradle"
 
 group = 'ru'
 version = '1.0'
@@ -44,8 +45,6 @@ configurations {
 }
 
 dependencies {
-    implementation 'org.asciidoctor:asciidoctorj:2.5.7'
-    implementation 'org.asciidoctor:asciidoctorj-pdf:1.6.2'
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${spring_version}"
     implementation "org.springframework.boot:spring-boot-starter-web:${spring_version}"
     implementation "org.springframework.boot:spring-boot-starter-mail:${spring_version}"
@@ -82,10 +81,10 @@ task runnn_exe {
 
 sonar {
     properties {
-        property "sonar.host.url", "http://192.168.241.129:9000"
-        property "sonar.projectKey", "EJournal"
-        property "sonar.projectName", "EJournal"
-        property "sonar.token", "sqp_357b6c189bab0cd681ae2df163e8b63c9284021d"
+        property "sonar.host.url", "${sonarURL}"
+        property "sonar.projectKey", "${sonarProjectName}"
+        property "sonar.projectName", "${sonarProjectName}"
+        property "sonar.token", "${sonarToken}"
         property "sonar.scm.disabled", "True"
         property "sonar.coverage.jacoco.xmlReportPath", "${layout.buildDirectory}/reports/jacoco.xml"
     }

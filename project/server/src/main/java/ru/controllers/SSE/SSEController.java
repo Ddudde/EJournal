@@ -1,5 +1,6 @@
 package ru.controllers.SSE;
 
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import ru.data.DTO.GetSubscriberDTO;
+import ru.data.DTO.controller.GetSubscriberDTO;
 import ru.data.DTO.SubscriberDTO;
 import ru.services.MainService;
 
@@ -24,10 +25,9 @@ import java.util.UUID;
  * @see SubscriberDTO */
 @Slf4j
 @RequestMapping("/sse")
-@RequiredArgsConstructor
+@NoArgsConstructor
 @RestController
 public class SSEController {
-    private final MainService mainService;
 
     /** RU: [start] открытие Server Sent Events для нового клиента
      * или сохранение подписки для старого пользователя
