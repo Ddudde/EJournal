@@ -3,13 +3,13 @@ package ru.controllers.main;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.epages.restdocs.apispec.SimpleType;
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
@@ -17,10 +17,11 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
+import ru.data.DTO.service.data.UserServiceDTO;
 import ru.security.user.Roles;
-import ru.services.PushService;
-import ru.services.db.DBService;
+import ru.services.IPushService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 import utils.TestUtils;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
@@ -38,8 +39,9 @@ import static utils.TestUtils.getSub;
 
 @Slf4j
 public class ProfileControllerTest extends AbstractTestIntegration {
-    private final DBService dbService;
-    private final PushService pushService;
+    private final IDBService dbService;
+    private final IPushService pushService;
+    private final ISSEService sseService;
     private static final String chKid_Summary = "Изменение контроллируемого ученика у родителя";
     private static final String chRole_Summary = "Изменение роли на следующую по иерархии из имеющихся у пользователя";
     private static final String exit_Summary = "Выход с аккаунта";
@@ -48,12 +50,13 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     private static final String chLogin_Summary = "Изменение логина пользователя + Server Sent Events";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<UserServiceDTO> answer;
 
     @Autowired
-    public ProfileControllerTest(DBService dbService, PushService pushService, ProfileController profileController) {
+    public ProfileControllerTest(IDBService dbService, IPushService pushService, ISSEService sseService, ProfileController profileController) {
         this.dbService = dbService;
         this.pushService = pushService;
+        this.sseService = sseService;
         this.testController = profileController;
         nameTestedClass = "ProfileController";
     }
@@ -161,8 +164,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     @Test @Tag("chEmail")
@@ -179,9 +181,9 @@ public class ProfileControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"email\":\"mail1@example.com\",\"role\":4}}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chInfo")
@@ -196,8 +198,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     @Test @Tag("chInfo")
@@ -214,9 +215,9 @@ public class ProfileControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"more\":\"testInfo\"}}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chLogin")
@@ -230,8 +231,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -248,13 +248,13 @@ public class ProfileControllerTest extends AbstractTestIntegration {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
-                "nLogin": nm
+                "nLogin": "nm"
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"oLogin\":\"nm12\",\"nLogin\":\"nm\"}}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     private RestDocumentationResultHandler getProfile_Docs(String methodName) {

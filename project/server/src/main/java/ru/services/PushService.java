@@ -22,7 +22,7 @@ import static java.util.Arrays.asList;
  *  Протестировать работоспособность
  * </pre> */
 @Slf4j
-@Service public class PushService {
+@Service public class PushService implements IPushService {
 
     /** RU: обращение к Firebase */
     private FirebaseMessaging firebase;
@@ -39,6 +39,7 @@ import static java.util.Arrays.asList;
     }
 
     /** RU: отправка уведомлений пользователям определённой темы */
+    @Override
     public void send(String topic, String title, String text, String imgUrl) {
         try {
             List<Message> messages = asList(
@@ -59,6 +60,7 @@ import static java.util.Arrays.asList;
     }
 
     /** RU: отправка уведомлений списку пользователей */
+    @Override
     public void send(List<String> registrationTokens, String title, String text, String imgUrl) {
         BatchResponse response = null;
         try {
@@ -88,6 +90,7 @@ import static java.util.Arrays.asList;
     }
 
     /** RU: подписывает токен уведомлений пользователя на определённую тему */
+    @Override
     public int subscribe(List<String> registrationTokens, String topic) {
         try {
             TopicManagementResponse response = firebase.subscribeToTopic(registrationTokens, topic);
@@ -103,6 +106,7 @@ import static java.util.Arrays.asList;
     }
 
     /** RU: отписывает токен уведомлений пользователя на определённую тему */
+    @Override
     public int unsubscribe(List<String> registrationTokens, String topic) {
         try {
             TopicManagementResponse response = firebase.unsubscribeFromTopic(registrationTokens, topic);
@@ -118,6 +122,7 @@ import static java.util.Arrays.asList;
     }
 
     /** RU: добавляет токен уведомлений пользователю */
+    @Override
     public void addToken(SettingUser settingUser, String token) {
         settingUser.getTokens().add(token);
         settingUser.getTopics().forEach((topic) -> {
@@ -132,6 +137,7 @@ import static java.util.Arrays.asList;
     }
 
     /** RU: удаляет токен уведомлений пользователя */
+    @Override
     public void remToken(SettingUser settingUser, String token) {
         settingUser.getTokens().remove(token);
         settingUser.getTopics().forEach((topic) -> {
@@ -140,12 +146,14 @@ import static java.util.Arrays.asList;
     }
 
     /** RU: добавляет тему пользователю */
+    @Override
     public void addTopic(SettingUser settingUser, String topic) {
         settingUser.getTopics().add(topic);
 //        pushService.subscribe(new ArrayList<>(settingUser.getTokens()), topic);
     }
 
     /** RU: удаляет тему пользователю */
+    @Override
     public void remTopic(SettingUser settingUser, String topic) {
         settingUser.getTopics().remove(topic);
 //        pushService.unsubscribe(new ArrayList<>(settingUser.getTokens()), topic);

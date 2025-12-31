@@ -1,33 +1,32 @@
 package ru.controllers.people;
 
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.reps.auth.RoleRepository;
 import ru.security.user.Roles;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,7 +34,8 @@ import static utils.TestUtils.*;
 
 public class ParentsControllerTest extends AbstractTestIntegration {
     private final RoleRepository roleRepository;
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final ISSEService sseService;
     private static final String remPep_Summary = "Создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events";
     private static final String chPep_Summary = "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events";
     private static final String addPar_Summary = "создаёт пользователя-родителя и сразу прикрепляет к ребёнку + Server Sent Events";
@@ -44,12 +44,13 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     private static final String getInfoForHTeacher_Summary = "[start] отправляет список групп учебного центра и подтверждает клиенту права";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    public ParentsControllerTest(RoleRepository roleRepository, DBService dbService, ParentsController parentsController) {
+    public ParentsControllerTest(RoleRepository roleRepository, IDBService dbService, ISSEService sseService, ParentsController parentsController) {
         this.roleRepository = roleRepository;
         this.dbService = dbService;
+        this.sseService = sseService;
         this.testController = parentsController;
         nameTestedClass = "ParentsController";
     }
@@ -89,9 +90,9 @@ public class ParentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("remPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
         assertEquals(users.size(), 5);
     }
 
@@ -124,9 +125,9 @@ public class ParentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872,\"name\":\"Петров П.А.\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addPar")
@@ -175,9 +176,9 @@ public class ParentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPar_Summary, "addPar_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addParC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any()));
-        assertEquals("{\"id\":3872,\"body\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\",\"par\":{\"null\":{\"name\":\"Петрова А.Б.\"}}}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addParC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
+        assertEquals("{\"id\":3872,\"body\":{\"name\":\"Якушева А.О.\",\"par\":{\"null\":{\"name\":\"Петрова А.Б.\"}},\"login\":\"esse_et\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("getParents")
@@ -204,7 +205,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/parents/getParents/{grId}", 20L)
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
-            .andExpect(content().json("{\"bodyP\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\",\"par\":{}},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\",\"par\":{}},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\",\"par\":{}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\",\"par\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\",\"par\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}},\"bodyC\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}"))
+            .andExpect(content().string("{\"bodyC\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}},\"bodyP\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"par\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}},\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}}"))
             .andDo(defaultSwaggerDocs(getParents_Summary, "getParents_whenGood_HTEACHER"));
     }
 
@@ -253,7 +254,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/parents/getInfoFH")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323}"))
+            .andExpect(content().string("{\"firstG\":2323,\"bodyG\":{\"3456\":\"1Б\",\"4354\":\"1В\",\"2323\":\"1А\"}}"))
             .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));
     }
 }

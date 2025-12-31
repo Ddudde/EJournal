@@ -1,32 +1,31 @@
 package ru.controllers.school;
 
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static utils.TestUtils.getCloneRequests;
 
 public class RequestControllerTest extends AbstractTestIntegration {
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final ISSEService sseService;
     private static final String addReq_Summary = "Добавляет заявку + Server Sent Events";
     private static final String delReq_Summary = "Удаление заявки + Server Sent Events";
     private static final String chTitle_Summary = "Изменение заголовка заявки + Server Sent Events";
@@ -35,11 +34,12 @@ public class RequestControllerTest extends AbstractTestIntegration {
     private static final String getRequests_Summary = "[start] Отправляет инфу о заявках";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    public RequestControllerTest(DBService dbService, RequestController requestController) {
+    public RequestControllerTest(IDBService dbService, ISSEService sseService, RequestController requestController) {
         this.dbService = dbService;
+        this.sseService = sseService;
         this.testController = requestController;
         nameTestedClass = "RequestController";
     }
@@ -53,8 +53,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(addReq_Summary, "addReq_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -74,9 +73,9 @@ public class RequestControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(addReq_Summary, "addReq_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"id\":null,\"body\":{\"title\":\"mail@mail.com\",\"date\":\"11.11.1111\",\"text\":\"Дрыздов А.А.\"}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"body\":{\"title\":\"mail@mail.com\",\"date\":\"11.11.1111\",\"text\":\"Дрыздов А.А.\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("delReq")
@@ -90,8 +89,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(delReq_Summary, "delReq_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -110,9 +108,9 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delReq_Summary, "delReq_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chTitle")
@@ -126,8 +124,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chTitle_Summary, "chTitle_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -147,9 +144,9 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chTitle_Summary, "chTitle_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352,\"title\":\"example@pepl.qq\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chDate")
@@ -163,8 +160,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chDate_Summary, "chDate_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -184,9 +180,9 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chDate_Summary, "chDate_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352,\"date\":\"01.01.2001\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chText")
@@ -200,8 +196,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chText_Summary, "chText_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -221,9 +216,9 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chText_Summary, "chText_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352,\"text\":\"Дроздич Г.Г.\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("getRequests")

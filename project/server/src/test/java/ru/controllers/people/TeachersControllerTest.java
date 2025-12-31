@@ -1,56 +1,57 @@
 package ru.controllers.people;
 
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.security.user.Roles;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.*;
+import static utils.TestUtils.getSub;
+import static utils.TestUtils.usersTest;
 
 public class TeachersControllerTest extends AbstractTestIntegration {
     private final LessonRepository lessonRepository;
     private final RoleRepository roleRepository;
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final ISSEService sseService;
     private static final String remPep_Summary = "Удаление роли преподавателя";
     private static final String chPep_Summary = "Изменяет ФИО преподавателю учебного центра.";
     private static final String addTea_Summary = "Cоздаёт нового учителя для учебного центра";
     private static final String getTeachers_Summary = "[start] отправка списка учителей учебного центра";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    public TeachersControllerTest(LessonRepository lessonRepository, RoleRepository roleRepository, DBService dbService, TeachersController teachersController) {
+    public TeachersControllerTest(LessonRepository lessonRepository, RoleRepository roleRepository, IDBService dbService, ISSEService sseService, TeachersController teachersController) {
         this.lessonRepository = lessonRepository;
         this.roleRepository = roleRepository;
         this.dbService = dbService;
+        this.sseService = sseService;
         this.testController = teachersController;
         nameTestedClass = "TeachersController";
     }
@@ -88,9 +89,9 @@ public class TeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chPep")
@@ -123,9 +124,9 @@ public class TeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"name\":\"Якуш А.О.\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addTea")
@@ -161,9 +162,9 @@ public class TeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addTea_Summary, "addTea_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addTeaC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"id\":null,\"name\":\"Якушева А.О.\"}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addTeaC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"name\":\"Якушева А.О.\"}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("getTeachers")
@@ -192,7 +193,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/teachers/getTeachers")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
-            .andExpect(content().string("{\"nt\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}},\"0\":{\"name\":\"Англ. Яз\",\"tea\":{\"22\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"23\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"24\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"}}},\"1\":{\"name\":\"Математика\",\"tea\":{\"25\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}}}"))
+            .andExpect(content().string("{\"nt\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}},\"body\":{\"0\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"}},\"name\":\"Англ. Яз\"},\"1\":{\"tea\":{\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}},\"name\":\"Математика\"}}}"))
             .andDo(defaultSwaggerDocs(getTeachers_Summary, "getTeachers_whenGood_HTEACHER"));
     }
 

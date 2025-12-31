@@ -4,20 +4,17 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.epages.restdocs.apispec.SimpleType;
 import config.CustomUser;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ru.AbstractTestIntegration;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.MainService;
+import ru.services.logic.SSE.ISSEService;
+import ru.services.logic.SSE.SSEService;
 
 import java.util.UUID;
 
@@ -33,23 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static utils.TestUtils.defaultDescription;
 
 public class SSEControllerTest extends AbstractTestIntegration {
-    private MockedStatic staticMockMainService;
+    private final ISSEService sseService;
 
     @Autowired
-    public SSEControllerTest(SSEController sseController) {
+    public SSEControllerTest(ISSEService sseService, SSEController sseController) {
+        this.sseService = sseService;
         this.testController = sseController;
         nameTestedClass = "SSEController";
-    }
-
-    @AfterEach
-    void afterEach() {
-        staticMockMainService.close();
-        staticMockSSE.close();
-    }
-
-    @BeforeEach
-    void setUp() {
-        staticMockMainService = Mockito.mockStatic(MainService.class);
     }
 
     /** RU: записывает ответ и тело запроса от теста эндпонта в Swagger вместе с описанием эндпоинта и именем теста
@@ -75,7 +62,7 @@ public class SSEControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/sse/start"))
             .andExpect(status().isOk())
             .andDo(swaggerDocs("start_whenGoodNext_Anonim"));
-        assertNotEquals(0, MainService.subscriptions.size());
+        assertNotEquals(0, SSEService.subscriptions.size());
     }
 
     /** RU: стартует со старой подпиской */
@@ -87,11 +74,11 @@ public class SSEControllerTest extends AbstractTestIntegration {
         final String uuid = cu.getUUID();
         final SubscriberDTO sub = mock(SubscriberDTO.class, Answers.RETURNS_DEEP_STUBS);
         when(sub.getLogin()).thenReturn("nm12");
-        MainService.subscriptions.put(UUID.fromString(uuid), sub);
+        SSEService.subscriptions.put(UUID.fromString(uuid), sub);
 
         mockMvc.perform(get("/sse/start/{uuidAuth}", uuid))
             .andExpect(status().isOk())
             .andDo(swaggerDocs("start_whenGood_AdminUser"));
-        staticMockMainService.verify(() -> MainService.setSSE(eq(sub), any(), eq(UUID.fromString(uuid))));
+        verify(sseService).setSSE(eq(sub), any(), eq(UUID.fromString(uuid)));
     }
 }

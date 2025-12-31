@@ -1,21 +1,18 @@
 package ru.controllers;
 
-import com.google.gson.JsonObject;
-import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.configs.AppConfig;
-import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
 import ru.data.DTO.SubscriberDTO;
-import ru.data.DTO.controller.TestInnerDTO;
+import ru.data.DTO.controller.test.TestInnerDTO;
+import ru.data.DTO.controller.test.TestOutDTO;
+import ru.data.DTO.service.data.initDB.InitDBServiceDTO;
 import ru.security.user.CustomToken;
-import ru.services.MainService;
-import ru.services.db.IniDBService;
+import ru.services.logic.ITestService;
+import ru.services.logic.SSE.ISSEService;
 
 /** RU: Контроллер для раздела тестирования
  * <pre>
@@ -24,48 +21,30 @@ import ru.services.db.IniDBService;
 @RequestMapping("/test")
 @RequiredArgsConstructor
 @RestController public class TestController {
-    private final IniDBService iniDBService;
-    private final MainService mainService;
+    private final ITestService testService;
+    private final ISSEService sseService;
 
     /** RU: изменяет параметры тестирования
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PutMapping("/chTests")
-    public ResponseEntity<JsonObject> chTests(@RequestBody TestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PUT] /chTests");
-        switch (body.id) {
-            case "checkbox_debug" -> AppConfig.DEBUG = body.val;
-            case "checkbox_test" -> {
-                AppConfig.TEST = body.val;
-                if(AppConfig.TEST) {
-                    iniDBService.testOn();
-                } else {
-                    iniDBService.testOff();
-                }
-                iniDBService.getTestInfo(wrtr);
-            }
-            default -> {}
-        }
-        return mainService.getObjR(ans -> {}, wrtr, HttpStatus.OK, false);
+    public ResponseEntity<InitDBServiceDTO> chTests(@RequestBody TestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+        final InitDBServiceDTO outDTO = testService.changeTests(body);
+        return ResponseEntity.ok(outDTO);
     }
 
     /** RU: [start] отправка инфы для тестов
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @GetMapping("/getInfo")
-    public ResponseEntity<JsonObject> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getInfo");
-        wrtr.name("bodyS").beginObject()
-            .name("checkbox_debug").value(AppConfig.DEBUG)
-            .name("checkbox_test").value(AppConfig.TEST)
-            .endObject();
-        iniDBService.getTestInfo(wrtr);
-        return mainService.getObjR(ans -> {
-            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.TEST, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK, false);
+    public ResponseEntity<TestOutDTO> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
+
+        final TestOutDTO outDTO = testService.prepareInfo();
+        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.TEST, "main", "main", "main", "main");
+        return ResponseEntity.ok(outDTO);
     }
 }

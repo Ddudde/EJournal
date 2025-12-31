@@ -1,17 +1,16 @@
 package ru.controllers.school;
 
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Day;
 import ru.data.DAO.school.Group;
@@ -21,16 +20,15 @@ import ru.data.reps.school.DayRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.MarkRepository;
 import ru.security.user.Roles;
-import ru.services.MainService;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
+import ru.services.logic.school.analytics.IPeriodService;
 
 import java.util.List;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -40,9 +38,10 @@ import static utils.TestUtils.*;
 public class TeacherJournalControllerTest extends AbstractTestIntegration {
     private final DayRepository dayRepository;
     private final MarkRepository markRepository;
-    private final DBService dbService;
-    private final MainService mainService;
+    private final IDBService dbService;
     private final LessonRepository lessonRepository;
+    private final ISSEService sseService;
+    private final IPeriodService periodService;
     private static final String addHomework_Summary = "Создаёт домашнее задание на определённое занятие дня группе";
     private static final String addMark_Summary = "Создаёт оценку к определённому уроку либо целому периоду(итоговая оценка)";
     private static final String getInfoPart3_Summary = "Отправляет данные о оценках, домашних заданиях и итоговых оценках группы подчинённой преподавателю на дисциплине";
@@ -50,15 +49,16 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     private static final String getInfoPart1_Summary = "[start] отправляет данные о расписании, периодах обучения и дисциплинах преподавателя";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    public TeacherJournalControllerTest(DayRepository dayRepository, MarkRepository markRepository, DBService dbService, MainService mainService, LessonRepository lessonRepository, TeacherJournalController teacherJournalController) {
+    public TeacherJournalControllerTest(DayRepository dayRepository, MarkRepository markRepository, IDBService dbService, LessonRepository lessonRepository, ISSEService sseService, IPeriodService periodService, TeacherJournalController teacherJournalController) {
         this.dayRepository = dayRepository;
         this.markRepository = markRepository;
         this.dbService = dbService;
-        this.mainService = mainService;
         this.lessonRepository = lessonRepository;
+        this.sseService = sseService;
+        this.periodService = periodService;
         this.testController = teacherJournalController;
         nameTestedClass = "TeacherJournalController";
     }
@@ -101,9 +101,9 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addHomework_Summary, "addHomework_whenGood_TEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addHomeworkC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"day\":\"10.06.22\",\"homework\":\"Упр. 6Стр. 103\"}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addHomeworkC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"homework\":\"Упр. 6Стр. 103\",\"day\":\"10.06.22\"}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addMark")
@@ -150,9 +150,9 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenPeriodMark_TEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"kid\":20,\"day\":\"10.06.22\",\"body\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Химия\",\"per\":20}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"day\":\"10.06.22\",\"kid\":20,\"body\":{\"mark\":\"5\",\"type\":\"Химия\",\"weight\":1,\"per\":20}}",
+            gson.toJson(answer.getValue()));
     }
 
     private void prepareMarkPeriod() {
@@ -192,9 +192,9 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenExistMark_TEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"kid\":20,\"day\":\"10.06.22,1\",\"body\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"per\":null}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"day\":\"10.06.22,1\",\"kid\":20,\"body\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1}}",
+            gson.toJson(answer.getValue()));
     }
 
     private void prepareMarksForExistMark() {
@@ -237,9 +237,9 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenGood_TEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"kid\":20,\"day\":\"10.06.22\",\"body\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"per\":null}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"day\":\"10.06.22\",\"kid\":20,\"body\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1}}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("getInfoPart3")
@@ -274,7 +274,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/pjournal/getInfoP3/{groupId}", 20L)
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"bodyD\":{\"12.06.22\":\"Упр. 5Стр. 103\",\"10.06.22\":\"Упр. 6Стр. 103\",\"11.06.22\":\"Упр. 7Стр. 103\"},\"bodyK\":{\"3872\":{\"name\":\"Якушева А.О.\",\"days\":{\"12.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1}},\"avg\":{\"9764\":\"4\",\"352\":\"Н\",\"3872\":\"5\"}},\"1705\":{\"name\":\"Дроздов А.А.\",\"days\":{\"12.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,1\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,2\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,3\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1}},\"avg\":{\"9764\":\"4\",\"352\":\"Н\",\"3872\":\"5\"}},\"1840\":{\"name\":\"Пестов Л.А.\",\"days\":{},\"avg\":{}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"days\":{},\"avg\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"days\":{},\"avg\":{}}}}"))
+            .andExpect(content().string("{\"bodyD\":{\"12.06.22\":\"Упр. 5Стр. 103\",\"10.06.22\":\"Упр. 6Стр. 103\",\"11.06.22\":\"Упр. 7Стр. 103\"},\"bodyK\":{\"3872\":{\"name\":\"Якушева А.О.\",\"days\":{\"10.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"12.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1}},\"avg\":{\"352\":\"Н\",\"3872\":\"5\",\"9764\":\"4\"}},\"1840\":{\"name\":\"Пестов Л.А.\",\"days\":{},\"avg\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"days\":{},\"avg\":{}},\"1705\":{\"name\":\"Дроздов А.А.\",\"days\":{\"10.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"12.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1}},\"avg\":{\"352\":\"Н\",\"3872\":\"5\",\"9764\":\"4\"}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"days\":{},\"avg\":{}}}}"))
             .andDo(defaultSwaggerDocs(getInfoPart3_Summary, "getInfoPart3_whenGood_TEACHER"));
     }
 
@@ -336,7 +336,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/pjournal/getInfoP2/{nameSubject}", "Math")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"bodyG\":{\"21\":\"1А\",\"22\":\"1Б\",\"23\":\"1В\"},\"firstG\":21}"))
+            .andExpect(content().string("{\"firstG\":21,\"bodyG\":{\"21\":\"1А\",\"22\":\"1Б\",\"23\":\"1В\"}}"))
             .andDo(defaultSwaggerDocs(getInfoPart2_Summary, "getInfoPart2_whenGood_TEACHER"));
     }
 
@@ -375,7 +375,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/pjournal/getInfoP1")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"bodyPred\":{\"0\":\"Англ.Яз.\",\"1\":\"Химия\",\"2\":\"Физика\"},\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"9764\":\"III четверть\",\"3456\":\"IV четверть\"},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyS\":{}}"))
+            .andExpect(content().string("{\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyPred\":{\"0\":\"Англ.Яз.\",\"1\":\"Химия\",\"2\":\"Физика\"},\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"3456\":\"IV четверть\",\"9764\":\"III четверть\"},\"bodyS\":{}}"))
             .andDo(defaultSwaggerDocs(getInfoPart1_Summary, "getInfoPart1_whenGood_TEACHER"));
     }
 
@@ -388,7 +388,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void preparePeriods(School school) {
         when(school.getPeriods()).thenReturn(TEST_UTILS.periods);
-        doReturn(TEST_UTILS.periods.get(2)).when(mainService).getActualPeriodBySchool(any());
+        doReturn(TEST_UTILS.periods.get(2)).when(periodService).getActualPeriodBySchool(any());
     }
 
     private void prepareUniqSubjectsName() {

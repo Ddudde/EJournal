@@ -3,11 +3,11 @@ package ru.controllers;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.epages.restdocs.apispec.SimpleType;
-import com.google.gson.JsonObject;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
@@ -15,12 +15,12 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.data.reps.NewsRepository;
 import ru.security.user.Roles;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,19 +34,21 @@ import static utils.TestUtils.getSub;
 
 public class NewsControllerTest extends AbstractTestIntegration {
     private final NewsRepository newsRepository;
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final ISSEService sseService;
     private static final String delNews_Summary = "Удаление новости + Server Sent Events";
     private static final String chNews_Summary = "Изменение новости + Server Sent Events";
     private static final String addNewsPortal_Summary = "Добавление новой новости портала + Server Sent Events";
     private static final String addNewsYO_Summary = "Добавление новой новости учебного центра + Server Sent Events";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    NewsControllerTest(NewsRepository newsRepository, DBService dbService, NewsController newsController) {
+    NewsControllerTest(NewsRepository newsRepository, IDBService dbService, ISSEService sseService, NewsController newsController) {
         this.newsRepository = newsRepository;
         this.dbService = dbService;
+        this.sseService = sseService;
         this.testController = newsController;
         nameTestedClass = "NewsController";
     }
@@ -66,8 +68,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenEmpty_Portal_AdminUser"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: завуч для школьных новостей
@@ -88,9 +89,9 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_YO_HTeacher"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     /** RU: админ для новостей сайта
@@ -111,9 +112,9 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_Portal_AdminUser"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     /** RU: админ для новостей сайта
@@ -130,8 +131,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenEmpty_Portal_AdminUser"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: завуч для школьных новостей
@@ -154,9 +154,9 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_YO_HTeacher"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     /** RU: админ для новостей сайта
@@ -179,9 +179,9 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_Portal_AdminUser"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     /** RU: общий сценарий тестирования */
@@ -197,8 +197,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             .andExpect(status)
             .andDo(defaultSwaggerDocs(type.equals("YO") ? addNewsYO_Summary : addNewsPortal_Summary, methodName));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any()),
-            times(timesSSE));
+        verify(sseService, times(timesSSE)).sendEventFor(eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: завуч для школьных новостей
@@ -216,8 +215,8 @@ public class NewsControllerTest extends AbstractTestIntegration {
             "text": "Начались первые работы"
         }
         """, "Yo", 1, status().isCreated());
-        assertEquals("{\"body\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"img_url\":null,\"text\":\"Начались первые работы\"},\"id\":null}",
-            answer.getValue().toString());
+        assertEquals("{\"body\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     /** RU: завуч для школьных новостей
@@ -249,8 +248,8 @@ public class NewsControllerTest extends AbstractTestIntegration {
         }
         """, "Por", 1, status().isCreated());
 
-        assertEquals("{\"body\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"img_url\":null,\"text\":\"Начались первые работы\"},\"id\":null}",
-            answer.getValue().toString());
+        assertEquals("{\"body\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     private RestDocumentationResultHandler getNews_Docs(String methodName) {

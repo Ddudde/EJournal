@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import ru.Main;
-import ru.services.PushService;
+import ru.services.IPushService;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ import java.util.Set;
 
     public void setNotif(Boolean notif) {
         this.notif = notif;
-        PushService pushService = (PushService) Main.ctx.getBean("pushService");
+        IPushService pushService = (IPushService) Main.ctx.getBean("pushService");
         if(notif){
             getTopics().forEach((topic) -> {
                 if(notif
@@ -75,7 +75,7 @@ import java.util.Set;
     }
 
     private void changeSubscribe(String name, boolean val) {
-        PushService pushService = (PushService) Main.ctx.getBean("pushService");
+        IPushService pushService = (IPushService) Main.ctx.getBean("pushService");
         if(val){
             getTopics().forEach((topic) -> {
                 if(notif && topic.contains(name)) {

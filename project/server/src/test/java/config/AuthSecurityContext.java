@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
 
 import java.util.UUID;
 
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
  * @see CustomAuth */
 @RequiredArgsConstructor
 public class AuthSecurityContext implements WithSecurityContextFactory<CustomAuth> {
-    private final DBService dbService;
+    private final IDBService dbService;
 
     @Override
     public SecurityContext createSecurityContext(CustomAuth customUser) {

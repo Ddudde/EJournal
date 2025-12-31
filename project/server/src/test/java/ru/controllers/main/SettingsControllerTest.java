@@ -13,24 +13,22 @@ import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
-import ru.services.EmailService;
-import ru.services.PushService;
-import ru.services.db.DBService;
+import ru.services.IEmailService;
+import ru.services.IPushService;
+import ru.services.db.IDBService;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static utils.TestUtils.getSub;
 
 public class SettingsControllerTest extends AbstractTestIntegration {
-    private final DBService dbService;
-    private final EmailService emailService;
-    private final PushService pushService;
+    private final IDBService dbService;
+    private final IEmailService emailService;
+    private final IPushService pushService;
     private final PasswordEncoder passwordEncoder;
     private static final String checkCodeEmail_Summary = "Подтверждение емэйла";
     private static final String startEmail_Summary = "Изменение электронной почты пользователя или добавление при регистрации";
@@ -42,7 +40,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
     private static final String getSettings_Summary = "Отправляет настройки клиенту";
 
     @Autowired
-    public SettingsControllerTest(DBService dbService, EmailService emailService, PushService pushService, PasswordEncoder passwordEncoder, SettingsController settingsController) {
+    public SettingsControllerTest(IDBService dbService, IEmailService emailService, IPushService pushService, PasswordEncoder passwordEncoder, SettingsController settingsController) {
         this.dbService = dbService;
         this.emailService = emailService;
         this.pushService = pushService;

@@ -30,7 +30,7 @@ import java.util.Map;
 @Slf4j
 @AllArgsConstructor
 @Service(value = "dbService")
-public class DBService {
+public class DBService implements IDBService {
     private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
     private final RequestRepository requestRepository;
@@ -40,89 +40,106 @@ public class DBService {
     private final SettingUserRepository settingUserRepository;
     private final PeriodRepository periodRepository;
 
+    @Override
     public SettingUser createSettingUser(SettingUser settingUser) {
         SettingUser savedSettingUser = settingUserRepository.saveAndFlush(settingUser);
         log.trace(savedSettingUser + "");
         return savedSettingUser;
     }
 
+    @Override
     public User userByLogin(String login) {
         if(login == null) return null;
 
         return userRepository.findByUsername(login);
     }
 
+    @Override
     public User userByCode(String code) {
         return userRepository.findByCode(code);
     }
 
+    @Override
     public boolean existUserById(Long id) {
         if(id == null) return false;
 
         return userRepository.existsById(id);
     }
 
+    @Override
     public boolean existUserBySubscription(SubscriberDTO subscriberDTO) {
         return existUserById(subscriberDTO.getUserId());
     }
 
+    @Override
     public User userById(Long id) {
         if(id == null) return null;
 
         return userRepository.findById(id).orElse(null);
     }
 
+    @Override
     public Roles getFirstRoleId(Map<Roles, Role> map) {
         return map.keySet().iterator().next();
     }
 
+    @Override
     public Role getFirstRole(Map<Roles, Role> map) {
         return map.get(getFirstRoleId(map));
     }
 
+    @Override
     public List<Request> getRequests() {
         return requestRepository.findAll();
     }
 
+    @Override
     public Request requestById(Long id) {
         if(id == null) return null;
 
         return requestRepository.findById(id).orElse(null);
     }
 
+    @Override
     public List<School> getSchools() {
         return schoolRepository.findAll();
     }
 
+    @Override
     public School schoolById(Long id) {
         if(id == null) return null;
 
         return schoolRepository.findById(id).orElse(null);
     }
 
+    @Override
     public Syst createSyst(Syst syst) {
         Syst savedSyst = systRepository.saveAndFlush(syst);
         log.trace(savedSyst + "");
         return savedSyst;
     }
 
+    @Override
     public Syst getSyst() {
         List<Syst> systs = systRepository.findAll();
         return systs.isEmpty() ? null : systs.get(0);
     }
 
+    @Override
     public News newsById(Long id) {
         if(id == null) return null;
 
         return newsRepository.findById(id).orElse(null);
     }
 
+    @Override
     public Group groupById(Long id) {
         if(id == null) return null;
 
         return groupRepository.findById(id).orElse(null);
     }
 
+    @Override
     public Period periodById(Long id) {
         if(id == null) return null;
 

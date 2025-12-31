@@ -1,32 +1,30 @@
 package ru.controllers.people;
 
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.reps.auth.RoleRepository;
 import ru.security.user.Roles;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,7 +32,8 @@ import static utils.TestUtils.*;
 
 public class StudentsControllerTest extends AbstractTestIntegration {
     private final RoleRepository roleRepository;
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final ISSEService sseService;
     private static final String remPep_Summary = "Удаляет роль ученика у пользователя + Server Sent Events";
     private static final String chPep_Summary = "Изменяет ФИО ученика + Server Sent Events";
     private static final String addPep_Summary = "Создаёт пользователя-ученика и отправляет информацию + Server Sent Events";
@@ -43,12 +42,13 @@ public class StudentsControllerTest extends AbstractTestIntegration {
     private static final String getInfoForHTeacher_Summary = "[start] отправляет список групп учебного центра и подтверждает клиенту права";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    public StudentsControllerTest(RoleRepository roleRepository, DBService dbService, StudentsController studentsController) {
+    public StudentsControllerTest(RoleRepository roleRepository, IDBService dbService, ISSEService sseService, StudentsController studentsController) {
         this.roleRepository = roleRepository;
         this.dbService = dbService;
+        this.sseService = sseService;
         this.testController = studentsController;
         nameTestedClass = "StudentsController";
     }
@@ -86,9 +86,9 @@ public class StudentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":3872}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chPep")
@@ -121,9 +121,9 @@ public class StudentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":3872,\"name\":\"Вейс А.А.\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addPep")
@@ -162,9 +162,9 @@ public class StudentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_HTEACHER"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"id\":null,\"body\":{\"name\":\"Вейс А.А.\"}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"body\":{\"name\":\"Вейс А.А.\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("getStud")

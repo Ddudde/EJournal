@@ -1,49 +1,49 @@
 package ru.controllers.people;
 
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.reps.auth.RoleRepository;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.*;
+import static utils.TestUtils.getSub;
+import static utils.TestUtils.usersTest;
 
 public class AdminsControllerTest extends AbstractTestIntegration {
-    private final DBService dbService;
+    private final IDBService dbService;
     private final RoleRepository roleRepository;
+    private final ISSEService sseService;
     private static final String remPep_Summary = "Удаляет у пользователя роль администратора + Server Sent Events";
     private static final String chPep_Summary = "Изменяет фамилию пользователя + Server Sent Events";
     private static final String addPep_Summary = "Cоздаёт пользователя-администратора + Server Sent Events";
     private static final String getAdmins_Summary = "[start] Отправляет список администраторов";
 
-
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    public AdminsControllerTest(AdminsController adminsController, RoleRepository roleRepository, DBService dbService) {
+    public AdminsControllerTest(AdminsController adminsController, RoleRepository roleRepository, IDBService dbService, ISSEService sseService) {
         this.testController = adminsController;
         this.roleRepository = roleRepository;
         this.dbService = dbService;
+        this.sseService = sseService;
         nameTestedClass = "AdminsController";
     }
 
@@ -56,8 +56,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -77,9 +76,9 @@ public class AdminsControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chPep")
@@ -91,8 +90,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -113,9 +111,9 @@ public class AdminsControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"name\":\"Дрыздов А.А.\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addPep")
@@ -127,8 +125,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenEmpty_Anonim"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -148,9 +145,9 @@ public class AdminsControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_Admin"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"id\":null,\"body\":{\"name\":\"Дрыздов А.А.\"}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"body\":{\"name\":\"Дрыздов А.А.\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     /** RU: аноним

@@ -1,41 +1,41 @@
 package ru.controllers.people;
 
-import com.google.gson.JsonObject;
 import config.CustomAuth;
 import config.CustomUser;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.reps.auth.RoleRepository;
 import ru.security.user.Roles;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
 import java.util.List;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.*;
+import static utils.TestUtils.getSub;
+import static utils.TestUtils.usersTest;
 
 public class HTeachersControllerTest extends AbstractTestIntegration {
-    private final DBService dbService;
+    private final IDBService dbService;
     private final RoleRepository roleRepository;
+    private final ISSEService sseService;
     private static final String remGroup_Summary = "Удаляет группу + Server Sent Events";
     private static final String addGroup_Summary = "Создаёт группу + Server Sent Events";
     private static final String chGroup_Summary = "Изменяет название группы + Server Sent Events";
@@ -49,12 +49,13 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
     private static final String getInfoForAdmins_Summary = "[start] отправка список завучей учебного центра для администраторов";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Autowired
-    public HTeachersControllerTest(DBService dbService, RoleRepository roleRepository, HTeachersController hTeachersController) {
+    public HTeachersControllerTest(IDBService dbService, RoleRepository roleRepository, ISSEService sseService, HTeachersController hTeachersController) {
         this.dbService = dbService;
         this.roleRepository = roleRepository;
+        this.sseService = sseService;
         this.testController = hTeachersController;
         nameTestedClass = "HTeachersController";
     }
@@ -94,9 +95,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(remGroup_Summary, "remGroup_whenGood_Hteacher"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remGroupC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("remGroupC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addGroup")
@@ -116,7 +117,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
     @Test @Tag("addGroup")
     @CustomUser(roles = Roles.HTEACHER)
     void addGroup_whenGood_Hteacher() throws Exception {
-        final ResultMatcher statusCode = status().isOk();
+        final ResultMatcher statusCode = status().isCreated();
         final School school = mock(School.class);
         final User user = dbService.userById(getSub().getUserId());
         user.getRoles().get(Roles.HTEACHER).setYO(school);
@@ -131,9 +132,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(addGroup_Summary, "addGroup_whenGood_Hteacher"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addGroupC"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"id\":null,\"name\":\"31В\"}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addGroupC"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"name\":\"31В\"}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chGroup")
@@ -172,9 +173,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chGroup_Summary, "chGroup_whenGood_Hteacher"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chGroupC"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chGroupC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20,\"name\":\"31В\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chPep")
@@ -214,9 +215,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_Admin"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"id1\":20,\"name\":\"Дрыздов А.А.\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("remPep")
@@ -255,9 +256,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_Admin"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"id1\":20}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addPep")
@@ -293,10 +294,10 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_Admin"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addInfoL2C"), any(), any(), any(), any(), any(), any()));
-        assertEquals("{\"id1\":20,\"id\":null,\"body\":{\"name\":\"Дрыздов А.А.\"}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(eq("addInfoL2C"), any(), any(), any(), any(), any(), any());
+        assertEquals("{\"id1\":20,\"body\":{\"name\":\"Дрыздов А.А.\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("chSch")
@@ -319,6 +320,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         final School school = mock(School.class);
         when(dbService.schoolById(20L)).thenReturn(school);
+        when(school.getId()).thenReturn(20L);
 
         mockMvc.perform(patch("/hteachers/chSch")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
@@ -331,9 +333,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chSch_Summary, "chSch_whenGood_Admin"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("chInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20,\"name\":\"Гимназия ? 4\"}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("addSch")
@@ -365,9 +367,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(addSch_Summary, "addSch_whenGood_Admin"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
-        assertEquals("{\"id\":null,\"body\":{\"name\":\"Гимназия ? 4\"}}",
-            answer.getValue().toString());
+        verify(sseService).sendEventFor(eq("addInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"body\":{\"name\":\"Гимназия ? 4\"}}",
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("remSch")
@@ -401,9 +403,9 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(remSch_Summary, "remSch_whenGood_Admin"));
 
-        staticMockSSE.verify(() -> SSEController.sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any()));
+        verify(sseService).sendEventFor(eq("remInfoL1C"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":20}",
-            answer.getValue().toString());
+            gson.toJson(answer.getValue()));
     }
 
     @Test @Tag("getInfo")

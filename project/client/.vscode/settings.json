@@ -22,5 +22,6 @@
         "**/.idea": true,
         "src.zip": true
     },
-    "js/ts.implicitProjectConfig.checkJs": false
+    "js/ts.implicitProjectConfig.checkJs": false,
+    "stylelint.config": {}
 }

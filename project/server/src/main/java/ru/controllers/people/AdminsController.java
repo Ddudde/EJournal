@@ -1,33 +1,26 @@
 package ru.controllers.people;
 
-import com.google.gson.JsonObject;
-import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.configs.AppConfig;
 import ru.controllers.DocsHelpController;
-import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.Syst;
-import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
-import ru.data.DTO.controller.people.AdminsInnerDTO;
-import ru.data.reps.SystRepository;
-import ru.data.reps.auth.RoleRepository;
-import ru.data.reps.auth.UserRepository;
+import ru.data.DTO.controller.people.admin.AdminsInnerDTO;
+import ru.data.DTO.controller.people.admin.AdminsOutDTO;
+import ru.data.DTO.service.data.userBody.UserServiceBodyUserDTO;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.MainService;
-import ru.services.db.DBService;
+import ru.services.data.IUserService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
+import ru.services.logic.people.IAdminsService;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Map;
 
 /** RU: Контроллер для раздела управления/просмотра администраторов + Server Sent Events
@@ -38,105 +31,73 @@ import java.util.Map;
 @RequestMapping("/admins")
 @RequiredArgsConstructor
 @RestController public class AdminsController {
-    private final UserRepository userRepository;
-    private final SystRepository systRepository;
-    private final DBService dbService;
-    private final MainService mainService;
-    private final RoleRepository roleRepository;
+    private final IDBService dbService;
+    private final IAdminsService adminsService;
+    private final ISSEService sseService;
+    private final IUserService userService;
 
     /** RU: удаляет у пользователя роль администратора + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> remPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /remPep");
         final Syst syst = dbService.getSyst();
         if (syst == null || user1 == null) {
             return ResponseEntity.notFound().build();
         }
 
-        user1.getRoles().remove(Roles.ADMIN);
-        userRepository.saveAndFlush(user1);
-        syst.getAdmins().remove(user1);
-        systRepository.saveAndFlush(syst);
-
-        wrtr.name("id").value(user1.getId());
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("remPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK);
+        final AdminsOutDTO outDTO = adminsService.deleteRoleUser(user1, syst);
+        sseService.sendEventFor("remPepC", outDTO, TypesConnect.ADMINS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
 
     /** RU: изменяет фамилию пользователя + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> chPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chPep");
         if (user1 == null) return ResponseEntity.notFound().build();
 
-        user1.setFio(body.name);
-        userRepository.saveAndFlush(user1);
-
-        wrtr.name("id").value(user1.getId())
-            .name("name").value(body.name);
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("chPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK);
+        final AdminsOutDTO outDTO = adminsService.changeFIO(user1, body.name);
+        sseService.sendEventFor("chPepC", outDTO, TypesConnect.ADMINS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
 
     /** RU: создаёт пользователя-администратора + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PostMapping("/addPep")
-    public ResponseEntity<Void> addPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
+    public ResponseEntity<Void> addPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Syst syst = dbService.getSyst();
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addPep");
         if (syst == null) return ResponseEntity.notFound().build();
 
-        final Instant after = Instant.now().plus(Duration.ofDays(30));
-        final Date dateAfter = Date.from(after);
-        final Role role = roleRepository.saveAndFlush(new Role());
-        final User inv = new User(body.name, Map.of(
-            Roles.ADMIN, role
-            ), AppConfig.df.format(dateAfter));
-        userRepository.saveAndFlush(inv);
-        syst.getAdmins().add(inv);
-        systRepository.saveAndFlush(syst);
-
-        wrtr.name("id").value(inv.getId())
-            .name("body").beginObject()
-            .name("name").value(body.name)
-            .endObject();
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("addPepC", ans, TypesConnect.ADMINS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.CREATED);
+        final AdminsOutDTO outDTO = adminsService.addNewAccountWithRole(syst, body.name);
+        sseService.sendEventFor("addPepC", outDTO, TypesConnect.ADMINS, "main", "main", "main", "main");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /** RU: [start] отправляет список администраторов
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @GetMapping("/getAdmins")
-    public ResponseEntity<JsonObject> getAdmins(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
+    public ResponseEntity<Map<Long, UserServiceBodyUserDTO>> getAdmins(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final Syst syst = dbService.getSyst();
-        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getAdmins");
+        final User user = dbService.userById(sub.getUserId());
+        String role = "main";
+        if (user != null && user.getRoles().containsKey(Roles.ADMIN)) {
+            role = "adm";
+        }
         if (syst == null) return ResponseEntity.notFound().build();
 
-        mainService.usersByList(syst.getAdmins(), true, wrtr);
-        return mainService.getObjR(ans -> {
-            final User user = dbService.userById(sub.getUserId());
-            String role = "main";
-            if (user.getRoles().containsKey(Roles.ADMIN)) {
-                role = "adm";
-            }
-            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
-        }, wrtr, HttpStatus.OK, false);
+        final Map<Long, UserServiceBodyUserDTO> mapUsers = userService.usersByListEntity(syst.getAdmins(), true);
+        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.ADMINS, "null", "main", role, "main");
+        return ResponseEntity.ok(mapUsers);
     }
-
 }

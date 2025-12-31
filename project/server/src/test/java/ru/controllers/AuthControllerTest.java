@@ -1,11 +1,11 @@
 package ru.controllers;
 
-import com.google.gson.JsonObject;
 import config.CustomUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,18 +14,16 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.AbstractTestIntegration;
 import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
 
 import java.util.UUID;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,7 +32,8 @@ import static utils.TestUtils.getSub;
 
 @Slf4j
 public class AuthControllerTest extends AbstractTestIntegration {
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final ISSEService sseService;
     private static final String infCon_Summary = "[start] Изменение подписки";
     private static final String remCon_Summary = "Завершение сеанса";
     private static final String auth_Summary = "Авторизация пользователя";
@@ -43,14 +42,15 @@ public class AuthControllerTest extends AbstractTestIntegration {
     private static final String setCodePep_Summary = "Установка/обновление инвайта для регистрации + Server Sent Events";
 
     @Captor
-    private ArgumentCaptor<JsonObject> answer;
+    private ArgumentCaptor<Object> answer;
 
     @Captor
     private ArgumentCaptor<Object> obj;
 
     @Autowired
-    AuthControllerTest(DBService dbService, AuthController authController) {
+    AuthControllerTest(IDBService dbService, ISSEService sseService, AuthController authController) {
         this.dbService = dbService;
+        this.sseService = sseService;
         this.testController = authController;
         nameTestedClass = "AuthController";
     }
@@ -140,7 +140,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
                 "permis": true
             }
             """)).andExpect(status().isOk())
-            .andExpect(content().string("{\"auth\":true,\"login\":\"nm12\",\"role\":4,\"uuidS\":\"" + uuid + "\",\"roles\":true,\"secFr\":false,\"email\":false}"))
+            .andExpect(content().string("{\"role\":4,\"auth\":true,\"login\":\"nm12\",\"uuidS\":\"" + uuid + "\",\"roles\":true,\"secFr\":false,\"email\":false}"))
             .andDo(defaultSwaggerDocs(auth_Summary, "auth_whenGood_AdminUser"));
     }
 
@@ -260,8 +260,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(setCodePep_Summary, "setCodePep_whenEmpty_AdminUser"));
-        staticMockSSE.verify(() -> SSEController.sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any()),
-            times(0));
+        verify(sseService, times(0)).sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -281,9 +280,8 @@ public class AuthControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(setCodePep_Summary, "setCodePep_whenGood_AdminUser"));
         verify(user).setCode((String) obj.capture());
-        staticMockSSE.verify(() -> SSEController.sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any()),
-            times(2));
-        assertEquals("{\"id\":9764,\"code\":\"%s\",\"id1\":0}".formatted(obj.getValue().toString()),
-            answer.getValue().toString());
+        verify(sseService, times(2)).sendEventFor(any(), answer.capture(), any(), any(), any(), any(), any());
+        assertEquals("{\"id\":9764,\"id1\":0,\"code\":\"%s\"}".formatted(obj.getValue().toString()),
+            gson.toJson(answer.getValue()));
     }
 }

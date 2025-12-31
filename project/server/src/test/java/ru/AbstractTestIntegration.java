@@ -2,13 +2,11 @@ package ru;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
+import com.google.gson.Gson;
 import config.BeanConfig;
 import config.SubscriberMethodArgumentResolver;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
@@ -22,7 +20,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
-import ru.controllers.SSE.SSEController;
 import ru.security.ControllerExceptionHandler;
 import utils.TestUtils;
 
@@ -41,8 +38,8 @@ import static utils.TestUtils.defaultDescription;
 public abstract class AbstractTestIntegration {
     protected static final TestUtils TEST_UTILS = new TestUtils();
     private static final String DESCRIPTION_DOCS = "UUID-токен, авторизация, в ней подписка и пользователь";
-    protected MockedStatic staticMockSSE;
     protected MockMvc mockMvc;
+    protected static final Gson gson = new Gson();
     private static final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
     private static final SubscriberMethodArgumentResolver subscriberMethodArgumentResolver = new SubscriberMethodArgumentResolver();
     private static final SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
@@ -50,14 +47,8 @@ public abstract class AbstractTestIntegration {
     protected Object testController;
     protected String nameTestedClass;
 
-    @AfterEach
-    void afterEach() {
-        staticMockSSE.close();
-    }
-
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) throws ServletException {
-        staticMockSSE = Mockito.mockStatic(SSEController.class);
         authInjector.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(testController)
             .setMessageConverters(converter)

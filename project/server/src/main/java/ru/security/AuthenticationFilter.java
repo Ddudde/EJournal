@@ -14,8 +14,8 @@ import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.MainService;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.SSEService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -32,9 +32,9 @@ import java.util.UUID;
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private final String basicScheme = "Basic ";
     private final PasswordEncoder passwordEncoder;
-    private final DBService dbService;
+    private final IDBService dbService;
 
-    public AuthenticationFilter(RequestMatcher req, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, DBService dbService) {
+    public AuthenticationFilter(RequestMatcher req, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, IDBService dbService) {
         super(req, authenticationManager);
         this.passwordEncoder = passwordEncoder;
         this.dbService = dbService;
@@ -55,9 +55,9 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
      * @param basicUser Проверенный юзер из BasicAuth
      * return Авторизация */
     private CustomToken setToken(UUID token, User basicUser) {
-        if(!MainService.subscriptions.containsKey(token)) return new CustomToken();
+        if(!SSEService.subscriptions.containsKey(token)) return new CustomToken();
 
-        final SubscriberDTO sub = MainService.subscriptions.get(token);
+        final SubscriberDTO sub = SSEService.subscriptions.get(token);
         if(basicUser != null) {
             sub.setLogin(basicUser.getUsername());
             sub.setUserId(basicUser.getId());

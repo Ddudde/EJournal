@@ -1,24 +1,25 @@
 package ru.controllers.school;
 
-import com.google.gson.JsonObject;
-import com.google.gson.internal.bind.JsonTreeWriter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.DocsHelpController;
-import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
 import ru.data.DAO.school.Request;
 import ru.data.DTO.SubscriberDTO;
-import ru.data.DTO.controller.school.RequestInnerDTO;
-import ru.data.reps.school.RequestRepository;
+import ru.data.DTO.controller.school.request.RequestBodyDTO;
+import ru.data.DTO.controller.school.request.RequestInnerDTO;
+import ru.data.DTO.controller.school.request.RequestOutDTO;
 import ru.security.user.CustomToken;
-import ru.services.MainService;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.SSE.ISSEService;
+import ru.services.logic.school.IRequestService;
+
+import java.util.List;
+import java.util.Map;
 
 /** RU: Контроллер для раздела заявок на подключение к системе учебных учреждений + Server Sent Events
  * <pre>
@@ -28,132 +29,95 @@ import ru.services.db.DBService;
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 @RestController public class RequestController {
-    private final RequestRepository requestRepository;
-    private final MainService mainService;
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final IRequestService requestService;
+    private final ISSEService sseService;
 
     /** RU: добавляет заявку + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PostMapping("/addReq")
-    public ResponseEntity<Void> addReq(@RequestBody RequestInnerDTO body) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[POST] /addReq");
+    public ResponseEntity<Void> addReq(@RequestBody RequestInnerDTO body) {
         if(ObjectUtils.isEmpty(body.email) || ObjectUtils.isEmpty(body.date) || ObjectUtils.isEmpty(body.fio)) {
             return ResponseEntity.notFound().build();
         }
-        final Request request = new Request(body.email, body.date, body.fio);
-        requestRepository.saveAndFlush(request);
 
-        wrtr.name("id").value(request.getId())
-            .name("body").beginObject()
-            .name("title").value(request.getEmail())
-            .name("date").value(request.getDate())
-            .name("text").value(request.getFio())
-            .endObject();
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("addReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK);
+        final RequestOutDTO outDTO = requestService.addRequest(body);
+        sseService.sendEventFor("addReq", outDTO, TypesConnect.REQUESTS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
 
     /** RU: удаление заявки + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @DeleteMapping("/delReq")
-    public ResponseEntity<Void> delReq(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[DELETE] /delReq");
+    public ResponseEntity<Void> delReq(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
 
-        requestRepository.delete(request);
-
-        wrtr.name("id").value(request.getId());
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("delReq", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK);
+        final RequestOutDTO outDTO = requestService.deleteRequest(request);
+        sseService.sendEventFor("delReq", outDTO, TypesConnect.REQUESTS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
 
     /** RU: изменение заголовка заявки + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chTitle")
-    public ResponseEntity<Void> chTitle(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chTitle");
+    public ResponseEntity<Void> chTitle(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
 
-        request.setEmail(body.title);
-        requestRepository.saveAndFlush(request);
-
-        wrtr.name("id").value(request.getId())
-            .name("title").value(request.getEmail());
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("chTitle", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK);
+        final RequestOutDTO outDTO = requestService.changeTitle(body.title, request);
+        sseService.sendEventFor("chTitle", outDTO, TypesConnect.REQUESTS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
 
     /** RU: изменение даты заявки + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chDate")
-    public ResponseEntity<Void> chDate(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chDate");
+    public ResponseEntity<Void> chDate(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
 
-        request.setDate(body.date);
-        requestRepository.saveAndFlush(request);
-
-        wrtr.name("id").value(request.getId())
-            .name("date").value(request.getDate());
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("chDate", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK);
+        final RequestOutDTO outDTO = requestService.changeDate(body.date, request);
+        sseService.sendEventFor("chDate", outDTO, TypesConnect.REQUESTS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
 
     /** RU: изменение текста заявки + Server Sent Events
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PatchMapping("/chText")
-    public ResponseEntity<Void> chText(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init(body.toString(), "[PATCH] /chText");
+    public ResponseEntity<Void> chText(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
 
-        request.setFio(body.text);
-        requestRepository.saveAndFlush(request);
-
-        wrtr.name("id").value(request.getId())
-            .name("text").value(request.getFio());
-        return mainService.getObjR(ans -> {
-            SSEController.sendEventFor("chText", ans, TypesConnect.REQUESTS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK);
+        final RequestOutDTO outDTO = requestService.changeText(body.text, request);
+        sseService.sendEventFor("chText", outDTO, TypesConnect.REQUESTS, "main", "main", "main", "main");
+        return ResponseEntity.ok().build();
     }
 
     /** RU: [start] отправляет инфу о заявках
-     * @see DocsHelpController#point(Object, Object) Описание */
+     * @see DocsHelpController#point Описание */
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @GetMapping("/getRequests")
-    public ResponseEntity<JsonObject> getRequests(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) throws Exception {
-        final JsonTreeWriter wrtr = mainService.init("", "[GET] /getRequests");
-        for(Request reqR : dbService.getRequests()){
-            wrtr.name(reqR.getId()+"").beginObject()
-                .name("title").value(reqR.getEmail())
-                .name("date").value(reqR.getDate())
-                .name("text").value(reqR.getFio())
-                .endObject();
-        }
-        return mainService.getObjR(ans -> {
-            SSEController.changeSubscriber(auth.getUUID(), null, TypesConnect.REQUESTS, "main", "main", "main", "main");
-        }, wrtr, HttpStatus.OK, false);
+    public ResponseEntity<Map<Long, RequestBodyDTO>> getRequests(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
+        final List<Request> requests = dbService.getRequests();
+
+        final Map<Long, RequestBodyDTO> outDTO = requestService.prepareRequests(requests);
+        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.REQUESTS, "main", "main", "main", "main");
+        return ResponseEntity.ok(outDTO);
     }
 
 }

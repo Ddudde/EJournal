@@ -1,6 +1,5 @@
 package ru.services;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,9 +11,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 /** RU: сервис для работы с рассылками по электронной почте */
-@Getter
 @RequiredArgsConstructor
-@Service public class EmailService {
+@Service public class EmailService implements IEmailService {
     private final JavaMailSender emailSender;
 
     /** RU: адрес электронной почты с которой ведётся рассылка */
@@ -45,6 +43,7 @@ import javax.mail.internet.MimeMessage;
      * @param code код восстановления
      * @see SettingsController#startEmail(SettingsController.DataSettings, SubscriberDTO)   Пример использования */
     @SuppressWarnings("JavadocReference")
+    @Override
     public void sendRegCode(String to, String code) {
         String text = """
             <h3>Здравствуйте!</h3>
@@ -65,6 +64,7 @@ import javax.mail.internet.MimeMessage;
      * @param title заголовок письма
      * @see SettingsController#chPass(SettingsController.DataSettings, SubscriberDTO)   Пример использования */
     @SuppressWarnings("JavadocReference")
+    @Override
     public void sendRecCode(String to, String code, String title) {
         String text = """
             <h3>Здравствуйте!</h3>

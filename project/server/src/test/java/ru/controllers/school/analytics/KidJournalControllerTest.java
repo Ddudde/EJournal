@@ -14,15 +14,13 @@ import ru.data.reps.school.DayRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.MarkRepository;
 import ru.security.user.Roles;
-import ru.services.MainService;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
+import ru.services.logic.school.analytics.IPeriodService;
 
 import java.util.List;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,19 +28,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class KidJournalControllerTest extends AbstractTestIntegration {
     private final MarkRepository markRepository;
     private final LessonRepository lessonRepository;
-    private final MainService mainService;
     private final DayRepository dayRepository;
-    private final DBService dbService;
+    private final IDBService dbService;
+    private final IPeriodService periodService;
     private static final String getInfoPers_Summary = "Отправляет данные о итоговых оценках";
     private static final String getInfo_Summary = "[start] отправляет данные о оценках";
 
     @Autowired
-    public KidJournalControllerTest(MarkRepository markRepository, LessonRepository lessonRepository, MainService mainService, DayRepository dayRepository, DBService dbService, KidJournalController kidJournalController) {
+    public KidJournalControllerTest(MarkRepository markRepository, LessonRepository lessonRepository, DayRepository dayRepository, IDBService dbService, IPeriodService periodService, KidJournalController kidJournalController) {
         this.markRepository = markRepository;
         this.lessonRepository = lessonRepository;
-        this.mainService = mainService;
         this.dayRepository = dayRepository;
         this.dbService = dbService;
+        this.periodService = periodService;
         this.testController = kidJournalController;
         nameTestedClass = "KidJournalController";
     }
@@ -76,7 +74,7 @@ public class KidJournalControllerTest extends AbstractTestIntegration {
         mockMvc.perform(get("/journal/getInfoPers")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"9764\":\"III четверть\",\"3456\":\"IV четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"9764\":\"1\",\"352\":\"Н\"},\"Математика\":{\"9764\":\"2\",\"352\":\"5\",\"3872\":\"5\"}}}"))
+            .andExpect(content().string("{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"3456\":\"IV четверть\",\"9764\":\"III четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"352\":\"Н\",\"9764\":\"1\"},\"Математика\":{\"352\":\"5\",\"3872\":\"5\",\"9764\":\"2\"}}}"))
             .andDo(defaultSwaggerDocs(getInfoPers_Summary, "getInfoPers_whenGood_KID"));
     }
 
@@ -151,6 +149,6 @@ public class KidJournalControllerTest extends AbstractTestIntegration {
     /** RU: создаём периоды обучения и выбираем 3тий период */
     private void prepareActualPeriod(School school) {
         when(school.getPeriods()).thenReturn(TEST_UTILS.periods);
-        doReturn(TEST_UTILS.periods.get(2)).when(mainService).getActualPeriodBySchool(any());
+        doReturn(TEST_UTILS.periods.get(2)).when(periodService).getActualPeriodBySchool(any());
     }
 }

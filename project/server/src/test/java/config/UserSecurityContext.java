@@ -8,7 +8,7 @@ import org.springframework.util.ObjectUtils;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.DBService;
+import ru.services.db.IDBService;
 
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ import static utils.TestUtils.usersTest;
  * @see CustomUser */
 @RequiredArgsConstructor
 public class UserSecurityContext implements WithSecurityContextFactory<CustomUser> {
-    private final DBService dbService;
+    private final IDBService dbService;
 
     @Override
     public SecurityContext createSecurityContext(CustomUser customUser) {

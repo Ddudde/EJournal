@@ -19,7 +19,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import ru.configs.AppConfig;
 import ru.controllers.SSE.TypesConnect;
 import ru.security.user.Roles;
-import ru.services.MainService;
+import ru.services.data.UserService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,7 +96,7 @@ class ExamplesTest {
 
         String fio = fakerRu.name().lastName() + " " + fakerRu.name().firstName().charAt(0) + "." + fakerRu.name().firstName().charAt(0) + ".";
         log.trace(fio);
-        log.trace(MainService.getRandomUsername(fakerEn));
+        log.trace(UserService.getRandomUsername(fakerEn));
         log.trace(fakerEn.bool().bool() + "");
         log.trace(fakerEn.internet().emailAddress());
         log.trace(fakerEn.internet().password());
