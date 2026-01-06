@@ -1,11 +1,10 @@
 package ru.data.DAO.school;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -13,7 +12,7 @@ import javax.persistence.Id;
 @Entity public class Period {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private String name, dateN, dateK;

@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import ru.configs.AppConfig;
-import ru.services.logic.school.analytics.IPeriodService;
 
 /** RU: Главный класс, запуск сервера */
 @Slf4j
@@ -22,17 +20,6 @@ public class Main {
     public static void main(String... args) {
         ctx = SpringApplication.run(Main.class);
         log.trace("Hello world!");
-    }
-
-    /** RU: Показывает исключение и в зависимости от свойства {@link AppConfig#DEBUG} с подробностью
-     * @see IPeriodService#getActualPeriodBySchool Пример использования*/
-    public static boolean excp(Exception e) {
-        if(AppConfig.DEBUG) {
-            e.printStackTrace();
-        } else {
-            log.debug(e.getMessage());
-        }
-        return false;
     }
 
     /** RU: публикует asciiDoc в формате PDF и HTML

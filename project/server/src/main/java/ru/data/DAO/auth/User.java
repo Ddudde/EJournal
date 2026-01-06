@@ -1,5 +1,7 @@
 package ru.data.DAO.auth;
 
+import jakarta.annotation.PreDestroy;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -8,8 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.security.user.Roles;
 
-import javax.annotation.PreDestroy;
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import java.util.Map;
 @Entity(name = "useer") public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
     private Long id;
 
     private String username, password, code, expDate, fio;

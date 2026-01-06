@@ -1,5 +1,6 @@
 package ru.data.DAO.auth;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import org.hibernate.annotations.LazyCollectionOption;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,17 +17,19 @@ import java.util.Set;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-@Entity(name = "rol") public class Role {
-    private String email;
-
+@Entity(name = "rol")
+public class Role {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private Long id;
 
-    @OneToOne
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "yo_id")
     private School YO;
 
-    @OneToOne
+    @ManyToOne
     private Group grp;
 
     @LazyCollection(LazyCollectionOption.FALSE)

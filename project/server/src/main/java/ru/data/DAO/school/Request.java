@@ -1,8 +1,7 @@
 package ru.data.DAO.school;
 
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -10,7 +9,7 @@ import javax.persistence.*;
 @Entity public class Request {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private Long id;
 
     private String email, date;

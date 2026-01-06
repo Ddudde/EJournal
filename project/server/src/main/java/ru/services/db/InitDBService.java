@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import ru.Main;
 import ru.configs.AppConfig;
 import ru.controllers.TestController;
 import ru.data.DAO.Contacts;
@@ -147,7 +146,7 @@ import static java.util.Arrays.asList;
                 }
             }
         } catch (ParseException e) {
-            Main.excp(e);
+            log.debug(e.getMessage());
         }
     }
 

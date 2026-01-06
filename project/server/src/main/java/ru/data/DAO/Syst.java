@@ -1,11 +1,11 @@
 package ru.data.DAO;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import ru.data.DAO.auth.User;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
     private String testPassword;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private Long id;
 
     @LazyCollection(LazyCollectionOption.FALSE)

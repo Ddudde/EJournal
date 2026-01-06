@@ -5,6 +5,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import com.google.gson.Gson;
 import config.BeanConfig;
 import config.SubscriberMethodArgumentResolver;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -22,8 +23,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.security.ControllerExceptionHandler;
 import utils.TestUtils;
-
-import javax.servlet.ServletException;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;

@@ -1,9 +1,8 @@
 package ru.data.DAO.school;
 
+import jakarta.persistence.*;
 import lombok.*;
 import ru.data.DAO.auth.User;
-
-import javax.persistence.*;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -11,13 +10,13 @@ import javax.persistence.*;
 @Entity public class Mark {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private User usr;
 
-    @OneToOne
+    @ManyToOne
     private Period period;
 
     private int weight;

@@ -2,7 +2,6 @@ package config;
 
 import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.GenericApplicationContext;
@@ -114,7 +113,6 @@ public class BeanConfig {
         markRepository, dbService, lessonRepository, groupService, scheduleService, periodService));
     private final IRequestService requestService = spy(new RequestService(requestRepository));
 
-
     @Autowired
     public BeanConfig(GenericApplicationContext context) {
         context.registerBean(DayRepository.class, () -> dayRepository);
@@ -183,9 +181,5 @@ public class BeanConfig {
             teacherJournalService, sseService)));
         context.registerBean(RequestController.class, () -> spy(new RequestController(dbService, requestService,
             sseService)));
-    }
-
-    public void defaultInitMethodMainService(BeanDefinition bd) {
-        bd.setInitMethodName("postConstruct");
     }
 }

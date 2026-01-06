@@ -1,5 +1,6 @@
 package ru.data.DAO.school;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,6 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import ru.data.DAO.auth.User;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,16 +17,16 @@ import java.util.List;
 @Entity(name = "daay") public class Day {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private User teacher;
 
-    @OneToOne
+    @ManyToOne
     private School school;
 
-    @OneToOne
+    @ManyToOne
     private Group grp;
 
     @Column(columnDefinition="text")

@@ -3,7 +3,6 @@ package ru.services.logic.school.analytics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.Main;
 import ru.configs.AppConfig;
 import ru.controllers.school.analytics.KidJournalController;
 import ru.controllers.school.analytics.PeriodController;
@@ -76,18 +75,28 @@ public class PeriodService implements IPeriodService {
 
     /** RU: исходя из заданных периодов в школе и актуальной даты
      * выбирается активный период
+     * В случае если дата между периодами, выбирается последний завершённый
      * @see KidJournalController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
     @Override
     public Period getActualPeriodBySchool(School school) {
         try {
             long now = DAYS.toMillis(LocalDate.now().toEpochDay());
+            Period lastEndedPeriod = null;
             for (Period per : school.getPeriods()) {
-                if (now >= AppConfig.dataFormat.parse(per.getDateN()).getTime() && now <= AppConfig.dataFormat.parse(per.getDateK()).getTime()) {
+                long timeBeginPeriod = AppConfig.dataFormat.parse(per.getDateN()).getTime();
+                long timeEndPeriod = AppConfig.dataFormat.parse(per.getDateK()).getTime();
+                if (now >= timeBeginPeriod && now >= timeEndPeriod) {
+                    lastEndedPeriod = per;
+                }
+                if(lastEndedPeriod != null && now < timeBeginPeriod) {
+                    return lastEndedPeriod;
+                }
+                if (now >= timeBeginPeriod && now <= timeEndPeriod) {
                     return per;
                 }
             }
         } catch (ParseException e) {
-            Main.excp(e);
+            log.debug(e.getMessage());
         }
         return null;
     }
