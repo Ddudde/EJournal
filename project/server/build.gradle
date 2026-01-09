@@ -18,9 +18,10 @@ apply from: "$rootProject.projectDir/secrets.gradle"
 group = 'ru'
 version = '1.0'
 
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 configurations {
@@ -30,6 +31,7 @@ configurations {
 }
 
 dependencies {
+    implementation "org.springframework.boot:spring-boot-starter:${spring_version}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${spring_version}"
     implementation "org.springframework.boot:spring-boot-starter-web:${spring_version}"
     implementation "org.springframework.boot:spring-boot-starter-mail:${spring_version}"

@@ -33,12 +33,12 @@ public class Role {
     private Group grp;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToMany
+    @OneToMany
     @JoinColumn(name = "role_kid_id")
     private List<User> kids;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToMany
+    @OneToMany
     @JoinColumn(name = "role_par_id")
     private List<User> parents;
 

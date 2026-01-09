@@ -94,8 +94,9 @@ public class ParentsService implements IParentsService {
 
         parentsOutDTO.put(inv.getId() + "", new ParentsBodyDTO(inv.getFio()));
 
-        if (!inv.getRole(Roles.PARENT).getKids().contains(kidU)) {
-            inv.getRole(Roles.PARENT).getKids().add(kidU);
+        final List<User> kids = inv.getRole(Roles.PARENT).getKids();
+        if (!kids.contains(kidU)) {
+            kids.add(kidU);
         }
         kidU.getRole(Roles.KID).getParents().add(inv);
         userRepository.saveAndFlush(kidU);
