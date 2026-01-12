@@ -9,7 +9,6 @@ import ru.controllers.SSE.TypesConnect;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.test.TestInnerDTO;
 import ru.data.DTO.controller.test.TestOutDTO;
-import ru.data.DTO.service.data.initDB.InitDBServiceDTO;
 import ru.security.user.CustomToken;
 import ru.services.logic.ITestService;
 import ru.services.logic.SSE.ISSEService;
@@ -30,8 +29,8 @@ import ru.services.logic.SSE.ISSEService;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
     @PutMapping("/chTests")
-    public ResponseEntity<InitDBServiceDTO> chTests(@RequestBody TestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
-        final InitDBServiceDTO outDTO = testService.changeTests(body);
+    public ResponseEntity<TestOutDTO> chTests(@RequestBody TestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+        final TestOutDTO outDTO = testService.changeTests(body);
         return ResponseEntity.ok(outDTO);
     }
 

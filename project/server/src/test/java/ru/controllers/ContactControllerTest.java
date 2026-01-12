@@ -86,7 +86,8 @@ public class ContactControllerTest extends AbstractTestIntegration {
                 "p1": "text",
                 "val": "А проект вышел большим..."
             }
-            """)).andExpect(status().isOk())
+            """))
+                .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(CH_CONTACT_SUMMARY, "chContact_whenGood_YO_HTeacher"));
 
         verify(sseService).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
@@ -101,9 +102,9 @@ public class ContactControllerTest extends AbstractTestIntegration {
     void chContact_whenGood_Portal_AdminUser() throws Exception {
         getSub().setLvlMore2("Por");
         when(dbService.getSyst().getContacts())
-            .thenReturn(getCloneContacts(TEST_UTILS.contactsTest.get(0)));
+            .thenReturn(getCloneContacts(TEST_UTILS.contactsTest.getFirst()));
 
-        mockMvc.perform(put("/contacts/chContact/")
+        mockMvc.perform(put("/contacts/chContact")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""

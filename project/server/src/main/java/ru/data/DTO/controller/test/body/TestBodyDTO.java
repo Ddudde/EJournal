@@ -1,4 +1,4 @@
-package ru.data.DTO.controller.test;
+package ru.data.DTO.controller.test.body;
 
 import lombok.Builder;
 

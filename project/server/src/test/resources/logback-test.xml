@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <logger name="org.springframework" level="info"/>
+    <logger name="org.springframework.web" level="trace"/>
     <logger name="org.hibernate" level="info"/>
     <logger name="ru" level="trace"/>
     <logger name="example" level="trace"/>

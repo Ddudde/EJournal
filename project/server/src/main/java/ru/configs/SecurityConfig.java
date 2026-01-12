@@ -66,7 +66,7 @@ import ru.services.db.IDBService;
             .headers(config -> config.frameOptions(FrameOptionsConfig::disable))
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable)// В AuthenticationFilter функционал
             .logout(AbstractHttpConfigurer::disable)
             .rememberMe(AbstractHttpConfigurer::disable)
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)

@@ -1,11 +1,13 @@
 package utils;
 
-import org.junit.platform.suite.api.SelectPackages;
+import org.junit.platform.suite.api.IncludeTags;
+import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
+import ru.controllers.AuthControllerTest;
 
 /** RU: Запускает тесты при помощи junit-platform-suite */
 @Suite
-//@SelectClasses({RequestControllerTest.class})
-@SelectPackages("ru.controllers.people")
-//@IncludeTags({"getRequests", "chText"})
+@SelectClasses({AuthControllerTest.class})
+//@SelectPackages("ru.controllers.people")
+@IncludeTags({"reg", "chText"})
 public class RunTestSuite {}

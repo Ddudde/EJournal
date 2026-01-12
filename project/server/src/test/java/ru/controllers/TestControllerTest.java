@@ -13,7 +13,7 @@ import ru.configs.SecurityConfig;
 import ru.data.DAO.Syst;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
-import ru.services.db.InitDBService;
+import ru.services.db.IRandomizeService;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -26,15 +26,15 @@ import static utils.TestUtils.usersTest;
 public class TestControllerTest extends AbstractTestIntegration {
     private final LessonRepository lessonRepository;
     private final SchoolRepository schoolRepository;
-    private final InitDBService initDBService;
+    private final IRandomizeService randomService;
     private static final String chTests_Summary = "Изменяет параметры тестирования";
     private static final String getInfo_Summary = "[start] Отправка инфы для тестов";
 
     @Autowired
-    TestControllerTest(LessonRepository lessonRepository, SchoolRepository schoolRepository, InitDBService initDBService, TestController testController) {
+    TestControllerTest(LessonRepository lessonRepository, SchoolRepository schoolRepository, IRandomizeService randomService, TestController testController) {
         this.lessonRepository = lessonRepository;
         this.schoolRepository = schoolRepository;
-        this.initDBService = initDBService;
+        this.randomService = randomService;
         this.testController = testController;
         nameTestedClass = "TestController";
     }
@@ -116,10 +116,10 @@ public class TestControllerTest extends AbstractTestIntegration {
      */
     private void prepareSchools() {
         Syst syst = mock(Syst.class, Answers.RETURNS_DEEP_STUBS);
-        initDBService.setSyst(syst);
+        randomService.setSyst(syst);
         when(syst.getAdmins()).thenReturn(usersTest);
         when(schoolRepository.findAllById(any())).thenReturn(schools);
-        initDBService.getSchools().add(0L);
+        randomService.getSchools().add(0L);
         when(lessonRepository.uniqTeachersUBySchool(anyLong())).thenReturn(usersTest);
     }
 }

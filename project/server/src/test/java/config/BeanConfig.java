@@ -39,9 +39,7 @@ import ru.services.data.GroupService;
 import ru.services.data.IGroupService;
 import ru.services.data.IUserService;
 import ru.services.data.UserService;
-import ru.services.db.DBService;
-import ru.services.db.IDBService;
-import ru.services.db.InitDBService;
+import ru.services.db.*;
 import ru.services.logic.*;
 import ru.services.logic.SSE.ISSEService;
 import ru.services.logic.SSE.SSEService;
@@ -81,9 +79,11 @@ public class BeanConfig {
     private final PasswordEncoder passwordEncoder = spy(new BCryptPasswordEncoder(8));
     private final IGroupService groupService = spy(new GroupService(dbService));
     private final IPeriodService periodService = spy(new PeriodService(periodRepository, schoolRepository));
-    private final InitDBService initDBService = spy(new InitDBService(passwordEncoder, settingUserRepository,
+    private final IRandomizeService randomService = spy(new RandomizeService(passwordEncoder, settingUserRepository,
         roleRepository, userRepository, schoolRepository, dbService, newsRepository, contactsRepository, systRepository,
-        dayRepository, lessonRepository, markRepository, groupRepository, periodRepository, requestRepository, periodService));
+        dayRepository, lessonRepository, markRepository, groupRepository, periodRepository, periodService));
+    private final InitDBService initDBService = spy(new InitDBService(passwordEncoder, settingUserRepository,
+        roleRepository, userRepository, schoolRepository, dbService, randomService));
     private final IUserService userService = spy(new UserService(dbService, userRepository, settingUserRepository));
     private final IProfileService profileService = spy(new ProfileService(pushService, settingUserRepository,
         userService));
@@ -105,7 +105,7 @@ public class BeanConfig {
         roleRepository, dbService));
     private final IKidJournalService kidJournalService = spy(new KidJournalService(markRepository, lessonRepository,
         dayRepository, periodService));
-    private final ITestService testService = spy(new TestService(initDBService));
+    private final ITestService testService = spy(new TestService(randomService, schoolRepository, lessonRepository));
     private final IContactService contactService = spy(new ContactService(contactsRepository, dbService));
     private final IAuthService authService = spy(new AuthService(pushService, settingUserRepository, passwordEncoder,
         dbService, userRepository));
@@ -128,6 +128,7 @@ public class BeanConfig {
         context.registerBean(IPushService.class, () -> pushService);
         context.registerBean("dbService", IDBService.class, () -> dbService);
         context.registerBean(PasswordEncoder.class, () -> passwordEncoder);
+        context.registerBean(IRandomizeService.class, () -> randomService);
         context.registerBean(InitDBService.class, () -> initDBService);
         context.registerBean(IProfileService.class, () -> profileService);
         context.registerBean(IUserService.class, () -> userService);

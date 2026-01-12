@@ -76,7 +76,7 @@ import java.util.UUID;
     public ResponseEntity<AuthOutDTO> reg(@RequestBody AuthInnerDTO body) {
         final User user = dbService.userByLogin(body.login),
             user1 = dbService.userByCode(body.code);
-        if(user != null) return ResponseEntity.notFound().build();
+        if(user != null) return ResponseEntity.ok().build();
 
         final AuthOutDTO outDTO = authService.createUser(user1, body);
         if(outDTO != null) return ResponseEntity.accepted().body(outDTO);
