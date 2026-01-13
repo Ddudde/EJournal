@@ -88,7 +88,7 @@ public class Role {
         return parents;
     }
 
-    public String getToStringU(List<User> users) {
+    private String getToStringU(List<User> users) {
         String rez = null;
         if(users == null) return "[]";
         for(User user : users) {

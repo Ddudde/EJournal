@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import ru.Main;
-import ru.services.IPushService;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,46 +45,13 @@ import java.util.Set;
 
     public void setNotif(Boolean notif) {
         this.notif = notif;
-        IPushService pushService = (IPushService) Main.ctx.getBean("pushService");
-        if(notif){
-            getTopics().forEach((topic) -> {
-                if(notif
-                && ((topic.contains("News") && nNewNewsYO)
-                || (topic.contains("news") && nNewNewsPor))) {
-                    pushService.subscribe(new ArrayList<>(getTokens()), topic);
-                }
-            });
-        } else {
-            getTopics().forEach((topic) -> {
-                pushService.unsubscribe(new ArrayList<>(getTokens()), topic);
-            });
-        }
     }
 
     public void setNNewNewsYO(Boolean nNewNewsYO) {
         this.nNewNewsYO = nNewNewsYO;
-        changeSubscribe("News", nNewNewsYO);
     }
 
     public void setNNewNewsPor(Boolean nNewNewsPor) {
         this.nNewNewsPor = nNewNewsPor;
-        changeSubscribe("news", nNewNewsPor);
-    }
-
-    private void changeSubscribe(String name, boolean val) {
-        IPushService pushService = (IPushService) Main.ctx.getBean("pushService");
-        if(val){
-            getTopics().forEach((topic) -> {
-                if(notif && topic.contains(name)) {
-                    pushService.subscribe(new ArrayList<>(getTokens()), topic);
-                }
-            });
-        } else {
-            getTopics().forEach((topic) -> {
-                if(!topic.contains(name)) {
-                    pushService.unsubscribe(new ArrayList<>(getTokens()), topic);
-                }
-            });
-        }
     }
 }

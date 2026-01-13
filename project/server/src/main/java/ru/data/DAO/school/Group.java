@@ -29,12 +29,6 @@ import java.util.List;
         this.name = name;
     }
 
-//    @PreRemove
-//    private void rem() {
-//        System.out.println(name);
-//        getKids().clear();
-//    }
-
     public List<User> getKids() {
         if(kids == null) kids = new ArrayList<>();
         return kids;

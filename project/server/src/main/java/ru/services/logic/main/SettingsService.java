@@ -17,9 +17,7 @@ import ru.services.IPushService;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /** RU: сервис для контроллера
  * @see SettingsController */
@@ -69,15 +67,50 @@ public class SettingsService implements ISettingsService {
             case "chSecFR" -> settingUser.setSecFr(body.valString);
             case "chIco" -> settingUser.setIco(body.valInt);
             case "checkbox_hints" -> settingUser.setHints(body.val);
-            case "checkbox_notify" -> settingUser.setNotif(body.val);
+            case "checkbox_notify" -> setNotificationForUser(body.val, settingUser);
             case "checkbox_notify_sched" -> settingUser.setNChangeShedule(body.val);
             case "checkbox_notify_marks" -> settingUser.setNNewMarks(body.val);
-            case "checkbox_notify_yo" -> settingUser.setNNewNewsYO(body.val);
-            case "checkbox_notify_por" -> settingUser.setNNewNewsPor(body.val);
+            case "checkbox_notify_yo" -> changeSubscribe("News", body.val, settingUser);
+            case "checkbox_notify_por" -> changeSubscribe("news", body.val, settingUser);
             case "checkbox_notify_new_sch" -> settingUser.setNNewReqSch(body.val);
             default -> {}
         }
         settingUserRepository.saveAndFlush(settingUser);
+    }
+
+    private void setNotificationForUser(Boolean notif, SettingUser settings) {
+        final Set<String> topics = settings.getTopics();
+        final Set<String> tokens = settings.getTokens();
+
+        topics.forEach((topic) -> {
+            if(notif
+            && ((topic.contains("News") && settings.getNNewNewsYO())
+            || (topic.contains("news") && settings.getNNewNewsPor()))) {
+                pushService.subscribe(new ArrayList<>(tokens), topic);
+            } else {
+                pushService.unsubscribe(new ArrayList<>(tokens), topic);
+            }
+        });
+        settings.setNotif(notif);
+    }
+
+    private void changeSubscribe(String name, boolean enabledSubscribe, SettingUser settings) {
+        final Set<String> topics = settings.getTopics();
+        final Set<String> tokens = settings.getTokens();
+
+        topics.forEach((topic) -> {
+            if(enabledSubscribe && settings.getNotif() && topic.contains(name)) {
+                pushService.subscribe(new ArrayList<>(tokens), topic);
+            } else { // сброс подписки при переходе между Учебным центром и Порталом
+                pushService.unsubscribe(new ArrayList<>(tokens), topic);
+            }
+        });
+        if(Objects.equals(name, "News")) {
+            settings.setNNewNewsYO(enabledSubscribe);
+        } else {
+            settings.setNNewNewsPor(enabledSubscribe);
+        }
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ru.services.db;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +34,9 @@ import java.util.Map;
     private final IDBService dbService;
     private final IRandomizeService randomService;
 
-    private void postConstruct() {
+    @PostConstruct
+    public void postConstruct() {
+//        log.info("test234");
         final SettingUser setts = settingUserRepository.saveAndFlush(new SettingUser(1));
         final Role role = roleRepository.saveAndFlush(new Role("ex@ya.ru"));
         final User user = userRepository
