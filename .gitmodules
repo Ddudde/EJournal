@@ -1,0 +1,3 @@
+[submodule "EJournal_Client"]
+	path = EJournal_Client
+	url = https://github.com/Ddudde/EJournal_Client

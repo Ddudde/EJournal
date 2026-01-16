@@ -1,7 +1,7 @@
 = Asciidoc
 Natik Muradov <myratoff25@gmail.com>
-:revnumber: v0.3
-:revdate: 26.11.2025
+:revnumber: v0.4.1
+:revdate: 16.01.2026
 :revremark: Основное описание
 :sectnums:
 :hardbreaks-option:
@@ -12,6 +12,7 @@ Natik Muradov <myratoff25@gmail.com>
 
 ====
 Github: https://github.com/Ddudde/EJournal
+NOTE: Доки в ветке public репозитория клиента.
 Публикации в HTML и PDF форматах находятся в /docs/EJournal/asciiDoc/.
 Основное описание проекта здесь. Также есть дополнительные:
 Также в /docs/start-web.bat можно стартануть Python http server для просмотра документации
@@ -21,15 +22,17 @@ Github: https://github.com/Ddudde/EJournal
 * AsciiDoc: link:/EJournal/asciiDoc/[]
 
 Сервер:
+https://github.com/Ddudde/EJournal
 Выполнен в классическом монолите
-Находится в /project/server
+Находится в /server
 http://localhost:8080
 Java, Spring, REST + Server Sent Events
 
 Клиент:
-Находится в /project/client
-http://localhost:3000/EJournal
-Github Pages: https://ddudde.github.io/EJournal/
+https://github.com/Ddudde/EJournal_Client
+Находится в /client
+http://localhost:3000/EJournal_Client/
+Github Pages: https://ddudde.github.io/EJournal_Client/
 JS, React, Redux, PWA
 ====
 
@@ -40,12 +43,12 @@ Intellij IDEA в качестве IDE
 BD: H2
 http://localhost:8080/console_db
 JDK: GraalVM 21
-Сборка: Gradle 8.14.3
+Сборка: Gradle 9.2.1
 БД: PostgreSQL 15 / H2
 
 Фреймворки:
 
-. Spring Boot 2.7.18
+. Spring Boot 3.3.13
 . Spring Security
 . JUnit 5
 . Hibernate
@@ -82,7 +85,7 @@ NOTE: Vs Code в качестве IDE
 == Использование
 ====
 Запускаем сервер
-И запускаем клиент по одному из адресов: http://localhost:3000/EJournal
+И запускаем клиент по одному из адресов: http://localhost:3000/EJournal_Client/
 , https://ddudde.github.io/EJournal/
 Выбираем роль, допустим администратора
 И авторизируемся
@@ -101,6 +104,7 @@ NOTE: Vs Code в качестве IDE
 ====
 == Документы
 ====
+NOTE: Доки в ветке public репозитория клиента.
 JavaDoc, AsciiDoc и Swagger генерируются при помощи Gradle
 команды:
 gradle javadoc
@@ -162,7 +166,7 @@ beenDo - что уже сделано
 
 == Логгирование
 ====
-Логи сохраняются в папку: \project\server\logs.
+Логи сохраняются в папку: \server\logs.
 Slf4j + logback-spring
 ====
 

@@ -1,7 +1,7 @@
 = ReadMe
 Natik Muradov <myratoff25@gmail.com>
-:revnumber: v0.1
-:revdate: 08.12.2024
+:revnumber: v0.1.1
+:revdate: 16.01.2026
 :revremark: Поверхностное описание
 :sectnums:
 :hardbreaks-option:
@@ -14,27 +14,30 @@ Natik Muradov <myratoff25@gmail.com>
 Основное описание в AsciiDoc.
 Github: https://github.com/Ddudde/EJournal
 
-* Swagger: https://ddudde.github.io/EJournal/swagger/htmlSwag/
-* JavaDoc: https://ddudde.github.io/EJournal/javaDoc/
-* AsciiDoc: https://ddudde.github.io/EJournal/asciiDoc/
+* Swagger: https://ddudde.github.io/EJournal_Client/swagger/htmlSwag/
+* JavaDoc: https://ddudde.github.io/EJournal_Client/javaDoc/
+* AsciiDoc: https://ddudde.github.io/EJournal_Client/asciiDoc/
 
 Сервер:
-Находится в /project/server
+https://github.com/Ddudde/EJournal
+Выполнен в классическом монолите
+Находится в /server
 http://localhost:8080
 Java, Spring, REST + Server Sent Events
 
 Клиент:
-Находится в /project/client
+https://github.com/Ddudde/EJournal_Client
+Находится в /client
 http://localhost:3000/EJournal
-Github Pages: https://ddudde.github.io/EJournal/
+Github Pages: https://ddudde.github.io/EJournal_Client/
 JS, React, Redux
 ====
 
 == Использование
 ====
 Запускаем сервер
-И запускаем клиент по одному из адресов: http://localhost:3000/EJournal
-, https://ddudde.github.io/EJournal/
+И запускаем клиент по одному из адресов: http://localhost:3000/EJournal_Client/
+, https://ddudde.github.io/EJournal_Client/
 Выбираем роль, допустим администратора
 И авторизируемся
 Логин: nm12
