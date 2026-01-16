@@ -1,6 +1,6 @@
 = Asciidoc
 Natik Muradov <myratoff25@gmail.com>
-:revnumber: v0.4.1
+:revnumber: v0.4.2
 :revdate: 16.01.2026
 :revremark: Основное описание
 :sectnums:
@@ -12,14 +12,15 @@ Natik Muradov <myratoff25@gmail.com>
 
 ====
 Github: https://github.com/Ddudde/EJournal
+А также клиент вставлен в качестве подмодуля Git(папка /EJournal_Client/) в репозиторий сервера и можно увидеть соотношения коммитов сервера и клиента. 
 NOTE: Доки в ветке public репозитория клиента.
 Публикации в HTML и PDF форматах находятся в /docs/EJournal/asciiDoc/.
 Основное описание проекта здесь. Также есть дополнительные:
 Также в /docs/start-web.bat можно стартануть Python http server для просмотра документации
 
-* Swagger: link:/EJournal/swagger/htmlSwag/[]
-* JavaDoc: link:/EJournal/javaDoc/[]
-* AsciiDoc: link:/EJournal/asciiDoc/[]
+* Swagger: link:/EJournal_Client/swagger/htmlSwag/[]
+* JavaDoc: link:/EJournal_Client/javaDoc/[]
+* AsciiDoc: link:/EJournal_Client/asciiDoc/[]
 
 Сервер:
 https://github.com/Ddudde/EJournal
