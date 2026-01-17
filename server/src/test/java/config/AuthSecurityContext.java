@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
 
 import java.util.UUID;
 

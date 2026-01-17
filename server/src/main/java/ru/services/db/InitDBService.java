@@ -16,6 +16,8 @@ import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.SchoolRepository;
 import ru.security.user.Roles;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.db.IRandomizeService;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -36,7 +38,6 @@ import java.util.Map;
 
     @PostConstruct
     public void postConstruct() {
-//        log.info("test234");
         final SettingUser setts = settingUserRepository.saveAndFlush(new SettingUser(1));
         final Role role = roleRepository.saveAndFlush(new Role("ex@ya.ru"));
         final User user = userRepository

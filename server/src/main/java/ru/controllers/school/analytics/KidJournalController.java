@@ -19,9 +19,9 @@ import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.school.analytics.kidJournal.KidJournalOutDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.school.analytics.IKidJournalService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.school.analytics.IKidJournalService;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ import java.util.List;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
-    @GetMapping("/getInfoPers")
+    @GetMapping("/getInfoPers/")
     public ResponseEntity<KidJournalOutDTO> getInfoPers(@AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final Role firstRole = dbService.getFirstRole(user.getRoles());
@@ -63,7 +63,7 @@ import java.util.List;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
-    @GetMapping("/getInfo")
+    @GetMapping("/getInfo/")
     public ResponseEntity<KidJournalOutDTO> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final Role firstRole = dbService.getFirstRole(user.getRoles());

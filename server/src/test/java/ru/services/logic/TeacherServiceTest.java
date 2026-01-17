@@ -14,7 +14,7 @@ import ru.data.DTO.service.school.TeacherServiceDTO;
 import ru.data.reps.school.LessonRepository;
 import ru.services.data.UserService;
 import ru.services.db.DBService;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
 import ru.services.logic.people.TeacherService;
 
 import java.util.ArrayList;

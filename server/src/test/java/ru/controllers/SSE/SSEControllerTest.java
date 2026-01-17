@@ -13,8 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import ru.AbstractTestIntegration;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.SSE.SSEService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.logic.SSEService;
 
 import java.util.UUID;
 
@@ -59,7 +59,7 @@ public class SSEControllerTest extends AbstractTestIntegration {
     /** RU: стартует для нового клиента */
     @Test @Tag("start")
     void start_whenGoodNext_Anonim() throws Exception {
-        mockMvc.perform(get("/sse/start"))
+        mockMvc.perform(get("/sse/start/"))
             .andExpect(status().isOk())
             .andDo(swaggerDocs("start_whenGoodNext_Anonim"));
         assertNotEquals(0, SSEService.subscriptions.size());
@@ -76,7 +76,7 @@ public class SSEControllerTest extends AbstractTestIntegration {
         when(sub.getLogin()).thenReturn("nm12");
         SSEService.subscriptions.put(UUID.fromString(uuid), sub);
 
-        mockMvc.perform(get("/sse/start/{uuidAuth}", uuid))
+        mockMvc.perform(get("/sse/start/{uuidAuth}/", uuid))
             .andExpect(status().isOk())
             .andDo(swaggerDocs("start_whenGood_AdminUser"));
         verify(sseService).setSSE(eq(sub), any(), eq(UUID.fromString(uuid)));

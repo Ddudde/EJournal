@@ -18,8 +18,8 @@ import ru.data.DAO.school.School;
 import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
     void remPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(delete("/teachers/remPep")
+        mockMvc.perform(delete("/teachers/remPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -79,7 +79,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
         when(dbService.groupById(20L)).thenReturn(group);
         when(group.getKids()).thenReturn(new ArrayList<>(usersTest));
 
-        mockMvc.perform(delete("/teachers/remPep")
+        mockMvc.perform(delete("/teachers/remPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -99,7 +99,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
     void chPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/teachers/chPep")
+        mockMvc.perform(patch("/teachers/chPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -113,7 +113,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
         final User user = dbService.userById(getSub().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
 
-        mockMvc.perform(patch("/teachers/chPep")
+        mockMvc.perform(patch("/teachers/chPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -134,7 +134,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
     void addTea_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(post("/teachers/addTea")
+        mockMvc.perform(post("/teachers/addTea/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -151,7 +151,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
         getSub().setLvlSch("20");
         when(dbService.schoolById(20L)).thenReturn(sch1);
 
-        mockMvc.perform(post("/teachers/addTea")
+        mockMvc.perform(post("/teachers/addTea/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -173,7 +173,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/teachers/getTeachers")
+        mockMvc.perform(get("/teachers/getTeachers/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(getTeachers_Summary, "getTeachers_whenEmpty_Anonim"));
@@ -190,7 +190,7 @@ public class TeachersControllerTest extends AbstractTestIntegration {
         user.getSelecRole().setYO(sch1);
         prepareTeachersByLessons();
 
-        mockMvc.perform(get("/teachers/getTeachers")
+        mockMvc.perform(get("/teachers/getTeachers/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().string("{\"nt\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}},\"body\":{\"0\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"}},\"name\":\"Англ. Яз\"},\"1\":{\"tea\":{\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}},\"name\":\"Математика\"}}}"))

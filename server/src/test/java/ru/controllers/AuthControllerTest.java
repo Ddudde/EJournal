@@ -17,8 +17,8 @@ import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.util.UUID;
 

@@ -16,8 +16,8 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.reps.school.LessonRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
     void addLesson_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(post("/schedule/addLesson")
+        mockMvc.perform(post("/schedule/addLesson/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -78,7 +78,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
         when(dbService.schoolById(20L)).thenReturn(sch1);
         prepareTeachersByLessons();
 
-        mockMvc.perform(post("/schedule/addLesson")
+        mockMvc.perform(post("/schedule/addLesson/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -107,7 +107,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
     void getSchedule_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/schedule/getSchedule/{grId}", 20L)
+        mockMvc.perform(get("/schedule/getSchedule/{grId}/", 20L)
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getSchedule_Summary, "getSchedule_whenEmpty_Anonim"));
@@ -124,7 +124,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch1);
         prepareLessons();
 
-        mockMvc.perform(get("/schedule/getSchedule/{grId}", 20L)
+        mockMvc.perform(get("/schedule/getSchedule/{grId}/", 20L)
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"name\":\"Силин А.К.\",\"id\":9764}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"name\":\"Якушева А.О.\",\"id\":3872}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"name\":\"Дроздов А.А.\",\"id\":1705}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"name\":\"Пестов Л.А.\",\"id\":1840}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"name\":\"Никифорова Н.А.\",\"id\":3225}}}}}}"))
@@ -142,7 +142,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
     void getInfo_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/schedule/getInfo")
+        mockMvc.perform(get("/schedule/getInfo/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
@@ -156,7 +156,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
         when(sch1.getHteachers()).thenReturn(usersTest);
         user.getSelecRole().setYO(sch1);
 
-        mockMvc.perform(get("/schedule/getInfo")
+        mockMvc.perform(get("/schedule/getInfo/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
@@ -167,7 +167,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
     void getInfoForHTeacherOrTEACHER_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/schedule/getInfoToHT")
+        mockMvc.perform(get("/schedule/getInfoToHT/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoForHTeacherOrTEACHER_Summary, "getInfoForHTeacherOrTEACHER_whenEmpty_Anonim"));
@@ -183,7 +183,7 @@ public class ScheduleControllerTest extends AbstractTestIntegration {
         when(sch1.getId()).thenReturn(20L);
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch1);
 
-        mockMvc.perform(get("/schedule/getInfoToHT")
+        mockMvc.perform(get("/schedule/getInfoToHT/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyT\":{\"nt\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}},\"body\":{\"0\":{\"tea\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"}},\"name\":\"Англ. Яз\"},\"1\":{\"tea\":{\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}},\"name\":\"Математика\"}}},\"firstG\":2323,\"bodyG\":{\"3456\":\"1Б\",\"4354\":\"1В\",\"2323\":\"1А\"}}"))

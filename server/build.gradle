@@ -20,7 +20,7 @@ version = '1.0'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -48,7 +48,7 @@ dependencies {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
 //    implementation 'org.slf4j:slf4j-api:2.0.13'
-    implementation 'com.h2database:h2:2.3.232'
+    implementation 'com.h2database:h2'
 //    implementation 'org.postgresql:postgresql'
 //    implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
@@ -56,8 +56,8 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombok_version}"
 }
 
-task build_exe(type: Exec) {
-    workingDir 'D:\\Desk\\Rep\\DipvLom\\project\\server'
+tasks.register('build_exe', Exec) {
+    workingDir 'D:\\Desk\\Rep\\EJournal\\server'
     commandLine "launch4jc.exe", "exec.xml"
 }
 
@@ -65,7 +65,7 @@ bootWar {
     archiveFileName = "EJournal"
 }
 
-task runnn_exe {
+tasks.register('runnn_exe', Exec) {
     dependsOn(bootWar)
     dependsOn(build_exe)
 }

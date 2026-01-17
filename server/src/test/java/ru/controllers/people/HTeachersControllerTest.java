@@ -18,8 +18,8 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.reps.auth.RoleRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(delete("/hteachers/remGroup")
+        mockMvc.perform(delete("/hteachers/remGroup/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -85,7 +85,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         when(dbService.groupById(20L)).thenReturn(group);
         when(group.getId()).thenReturn(20L);
 
-        mockMvc.perform(delete("/hteachers/remGroup")
+        mockMvc.perform(delete("/hteachers/remGroup/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -106,7 +106,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(post("/hteachers/addGroup")
+        mockMvc.perform(post("/hteachers/addGroup/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -122,7 +122,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final User user = dbService.userById(getSub().getUserId());
         user.getRoles().get(Roles.HTEACHER).setYO(school);
 
-        mockMvc.perform(post("/hteachers/addGroup")
+        mockMvc.perform(post("/hteachers/addGroup/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -143,7 +143,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/hteachers/chGroup")
+        mockMvc.perform(patch("/hteachers/chGroup/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -162,7 +162,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         when(dbService.groupById(20L)).thenReturn(group);
         when(group.getId()).thenReturn(20L);
 
-        mockMvc.perform(patch("/hteachers/chGroup")
+        mockMvc.perform(patch("/hteachers/chGroup/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -184,7 +184,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
         
-        mockMvc.perform(patch("/hteachers/chPep")
+        mockMvc.perform(patch("/hteachers/chPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -204,7 +204,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         when(school.getId()).thenReturn(20L);
         when(role.getYO()).thenReturn(school);
 
-        mockMvc.perform(patch("/hteachers/chPep")
+        mockMvc.perform(patch("/hteachers/chPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -226,7 +226,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
         
-        mockMvc.perform(delete("/hteachers/remPep")
+        mockMvc.perform(delete("/hteachers/remPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -246,7 +246,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         when(school.getId()).thenReturn(20L);
         when(role.getYO()).thenReturn(school);
 
-        mockMvc.perform(delete("/hteachers/remPep")
+        mockMvc.perform(delete("/hteachers/remPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -267,7 +267,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(post("/hteachers/addPep")
+        mockMvc.perform(post("/hteachers/addPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -283,7 +283,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
             .then(invocation -> invocation.getArguments()[0]);
         when(dbService.schoolById(any()).getId()).thenReturn(20L);
 
-        mockMvc.perform(post("/hteachers/addPep")
+        mockMvc.perform(post("/hteachers/addPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -306,7 +306,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/hteachers/chSch")
+        mockMvc.perform(patch("/hteachers/chSch/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -322,7 +322,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         when(dbService.schoolById(20L)).thenReturn(school);
         when(school.getId()).thenReturn(20L);
 
-        mockMvc.perform(patch("/hteachers/chSch")
+        mockMvc.perform(patch("/hteachers/chSch/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -344,7 +344,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(post("/hteachers/addSch")
+        mockMvc.perform(post("/hteachers/addSch/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -357,7 +357,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
     void addSch_whenGood_Admin() throws Exception {
         final ResultMatcher statusCode = status().isCreated();
         
-        mockMvc.perform(post("/hteachers/addSch")
+        mockMvc.perform(post("/hteachers/addSch/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -378,7 +378,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(delete("/hteachers/remSch")
+        mockMvc.perform(delete("/hteachers/remSch/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -393,7 +393,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final School school = mock(School.class);
         when(dbService.schoolById(20L)).thenReturn(school);
 
-        mockMvc.perform(delete("/hteachers/remSch")
+        mockMvc.perform(delete("/hteachers/remSch/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -414,7 +414,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/hteachers/getInfo")
+        mockMvc.perform(get("/hteachers/getInfo/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
@@ -429,7 +429,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         when(sch1.getHteachers()).thenReturn(usersTest);
         user.getSelecRole().setYO(sch1);
 
-        mockMvc.perform(get("/hteachers/getInfo")
+        mockMvc.perform(get("/hteachers/getInfo/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
@@ -442,7 +442,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/hteachers/getInfoFA")
+        mockMvc.perform(get("/hteachers/getInfoFA/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(getInfoForAdmins_Summary, "getInfoForAdmins_whenEmpty_Anonim"));
@@ -458,7 +458,7 @@ public class HTeachersControllerTest extends AbstractTestIntegration {
         when(sch2.getHteachers()).thenReturn(usersTest);
         when(dbService.getSchools()).thenReturn(List.of(sch1, sch2));
 
-        mockMvc.perform(get("/hteachers/getInfoFA")
+        mockMvc.perform(get("/hteachers/getInfoFA/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"0\":{\"pep\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}}}"))

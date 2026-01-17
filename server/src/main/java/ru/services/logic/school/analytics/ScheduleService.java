@@ -22,9 +22,10 @@ import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.data.IGroupService;
-import ru.services.db.IDBService;
-import ru.services.logic.people.ITeacherService;
+import ru.services.interfaces.data.IGroupService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.people.ITeacherService;
+import ru.services.interfaces.logic.school.analytics.IScheduleService;
 
 import java.util.*;
 

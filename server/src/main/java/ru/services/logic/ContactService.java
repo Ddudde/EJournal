@@ -14,7 +14,8 @@ import ru.data.DTO.controller.contact.ContactOutDTO;
 import ru.data.DTO.controller.contact.ContactsInnerDTO;
 import ru.data.reps.ContactsRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.IContactService;
 
 import java.util.Map;
 import java.util.Objects;

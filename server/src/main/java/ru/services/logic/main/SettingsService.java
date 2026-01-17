@@ -12,8 +12,9 @@ import ru.data.DTO.controller.main.SettingOutDTO;
 import ru.data.DTO.controller.main.SettingsInnerDTO;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
-import ru.services.IEmailService;
-import ru.services.IPushService;
+import ru.services.interfaces.IEmailService;
+import ru.services.interfaces.IPushService;
+import ru.services.interfaces.logic.main.ISettingsService;
 
 import java.time.Duration;
 import java.time.Instant;

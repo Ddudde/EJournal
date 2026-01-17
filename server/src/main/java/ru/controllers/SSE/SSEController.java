@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.data.DTO.SubscriberDTO;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.io.IOException;
 
@@ -30,7 +30,7 @@ public class SSEController {
      * или сохранение подписки для старого пользователя
      * @param uuidAuth Авторизация, в ней подписка и пользователь
      * @exception IOException Исключение вызывается при ошибках с Json */
-    @GetMapping(value = {"/start/{uuidAuth}", "/start"}, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = {"/start/{uuidAuth}/", "/start/"}, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter start(@PathVariable(required = false) String uuidAuth) throws IOException {
         log.trace("YT3 " + SecurityContextHolder.getContext().getAuthentication());
         return sseService.startSSE(uuidAuth);

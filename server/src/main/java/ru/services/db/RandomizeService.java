@@ -25,7 +25,9 @@ import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.*;
 import ru.security.user.Roles;
 import ru.services.data.UserService;
-import ru.services.logic.school.analytics.IPeriodService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.db.IRandomizeService;
+import ru.services.interfaces.logic.school.analytics.IPeriodService;
 
 import java.time.DayOfWeek;
 import java.time.Duration;

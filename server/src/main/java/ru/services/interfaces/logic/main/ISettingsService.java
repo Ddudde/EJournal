@@ -1,4 +1,4 @@
-package ru.services.logic.main;
+package ru.services.interfaces.logic.main;
 
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;

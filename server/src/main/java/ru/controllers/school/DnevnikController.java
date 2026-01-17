@@ -16,9 +16,9 @@ import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.school.dnevnik.DnevnikOutDTO;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.school.IDnevnikService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.school.IDnevnikService;
 
 /** RU: Контроллер для просмотра дневника ученика.
  * Оценки могут быть на нескольких уроках одной дисциплины, а домашние задания выдаются на целый день.
@@ -36,7 +36,7 @@ import ru.services.logic.school.IDnevnikService;
     /** RU: отправляет данные о расписании, оценках, домашних заданиях
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @GetMapping("/getDnevnik")
+    @GetMapping("/getDnevnik/")
     public ResponseEntity<DnevnikOutDTO> getDnevnik(@AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         Group group = null;
@@ -59,7 +59,7 @@ import ru.services.logic.school.IDnevnikService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         AND (hasAuthority('KID') OR hasAuthority('PARENT'))""")
-    @GetMapping("/getInfo")
+    @GetMapping("/getInfo/")
     public ResponseEntity<Void> startDnevkik(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final Long schId = user.getSelecRole().getYO().getId();

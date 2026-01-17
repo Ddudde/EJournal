@@ -11,7 +11,8 @@ import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.service.data.GroupServiceDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
+import ru.services.interfaces.data.IGroupService;
+import ru.services.interfaces.db.IDBService;
 
 import java.util.HashMap;
 import java.util.List;

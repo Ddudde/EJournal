@@ -16,10 +16,10 @@ import ru.data.DTO.controller.main.profile.ProfileInnerDTO;
 import ru.data.DTO.controller.main.profile.ProfileOutDTO;
 import ru.data.DTO.service.data.UserServiceDTO;
 import ru.security.user.CustomToken;
-import ru.services.data.IUserService;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.main.IProfileService;
+import ru.services.interfaces.data.IUserService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.main.IProfileService;
 
 /** RU: Контроллер для раздела профиля и частично управлением аккаунтом + Server Sent Events
  * <pre>
@@ -40,7 +40,7 @@ import ru.services.logic.main.IProfileService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('PARENT')""")
-    @PatchMapping("/chKid")
+    @PatchMapping("/chKid/")
     public ResponseEntity<ProfileOutDTO> chKid(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         if(body.idL == null) return ResponseEntity.notFound().build();
@@ -53,7 +53,7 @@ import ru.services.logic.main.IProfileService;
     /** RU: изменение роли на следующую по иерархии из имеющихся у пользователя
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/chRole")
+    @PatchMapping("/chRole/")
     public ResponseEntity<ProfileOutDTO> chRole(final @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final UserServiceDTO userServiceDTO = userService.setNextRole(user);
@@ -65,7 +65,7 @@ import ru.services.logic.main.IProfileService;
     /** RU: выход с аккаунта
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/exit")
+    @PatchMapping("/exit/")
     public ResponseEntity<Void> exit(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
 
@@ -76,7 +76,7 @@ import ru.services.logic.main.IProfileService;
     /** RU: изменение/добавление электронной почты определённой роли пользователя + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/chEmail")
+    @PatchMapping("/chEmail/")
     public ResponseEntity<Void> chEmail(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final UserServiceDTO userServiceDTO = userService.changeEmail(user, body.email);
@@ -88,7 +88,7 @@ import ru.services.logic.main.IProfileService;
     /** RU: изменение/добавление дополнительной информации о пользователе + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/chInfo")
+    @PatchMapping("/chInfo/")
     public ResponseEntity<Void> chInfo(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) throws Exception {
         final User user = dbService.userById(sub.getUserId());
         final UserServiceDTO userServiceDTO = userService.changeProfileInfo(user.getSettings(), body.info);
@@ -100,7 +100,7 @@ import ru.services.logic.main.IProfileService;
     /** RU: изменение логина пользователя + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/chLogin")
+    @PatchMapping("/chLogin/")
     public ResponseEntity<Void> chLogin(@RequestBody ProfileInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final User userN = dbService.userByLogin(body.nLogin);
@@ -113,7 +113,7 @@ import ru.services.logic.main.IProfileService;
 
     /** RU: [start] отправляет инфу профиля либо другого пользователя либо личную
      * @see DocsHelpController#point Описание */
-    @GetMapping({"/getProfile", "/getProfile/{login}"})
+    @GetMapping({"/getProfile/", "/getProfile/{login}/"})
     public ResponseEntity<ProfileOutDTO> getProfile(@PathVariable(required = false) String login, CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
         User user;
         if(ObjectUtils.isEmpty(login)) {

@@ -8,6 +8,7 @@ import ru.data.DTO.controller.school.request.RequestBodyDTO;
 import ru.data.DTO.controller.school.request.RequestInnerDTO;
 import ru.data.DTO.controller.school.request.RequestOutDTO;
 import ru.data.reps.school.RequestRepository;
+import ru.services.interfaces.logic.school.IRequestService;
 
 import java.util.HashMap;
 import java.util.List;

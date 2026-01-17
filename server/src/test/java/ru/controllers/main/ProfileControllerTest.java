@@ -19,9 +19,9 @@ import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
 import ru.data.DTO.service.data.UserServiceDTO;
 import ru.security.user.Roles;
-import ru.services.IPushService;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.IPushService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 import utils.TestUtils;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
@@ -67,7 +67,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/profiles/chKid")
+        mockMvc.perform(patch("/profiles/chKid/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -80,7 +80,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     void chKid_whenGood_Parent() throws Exception {
         final ResultMatcher statusCode = status().isOk();
 
-        mockMvc.perform(patch("/profiles/chKid")
+        mockMvc.perform(patch("/profiles/chKid/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -98,7 +98,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/profiles/chRole")
+        mockMvc.perform(patch("/profiles/chRole/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -114,7 +114,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         dbService.userById(getSub().getUserId()).setSelRole(Roles.KID);
 
-        mockMvc.perform(patch("/profiles/chRole")
+        mockMvc.perform(patch("/profiles/chRole/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"role\":4}"))
@@ -127,7 +127,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/profiles/exit")
+        mockMvc.perform(patch("/profiles/exit/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -140,7 +140,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     void exit_whenGood_Admin() throws Exception {
         final ResultMatcher statusCode = status().isOk();
 
-        mockMvc.perform(patch("/profiles/exit")
+        mockMvc.perform(patch("/profiles/exit/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -158,7 +158,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/profiles/chEmail")
+        mockMvc.perform(patch("/profiles/chEmail/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -172,7 +172,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     void chEmail_whenGood_Admin() throws Exception {
         final ResultMatcher statusCode = status().isOk();
 
-        mockMvc.perform(patch("/profiles/chEmail")
+        mockMvc.perform(patch("/profiles/chEmail/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -192,7 +192,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/profiles/chInfo")
+        mockMvc.perform(patch("/profiles/chInfo/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -206,7 +206,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     void chInfo_whenGood_Admin() throws Exception {
         final ResultMatcher statusCode = status().isOk();
 
-        mockMvc.perform(patch("/profiles/chInfo")
+        mockMvc.perform(patch("/profiles/chInfo/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -225,7 +225,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     void chLogin_whenEmpty_Anonim() throws Exception {
         final ResultMatcher statusCode = status().isUnauthorized();
 
-        mockMvc.perform(patch("/profiles/chLogin")
+        mockMvc.perform(patch("/profiles/chLogin/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -243,7 +243,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2("nm12");
         when(dbService.userByLogin("nm")).thenReturn(null);
 
-        mockMvc.perform(patch("/profiles/chLogin")
+        mockMvc.perform(patch("/profiles/chLogin/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -279,7 +279,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
+        mockMvc.perform(get("/profiles/getProfile/{login}/", "nm12")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andDo(getProfile_Docs("getProfile_whenEmpty_Anonim"));
@@ -292,7 +292,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     void getProfile_whenGood_AuthLogin_Admin() throws Exception {
         final ResultMatcher statusCode = status().isOk();
 
-        mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
+        mockMvc.perform(get("/profiles/getProfile/{login}/", "nm12")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"login\":\"nm12\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}},\"4\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))
@@ -307,7 +307,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         when(dbService.userByLogin("nm12")).thenReturn(TestUtils.usersTest.get(4));
 
-        mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
+        mockMvc.perform(get("/profiles/getProfile/{login}/", "nm12")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"login\":\"facere_a\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))

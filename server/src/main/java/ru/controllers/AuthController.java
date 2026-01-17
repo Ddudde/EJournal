@@ -12,10 +12,10 @@ import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.auth.AuthInnerDTO;
 import ru.data.DTO.controller.auth.AuthOutDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.IAuthService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.SSE.SSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.IAuthService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.logic.SSEService;
 
 import java.util.UUID;
 
@@ -25,16 +25,17 @@ import java.util.UUID;
  * </pre>
  * @see SubscriberDTO */
 @Slf4j
-@RequestMapping("/auth")
 @RequiredArgsConstructor
-@RestController public class AuthController {
+@RestController
+@RequestMapping("/auth/")
+public class AuthController {
     private final IDBService dbService;
     private final IAuthService authService;
     private final ISSEService sseService;
 
     /** RU: [start] изменение подписки
      * @see DocsHelpController#point Описание */
-    @PatchMapping("/infCon")
+    @PatchMapping("/infCon/")
     public ResponseEntity<AuthOutDTO> infCon(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userByLogin(body.login);
         sseService.changeSubscriber(auth.getUUID(), body.login, body.type, null, null, null, null);
@@ -47,7 +48,7 @@ import java.util.UUID;
     /** RU: завершение сеанса
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(#sub != null)")
-    @PatchMapping("/remCon")
+    @PatchMapping("/remCon/")
     public ResponseEntity<Void> remCon(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         if(sub.getLogin() != null) {
             log.debug("subscription remCon " + auth.getUUID() + " was noclosed " + sub.getLogin());
@@ -62,7 +63,7 @@ import java.util.UUID;
     /** RU: авторизация пользователя
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PostMapping("/auth")
+    @PostMapping("/auth/")
     public ResponseEntity<AuthOutDTO> auth(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
 
@@ -72,11 +73,11 @@ import java.util.UUID;
 
     /** RU: регистрация пользователя
      * @see DocsHelpController#point Описание */
-    @PostMapping("/reg")
+    @PostMapping("/reg/")
     public ResponseEntity<AuthOutDTO> reg(@RequestBody AuthInnerDTO body) {
         final User user = dbService.userByLogin(body.login),
             user1 = dbService.userByCode(body.code);
-        if(user != null) return ResponseEntity.ok().build();
+        if(user != null) return ResponseEntity.notFound().build();
 
         final AuthOutDTO outDTO = authService.createUser(user1, body);
         if(outDTO != null) return ResponseEntity.accepted().body(outDTO);
@@ -85,7 +86,7 @@ import java.util.UUID;
 
     /** RU: проверка инвайта для регистрации/регистрации новой роли
      * @see DocsHelpController#point Описание */
-    @PostMapping("/checkInvCode")
+    @PostMapping("/checkInvCode/")
     public ResponseEntity<Void> checkInvCode(@RequestBody AuthInnerDTO body) {
         final User user = dbService.userByCode(body.code);
         if(user == null) return ResponseEntity.notFound().build();
@@ -97,7 +98,7 @@ import java.util.UUID;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
-    @PatchMapping("/setCodePep")
+    @PatchMapping("/setCodePep/")
     public ResponseEntity<AuthOutDTO> setCodePep(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userByLogin(body.id);
         if(user1 == null) return ResponseEntity.notFound().build();

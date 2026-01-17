@@ -1,4 +1,4 @@
-package ru.services.logic.SSE;
+package ru.services.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,6 +8,7 @@ import ru.controllers.SSE.SSEController;
 import ru.controllers.SSE.TypesConnect;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.GetSubscriberDTO;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.io.IOException;
 import java.util.Map;

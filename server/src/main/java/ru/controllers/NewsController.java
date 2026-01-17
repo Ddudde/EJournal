@@ -17,9 +17,9 @@ import ru.data.DTO.controller.news.NewsInnerDTO;
 import ru.data.DTO.controller.news.NewsOutBodyDTO;
 import ru.data.DTO.controller.news.NewsOutDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.INewsService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.INewsService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.util.List;
 import java.util.Map;
@@ -29,9 +29,10 @@ import java.util.Map;
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/NewsController">http://localhost:9001/swagger/htmlSwag/#/NewsController</a>
  * </pre>
  * @see SubscriberDTO */
-@RequestMapping("/news")
 @RequiredArgsConstructor
-@RestController public class NewsController {
+@RestController
+@RequestMapping("/news")
+public class NewsController {
     private final IDBService dbService;
     private final INewsService newsService;
     private final ISSEService sseService;
@@ -42,7 +43,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
         or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
-    @DeleteMapping("/delNews")
+    @DeleteMapping("/delNews/")
     public ResponseEntity<Void> delNews(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final News news = dbService.newsById(body.id);
         final Syst syst = dbService.getSyst();
@@ -60,7 +61,7 @@ import java.util.Map;
         @code401.check(@dbService.existUserBySubscription(#sub))
         and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
         or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
-    @PutMapping("/chNews")
+    @PutMapping("/chNews/")
     public ResponseEntity<Void> chNews(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final News news = dbService.newsById(body.id);
         if (news == null || ObjectUtils.isEmpty(body.type)) return ResponseEntity.notFound().build();
@@ -76,7 +77,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and #sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER')""")
-    @PostMapping("/addNewsYo")
+    @PostMapping("/addNewsYo/")
     public ResponseEntity<Void> addNewsYO(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -93,7 +94,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and #sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')""")
-    @PostMapping("/addNewsPor")
+    @PostMapping("/addNewsPor/")
     public ResponseEntity<Void> addNewsPortal(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Syst syst = dbService.getSyst();
         if (syst == null || ObjectUtils.isEmpty(body.date)) return ResponseEntity.notFound().build();
@@ -106,7 +107,7 @@ import java.util.Map;
 
     /** RU: [start] отправка новостей, портала/школы
      * @see DocsHelpController#point Описание */
-    @GetMapping("/getNews/Yo")
+    @GetMapping("/getNews/Yo/")
     public ResponseEntity<Map<Long, NewsOutBodyDTO>> getNewsYo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         List<News> list = null;
@@ -127,7 +128,7 @@ import java.util.Map;
 
     /** RU: [start] отправка новостей, портала/школы
      * @see DocsHelpController#point Описание */
-    @GetMapping("/getNews/Por")
+    @GetMapping("/getNews/Por/")
     public ResponseEntity<Map<Long, NewsOutBodyDTO>> getNewsPor(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         List<News> list = null;
         final Syst syst = dbService.getSyst();

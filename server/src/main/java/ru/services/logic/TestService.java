@@ -20,7 +20,8 @@ import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.db.IRandomizeService;
+import ru.services.interfaces.db.IRandomizeService;
+import ru.services.interfaces.logic.ITestService;
 
 import java.util.HashMap;
 import java.util.List;

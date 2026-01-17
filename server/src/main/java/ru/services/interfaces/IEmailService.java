@@ -1,4 +1,4 @@
-package ru.services;
+package ru.services.interfaces;
 
 public interface IEmailService {
     @SuppressWarnings("JavadocReference")

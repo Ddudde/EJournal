@@ -14,8 +14,8 @@ import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.main.SettingOutDTO;
 import ru.data.DTO.controller.main.SettingsInnerDTO;
-import ru.services.db.IDBService;
-import ru.services.logic.main.ISettingsService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.main.ISettingsService;
 
 import java.util.Objects;
 
@@ -32,7 +32,7 @@ import java.util.Objects;
 
     /** RU: подтверждение емэйла
      * @see DocsHelpController#point Описание */
-    @PatchMapping("/checkCodeEmail")
+    @PatchMapping("/checkCodeEmail/")
     public ResponseEntity<Void> checkCodeEmail(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
@@ -52,7 +52,7 @@ import java.util.Objects;
 
     /** RU: изменение электронной почты пользователя или добавление при регистрации
      * @see DocsHelpController#point Описание */
-    @PatchMapping("/startEmail")
+    @PatchMapping("/startEmail/")
     public ResponseEntity<Void> startEmail(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         User user = null;
         if(!ObjectUtils.isEmpty(body.invCod)) {
@@ -70,7 +70,7 @@ import java.util.Objects;
     /** RU: удаление токена уведомлений
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PostMapping("/remNotifToken")
+    @PostMapping("/remNotifToken/")
     public ResponseEntity<Void> remNotifToken(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
@@ -82,7 +82,7 @@ import java.util.Objects;
     /** RU: установка токена уведомлений
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PostMapping("/addNotifToken")
+    @PostMapping("/addNotifToken/")
     public ResponseEntity<Void> addNotifToken(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         if(ObjectUtils.isEmpty(body.notifToken)) return ResponseEntity.notFound().build();
@@ -94,7 +94,7 @@ import java.util.Objects;
     /** RU: Вкл/выкл подсказки или ряд уведомлений
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/chSettings")
+    @PatchMapping("/chSettings/")
     public ResponseEntity<Void> chSettings(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         if(ObjectUtils.isEmpty(body.id)) return ResponseEntity.notFound().build();
@@ -106,7 +106,7 @@ import java.util.Objects;
     /** RU: изменяет пароль пользователя при помощи емэйла
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/checkPasCodeEmail")
+    @PatchMapping("/checkPasCodeEmail/")
     public ResponseEntity<Void> checkPasCodeEmail(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
         final User user = empLogin ? dbService.userById(sub.getUserId()) : dbService.userByLogin(body.login);
@@ -121,7 +121,7 @@ import java.util.Objects;
     /** RU: изменяет пароль пользователя при помощи емэйла/секретной фразы
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PatchMapping("/chPass")
+    @PatchMapping("/chPass/")
     public ResponseEntity<SettingOutDTO> chPass(@RequestBody SettingsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final boolean empLogin = ObjectUtils.isEmpty(body.login);
         final User user = empLogin ? dbService.userById(sub.getUserId()) : dbService.userByLogin(body.login);
@@ -134,7 +134,7 @@ import java.util.Objects;
     /** RU: отправляет настройки клиенту
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @GetMapping("/getSettings")
+    @GetMapping("/getSettings/")
     public ResponseEntity<SettingOutDTO> getSettings(@AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final SettingUser settingUser = user.getSettings();

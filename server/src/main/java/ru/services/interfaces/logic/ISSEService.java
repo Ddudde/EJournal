@@ -1,4 +1,4 @@
-package ru.services.logic.SSE;
+package ru.services.interfaces.logic;
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.controllers.SSE.TypesConnect;

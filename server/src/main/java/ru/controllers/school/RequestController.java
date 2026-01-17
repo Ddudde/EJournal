@@ -14,9 +14,9 @@ import ru.data.DTO.controller.school.request.RequestBodyDTO;
 import ru.data.DTO.controller.school.request.RequestInnerDTO;
 import ru.data.DTO.controller.school.request.RequestOutDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.school.IRequestService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.school.IRequestService;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ import java.util.Map;
 
     /** RU: добавляет заявку + Server Sent Events
      * @see DocsHelpController#point Описание */
-    @PostMapping("/addReq")
+    @PostMapping("/addReq/")
     public ResponseEntity<Void> addReq(@RequestBody RequestInnerDTO body) {
         if(ObjectUtils.isEmpty(body.email) || ObjectUtils.isEmpty(body.date) || ObjectUtils.isEmpty(body.fio)) {
             return ResponseEntity.notFound().build();
@@ -51,7 +51,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @DeleteMapping("/delReq")
+    @DeleteMapping("/delReq/")
     public ResponseEntity<Void> delReq(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -66,7 +66,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PatchMapping("/chTitle")
+    @PatchMapping("/chTitle/")
     public ResponseEntity<Void> chTitle(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -81,7 +81,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PatchMapping("/chDate")
+    @PatchMapping("/chDate/")
     public ResponseEntity<Void> chDate(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -96,7 +96,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PatchMapping("/chText")
+    @PatchMapping("/chText/")
     public ResponseEntity<Void> chText(@RequestBody RequestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Request request = dbService.requestById(body.id);
         if(request == null) return ResponseEntity.notFound().build();
@@ -111,7 +111,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @GetMapping("/getRequests")
+    @GetMapping("/getRequests/")
     public ResponseEntity<Map<Long, RequestBodyDTO>> getRequests(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final List<Request> requests = dbService.getRequests();
 

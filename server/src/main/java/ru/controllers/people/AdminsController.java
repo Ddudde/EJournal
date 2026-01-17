@@ -16,10 +16,10 @@ import ru.data.DTO.controller.people.admin.AdminsOutDTO;
 import ru.data.DTO.service.data.userBody.UserServiceBodyUserDTO;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.data.IUserService;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.people.IAdminsService;
+import ru.services.interfaces.data.IUserService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.people.IAdminsService;
 
 import java.util.Map;
 
@@ -41,7 +41,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @DeleteMapping("/remPep")
+    @DeleteMapping("/remPep/")
     public ResponseEntity<Void> remPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
         final Syst syst = dbService.getSyst();
@@ -59,7 +59,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PatchMapping("/chPep")
+    @PatchMapping("/chPep/")
     public ResponseEntity<Void> chPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
         if (user1 == null) return ResponseEntity.notFound().build();
@@ -74,7 +74,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PostMapping("/addPep")
+    @PostMapping("/addPep/")
     public ResponseEntity<Void> addPep(@RequestBody AdminsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Syst syst = dbService.getSyst();
         if (syst == null) return ResponseEntity.notFound().build();
@@ -86,7 +86,7 @@ import java.util.Map;
 
     /** RU: [start] отправляет список администраторов
      * @see DocsHelpController#point Описание */
-    @GetMapping("/getAdmins")
+    @GetMapping("/getAdmins/")
     public ResponseEntity<Map<Long, UserServiceBodyUserDTO>> getAdmins(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final Syst syst = dbService.getSyst();
         final User user = dbService.userById(sub.getUserId());

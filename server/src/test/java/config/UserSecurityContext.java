@@ -8,7 +8,7 @@ import org.springframework.util.ObjectUtils;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
 
 import java.util.UUID;
 

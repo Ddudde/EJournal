@@ -14,9 +14,10 @@ import ru.data.DTO.controller.school.dnevnik.DnevnikBodyMarkDTO;
 import ru.data.DTO.controller.school.dnevnik.DnevnikOutDTO;
 import ru.data.DTO.service.school.ScheduleServiceDTO;
 import ru.data.reps.school.DayRepository;
-import ru.services.db.IDBService;
-import ru.services.logic.school.analytics.IPeriodService;
-import ru.services.logic.school.analytics.IScheduleService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.school.IDnevnikService;
+import ru.services.interfaces.logic.school.analytics.IPeriodService;
+import ru.services.interfaces.logic.school.analytics.IScheduleService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

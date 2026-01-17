@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.configs.AppConfig;
 import ru.data.DAO.auth.SettingUser;
+import ru.services.interfaces.IPushService;
 
 import java.io.IOException;
 import java.io.InputStream;

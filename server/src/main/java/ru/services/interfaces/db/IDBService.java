@@ -1,4 +1,4 @@
-package ru.services.db;
+package ru.services.interfaces.db;
 
 import ru.data.DAO.News;
 import ru.data.DAO.Syst;

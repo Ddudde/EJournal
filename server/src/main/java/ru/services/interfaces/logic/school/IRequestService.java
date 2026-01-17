@@ -1,4 +1,4 @@
-package ru.services.logic.school;
+package ru.services.interfaces.logic.school;
 
 import ru.data.DAO.school.Request;
 import ru.data.DTO.controller.school.request.RequestBodyDTO;

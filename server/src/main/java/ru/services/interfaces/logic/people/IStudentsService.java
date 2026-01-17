@@ -1,4 +1,4 @@
-package ru.services.logic.people;
+package ru.services.interfaces.logic.people;
 
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;

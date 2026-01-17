@@ -1,4 +1,4 @@
-package ru.services.data;
+package ru.services.interfaces.data;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.data.DAO.auth.SettingUser;

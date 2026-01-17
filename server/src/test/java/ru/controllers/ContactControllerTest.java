@@ -17,8 +17,8 @@ import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -104,7 +104,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
         when(dbService.getSyst().getContacts())
             .thenReturn(getCloneContacts(TEST_UTILS.contactsTest.getFirst()));
 
-        mockMvc.perform(put("/contacts/chContact")
+        mockMvc.perform(put("/contacts/chContact/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -148,7 +148,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
     void getContacts_whenEmpty_Portal_AdminUser() throws Exception {
         when(dbService.getSyst()).thenReturn(null);
 
-        mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
+        mockMvc.perform(get("/contacts/getContacts/{type}/", "Por")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isNotFound())
             .andDo(getContacts_Docs("getContacts_whenEmpty_Portal_AdminUser", true));
@@ -165,7 +165,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
         when(school.getContacts())
             .thenReturn(TEST_UTILS.contactsTest.get(0));
 
-        mockMvc.perform(get("/contacts/getContacts/{type}", "Yo")
+        mockMvc.perform(get("/contacts/getContacts/{type}/", "Yo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))
@@ -180,7 +180,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
         when(dbService.getSyst().getContacts())
             .thenReturn(TEST_UTILS.contactsTest.get(0));
 
-        mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
+        mockMvc.perform(get("/contacts/getContacts/{type}/", "Por")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))

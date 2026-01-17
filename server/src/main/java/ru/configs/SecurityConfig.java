@@ -19,13 +19,13 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.security.AuthenticationFilter;
 import ru.security.CustomProvider;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
 
 /** RU: Начало описания security.
  * В БД пароли хранятся зашифрованно(BCryptPasswordEncoder).
@@ -40,8 +40,8 @@ import ru.services.db.IDBService;
 @EnableWebSecurity public class SecurityConfig {
     private final CustomProvider provider;
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
-        new AntPathRequestMatcher("/console_db"),
-        new AntPathRequestMatcher("/console_db/*")
+        PathPatternRequestMatcher.withDefaults().matcher("/console_db"),
+        PathPatternRequestMatcher.withDefaults().matcher("/console_db/*")
     );
     private static final RequestMatcher PROTECTED_URLS = new NegatedRequestMatcher(PUBLIC_URLS);
     public static final String authTokenHeader = "x-access-token";

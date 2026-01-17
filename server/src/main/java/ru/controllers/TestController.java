@@ -10,8 +10,8 @@ import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.test.TestInnerDTO;
 import ru.data.DTO.controller.test.TestOutDTO;
 import ru.security.user.CustomToken;
-import ru.services.logic.ITestService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.ITestService;
 
 /** RU: Контроллер для раздела тестирования
  * <pre>
@@ -28,7 +28,7 @@ import ru.services.logic.SSE.ISSEService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PutMapping("/chTests")
+    @PutMapping("/chTests/")
     public ResponseEntity<TestOutDTO> chTests(@RequestBody TestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final TestOutDTO outDTO = testService.changeTests(body);
         return ResponseEntity.ok(outDTO);
@@ -39,7 +39,7 @@ import ru.services.logic.SSE.ISSEService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @GetMapping("/getInfo")
+    @GetMapping("/getInfo/")
     public ResponseEntity<TestOutDTO> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
 
         final TestOutDTO outDTO = testService.prepareInfo();

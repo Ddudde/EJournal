@@ -7,15 +7,15 @@ dependencies {
 }
 
 javadoc {
-    destinationDir = file("../../docs/EJournal/javaDoc")
+    destinationDir = file("../docs/EJournal_Client/javaDoc")
     options.encoding = 'UTF-8'
     options.memberLevel = JavadocMemberLevel.PACKAGE
     options.overview = 'src/docs/docDescriptionJavaDoc.html'
 }
 
 asciidoctorPdf {
-    sourceDir '../../'
-    outputDir '../../docs/EJournal/asciiDoc'
+    sourceDir '../'
+    outputDir '../docs/EJournal_Client/asciiDoc'
     asciidoctorj {
         attributes \
             'icons': 'font',
@@ -26,11 +26,11 @@ asciidoctorPdf {
 }
 
 asciidoctor {
-    sourceDir '../../'
+    sourceDir '../'
     sources {
-        exclude '/project/', '/release/', '/docs/', '/imgAsciiDoc/'
+        exclude '/server/', '/docs/', '/imgAsciiDoc/', '/EJournal_Client/'
     }
-    outputDir '../../docs/EJournal/asciiDoc'
+    outputDir '../docs/EJournal_Client/asciiDoc'
     baseDirFollowsSourceFile()
     resources {
         from(sourceDir) {
@@ -52,7 +52,7 @@ openapi3 {
     tagDescriptionsPropertiesFile = 'src/docs/swagger/tags.yaml'
     version = '1.0'
     format = 'json'
-    outputDirectory = '../../docs/EJournal/swagger/htmlSwag'
+    outputDirectory = '../docs/EJournal_Client/swagger/htmlSwag'
     outputFileNamePrefix = 'swagger'
     snippetsDirectory = "build/generated-snippets"
 }

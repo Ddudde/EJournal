@@ -14,9 +14,9 @@ import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.contact.ContactOutDTO;
 import ru.data.DTO.controller.contact.ContactsInnerDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.IContactService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.IContactService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.util.Objects;
 
@@ -24,9 +24,10 @@ import java.util.Objects;
  * <pre>
  * Swagger: <a href="http://localhost:9001/EJournal/swagger/htmlSwag/#/ContactsController">http://localhost:9001/swagger/htmlSwag/#/ContactsController</a>
  * </pre> */
-@RequestMapping("/contacts")
 @RequiredArgsConstructor
-@RestController public class ContactController {
+@RestController
+@RequestMapping("/contacts/")
+public class ContactController {
     private final IDBService dbService;
     private final IContactService contactService;
     private final ISSEService sseService;
@@ -34,7 +35,7 @@ import java.util.Objects;
     /** RU: изменение контакта + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PutMapping("/chContact")
+    @PutMapping("/chContact/")
     public ResponseEntity<Void> chContact(@RequestBody ContactsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         Contacts contacts = contactService.prepareContactsForChangeContact(sub, user);
@@ -48,7 +49,7 @@ import java.util.Objects;
     /** RU: [start] Отправка контактов, портала/школы
      * @param type Нужный тип: Por - портал, Yo - школы
      * @see DocsHelpController#point Описание */
-    @GetMapping("/getContacts/{type}")
+    @GetMapping("/getContacts/{type}/")
     public ResponseEntity<ContactOutDTO> getContacts(@PathVariable String type, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final Syst syst = dbService.getSyst();

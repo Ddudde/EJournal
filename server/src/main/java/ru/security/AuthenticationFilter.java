@@ -18,8 +18,8 @@ import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.SSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.logic.SSEService;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

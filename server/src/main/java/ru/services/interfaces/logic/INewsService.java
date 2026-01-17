@@ -1,4 +1,4 @@
-package ru.services.logic;
+package ru.services.interfaces.logic;
 
 import ru.data.DAO.News;
 import ru.data.DAO.Syst;

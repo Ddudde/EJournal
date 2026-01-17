@@ -14,10 +14,11 @@ import ru.data.DTO.service.school.ScheduleServiceDTO;
 import ru.data.reps.school.DayRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.MarkRepository;
-import ru.services.data.IGroupService;
-import ru.services.db.IDBService;
-import ru.services.logic.school.analytics.IPeriodService;
-import ru.services.logic.school.analytics.IScheduleService;
+import ru.services.interfaces.data.IGroupService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.school.ITeacherJournalService;
+import ru.services.interfaces.logic.school.analytics.IPeriodService;
+import ru.services.interfaces.logic.school.analytics.IScheduleService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

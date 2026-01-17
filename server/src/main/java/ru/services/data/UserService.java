@@ -18,7 +18,8 @@ import ru.data.DTO.service.data.userBody.UserServiceBodyUserDTO;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
+import ru.services.interfaces.data.IUserService;
+import ru.services.interfaces.db.IDBService;
 
 import java.util.HashMap;
 import java.util.List;

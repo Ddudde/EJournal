@@ -16,8 +16,9 @@ import ru.data.DTO.service.data.UserServiceDTO;
 import ru.data.DTO.service.data.userBody.UserServiceBodyUserDTO;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.security.user.Roles;
-import ru.services.IPushService;
-import ru.services.data.IUserService;
+import ru.services.interfaces.IPushService;
+import ru.services.interfaces.data.IUserService;
+import ru.services.interfaces.logic.main.IProfileService;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import ru.controllers.main.SettingsController;
 import ru.data.DTO.SubscriberDTO;
+import ru.services.interfaces.IEmailService;
 
 /** RU: сервис для работы с рассылками по электронной почте */
 @RequiredArgsConstructor

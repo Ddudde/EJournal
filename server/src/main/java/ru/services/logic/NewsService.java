@@ -14,7 +14,8 @@ import ru.data.DTO.controller.news.NewsOutDTO;
 import ru.data.reps.NewsRepository;
 import ru.data.reps.SystRepository;
 import ru.data.reps.school.SchoolRepository;
-import ru.services.IPushService;
+import ru.services.interfaces.IPushService;
+import ru.services.interfaces.logic.INewsService;
 
 import java.util.HashMap;
 import java.util.List;

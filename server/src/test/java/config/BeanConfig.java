@@ -3,7 +3,6 @@ package config;
 import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,35 +29,48 @@ import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.*;
-import ru.security.CustomAccessDenied;
 import ru.services.EmailService;
-import ru.services.IEmailService;
-import ru.services.IPushService;
 import ru.services.PushService;
 import ru.services.data.GroupService;
-import ru.services.data.IGroupService;
-import ru.services.data.IUserService;
 import ru.services.data.UserService;
-import ru.services.db.*;
+import ru.services.db.DBService;
+import ru.services.db.InitDBService;
+import ru.services.db.RandomizeService;
+import ru.services.interfaces.IEmailService;
+import ru.services.interfaces.IPushService;
+import ru.services.interfaces.data.IGroupService;
+import ru.services.interfaces.data.IUserService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.db.IRandomizeService;
+import ru.services.interfaces.logic.*;
+import ru.services.interfaces.logic.main.IProfileService;
+import ru.services.interfaces.logic.main.ISettingsService;
+import ru.services.interfaces.logic.people.*;
+import ru.services.interfaces.logic.school.IDnevnikService;
+import ru.services.interfaces.logic.school.IRequestService;
+import ru.services.interfaces.logic.school.ITeacherJournalService;
+import ru.services.interfaces.logic.school.analytics.IKidJournalService;
+import ru.services.interfaces.logic.school.analytics.IPeriodService;
+import ru.services.interfaces.logic.school.analytics.IScheduleService;
 import ru.services.logic.*;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.SSE.SSEService;
-import ru.services.logic.main.IProfileService;
-import ru.services.logic.main.ISettingsService;
 import ru.services.logic.main.ProfileService;
 import ru.services.logic.main.SettingsService;
 import ru.services.logic.people.*;
-import ru.services.logic.school.*;
-import ru.services.logic.school.analytics.*;
+import ru.services.logic.school.DnevnikService;
+import ru.services.logic.school.RequestService;
+import ru.services.logic.school.TeacherJournalService;
+import ru.services.logic.school.analytics.KidJournalService;
+import ru.services.logic.school.analytics.PeriodService;
+import ru.services.logic.school.analytics.ScheduleService;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 @TestConfiguration
-@Import({CustomAccessDenied.class})
 @EnableMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class BeanConfig {
+
     private final SettingUserRepository settingUserRepository = mock(SettingUserRepository.class);
     private final RoleRepository roleRepository = mock(RoleRepository.class, Answers.RETURNS_DEEP_STUBS);
     private final UserRepository userRepository = mock(UserRepository.class);

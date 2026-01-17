@@ -1,4 +1,4 @@
-package ru.services.logic;
+package ru.services.interfaces.logic;
 
 import ru.data.DTO.controller.test.TestInnerDTO;
 import ru.data.DTO.controller.test.TestOutDTO;

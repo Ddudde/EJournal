@@ -18,8 +18,9 @@ import ru.data.DTO.controller.auth.AuthServiceDTO;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.security.user.Roles;
-import ru.services.IPushService;
-import ru.services.db.IDBService;
+import ru.services.interfaces.IPushService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.IAuthService;
 
 import java.time.Duration;
 import java.time.Instant;

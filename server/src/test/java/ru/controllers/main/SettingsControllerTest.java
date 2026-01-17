@@ -13,9 +13,9 @@ import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.SettingUser;
 import ru.data.DAO.auth.User;
-import ru.services.IEmailService;
-import ru.services.IPushService;
-import ru.services.db.IDBService;
+import ru.services.interfaces.IEmailService;
+import ru.services.interfaces.IPushService;
+import ru.services.interfaces.db.IDBService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

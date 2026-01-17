@@ -18,8 +18,8 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
 import ru.data.reps.auth.RoleRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     void remPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(delete("/parents/remPep")
+        mockMvc.perform(delete("/parents/remPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -80,7 +80,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.groupById(20L)).thenReturn(group);
         when(group.getKids()).thenReturn(users);
 
-        mockMvc.perform(delete("/parents/remPep")
+        mockMvc.perform(delete("/parents/remPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -101,7 +101,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     void chPep_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/parents/chPep")
+        mockMvc.perform(patch("/parents/chPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -114,7 +114,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     void chPep_whenGood_HTEACHER() throws Exception {
         when(dbService.userById(20L)).thenReturn(getCloneUsers(usersTest.get(0)));
 
-        mockMvc.perform(patch("/parents/chPep")
+        mockMvc.perform(patch("/parents/chPep/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -135,7 +135,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     void addPar_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(post("/parents/addPar")
+        mockMvc.perform(post("/parents/addPar/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -155,7 +155,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         getSub().setLvlSch("20");
         when(dbService.schoolById(20L)).thenReturn(sch1);
 
-        mockMvc.perform(post("/parents/addPar")
+        mockMvc.perform(post("/parents/addPar/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -186,7 +186,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     void getParents_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/parents/getParents/{grId}", 20L)
+        mockMvc.perform(get("/parents/getParents/{grId}/", 20L)
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getParents_Summary, "getParents_whenEmpty_Anonim"));
@@ -202,7 +202,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.groupById(20L)).thenReturn(group);
         when(group.getKids()).thenReturn(usersTest);
 
-        mockMvc.perform(get("/parents/getParents/{grId}", 20L)
+        mockMvc.perform(get("/parents/getParents/{grId}/", 20L)
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyC\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}},\"bodyP\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"par\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}},\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}}"))
@@ -214,7 +214,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     void getInfo_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/parents/getInfo")
+        mockMvc.perform(get("/parents/getInfo/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
@@ -225,7 +225,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     @Test @Tag("getInfo")
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
-        mockMvc.perform(get("/parents/getInfo")
+        mockMvc.perform(get("/parents/getInfo/")
             .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
         .andExpect(status().isOk())
         .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
@@ -236,7 +236,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     void getInfoForHTeacher_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/parents/getInfoFH")
+        mockMvc.perform(get("/parents/getInfoFH/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
@@ -251,7 +251,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.getFirstRole(any()).getYO()).thenReturn(sch1);
         when(sch1.getGroups()).thenReturn(TEST_UTILS.groups);
 
-        mockMvc.perform(get("/parents/getInfoFH")
+        mockMvc.perform(get("/parents/getInfoFH/")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"firstG\":2323,\"bodyG\":{\"3456\":\"1Б\",\"4354\":\"1В\",\"2323\":\"1А\"}}"))

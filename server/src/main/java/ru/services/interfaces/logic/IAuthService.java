@@ -1,4 +1,4 @@
-package ru.services.logic;
+package ru.services.interfaces.logic;
 
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;

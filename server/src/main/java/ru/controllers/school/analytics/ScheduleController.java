@@ -18,9 +18,9 @@ import ru.data.DTO.controller.school.analytics.schedule.ScheduleOutDTO;
 import ru.data.DTO.service.school.ScheduleServiceDTO;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.school.analytics.IScheduleService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.school.analytics.IScheduleService;
 
 /** RU: Контроллер для управления/просмотра расписания + Server Sent Events
  * <pre>
@@ -41,7 +41,7 @@ import ru.services.logic.school.analytics.IScheduleService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PostMapping("/addLesson")
+    @PostMapping("/addLesson/")
     public ResponseEntity<Void> addLesson(@RequestBody ScheduleInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Group group = dbService.groupById(body.group());
         if(group == null) return ResponseEntity.notFound().build();
@@ -62,7 +62,7 @@ import ru.services.logic.school.analytics.IScheduleService;
     /** RU: отправляет данные о расписании для группы
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @GetMapping("/getSchedule/{grId}")
+    @GetMapping("/getSchedule/{grId}/")
     public ResponseEntity<ScheduleServiceDTO> getSchedule(@PathVariable Long grId, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         Group group = null;
@@ -89,7 +89,7 @@ import ru.services.logic.school.analytics.IScheduleService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
-    @GetMapping("/getInfo")
+    @GetMapping("/getInfo/")
     public ResponseEntity<Void> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final School school = dbService.getFirstRole(user.getRoles()).getYO();
@@ -104,7 +104,7 @@ import ru.services.logic.school.analytics.IScheduleService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('HTEACHER') OR hasAuthority('TEACHER'))""")
-    @GetMapping("/getInfoToHT")
+    @GetMapping("/getInfoToHT/")
     public ResponseEntity<ScheduleOutDTO> getInfoForHTeacherOrTEACHER(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final School school = dbService.getFirstRole(user.getRoles()).getYO();

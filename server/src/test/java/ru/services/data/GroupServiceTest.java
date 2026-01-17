@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.data.DTO.service.data.GroupServiceDTO;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
 import utils.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

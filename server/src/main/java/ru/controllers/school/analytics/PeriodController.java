@@ -17,9 +17,9 @@ import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.school.analytics.period.PeriodOutDTO;
 import ru.data.DTO.controller.school.analytics.period.PeriodsInnerDTO;
 import ru.security.user.CustomToken;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
-import ru.services.logic.school.analytics.IPeriodService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
+import ru.services.interfaces.logic.school.analytics.IPeriodService;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ import java.util.List;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PostMapping("/addPer")
+    @PostMapping("/addPer/")
     public ResponseEntity<Void> addPer(@RequestBody PeriodsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -55,7 +55,7 @@ import java.util.List;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @GetMapping("/getInfo")
+    @GetMapping("/getInfo/")
     public ResponseEntity<PeriodOutDTO> getInfo(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();

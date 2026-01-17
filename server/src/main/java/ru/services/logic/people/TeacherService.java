@@ -20,7 +20,8 @@ import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
 import ru.security.user.CustomToken;
 import ru.security.user.Roles;
-import ru.services.data.IUserService;
+import ru.services.interfaces.data.IUserService;
+import ru.services.interfaces.logic.people.ITeacherService;
 
 import java.time.Duration;
 import java.time.Instant;

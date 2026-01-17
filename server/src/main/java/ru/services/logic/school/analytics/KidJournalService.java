@@ -16,6 +16,8 @@ import ru.data.DTO.controller.school.analytics.kidJournal.KidJournalOutDTO;
 import ru.data.reps.school.DayRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.MarkRepository;
+import ru.services.interfaces.logic.school.analytics.IKidJournalService;
+import ru.services.interfaces.logic.school.analytics.IPeriodService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

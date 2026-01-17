@@ -19,8 +19,8 @@ import ru.data.DAO.auth.User;
 import ru.data.DAO.school.School;
 import ru.data.reps.NewsRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
-import ru.services.logic.SSE.ISSEService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.ISSEService;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -271,7 +271,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
     @Test @Tag("getNews")
     @CustomUser
     void getNews_whenEmpty_Portal_Admin() throws Exception {
-        mockMvc.perform(get("/news/getNews/{type}", "Por")
+        mockMvc.perform(get("/news/getNews/{type}/", "Por")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{}"))
@@ -288,7 +288,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(user.getSelecRole().getYO().getNews())
             .thenReturn(TEST_UTILS.newsTest);
 
-        mockMvc.perform(get("/news/getNews/{type}", "Yo")
+        mockMvc.perform(get("/news/getNews/{type}/", "Yo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
@@ -303,7 +303,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(dbService.getSyst().getNews())
             .thenReturn(TEST_UTILS.newsTest);
 
-        mockMvc.perform(get("/news/getNews/{type}", "Por")
+        mockMvc.perform(get("/news/getNews/{type}/", "Por")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))

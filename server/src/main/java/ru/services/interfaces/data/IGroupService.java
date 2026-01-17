@@ -1,4 +1,4 @@
-package ru.services.data;
+package ru.services.interfaces.data;
 
 import ru.data.DAO.auth.User;
 import ru.data.DTO.service.data.GroupServiceDTO;

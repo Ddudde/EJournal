@@ -14,7 +14,7 @@ import ru.data.DAO.school.Lesson;
 import ru.data.DTO.service.school.ScheduleServiceDTO;
 import ru.data.reps.school.LessonRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
 import ru.services.logic.school.analytics.ScheduleService;
 
 import java.util.ArrayList;

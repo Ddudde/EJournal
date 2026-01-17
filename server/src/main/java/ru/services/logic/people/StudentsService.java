@@ -15,7 +15,8 @@ import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.GroupRepository;
 import ru.security.user.Roles;
-import ru.services.db.IDBService;
+import ru.services.interfaces.db.IDBService;
+import ru.services.interfaces.logic.people.IStudentsService;
 
 import java.time.Duration;
 import java.time.Instant;

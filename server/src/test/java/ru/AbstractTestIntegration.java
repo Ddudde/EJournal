@@ -9,7 +9,6 @@ import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -22,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.configs.SecurityConfig;
 import ru.security.ControllerExceptionHandler;
+import ru.security.CustomAccessDenied;
 import utils.TestUtils;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
@@ -31,9 +31,9 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static utils.TestUtils.defaultDescription;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@ContextConfiguration(initializers = ConfigDataApplicationContextInitializer.class)
-@Import({BeanConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ContextConfiguration(initializers = ConfigDataApplicationContextInitializer.class,
+    classes = {BeanConfig.class, CustomAccessDenied.class})
 public abstract class AbstractTestIntegration {
     protected static final TestUtils TEST_UTILS = new TestUtils();
     private static final String DESCRIPTION_DOCS = "UUID-токен, авторизация, в ней подписка и пользователь";
