@@ -17,7 +17,8 @@ Github: https://github.com/Ddudde/EJournal
 
 * Swagger: https://ddudde.github.io/EJournal_Client/swagger/htmlSwag/
 * JavaDoc: https://ddudde.github.io/EJournal_Client/javaDoc/
-* AsciiDoc: https://ddudde.github.io/EJournal_Client/asciiDoc/
+* AsciiDoc-Server: https://ddudde.github.io/EJournal_Client/asciiDoc/
+* AsciiDoc-Client: https://ddudde.github.io/EJournal_Client/asciiDoc/client.html
 
 Сервер:
 https://github.com/Ddudde/EJournal
@@ -29,9 +30,9 @@ Java, Spring, REST + Server Sent Events
 Клиент:
 https://github.com/Ddudde/EJournal_Client
 Находится в /client
-http://localhost:3000/EJournal_Client/
+http://localhost:5173/EJournal_Client
 Github Pages: https://ddudde.github.io/EJournal_Client/
-JS, React, Redux
+Typescript, React, Vite, Mobx
 ====
 
 == Использование

@@ -26,7 +26,7 @@ import java.util.Objects;
  * </pre> */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/contacts/")
+@RequestMapping("/contacts")
 public class ContactController {
     private final IDBService dbService;
     private final IContactService contactService;
@@ -35,7 +35,7 @@ public class ContactController {
     /** RU: изменение контакта + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @PutMapping("/chContact/")
+    @PutMapping("/chContact")
     public ResponseEntity<Void> chContact(@RequestBody ContactsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         Contacts contacts = contactService.prepareContactsForChangeContact(sub, user);
@@ -49,7 +49,7 @@ public class ContactController {
     /** RU: [start] Отправка контактов, портала/школы
      * @param type Нужный тип: Por - портал, Yo - школы
      * @see DocsHelpController#point Описание */
-    @GetMapping("/getContacts/{type}/")
+    @GetMapping("/getContacts/{type}")
     public ResponseEntity<ContactOutDTO> getContacts(@PathVariable String type, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final Syst syst = dbService.getSyst();

@@ -42,7 +42,7 @@ import ru.services.interfaces.logic.people.IParentsService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @DeleteMapping("/remPep/")
+    @DeleteMapping("/remPep")
     public ResponseEntity<Void> remPep(@RequestBody ParentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
         final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
@@ -61,7 +61,7 @@ import ru.services.interfaces.logic.people.IParentsService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PatchMapping("/chPep/")
+    @PatchMapping("/chPep")
     public ResponseEntity<Void> chPep(@RequestBody ParentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
         if (user1 == null) return ResponseEntity.notFound().build();
@@ -77,7 +77,7 @@ import ru.services.interfaces.logic.people.IParentsService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PostMapping("/addPar/")
+    @PostMapping("/addPar")
     public ResponseEntity<Void> addPar(@RequestBody ParentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User kidU = dbService.userById(body.id);
         if (kidU == null) return ResponseEntity.notFound().build();
@@ -90,7 +90,7 @@ import ru.services.interfaces.logic.people.IParentsService;
     /** RU: отправляет список ребёнок-родители группы
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @GetMapping("/getParents/{grId}/")
+    @GetMapping("/getParents/{grId}")
     public ResponseEntity<ParentsOutDTO> getParents(@PathVariable Long grId, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final School school = dbService.getFirstRole(user.getRoles()).getYO();
@@ -112,7 +112,7 @@ import ru.services.interfaces.logic.people.IParentsService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and !hasAuthority('ADMIN')""")
-    @GetMapping("/getInfo/")
+    @GetMapping("/getInfo")
     public ResponseEntity<Void> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.PARENTS, "main", "main", "main", "main");
         return ResponseEntity.ok().build();
@@ -123,7 +123,7 @@ import ru.services.interfaces.logic.people.IParentsService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @GetMapping("/getInfoFH/")
+    @GetMapping("/getInfoFH")
     public ResponseEntity<GroupServiceDTO> getInfoForHTeacher(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
 

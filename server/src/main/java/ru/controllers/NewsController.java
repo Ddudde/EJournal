@@ -43,7 +43,7 @@ public class NewsController {
         @code401.check(@dbService.existUserBySubscription(#sub))
         and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
         or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
-    @DeleteMapping("/delNews/")
+    @DeleteMapping("/delNews")
     public ResponseEntity<Void> delNews(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final News news = dbService.newsById(body.id);
         final Syst syst = dbService.getSyst();
@@ -61,7 +61,7 @@ public class NewsController {
         @code401.check(@dbService.existUserBySubscription(#sub))
         and ((#sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER'))
         or (#sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')))""")
-    @PutMapping("/chNews/")
+    @PutMapping("/chNews")
     public ResponseEntity<Void> chNews(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final News news = dbService.newsById(body.id);
         if (news == null || ObjectUtils.isEmpty(body.type)) return ResponseEntity.notFound().build();
@@ -77,7 +77,7 @@ public class NewsController {
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and #sub.getLvlMore2() == 'Yo' and hasAuthority('HTEACHER')""")
-    @PostMapping("/addNewsYo/")
+    @PostMapping("/addNewsYo")
     public ResponseEntity<Void> addNewsYO(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -94,7 +94,7 @@ public class NewsController {
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and #sub.getLvlMore2() == 'Por' and hasAuthority('ADMIN')""")
-    @PostMapping("/addNewsPor/")
+    @PostMapping("/addNewsPor")
     public ResponseEntity<Void> addNewsPortal(@RequestBody NewsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final Syst syst = dbService.getSyst();
         if (syst == null || ObjectUtils.isEmpty(body.date)) return ResponseEntity.notFound().build();
@@ -107,7 +107,7 @@ public class NewsController {
 
     /** RU: [start] отправка новостей, портала/школы
      * @see DocsHelpController#point Описание */
-    @GetMapping("/getNews/Yo/")
+    @GetMapping("/getNews/Yo")
     public ResponseEntity<Map<Long, NewsOutBodyDTO>> getNewsYo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         List<News> list = null;
@@ -128,7 +128,7 @@ public class NewsController {
 
     /** RU: [start] отправка новостей, портала/школы
      * @see DocsHelpController#point Описание */
-    @GetMapping("/getNews/Por/")
+    @GetMapping("/getNews/Por")
     public ResponseEntity<Map<Long, NewsOutBodyDTO>> getNewsPor(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         List<News> list = null;
         final Syst syst = dbService.getSyst();

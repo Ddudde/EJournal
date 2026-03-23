@@ -64,7 +64,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
     @Test @Tag("infCon")
     @CustomUser
     void infCon_whenGood_AdminUser() throws Exception {
-        mockMvc.perform(patch("/auth/infCon/")
+        mockMvc.perform(patch("/auth/infCon")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -87,7 +87,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
         final SseEmitter sseEmitter = mock(SseEmitter.class);
         getSub().setSSE(sseEmitter);
 
-        mockMvc.perform(patch("/auth/remCon/")
+        mockMvc.perform(patch("/auth/remCon")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remCon_Summary, "remCon_whenGood_AdminUser"));
@@ -108,7 +108,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
 
         log.trace(getAuth() + "");
 
-        mockMvc.perform(post("/auth/auth/")
+        mockMvc.perform(post("/auth/auth")
                 .header(HttpHeaders.AUTHORIZATION, "Basic bm0xMjpwYXNzVGVzdA==")// Basic Auth
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +130,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
         final String uuid = getAuth().getUUID();
 //        SecurityContextHolder.getContext().setAuthentication(new CustomToken());
 
-        mockMvc.perform(post("/auth/auth/")
+        mockMvc.perform(post("/auth/auth")
                 .header(HttpHeaders.AUTHORIZATION, "Basic bm0xMjpwYXNzVGVzdA==")// Basic Auth
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +151,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
         final User user = dbService.userById(getSub().getUserId());
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
-        mockMvc.perform(post("/auth/reg/")
+        mockMvc.perform(post("/auth/reg")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -173,7 +173,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
         when(dbService.userByCode("uuidTest")).thenReturn(null);
         when(dbService.userByLogin("nm")).thenReturn(null);
 
-        mockMvc.perform(post("/auth/reg/")
+        mockMvc.perform(post("/auth/reg")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -198,7 +198,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
         when(dbService.userByCode("uuidTest")).thenReturn(user);
         when(dbService.userByLogin("nm")).thenReturn(null);
 
-        mockMvc.perform(post("/auth/reg/")
+        mockMvc.perform(post("/auth/reg")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -221,7 +221,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
     void checkInvCode_whenWrong_AdminUser() throws Exception {
         when(dbService.userByCode(null)).thenReturn(null);
 
-        mockMvc.perform(post("/auth/checkInvCode/")
+        mockMvc.perform(post("/auth/checkInvCode")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -237,7 +237,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
         final User user = dbService.userById(getSub().getUserId());
         when(dbService.userByCode("uuidTest")).thenReturn(user);
 
-        mockMvc.perform(post("/auth/checkInvCode/")
+        mockMvc.perform(post("/auth/checkInvCode")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -254,7 +254,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
     void setCodePep_whenEmpty_AdminUser() throws Exception {
         when(dbService.userByLogin(null)).thenReturn(null);
 
-        mockMvc.perform(patch("/auth/setCodePep/")
+        mockMvc.perform(patch("/auth/setCodePep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -270,7 +270,7 @@ public class AuthControllerTest extends AbstractTestIntegration {
     void setCodePep_whenGood_AdminUser() throws Exception {
         final User user = dbService.userById(getSub().getUserId());
 
-        mockMvc.perform(patch("/auth/setCodePep/")
+        mockMvc.perform(patch("/auth/setCodePep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""

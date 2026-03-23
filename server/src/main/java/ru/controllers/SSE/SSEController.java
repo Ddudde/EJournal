@@ -30,7 +30,7 @@ public class SSEController {
      * или сохранение подписки для старого пользователя
      * @param uuidAuth Авторизация, в ней подписка и пользователь
      * @exception IOException Исключение вызывается при ошибках с Json */
-    @GetMapping(value = {"/start/{uuidAuth}/", "/start/"}, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = {"/start/{uuidAuth}", "/start"}, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter start(@PathVariable(required = false) String uuidAuth) throws IOException {
         log.trace("YT3 " + SecurityContextHolder.getContext().getAuthentication());
         return sseService.startSSE(uuidAuth);

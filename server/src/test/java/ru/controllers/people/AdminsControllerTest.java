@@ -50,7 +50,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @Test @Tag("remPep")
     @CustomAuth
     void remPep_whenEmpty_Anonim() throws Exception {
-        mockMvc.perform(delete("/admins/remPep/")
+        mockMvc.perform(delete("/admins/remPep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -66,7 +66,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     void remPep_whenGood_Admin() throws Exception {
         User user = dbService.userById(getSub().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
-        mockMvc.perform(delete("/admins/remPep/")
+        mockMvc.perform(delete("/admins/remPep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -84,7 +84,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @Test @Tag("chPep")
     @CustomAuth
     void chPep_whenEmpty_Anonim() throws Exception {
-        mockMvc.perform(patch("/admins/chPep/")
+        mockMvc.perform(patch("/admins/chPep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -100,7 +100,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     void chPep_whenGood_Admin() throws Exception {
         User user = dbService.userById(getSub().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
-        mockMvc.perform(patch("/admins/chPep/")
+        mockMvc.perform(patch("/admins/chPep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -119,7 +119,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @Test @Tag("addPep")
     @CustomAuth
     void addPep_whenEmpty_Anonim() throws Exception {
-        mockMvc.perform(post("/admins/addPep/")
+        mockMvc.perform(post("/admins/addPep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -135,7 +135,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     void addPep_whenGood_Admin() throws Exception {
         when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
-        mockMvc.perform(post("/admins/addPep/")
+        mockMvc.perform(post("/admins/addPep")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -156,7 +156,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @CustomAuth
     void getAdmins_whenEmpty_Anonim() throws Exception {
         when(dbService.getSyst()).thenReturn(null);
-        mockMvc.perform(get("/admins/getAdmins/")
+        mockMvc.perform(get("/admins/getAdmins")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(getAdmins_Summary, "getAdmins_whenEmpty_Anonim"));
@@ -168,7 +168,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @CustomUser
     void getAdmins_whenGood_Admin() throws Exception {
         when(dbService.getSyst().getAdmins()).thenReturn(usersTest);
-        mockMvc.perform(get("/admins/getAdmins/")
+        mockMvc.perform(get("/admins/getAdmins")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))

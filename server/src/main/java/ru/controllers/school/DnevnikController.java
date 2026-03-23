@@ -36,7 +36,7 @@ import ru.services.interfaces.logic.school.IDnevnikService;
     /** RU: отправляет данные о расписании, оценках, домашних заданиях
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @GetMapping("/getDnevnik/")
+    @GetMapping("/getDnevnik")
     public ResponseEntity<DnevnikOutDTO> getDnevnik(@AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         Group group = null;
@@ -59,7 +59,7 @@ import ru.services.interfaces.logic.school.IDnevnikService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         AND (hasAuthority('KID') OR hasAuthority('PARENT'))""")
-    @GetMapping("/getInfo/")
+    @GetMapping("/getInfo")
     public ResponseEntity<Void> startDnevkik(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final Long schId = user.getSelecRole().getYO().getId();

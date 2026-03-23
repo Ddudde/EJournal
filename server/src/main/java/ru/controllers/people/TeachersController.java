@@ -39,7 +39,7 @@ import ru.services.interfaces.logic.people.ITeacherService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @DeleteMapping("/remPep/")
+    @DeleteMapping("/remPep")
     public ResponseEntity<Void> remPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
         final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
@@ -58,7 +58,7 @@ import ru.services.interfaces.logic.people.ITeacherService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PatchMapping("/chPep/")
+    @PatchMapping("/chPep")
     public ResponseEntity<Void> chPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user1 = dbService.userById(body.id);
         if(user1 == null) return ResponseEntity.notFound().build();
@@ -73,7 +73,7 @@ import ru.services.interfaces.logic.people.ITeacherService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PostMapping("/addTea/")
+    @PostMapping("/addTea")
     public ResponseEntity<Void> addTea(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final School school = dbService.schoolById(Long.parseLong(sub.getLvlSch()));
         if(school == null) return ResponseEntity.notFound().build();
@@ -86,7 +86,7 @@ import ru.services.interfaces.logic.people.ITeacherService;
     /** RU: [start] отправка списка учителей учебного центра
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @GetMapping("/getTeachers/")
+    @GetMapping("/getTeachers")
     public ResponseEntity<TeacherServiceDTO> getTeachers(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();

@@ -49,7 +49,7 @@ public class DnevnikControllerTest extends AbstractTestIntegration {
     void getDnevnik_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/dnevnik/getDnevnik/")
+        mockMvc.perform(get("/dnevnik/getDnevnik")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getDnevnik_Summary, "getDnevnik_whenEmpty_Anonim"));
@@ -71,7 +71,7 @@ public class DnevnikControllerTest extends AbstractTestIntegration {
         prepareActualPeriod(school);
         prepareHomework();
 
-        mockMvc.perform(get("/dnevnik/getDnevnik/")
+        mockMvc.perform(get("/dnevnik/getDnevnik")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"id\":3872,\"name\":\"Якушева А.О.\"}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"id\":1705,\"name\":\"Дроздов А.А.\"}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"id\":1840,\"name\":\"Пестов Л.А.\"}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"id\":3225,\"name\":\"Никифорова Н.А.\"}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"id\":9764,\"name\":\"Силин А.К.\"}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"id\":3872,\"name\":\"Якушева А.О.\"}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"id\":1705,\"name\":\"Дроздов А.А.\"}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"id\":1840,\"name\":\"Пестов Л.А.\"}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"id\":3225,\"name\":\"Никифорова Н.А.\"}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"marks\":{\"0\":{\"homework\":\"Стр. 62-63 пересказ\"}},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"marks\":{\"0\":{\"homework\":\"Упр. 5Стр. 103\"}},\"i\":0},\"10.06.22\":{\"marks\":{\"0\":{\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"}},\"i\":0}},\"Математика\":{\"10.06.22\":{\"marks\":{\"0\":{\"homework\":\"Упр. 6Стр. 103\"}},\"i\":0},\"11.06.22\":{\"marks\":{\"0\":{\"homework\":\"Упр. 7Стр. 103\"}},\"i\":0}}}}"))
@@ -95,7 +95,7 @@ public class DnevnikControllerTest extends AbstractTestIntegration {
         prepareMarks();
         prepareHomework();
 
-        mockMvc.perform(get("/dnevnik/getDnevnik/")
+        mockMvc.perform(get("/dnevnik/getDnevnik")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"id\":3872,\"name\":\"Якушева А.О.\"}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"id\":1705,\"name\":\"Дроздов А.А.\"}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"id\":1840,\"name\":\"Пестов Л.А.\"}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"id\":3225,\"name\":\"Никифорова Н.А.\"}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"id\":9764,\"name\":\"Силин А.К.\"}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"id\":3872,\"name\":\"Якушева А.О.\"}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"id\":1705,\"name\":\"Дроздов А.А.\"}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"id\":1840,\"name\":\"Пестов Л.А.\"}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"id\":3225,\"name\":\"Никифорова Н.А.\"}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"marks\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Стр. 62-63 пересказ\"}},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"marks\":{\"0\":{\"mark\":\"Н\",\"weight\":1,\"homework\":\"Упр. 5Стр. 103\"}},\"i\":0},\"10.06.22\":{\"marks\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 5Стр. 103,Упр. 2Стр. 104\"}},\"i\":0}},\"Математика\":{\"10.06.22\":{\"marks\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 6Стр. 103\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"}},\"i\":0},\"11.06.22\":{\"marks\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\",\"homework\":\"Упр. 7Стр. 103\"}},\"i\":0}}}}"))
@@ -118,7 +118,7 @@ public class DnevnikControllerTest extends AbstractTestIntegration {
         prepareActualPeriod(school);
         prepareMarks();
 
-        mockMvc.perform(get("/dnevnik/getDnevnik/")
+        mockMvc.perform(get("/dnevnik/getDnevnik")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"body\":{\"1\":{\"lessons\":{\"0\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1283\",\"prepod\":{\"id\":3872,\"name\":\"Якушева А.О.\"}},\"3\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1977\",\"prepod\":{\"id\":1705,\"name\":\"Дроздов А.А.\"}},\"4\":{\"name\":\"Математика\",\"cabinet\":\"1870\",\"prepod\":{\"id\":1840,\"name\":\"Пестов Л.А.\"}},\"5\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"640\",\"prepod\":{\"id\":3225,\"name\":\"Никифорова Н.А.\"}}}},\"3\":{\"lessons\":{\"0\":{\"name\":\"Англ. Яз.\",\"cabinet\":\"1098\",\"prepod\":{\"id\":9764,\"name\":\"Силин А.К.\"}},\"2\":{\"name\":\"Русский Яз.\",\"cabinet\":\"1660\",\"prepod\":{\"id\":3872,\"name\":\"Якушева А.О.\"}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"1837\",\"prepod\":{\"id\":1705,\"name\":\"Дроздов А.А.\"}}}},\"4\":{\"lessons\":{\"3\":{\"name\":\"Русский Яз.\",\"cabinet\":\"482\",\"prepod\":{\"id\":1840,\"name\":\"Пестов Л.А.\"}},\"4\":{\"name\":\"Физика\",\"cabinet\":\"394\",\"prepod\":{\"id\":3225,\"name\":\"Никифорова Н.А.\"}}}}},\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyD\":{\"Химия\":{\"10.06.22\":{\"marks\":{\"0\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"}},\"i\":0}},\"Англ. Яз\":{\"12.06.22\":{\"marks\":{\"0\":{\"mark\":\"Н\",\"weight\":1}},\"i\":0},\"10.06.22\":{\"marks\":{\"0\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"}},\"i\":0}},\"Математика\":{\"10.06.22\":{\"marks\":{\"0\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"1\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"}},\"i\":0},\"11.06.22\":{\"marks\":{\"0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"}},\"i\":0}}}}"))
@@ -168,7 +168,7 @@ public class DnevnikControllerTest extends AbstractTestIntegration {
     void getInfo_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/dnevnik/getInfo/")
+        mockMvc.perform(get("/dnevnik/getInfo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
@@ -182,7 +182,7 @@ public class DnevnikControllerTest extends AbstractTestIntegration {
         when(sch1.getId()).thenReturn(20L);
         user.getSelecRole().setYO(sch1);
 
-        mockMvc.perform(get("/dnevnik/getInfo/")
+        mockMvc.perform(get("/dnevnik/getInfo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));

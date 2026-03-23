@@ -2,7 +2,7 @@
 Natik Muradov <myratoff25@gmail.com>
 :revnumber: v0.4.2
 :revdate: 16.01.2026
-:revremark: Основное описание
+:revremark: Основное описание сервера
 :sectnums:
 :hardbreaks-option:
 :toc: left
@@ -20,7 +20,8 @@ NOTE: Доки в ветке public репозитория клиента.
 
 * Swagger: link:/EJournal_Client/swagger/htmlSwag/[]
 * JavaDoc: link:/EJournal_Client/javaDoc/[]
-* AsciiDoc: link:/EJournal_Client/asciiDoc/[]
+* AsciiDoc-Server: link:/EJournal_Client/asciiDoc/[]
+* AsciiDoc-Client: link:/EJournal_Client/asciiDoc/client.html[]
 
 Сервер:
 https://github.com/Ddudde/EJournal
@@ -29,12 +30,6 @@ https://github.com/Ddudde/EJournal
 http://localhost:8080
 Java, Spring, REST + Server Sent Events
 
-Клиент:
-https://github.com/Ddudde/EJournal_Client
-Находится в /client
-http://localhost:3000/EJournal_Client/
-Github Pages: https://ddudde.github.io/EJournal_Client/
-JS, React, Redux, PWA
 ====
 
 == Технологии сервера
@@ -70,23 +65,10 @@ JDK: GraalVM 21
 . Lombok
 . Logback
 ====
-== Зависимости клиента
-====
-NOTE: Vs Code в качестве IDE
-
-. Github Pages
-. Single Page Application
-. Progressive Web App
-. React
-. Redux
-. React Router
-. Firebase Cloud Messaging
-. React Helmet
-====
 == Использование
 ====
 Запускаем сервер
-И запускаем клиент по одному из адресов: http://localhost:3000/EJournal_Client/
+И запускаем клиент по одному из адресов: http://localhost:5173/EJournal_Client/
 , https://ddudde.github.io/EJournal/
 Выбираем роль, допустим администратора
 И авторизируемся

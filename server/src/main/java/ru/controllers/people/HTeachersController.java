@@ -43,7 +43,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @DeleteMapping("/remGroup/")
+    @DeleteMapping("/remGroup")
     public ResponseEntity<Void> remGroup(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -59,7 +59,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PostMapping("/addGroup/")
+    @PostMapping("/addGroup")
     public ResponseEntity<Void> addGroup(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -75,7 +75,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('HTEACHER')""")
-    @PatchMapping("/chGroup/")
+    @PatchMapping("/chGroup")
     public ResponseEntity<Void> chGroup(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -91,7 +91,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
-    @PatchMapping("/chPep/")
+    @PatchMapping("/chPep")
     public ResponseEntity<Void> chPep(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final User user1 = dbService.userById(body.id);
@@ -116,7 +116,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
-    @DeleteMapping("/remPep/")
+    @DeleteMapping("/remPep")
     public ResponseEntity<Void> remPep(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final User user1 = dbService.userById(body.id);
@@ -141,7 +141,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
-    @PostMapping("/addPep/")
+    @PostMapping("/addPep")
     public ResponseEntity<Void> addPep(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         Long schId = body.yo;
@@ -168,7 +168,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PatchMapping("/chSch/")
+    @PatchMapping("/chSch")
     public ResponseEntity<Void> chSch(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final School school = dbService.schoolById(body.schId);
         if (school == null) return ResponseEntity.notFound().build();
@@ -183,7 +183,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @PostMapping("/addSch/")
+    @PostMapping("/addSch")
     public ResponseEntity<Void> addSch(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final HTeachersOutDTO outDTO = hTeachersService.addSchool(body.name);
 
@@ -196,7 +196,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @DeleteMapping("/remSch/")
+    @DeleteMapping("/remSch")
     public ResponseEntity<Void> remSch(@RequestBody HTeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final School school = dbService.schoolById(body.schId);
         if (school == null) return ResponseEntity.notFound().build();
@@ -209,7 +209,7 @@ import java.util.Map;
     /** RU: отправка списка завучей учебного центра
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
-    @GetMapping("/getInfo/")
+    @GetMapping("/getInfo")
     public ResponseEntity<Map<Long, UserServiceBodyUserDTO>> getInfo(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -225,7 +225,7 @@ import java.util.Map;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('ADMIN')""")
-    @GetMapping("/getInfoFA/")
+    @GetMapping("/getInfoFA")
     public ResponseEntity<Map<Long, HTeachersBodyDTO>> getInfoForAdmins(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
         final Map<Long, HTeachersBodyDTO> outDTO = hTeachersService.prepareInfoForAdmins(dbService.getSchools());
 

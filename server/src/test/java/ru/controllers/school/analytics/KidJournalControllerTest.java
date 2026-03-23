@@ -50,7 +50,7 @@ public class KidJournalControllerTest extends AbstractTestIntegration {
     void getInfoPers_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/journal/getInfoPers/")
+        mockMvc.perform(get("/journal/getInfoPers")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoPers_Summary, "getInfoPers_whenEmpty_Anonim"));
@@ -71,7 +71,7 @@ public class KidJournalControllerTest extends AbstractTestIntegration {
         prepareMarksPers();
         prepareListLessons();
 
-        mockMvc.perform(get("/journal/getInfoPers/")
+        mockMvc.perform(get("/journal/getInfoPers")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"3456\":\"IV четверть\",\"9764\":\"III четверть\"},\"bodyM\":{\"Химия\":{\"9764\":\"4\"},\"Англ. Яз\":{\"352\":\"Н\",\"9764\":\"1\"},\"Математика\":{\"352\":\"5\",\"3872\":\"5\",\"9764\":\"2\"}}}"))
@@ -97,7 +97,7 @@ public class KidJournalControllerTest extends AbstractTestIntegration {
     void getInfo_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/journal/getInfo/")
+        mockMvc.perform(get("/journal/getInfo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
@@ -118,7 +118,7 @@ public class KidJournalControllerTest extends AbstractTestIntegration {
         prepareMarks();
         prepareListLessons();
 
-        mockMvc.perform(get("/journal/getInfo/")
+        mockMvc.perform(get("/journal/getInfo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyJ\":{\"Химия\":{\"days\":{\"10.06.22\":{\"mark\":\"4\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Англ. Яз\":{\"days\":{\"12.06.22\":{\"mark\":\"Н\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"weight\":1,\"type\":\"Ответ на уроке\"}}},\"Математика\":{\"days\":{\"10.06.22\":{\"mark\":\"2\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"10.06.22,0\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"},\"11.06.22\":{\"mark\":\"5\",\"weight\":1,\"type\":\"Ответ на уроке\"}}}}}"))

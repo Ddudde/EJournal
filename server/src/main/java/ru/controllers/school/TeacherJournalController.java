@@ -38,7 +38,7 @@ import ru.services.interfaces.logic.school.ITeacherJournalService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
-    @PostMapping("/addHomework/")
+    @PostMapping("/addHomework")
     public ResponseEntity<Void> addHomework(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final Group group = dbService.groupById(body.group);
@@ -55,7 +55,7 @@ import ru.services.interfaces.logic.school.ITeacherJournalService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
-    @PostMapping("/addMark/")
+    @PostMapping("/addMark")
     public ResponseEntity<Void> addMark(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final Group group = dbService.groupById(body.group);
@@ -73,7 +73,7 @@ import ru.services.interfaces.logic.school.ITeacherJournalService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
-    @GetMapping("/getInfoP3/{groupId}/")
+    @GetMapping("/getInfoP3/{groupId}")
     public ResponseEntity<TeacherJournalOutDTO> getInfoPart3(@PathVariable Long groupId, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -89,7 +89,7 @@ import ru.services.interfaces.logic.school.ITeacherJournalService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
-    @GetMapping("/getInfoP2/{nameSubject}/")
+    @GetMapping("/getInfoP2/{nameSubject}")
     public ResponseEntity<GroupServiceDTO> getInfoPart2(CustomToken auth, @PathVariable String nameSubject, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();
@@ -105,7 +105,7 @@ import ru.services.interfaces.logic.school.ITeacherJournalService;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and hasAuthority('TEACHER')""")
-    @GetMapping("/getInfoP1/")
+    @GetMapping("/getInfoP1")
     public ResponseEntity<TeacherJournalOutDTO> getInfoPart1(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final School school = user.getSelecRole().getYO();

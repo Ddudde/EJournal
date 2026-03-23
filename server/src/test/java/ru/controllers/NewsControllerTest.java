@@ -61,7 +61,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(dbService.newsById(any())).thenReturn(null);
         getSub().setLvlMore2("Por");
 
-        mockMvc.perform(delete("/news/delNews/")
+        mockMvc.perform(delete("/news/delNews")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -79,7 +79,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(dbService.newsById(1L)).thenReturn(TEST_UTILS.newsTest.get(1));
         getSub().setLvlMore2("Yo");
 
-        mockMvc.perform(delete("/news/delNews/")
+        mockMvc.perform(delete("/news/delNews")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -102,7 +102,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(dbService.newsById(1L)).thenReturn(TEST_UTILS.newsTest.get(1));
         getSub().setLvlMore2("Por");
 
-        mockMvc.perform(delete("/news/delNews/")
+        mockMvc.perform(delete("/news/delNews")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -124,7 +124,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
     void chNews_whenEmpty_Portal_AdminUser() throws Exception {
         getSub().setLvlMore2("Por");
 
-        mockMvc.perform(put("/news/chNews/")
+        mockMvc.perform(put("/news/chNews")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -142,7 +142,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(dbService.newsById(1L)).thenReturn(TEST_UTILS.newsTest.get(1));
         getSub().setLvlMore2("Yo");
 
-        mockMvc.perform(put("/news/chNews/")
+        mockMvc.perform(put("/news/chNews")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -167,7 +167,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(dbService.newsById(1L)).thenReturn(TEST_UTILS.newsTest.get(1));
         getSub().setLvlMore2("Por");
 
-        mockMvc.perform(put("/news/chNews/")
+        mockMvc.perform(put("/news/chNews")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -190,7 +190,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             .then(invocation -> invocation.getArguments()[0]);
         getSub().setLvlMore2(type);
 
-        mockMvc.perform(post("/news/addNews" + type + "/")
+        mockMvc.perform(post("/news/addNews" + type + "")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
@@ -271,7 +271,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
     @Test @Tag("getNews")
     @CustomUser
     void getNews_whenEmpty_Portal_Admin() throws Exception {
-        mockMvc.perform(get("/news/getNews/{type}/", "Por")
+        mockMvc.perform(get("/news/getNews/{type}", "Por")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{}"))
@@ -288,7 +288,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(user.getSelecRole().getYO().getNews())
             .thenReturn(TEST_UTILS.newsTest);
 
-        mockMvc.perform(get("/news/getNews/{type}/", "Yo")
+        mockMvc.perform(get("/news/getNews/{type}", "Yo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
@@ -303,7 +303,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         when(dbService.getSyst().getNews())
             .thenReturn(TEST_UTILS.newsTest);
 
-        mockMvc.perform(get("/news/getNews/{type}/", "Por")
+        mockMvc.perform(get("/news/getNews/{type}", "Por")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))

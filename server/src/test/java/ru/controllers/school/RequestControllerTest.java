@@ -47,7 +47,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
    @Test @Tag("addReq")
     @CustomAuth
     void addReq_whenEmpty_Anonim() throws Exception {
-        mockMvc.perform(post("/requests/addReq/")
+        mockMvc.perform(post("/requests/addReq")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -61,7 +61,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     @Test @Tag("addReq")
     @CustomUser
     void addReq_whenGood_Admin() throws Exception {
-        mockMvc.perform(post("/requests/addReq/")
+        mockMvc.perform(post("/requests/addReq")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -83,7 +83,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void delReq_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(delete("/requests/delReq/")
+        mockMvc.perform(delete("/requests/delReq")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -99,7 +99,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void delReq_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
-        mockMvc.perform(delete("/requests/delReq/")
+        mockMvc.perform(delete("/requests/delReq")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -118,7 +118,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void chTitle_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/requests/chTitle/")
+        mockMvc.perform(patch("/requests/chTitle")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -134,7 +134,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void chTitle_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
-        mockMvc.perform(patch("/requests/chTitle/")
+        mockMvc.perform(patch("/requests/chTitle")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -154,7 +154,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void chDate_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/requests/chDate/")
+        mockMvc.perform(patch("/requests/chDate")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -170,7 +170,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void chDate_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
-        mockMvc.perform(patch("/requests/chDate/")
+        mockMvc.perform(patch("/requests/chDate")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -190,7 +190,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void chText_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(patch("/requests/chText/")
+        mockMvc.perform(patch("/requests/chText")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -206,7 +206,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void chText_whenGood_Admin() throws Exception {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
-        mockMvc.perform(patch("/requests/chText/")
+        mockMvc.perform(patch("/requests/chText")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -226,7 +226,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void getRequests_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/requests/getRequests/")
+        mockMvc.perform(get("/requests/getRequests")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getRequests_Summary, "getRequests_whenEmpty_Anonim"));
@@ -239,7 +239,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     void getRequests_whenGood_Admin() throws Exception {
         when(dbService.getRequests()).thenReturn(TEST_UTILS.requestTest);
 
-        mockMvc.perform(get("/requests/getRequests/")
+        mockMvc.perform(get("/requests/getRequests")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"352\":{\"title\":\"mail1@mail.com\",\"date\":\"11.11.2011\",\"text\":\"Дроздов А.А.\"},\"3872\":{\"title\":\"mail10@mail.com\",\"date\":\"11.01.2011\",\"text\":\"Силин А.К.\"},\"9764\":{\"title\":\"mail11@mail.com\",\"date\":\"01.11.2011\",\"text\":\"Пестов Л.А.\"}}"))

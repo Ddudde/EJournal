@@ -50,7 +50,7 @@ public class PeriodControllerTest extends AbstractTestIntegration {
     void addPer_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(post("/periods/addPer/")
+        mockMvc.perform(post("/periods/addPer")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -66,7 +66,7 @@ public class PeriodControllerTest extends AbstractTestIntegration {
         when(sch1.getPeriods()).thenReturn(new ArrayList<>(TEST_UTILS.periods));
         user.getSelecRole().setYO(sch1);
 
-        mockMvc.perform(post("/periods/addPer/")
+        mockMvc.perform(post("/periods/addPer")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -88,7 +88,7 @@ public class PeriodControllerTest extends AbstractTestIntegration {
     void getInfo_whenEmpty_Anonim() throws Exception {
         when(dbService.userByLogin(any())).thenReturn(null);
 
-        mockMvc.perform(get("/periods/getInfo/")
+        mockMvc.perform(get("/periods/getInfo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
@@ -102,7 +102,7 @@ public class PeriodControllerTest extends AbstractTestIntegration {
         when(sch1.getPeriods()).thenReturn(TEST_UTILS.periods);
         user.getSelecRole().setYO(sch1);
 
-        mockMvc.perform(get("/periods/getInfo/")
+        mockMvc.perform(get("/periods/getInfo")
                 .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyP\":{\"0\":{\"name\":\"I четверть\",\"perN\":\"01.09.23\",\"perK\":\"03.11.23\"},\"1\":{\"name\":\"II четверть\",\"perN\":\"12.11.23\",\"perK\":\"29.12.23\"},\"2\":{\"name\":\"III четверть\",\"perN\":\"12.01.24\",\"perK\":\"29.03.24\"},\"3\":{\"name\":\"IV четверть\",\"perN\":\"01.04.24\",\"perK\":\"30.08.24\"}}}"))

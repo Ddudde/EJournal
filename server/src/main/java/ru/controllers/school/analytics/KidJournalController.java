@@ -43,7 +43,7 @@ import java.util.List;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
-    @GetMapping("/getInfoPers/")
+    @GetMapping("/getInfoPers")
     public ResponseEntity<KidJournalOutDTO> getInfoPers(@AuthenticationPrincipal SubscriberDTO sub) {
         final User user = dbService.userById(sub.getUserId());
         final Role firstRole = dbService.getFirstRole(user.getRoles());
@@ -63,7 +63,7 @@ import java.util.List;
     @PreAuthorize("""
         @code401.check(@dbService.existUserBySubscription(#sub))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
-    @GetMapping("/getInfo/")
+    @GetMapping("/getInfo")
     public ResponseEntity<KidJournalOutDTO> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
         final User user = dbService.userById(sub.getUserId());
         final Role firstRole = dbService.getFirstRole(user.getRoles());
