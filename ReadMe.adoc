@@ -38,7 +38,7 @@ Typescript, React, Vite, Mobx
 == Использование
 ====
 Запускаем сервер
-И запускаем клиент по одному из адресов: http://localhost:3000/EJournal_Client/
+И запускаем клиент по одному из адресов: http://localhost:5173/EJournal_Client/
 , https://ddudde.github.io/EJournal_Client/
 Выбираем роль, допустим администратора
 И авторизируемся

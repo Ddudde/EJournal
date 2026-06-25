@@ -10,7 +10,7 @@ import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.*;
 import ru.data.DTO.SubscriberDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 
 import java.util.*;
@@ -107,8 +107,12 @@ public class TestUtils {
     ));
 
     public static SubscriberDTO getSub(){
-        return ((CustomToken) SecurityContextHolder.getContext()
+        return ((AuthToken) SecurityContextHolder.getContext()
             .getAuthentication()).getSub();
+    }
+
+    public static AuthToken getAuth(){
+        return (AuthToken) SecurityContextHolder.getContext().getAuthentication();
     }
 
     public static Contacts getCloneContacts(Contacts contacts) {

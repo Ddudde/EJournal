@@ -19,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.configs.AppConfig;
 import ru.configs.SecurityConfig;
 import ru.security.ControllerExceptionHandler;
 import ru.security.CustomAccessDenied;
@@ -36,7 +37,8 @@ import static utils.TestUtils.defaultDescription;
     classes = {BeanConfig.class, CustomAccessDenied.class})
 public abstract class AbstractTestIntegration {
     protected static final TestUtils TEST_UTILS = new TestUtils();
-    private static final String DESCRIPTION_DOCS = "UUID-токен, авторизация, в ней подписка и пользователь";
+    private static final String SSE_DESCRIPTION_DOCS = "SSE UUID-токен, в ней подписка";
+    private static final String JWT_DESCRIPTION_DOCS = "JWT-токен, авторизация";
     protected MockMvc mockMvc;
     protected static final Gson gson = new Gson();
     private static final ControllerExceptionHandler controllerExceptionHandler = new ControllerExceptionHandler();
@@ -69,8 +71,9 @@ public abstract class AbstractTestIntegration {
             .summary(summary)
             .description(defaultDescription)
             .tag(nameTestedClass).requestFields()
-            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
-                .description(DESCRIPTION_DOCS));
+            .requestHeaders(headerWithName(SecurityConfig.SSE_TOKEN_HEADER).description(SSE_DESCRIPTION_DOCS),
+                headerWithName(SecurityConfig.ACCESS_TOKEN_HEADER).description(JWT_DESCRIPTION_DOCS)
+                    .defaultValue(AppConfig.TEST_JWT_TOKEN).optional());
         return document(nameTestedClass + "/" + methodName, resource(snip.build()));
     }
 }

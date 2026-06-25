@@ -59,7 +59,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/students/remPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -77,7 +77,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(group.getKids()).thenReturn(users);
 
         mockMvc.perform(delete("/students/remPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -86,7 +86,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        verify(sseService).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":3872}",
             gson.toJson(answer.getValue()));
     }
@@ -97,7 +97,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/students/chPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -111,7 +111,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(dbService.userById(20L)).thenReturn(user);
 
         mockMvc.perform(patch("/students/chPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -121,7 +121,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        verify(sseService).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":3872,\"name\":\"Вейс А.А.\"}",
             gson.toJson(answer.getValue()));
     }
@@ -132,7 +132,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/students/addPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -153,7 +153,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
 
 
         mockMvc.perform(post("/students/addPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -162,7 +162,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_HTEACHER"));
 
-        verify(sseService).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"name\":\"Вейс А.А.\"}}",
             gson.toJson(answer.getValue()));
     }
@@ -173,7 +173,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getStud/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getStud_Summary, "getStud_whenEmpty_Anonim"));
     }
@@ -189,7 +189,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(sch.getGroups()).thenReturn(TEST_UTILS.groups);
 
         mockMvc.perform(get("/students/getStud/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
             .andDo(defaultSwaggerDocs(getStud_Summary, "getStud_whenGood_KID"));
@@ -201,7 +201,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getInfo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -210,7 +210,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
         mockMvc.perform(get("/students/getInfo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
@@ -221,7 +221,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/students/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
     }
@@ -234,7 +234,7 @@ public class StudentsControllerTest extends AbstractTestIntegration {
         when(sch.getGroups()).thenReturn(TEST_UTILS.groups);
 
         mockMvc.perform(get("/students/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"bodyG\":{\"2323\":\"1А\",\"3456\":\"1Б\",\"4354\":\"1В\"},\"firstG\":2323}"))
             .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));

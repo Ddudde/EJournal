@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.getSub;
+import static utils.TestUtils.getAuth;
 import static utils.TestUtils.usersTest;
 
 public class AdminsControllerTest extends AbstractTestIntegration {
@@ -51,12 +51,12 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @CustomAuth
     void remPep_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(delete("/admins/remPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -64,10 +64,10 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @Test @Tag("remPep")
     @CustomUser
     void remPep_whenGood_Admin() throws Exception {
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
         mockMvc.perform(delete("/admins/remPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -76,7 +76,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("remPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764}",
             gson.toJson(answer.getValue()));
     }
@@ -85,12 +85,12 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @CustomAuth
     void chPep_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(patch("/admins/chPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -98,10 +98,10 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @Test @Tag("chPep")
     @CustomUser
     void chPep_whenGood_Admin() throws Exception {
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(dbService.userById(20L)).thenReturn(user);
         mockMvc.perform(patch("/admins/chPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -111,7 +111,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":9764,\"name\":\"Дрыздов А.А.\"}",
             gson.toJson(answer.getValue()));
     }
@@ -120,12 +120,12 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     @CustomAuth
     void addPep_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(post("/admins/addPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -136,7 +136,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
         when(roleRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         mockMvc.perform(post("/admins/addPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -145,7 +145,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPep_Summary, "addPep_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addPepC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"name\":\"Дрыздов А.А.\"}}",
             gson.toJson(answer.getValue()));
     }
@@ -157,7 +157,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     void getAdmins_whenEmpty_Anonim() throws Exception {
         when(dbService.getSyst()).thenReturn(null);
         mockMvc.perform(get("/admins/getAdmins")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(getAdmins_Summary, "getAdmins_whenEmpty_Anonim"));
     }
@@ -169,7 +169,7 @@ public class AdminsControllerTest extends AbstractTestIntegration {
     void getAdmins_whenGood_Admin() throws Exception {
         when(dbService.getSyst().getAdmins()).thenReturn(usersTest);
         mockMvc.perform(get("/admins/getAdmins")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"}}"))
             .andDo(defaultSwaggerDocs(getAdmins_Summary, "getAdmins_whenGood_Admin"));

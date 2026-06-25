@@ -61,7 +61,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/parents/remPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -81,7 +81,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(group.getKids()).thenReturn(users);
 
         mockMvc.perform(delete("/parents/remPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -90,7 +90,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(remPep_Summary, "remPep_whenGood_HTEACHER"));
 
-        verify(sseService).sendEventFor(eq("remPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("remPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872}",
             gson.toJson(answer.getValue()));
         assertEquals(users.size(), 5);
@@ -102,7 +102,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/parents/chPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -115,7 +115,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.userById(20L)).thenReturn(getCloneUsers(usersTest.get(0)));
 
         mockMvc.perform(patch("/parents/chPep")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -125,7 +125,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chPep_Summary, "chPep_whenGood_HTEACHER"));
 
-        verify(sseService).sendEventFor(eq("chPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chPepC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872,\"name\":\"Петров П.А.\"}",
             gson.toJson(answer.getValue()));
     }
@@ -136,7 +136,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/parents/addPar")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -156,7 +156,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.schoolById(20L)).thenReturn(sch1);
 
         mockMvc.perform(post("/parents/addPar")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -176,7 +176,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPar_Summary, "addPar_whenGood_HTEACHER"));
 
-        verify(sseService).sendEventFor(eq("addParC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addParC"), answer.capture(), eq(TypesConnect.PARENTS), any(), any(), any(), any());
         assertEquals("{\"id\":3872,\"body\":{\"name\":\"Якушева А.О.\",\"par\":{\"null\":{\"name\":\"Петрова А.Б.\"}},\"login\":\"esse_et\"}}",
             gson.toJson(answer.getValue()));
     }
@@ -187,7 +187,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/parents/getParents/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getParents_Summary, "getParents_whenEmpty_Anonim"));
     }
@@ -203,7 +203,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(group.getKids()).thenReturn(usersTest);
 
         mockMvc.perform(get("/parents/getParents/{grId}", 20L)
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyC\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}},\"bodyP\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"},\"1840\":{\"name\":\"Пестов Л.А.\",\"login\":\"sed_commodi\"},\"9764\":{\"name\":\"Силин А.К.\",\"par\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}},\"login\":\"facere_a\"},\"1705\":{\"name\":\"Дроздов А.А.\",\"login\":\"debitis_accusantium\"},\"3225\":{\"name\":\"Никифорова Н.А.\",\"login\":\"numquam_nobis\"}}}"))
             .andDo(defaultSwaggerDocs(getParents_Summary, "getParents_whenGood_HTEACHER"));
@@ -215,7 +215,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/parents/getInfo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -226,7 +226,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
     @CustomUser(roles = Roles.KID)
     void getInfo_whenGood_KID() throws Exception {
         mockMvc.perform(get("/parents/getInfo")
-            .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+            .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
         .andExpect(status().isOk())
         .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_KID"));
     }
@@ -237,7 +237,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/parents/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenEmpty_Anonim"));
     }
@@ -252,7 +252,7 @@ public class ParentsControllerTest extends AbstractTestIntegration {
         when(sch1.getGroups()).thenReturn(TEST_UTILS.groups);
 
         mockMvc.perform(get("/parents/getInfoFH")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"firstG\":2323,\"bodyG\":{\"3456\":\"1Б\",\"4354\":\"1В\",\"2323\":\"1А\"}}"))
             .andDo(defaultSwaggerDocs(getInfoForHTeacher_Summary, "getInfoForHTeacher_whenGood_HTEACHER"));

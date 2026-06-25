@@ -1,8 +1,10 @@
 package ru.services.logic.main;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import ru.configs.SecurityConfig;
 import ru.controllers.main.ProfileController;
 import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.SettingUser;
@@ -15,6 +17,7 @@ import ru.data.DTO.controller.main.profile.ProfileOutDTO;
 import ru.data.DTO.service.data.UserServiceDTO;
 import ru.data.DTO.service.data.userBody.UserServiceBodyUserDTO;
 import ru.data.reps.auth.SettingUserRepository;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 import ru.services.interfaces.IPushService;
 import ru.services.interfaces.data.IUserService;
@@ -50,15 +53,19 @@ public class ProfileService implements IProfileService {
 
     /** RU: очищение авторизации */
     @Override
-    public void exitFromAccount(User user, SubscriberDTO sub, String notifToken) {
+    public String exitFromAccount(User user, SubscriberDTO sub, String notifToken, AuthToken auth) {
         if (!ObjectUtils.isEmpty(notifToken)) {
             final SettingUser settingUser = user.getSettings();
             pushService.remToken(settingUser, notifToken);
             settingUserRepository.saveAndFlush(settingUser);
         }
-        sub.setLogin(null);
+        auth.setUserId(null);
         sub.setLvlSch(null);
         sub.setLvlGr(null);
+
+        final ResponseCookie deleteCoookie = ResponseCookie.from(SecurityConfig.NAME_OF_COOKIE, null).path("/auth/refreshToken").httpOnly(false)
+            .maxAge(0).sameSite("Strict").build();
+        return deleteCoookie.toString();
     }
 
     @Override
@@ -82,7 +89,7 @@ public class ProfileService implements IProfileService {
     }
 
     private void prepareRoleToDTO(User user, int i, Map<Integer, ProfileOutBodyRolesDTO> roles) {
-        final Roles roleI = Roles.roleByI(i);
+        final Roles roleI = Roles.roleByInteger(i);
         final ProfileOutBodyRolesDTO.ProfileOutBodyRolesDTOBuilder rolesDTOBuilder = ProfileOutBodyRolesDTO.builder();
         if (!user.getRoles().containsKey(roleI)) return;
 

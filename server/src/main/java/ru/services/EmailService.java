@@ -7,7 +7,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import ru.controllers.main.SettingsController;
-import ru.data.DTO.SubscriberDTO;
+import ru.data.DTO.controller.main.SettingsInnerDTO;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.IEmailService;
 
 /** RU: сервис для работы с рассылками по электронной почте */
@@ -41,7 +42,7 @@ import ru.services.interfaces.IEmailService;
     /** RU: посылает на указанную почту код подтверждения для регистрации
      * @param to адрес электронной почты
      * @param code код восстановления
-     * @see SettingsController#startEmail(SettingsController.DataSettings, SubscriberDTO)   Пример использования */
+     * @see SettingsController#startEmail(SettingsInnerDTO, AuthToken)    Пример использования */
     @SuppressWarnings("JavadocReference")
     @Override
     public void sendRegCode(String to, String code) {
@@ -62,7 +63,7 @@ import ru.services.interfaces.IEmailService;
      * @param to адрес электронной почты
      * @param code код восстановления
      * @param title заголовок письма
-     * @see SettingsController#chPass(SettingsController.DataSettings, SubscriberDTO)   Пример использования */
+     * @see SettingsController#chPass(SettingsInnerDTO, AuthToken)    Пример использования */
     @SuppressWarnings("JavadocReference")
     @Override
     public void sendRecCode(String to, String code, String title) {

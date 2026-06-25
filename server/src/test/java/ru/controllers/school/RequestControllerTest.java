@@ -44,16 +44,16 @@ public class RequestControllerTest extends AbstractTestIntegration {
         nameTestedClass = "RequestController";
     }
 
-   @Test @Tag("addReq")
+    @Test @Tag("addReq")
     @CustomAuth
     void addReq_whenEmpty_Anonim() throws Exception {
         mockMvc.perform(post("/requests/addReq")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(addReq_Summary, "addReq_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -62,7 +62,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
     @CustomUser
     void addReq_whenGood_Admin() throws Exception {
         mockMvc.perform(post("/requests/addReq")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -73,7 +73,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
             """))
             .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(addReq_Summary, "addReq_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addReq"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"title\":\"mail@mail.com\",\"date\":\"11.11.1111\",\"text\":\"Дрыздов А.А.\"}}",
             gson.toJson(answer.getValue()));
     }
@@ -84,12 +84,12 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(delete("/requests/delReq")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(delReq_Summary, "delReq_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -100,7 +100,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
         mockMvc.perform(delete("/requests/delReq")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -108,7 +108,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delReq_Summary, "delReq_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("delReq"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352}",
             gson.toJson(answer.getValue()));
     }
@@ -119,12 +119,12 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/requests/chTitle")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chTitle_Summary, "chTitle_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -135,7 +135,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
         mockMvc.perform(patch("/requests/chTitle")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -144,7 +144,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chTitle_Summary, "chTitle_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chTitle"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352,\"title\":\"example@pepl.qq\"}",
             gson.toJson(answer.getValue()));
     }
@@ -155,12 +155,12 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/requests/chDate")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chDate_Summary, "chDate_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -171,7 +171,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
         mockMvc.perform(patch("/requests/chDate")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -180,7 +180,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chDate_Summary, "chDate_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chDate"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352,\"date\":\"01.01.2001\"}",
             gson.toJson(answer.getValue()));
     }
@@ -191,12 +191,12 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/requests/chText")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(chText_Summary, "chText_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chText"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -207,7 +207,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.requestById(20L)).thenReturn(getCloneRequests(TEST_UTILS.requestTest.get(0)));
 
         mockMvc.perform(patch("/requests/chText")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -216,7 +216,7 @@ public class RequestControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chText_Summary, "chText_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("chText"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chText"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":352,\"text\":\"Дроздич Г.Г.\"}",
             gson.toJson(answer.getValue()));
     }
@@ -227,7 +227,8 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/requests/getRequests")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
+                .header(SecurityConfig.ACCESS_TOKEN_HEADER, AppConfig.TEST_JWT_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getRequests_Summary, "getRequests_whenEmpty_Anonim"));
     }
@@ -240,7 +241,8 @@ public class RequestControllerTest extends AbstractTestIntegration {
         when(dbService.getRequests()).thenReturn(TEST_UTILS.requestTest);
 
         mockMvc.perform(get("/requests/getRequests")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
+                .header(SecurityConfig.ACCESS_TOKEN_HEADER, AppConfig.TEST_JWT_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"352\":{\"title\":\"mail1@mail.com\",\"date\":\"11.11.2011\",\"text\":\"Дроздов А.А.\"},\"3872\":{\"title\":\"mail10@mail.com\",\"date\":\"11.01.2011\",\"text\":\"Силин А.К.\"},\"9764\":{\"title\":\"mail11@mail.com\",\"date\":\"01.11.2011\",\"text\":\"Пестов Л.А.\"}}"))
             .andDo(defaultSwaggerDocs(getRequests_Summary, "getRequests_whenGood_Admin"));

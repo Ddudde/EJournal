@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.getSub;
+import static utils.TestUtils.getAuth;
 
 public class SettingsControllerTest extends AbstractTestIntegration {
     private final IDBService dbService;
@@ -55,7 +55,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         
         mockMvc.perform(patch("/settings/checkCodeEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
@@ -68,12 +68,12 @@ public class SettingsControllerTest extends AbstractTestIntegration {
     @CustomUser
     void checkCodeEmail_whenGood_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(dbService.userByCode("uuid")).thenReturn(user);
         user.getSettings().setEmailCode("code");
 
         mockMvc.perform(patch("/settings/checkCodeEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -91,7 +91,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
         
         mockMvc.perform(patch("/settings/startEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
@@ -104,11 +104,11 @@ public class SettingsControllerTest extends AbstractTestIntegration {
     @CustomUser
     void startEmail_whenGood_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(dbService.userByCode("uuid")).thenReturn(user);
 
         mockMvc.perform(patch("/settings/startEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -127,7 +127,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isNotFound();
         
         mockMvc.perform(post("/settings/remNotifToken")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
@@ -142,7 +142,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         
         mockMvc.perform(post("/settings/remNotifToken")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -160,7 +160,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isNotFound();
         
         mockMvc.perform(post("/settings/addNotifToken")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
 
@@ -177,7 +177,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         
         mockMvc.perform(post("/settings/addNotifToken")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -197,7 +197,7 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isNotFound();
         
         mockMvc.perform(patch("/settings/chSettings")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
@@ -211,11 +211,11 @@ public class SettingsControllerTest extends AbstractTestIntegration {
     void chSettings_whenGood_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = mock(SettingUser.class);
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chSettings")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -235,11 +235,11 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isNotFound();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmailCode("11112");
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/checkPasCodeEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -260,12 +260,12 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmailCode("1111");
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/checkPasCodeEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -287,11 +287,11 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isAccepted();
         SettingUser settingUser = new SettingUser();
         settingUser.setSecFr("victoria_secret1");
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chPass")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -311,12 +311,12 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setSecFr("victoria_secret");
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chPass")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -340,12 +340,12 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setEmail("test@mail.com");
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         when(dbService.userByLogin("nm12")).thenReturn(user);
         when(user.getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(patch("/settings/chPass")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -365,10 +365,10 @@ public class SettingsControllerTest extends AbstractTestIntegration {
     @CustomUser
     void getSettings_whenEmpty_AdminUser() throws Exception {
         final ResultMatcher statusCode = status().isNotFound();
-        when(dbService.userById(getSub().getUserId()).getSettings()).thenReturn(null);
+        when(dbService.userById(getAuth().getUserId()).getSettings()).thenReturn(null);
 
         mockMvc.perform(get("/settings/getSettings")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(getSettings_Summary, "getSettings_whenEmpty_AdminUser"));
     }
@@ -381,10 +381,10 @@ public class SettingsControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
         SettingUser settingUser = new SettingUser();
         settingUser.setNNewReqSch(true);
-        when(dbService.userById(getSub().getUserId()).getSettings()).thenReturn(settingUser);
+        when(dbService.userById(getAuth().getUserId()).getSettings()).thenReturn(settingUser);
 
         mockMvc.perform(get("/settings/getSettings")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"checkbox_hints\":true,\"checkbox_notify\":false,\"checkbox_notify_sched\":false,\"checkbox_notify_marks\":false,\"checkbox_notify_yo\":false,\"checkbox_notify_por\":false,\"checkbox_notify_new_sch\":true}"))
             .andDo(defaultSwaggerDocs(getSettings_Summary, "getSettings_whenGood_AdminUser"));

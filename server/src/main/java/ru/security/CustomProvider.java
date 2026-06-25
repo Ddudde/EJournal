@@ -7,7 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 
 import java.util.Collection;
 import java.util.Set;
@@ -18,7 +18,7 @@ public class CustomProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(final Class<?> authentication) {
-        return authentication.isAssignableFrom(CustomToken.class);
+        return authentication.isAssignableFrom(AuthToken.class);
     }
 
     @Override

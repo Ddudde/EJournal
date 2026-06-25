@@ -9,7 +9,6 @@ import ru.data.DAO.Syst;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.test.TestInnerDTO;
 import ru.data.DTO.controller.test.TestOutDTO;
 import ru.data.DTO.controller.test.body.TestBodyDTO;
@@ -18,7 +17,7 @@ import ru.data.DTO.controller.test.body.TestServiceBodyGroupDTO;
 import ru.data.DTO.controller.test.body.TestServiceBodySchoolDTO;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 import ru.services.interfaces.db.IRandomizeService;
 import ru.services.interfaces.logic.ITestService;
@@ -114,7 +113,7 @@ public class TestService implements ITestService {
      * }
      * </pre>
      * toDo: добавление testPassword в bodyT
-     * @see TestController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
+     * @see TestController#getInfo(AuthToken)   Пример использования */
     public TestOutDTO getTestInfo() {
         final var dtoBuilder = TestServiceBodyDTO.builder();
         final Map<Long, TestServiceBodySchoolDTO> schoolsByIdDTO = new HashMap<>();

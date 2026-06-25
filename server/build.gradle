@@ -18,6 +18,12 @@ apply from: "$rootProject.projectDir/secrets.gradle"
 group = 'ru'
 version = '1.0'
 
+bootRun {// запускаем обязательно через эту команду, чтобы передались секреты
+    systemProperty 'beginSecret', "${beginSecret}"
+    systemProperty 'middleSecret', "${middleSecret}"
+    systemProperty 'endSecret', "${endSecret}"
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
@@ -39,7 +45,7 @@ dependencies {
     implementation ('com.google.code.gson:gson:2.10.1'){
         exclude group: 'commons-logging', module: 'commons-logging'
     }
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'io.jsonwebtoken:jjwt:0.12.3'
     implementation ('com.github.javafaker:javafaker:1.0.2'){
         exclude group: 'org.yaml', module: 'snakeyaml'
     }

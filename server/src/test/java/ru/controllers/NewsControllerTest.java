@@ -29,8 +29,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.defaultDescription;
-import static utils.TestUtils.getSub;
+import static utils.TestUtils.*;
 
 public class NewsControllerTest extends AbstractTestIntegration {
     private final NewsRepository newsRepository;
@@ -62,13 +61,13 @@ public class NewsControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2("Por");
 
         mockMvc.perform(delete("/news/delNews")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenEmpty_Portal_AdminUser"));
 
-        verify(sseService, times(0)).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: завуч для школьных новостей
@@ -80,7 +79,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2("Yo");
 
         mockMvc.perform(delete("/news/delNews")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -89,7 +88,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_YO_HTeacher"));
 
-        verify(sseService).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1}",
             gson.toJson(answer.getValue()));
     }
@@ -103,7 +102,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2("Por");
 
         mockMvc.perform(delete("/news/delNews")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -112,7 +111,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(delNews_Summary, "delNews_whenGood_Portal_AdminUser"));
 
-        verify(sseService).sendEventFor(eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("delNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1}",
             gson.toJson(answer.getValue()));
     }
@@ -125,13 +124,13 @@ public class NewsControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2("Por");
 
         mockMvc.perform(put("/news/chNews")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenEmpty_Portal_AdminUser"));
 
-        verify(sseService, times(0)).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: завуч для школьных новостей
@@ -143,7 +142,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2("Yo");
 
         mockMvc.perform(put("/news/chNews")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -154,7 +153,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_YO_HTeacher"));
 
-        verify(sseService).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
             gson.toJson(answer.getValue()));
     }
@@ -168,7 +167,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2("Por");
 
         mockMvc.perform(put("/news/chNews")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -179,7 +178,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(chNews_Summary, "chNews_whenGood_Portal_AdminUser"));
 
-        verify(sseService).sendEventFor(eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chNewsC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"id\":1,\"type\":\"title\",\"val\":\"А проект вышел большим...\"}",
             gson.toJson(answer.getValue()));
     }
@@ -191,13 +190,13 @@ public class NewsControllerTest extends AbstractTestIntegration {
         getSub().setLvlMore2(type);
 
         mockMvc.perform(post("/news/addNews" + type + "")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
             .andExpect(status)
             .andDo(defaultSwaggerDocs(type.equals("YO") ? addNewsYO_Summary : addNewsPortal_Summary, methodName));
 
-        verify(sseService, times(timesSSE)).sendEventFor(eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(timesSSE)).sendEventFor(any(), eq("addNewsC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: завуч для школьных новостей
@@ -205,7 +204,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
     @Test @Tag("addNewsYO")
     @CustomUser(roles = Roles.HTEACHER)
     void addNewsYO_whenGood_HTeacher() throws Exception {
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         user.getSelecRole().setYO(mock(School.class));
 
         addNews_run("addNewsYO_whenGood_HTeacher", """
@@ -261,7 +260,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
                 .description("Нужный тип: Por - портал, Yo - школы")
             )
             .tag("NewsController")
-            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
+            .requestHeaders(headerWithName(SecurityConfig.SSE_TOKEN_HEADER)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("NewsController/" + methodName, resource(snip.build()));
     }
@@ -272,7 +271,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
     @CustomUser
     void getNews_whenEmpty_Portal_Admin() throws Exception {
         mockMvc.perform(get("/news/getNews/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{}"))
             .andDo(getNews_Docs("getNews_whenEmpty_Portal_Admin"));
@@ -283,13 +282,13 @@ public class NewsControllerTest extends AbstractTestIntegration {
     @Test @Tag("getNews")
     @CustomUser
     void getNews_whenGood_YO_HTeacher() throws Exception {
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         user.getSelecRole().setYO(mock(School.class));
         when(user.getSelecRole().getYO().getNews())
             .thenReturn(TEST_UTILS.newsTest);
 
         mockMvc.perform(get("/news/getNews/{type}", "Yo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
             .andDo(getNews_Docs("getNews_whenGood_YO_HTeacher"));
@@ -304,7 +303,7 @@ public class NewsControllerTest extends AbstractTestIntegration {
             .thenReturn(TEST_UTILS.newsTest);
 
         mockMvc.perform(get("/news/getNews/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"1213\":{\"title\":\"День рождения портала!\",\"date\":\"25.04.2022\",\"text\":\"Начались первые работы\"},\"352\":{\"title\":\"А проект вышел большим...\",\"date\":\"02.12.2022\",\"img_url\":\"/static/media/tuman.jpg\",\"text\":\"Да-да, всё ещё не конец...\"}}"))
             .andDo(getNews_Docs("getNews_whenGood_Portal_AdminUser"));

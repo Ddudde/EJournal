@@ -11,7 +11,8 @@ import java.time.format.DateTimeFormatter;
 @Configuration
 @NoArgsConstructor
 public class AppConfig {
-    public static final String TEST_BEARER_TOKEN = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    public static final String TEST_SSE_TOKEN = "9693b2a1-77bb-4426-8045-9f9b4395d454";
+    public static final String TEST_JWT_TOKEN = "eyJhbGciOiJIUzM4NCJ9.eyJpc3MiOiJlam91cm5hbCIsInN1YiI6IjEiLCJyb2xlIjpbIktJRCIsIkFETUlOIl0sImlhdCI6MTc4MTcxNzY1OCwiZXhwIjoyMTAxNzE3NjU4fQ.mqPag1Gf9BZVW7AwCfk1M_lKqQ3ypmfEZfeVrAsMi21bXsOM30r7z8lAXwnS3uR9";
     public static final String TEST_LOGIN = "nm12";
     public static final String PATH_FIREBASE = "/e-journalfcm-firebase-auth.json";
 

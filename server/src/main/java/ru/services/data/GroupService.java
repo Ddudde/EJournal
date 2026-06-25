@@ -8,9 +8,8 @@ import ru.controllers.school.TeacherJournalController;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.service.data.GroupServiceDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.data.IGroupService;
 import ru.services.interfaces.db.IDBService;
 
@@ -32,7 +31,7 @@ public class GroupService implements IGroupService {
      * }
      * </pre>
      * @return ID первой группы
-     * @see StudentsController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
+     * @see StudentsController#getInfo(AuthToken)   Пример использования */
     @Override
     public GroupServiceDTO groupsBySchoolOfUser(User user) {
         final Map<Long, String> bodyGroup = new HashMap<>();
@@ -58,7 +57,7 @@ public class GroupService implements IGroupService {
      * }
      * </pre>
      * @return ID первой группы
-     * @see TeacherJournalController#getInfoPart2(CustomToken, String, SubscriberDTO)   Пример использования */
+     * @see TeacherJournalController#getInfoPart2(AuthToken, String)    Пример использования */
     @Override
     public GroupServiceDTO groupsByList(List<Long> groupsId) {
         final Map<Long, String> bodyGroup = new HashMap<>();

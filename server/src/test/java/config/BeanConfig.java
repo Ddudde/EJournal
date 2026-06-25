@@ -25,11 +25,13 @@ import ru.controllers.school.analytics.ScheduleController;
 import ru.data.reps.ContactsRepository;
 import ru.data.reps.NewsRepository;
 import ru.data.reps.SystRepository;
+import ru.data.reps.auth.RefreshTokenRepository;
 import ru.data.reps.auth.RoleRepository;
 import ru.data.reps.auth.SettingUserRepository;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.*;
 import ru.services.EmailService;
+import ru.services.JwtService;
 import ru.services.PushService;
 import ru.services.data.GroupService;
 import ru.services.data.UserService;
@@ -37,6 +39,7 @@ import ru.services.db.DBService;
 import ru.services.db.InitDBService;
 import ru.services.db.RandomizeService;
 import ru.services.interfaces.IEmailService;
+import ru.services.interfaces.IJwtService;
 import ru.services.interfaces.IPushService;
 import ru.services.interfaces.data.IGroupService;
 import ru.services.interfaces.data.IUserService;
@@ -84,6 +87,7 @@ public class BeanConfig {
     private final SchoolRepository schoolRepository = mock(SchoolRepository.class);
     private final SystRepository systRepository = mock(SystRepository.class);
     private final RequestRepository requestRepository = mock(RequestRepository.class);
+    private final RefreshTokenRepository refreshTokenRepository = mock(RefreshTokenRepository.class);
 
     private final IEmailService emailService = mock(EmailService.class);
     private final IPushService pushService = mock(PushService.class, Answers.RETURNS_DEEP_STUBS);
@@ -93,7 +97,7 @@ public class BeanConfig {
     private final IPeriodService periodService = spy(new PeriodService(periodRepository, schoolRepository));
     private final IRandomizeService randomService = spy(new RandomizeService(passwordEncoder, settingUserRepository,
         roleRepository, userRepository, schoolRepository, dbService, newsRepository, contactsRepository, systRepository,
-        dayRepository, lessonRepository, markRepository, groupRepository, periodRepository, periodService));
+        dayRepository, lessonRepository, markRepository, groupRepository, periodRepository, requestRepository, periodService));
     private final InitDBService initDBService = spy(new InitDBService(passwordEncoder, settingUserRepository,
         roleRepository, userRepository, schoolRepository, dbService, randomService));
     private final IUserService userService = spy(new UserService(dbService, userRepository, settingUserRepository));
@@ -119,8 +123,9 @@ public class BeanConfig {
         dayRepository, periodService));
     private final ITestService testService = spy(new TestService(randomService, schoolRepository, lessonRepository));
     private final IContactService contactService = spy(new ContactService(contactsRepository, dbService));
-    private final IAuthService authService = spy(new AuthService(pushService, settingUserRepository, passwordEncoder,
-        dbService, userRepository));
+    private final IJwtService jwtService = spy(new JwtService());
+    private final IAuthService authService = spy(new AuthService(pushService, settingUserRepository, refreshTokenRepository,
+        passwordEncoder, dbService, userRepository, jwtService));
     private final ITeacherJournalService teacherJournalService = spy(new TeacherJournalService(dayRepository,
         markRepository, dbService, lessonRepository, groupService, scheduleService, periodService));
     private final IRequestService requestService = spy(new RequestService(requestRepository));
@@ -135,6 +140,7 @@ public class BeanConfig {
         context.registerBean(RoleRepository.class, () -> roleRepository);
         context.registerBean(SchoolRepository.class, () -> schoolRepository);
         context.registerBean(SettingUserRepository.class, () -> settingUserRepository);
+        context.registerBean(RefreshTokenRepository.class, () -> refreshTokenRepository);
 
         context.registerBean(IEmailService.class, () -> emailService);
         context.registerBean(IPushService.class, () -> pushService);
@@ -159,6 +165,7 @@ public class BeanConfig {
         context.registerBean(IScheduleService.class, () -> scheduleService);
         context.registerBean(ITestService.class, () -> testService);
         context.registerBean(IContactService.class, () -> contactService);
+        context.registerBean(IJwtService.class, () -> jwtService);
         context.registerBean(IAuthService.class, () -> authService);
         context.registerBean(ITeacherJournalService.class, () -> teacherJournalService);
         context.registerBean(IRequestService.class, () -> requestService);

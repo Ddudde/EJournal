@@ -1,6 +1,5 @@
 app:
-    jwtSecret: 'secret'
-    jwtExpirationInMs: 3600000
+    jwtExpirationInMs: '#{60000 * 15}'
     debug: true
     test: true
     origins: http://localhost:5173, http://192.168.1.66:5173, https://ddudde.github.io, http://localhost:9001

@@ -68,6 +68,9 @@ public class RandomizeServiceTest {
     @Mock
     private PeriodRepository periodRepository;
 
+    @Mock
+    private RequestRepository requestRepository;
+
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private PeriodService periodService;
 
@@ -110,6 +113,8 @@ public class RandomizeServiceTest {
             .then(invocation -> invocation.getArguments()[0]);
         when(dayRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
+        when(requestRepository.saveAllAndFlush(any()))
+            .then(invocation -> invocation.getArguments()[0]);
 
         randomizeService.createRandomData();
         randomizeService.removeRandomData();
@@ -149,6 +154,8 @@ public class RandomizeServiceTest {
         when(markRepository.saveAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
         when(dayRepository.saveAndFlush(any()))
+            .then(invocation -> invocation.getArguments()[0]);
+        when(requestRepository.saveAllAndFlush(any()))
             .then(invocation -> invocation.getArguments()[0]);
 
         randomizeService.createRandomData();

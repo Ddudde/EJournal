@@ -58,6 +58,7 @@ public class RandomizeService implements IRandomizeService {
     private final MarkRepository markRepository;
     private final GroupRepository groupRepository;
     private final PeriodRepository periodRepository;
+    private final RequestRepository requestRepository;
     private final IPeriodService periodService;
 
     private final Set<Long> setts = new HashSet<>();
@@ -65,6 +66,7 @@ public class RandomizeService implements IRandomizeService {
     private final Set<Long> contactsSet = new HashSet<>();
     private final Set<Long> periods = new HashSet<>();
     private final Set<Long> groups = new HashSet<>();
+    private Set<Long> requests = new HashSet<>();
 
     @Getter
     private final Set<Long> schools = new HashSet<>();
@@ -136,6 +138,14 @@ public class RandomizeService implements IRandomizeService {
         final Syst systM = new Syst(newsRepository.findAllById(newsSet), contacts);
         systM.setTestPassword(testPassword);
         syst = dbService.createSyst(systM);
+
+
+        requests = requestRepository.saveAllAndFlush(asList(
+                new Request("mail1@mail.com", "11.11.2011", "Дроздов А.А."),
+                new Request("mail10@mail.com", "11.01.2011", "Силин А.К."),
+                new Request("mail11@mail.com", "01.11.2011", "Пестов Л.А.")
+            )).stream()
+            .map(Request::getId).collect(Collectors.toCollection(HashSet::new));
         log.trace(syst + "");
 
         users.clear();
@@ -415,6 +425,10 @@ public class RandomizeService implements IRandomizeService {
     /** RU: очищаются/удаляются все тестовые данные */
     @Override
     public void removeRandomData(){
+        if(!ObjectUtils.isEmpty(requests)) {
+            requestRepository.deleteAllById(requests);
+            requests.clear();
+        }
         if(!ObjectUtils.isEmpty(days)) {
             dayRepository.deleteAllById(days);
             days.clear();

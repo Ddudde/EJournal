@@ -9,7 +9,6 @@ import ru.data.DAO.auth.Role;
 import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.people.teacher.TeacherOutBodyDTO;
 import ru.data.DTO.controller.people.teacher.TeacherOutDTO;
 import ru.data.DTO.service.school.TeacherServiceDTO;
@@ -18,7 +17,7 @@ import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.GroupRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 import ru.services.interfaces.data.IUserService;
 import ru.services.interfaces.logic.people.ITeacherService;
@@ -86,20 +85,19 @@ public class TeacherService implements ITeacherService {
     /** RU: готовит JSON с данными списка учителей.
      * <pre>
      * nt : {
-     *     tea : {{@link #usersByList}}
+     *     tea : {{@link IUserService#usersByListEntity(List, boolean)}}
      * },
      * body : {
      *    intNumSubject : {
      *        "name",
-     *        tea : {{@link #usersByList}}
+     *        tea : {{@link IUserService#usersByListId(List, boolean)}}
      *    }
      * }
      * nt - учителя принадлежащие школе, но ещё не прикреплённые к дисциплинам.
      * body - определённая дисциплина и учителя, которые её преподают
      * </pre>
      * toDo: подправить в клиенте изменение, появление body
-     * @see TeachersController#getTeachers(CustomToken, SubscriberDTO)   Пример использования */
-    @SuppressWarnings("JavadocReference")
+     * @see TeachersController#getTeachers(AuthToken)    Пример использования */
     @Override
     public TeacherServiceDTO teachersBySchool(School school) {
         final List<Object[]> rawData = lessonRepository.uniqTeachersLBySchool(school.getId());

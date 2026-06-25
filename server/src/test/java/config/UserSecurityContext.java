@@ -7,7 +7,7 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 import org.springframework.util.ObjectUtils;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.db.IDBService;
 
 import java.util.UUID;
@@ -32,15 +32,14 @@ public class UserSecurityContext implements WithSecurityContextFactory<CustomUse
             user.getRoles().put(customUser.roles()[0], user.getSelecRole());
             user.setSelRole(customUser.roles()[0]);
         }
-        final SubscriberDTO sub = new SubscriberDTO(customUser.username());
-        sub.setUserId(user.getId());
-        final CustomToken auth = new CustomToken(customUser.password(), user.getAuthorities(), sub, UUID.randomUUID().toString());
+        final SubscriberDTO sub = new SubscriberDTO();
+        final AuthToken auth = new AuthToken(user.getAuthorities(), sub, UUID.randomUUID().toString(), user.getId());
         user.setUsername(customUser.username());
         user.setPassword(customUser.password());
 
         when(dbService.userByLogin(customUser.username())).thenReturn(user);
         when(dbService.userById(user.getId())).thenReturn(user);
-        when(dbService.existUserBySubscription(any())).thenReturn(true);
+        when(dbService.existUserByAuth(any())).thenReturn(true);
         context.setAuthentication(auth);
         return context;
     }

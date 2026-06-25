@@ -28,7 +28,7 @@ asciidoctorPdf {
 asciidoctor {
     sourceDir '../'
     sources {
-        exclude '/server/', '/docs/', '/imgAsciiDoc/', '/EJournal_Client/'
+        exclude '/server/', '/server1/', '/docs/', '/imgAsciiDoc/', '/EJournal_Client/'
     }
     outputDir '../docs/EJournal_Client/asciiDoc'
     baseDirFollowsSourceFile()

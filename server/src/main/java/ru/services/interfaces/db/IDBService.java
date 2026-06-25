@@ -9,7 +9,7 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.Request;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public interface IDBService {
 
     boolean existUserById(Long id);
 
-    boolean existUserBySubscription(SubscriberDTO subscriberDTO);
+    boolean existUserByAuth(AuthToken authToken);
 
     User userById(Long id);
 

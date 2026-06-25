@@ -60,7 +60,7 @@ import java.util.Map;
 
         while(true){
             if(role == 5) role = 0;
-            roleI = Roles.roleByI(role);
+            roleI = Roles.roleByInteger(role);
             if(!user.getRoles().containsKey(roleI)) {
                 role++;
                 continue;
@@ -111,7 +111,6 @@ import java.util.Map;
         final UserServiceDTO.UserServiceDTOBuilder builderDTO = UserServiceDTO.builder();
 
         user.setUsername(newLogin);
-        sub.setLogin(newLogin);
         userRepository.saveAndFlush(user);
         final UserServiceBodyLoginDTO bodyLoginDTO = new UserServiceBodyLoginDTO(sub.getLvlMore2(), user.getUsername());
         sub.setLvlMore2(newLogin);

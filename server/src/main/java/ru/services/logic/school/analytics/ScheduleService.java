@@ -8,7 +8,6 @@ import ru.data.DAO.auth.User;
 import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Lesson;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.school.analytics.schedule.ScheduleInnerBodyDTO;
 import ru.data.DTO.controller.school.analytics.schedule.ScheduleInnerDTO;
 import ru.data.DTO.controller.school.analytics.schedule.ScheduleOutDTO;
@@ -20,7 +19,7 @@ import ru.data.DTO.service.school.ScheduleServiceDTO;
 import ru.data.reps.auth.UserRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 import ru.services.interfaces.data.IGroupService;
 import ru.services.interfaces.db.IDBService;
@@ -105,7 +104,7 @@ public class ScheduleService implements IScheduleService {
      * }
      * </pre>
      *
-     * @see ScheduleController#getSchedule(Long, SubscriberDTO, CustomToken)  Пример использования
+     * @see ScheduleController#getSchedule(Long, AuthToken)   Пример использования
      */
     @Override
     public ScheduleServiceDTO getShedule(User user, Long groupId) {

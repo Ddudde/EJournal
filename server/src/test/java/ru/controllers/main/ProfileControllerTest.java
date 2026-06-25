@@ -34,8 +34,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.defaultDescription;
-import static utils.TestUtils.getSub;
+import static utils.TestUtils.*;
 
 @Slf4j
 public class ProfileControllerTest extends AbstractTestIntegration {
@@ -68,7 +67,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chKid")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
@@ -81,7 +80,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
 
         mockMvc.perform(patch("/profiles/chKid")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -99,7 +98,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chRole")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
@@ -112,10 +111,10 @@ public class ProfileControllerTest extends AbstractTestIntegration {
     @CustomUser
     void chRole_whenGood_Kid() throws Exception {
         final ResultMatcher statusCode = status().isOk();
-        dbService.userById(getSub().getUserId()).setSelRole(Roles.KID);
+        dbService.userById(getAuth().getUserId()).setSelRole(Roles.KID);
 
         mockMvc.perform(patch("/profiles/chRole")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"role\":4}"))
             .andDo(defaultSwaggerDocs(chRole_Summary, "chRole_whenGood_Kid"));
@@ -128,7 +127,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/exit")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
@@ -141,7 +140,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
 
         mockMvc.perform(patch("/profiles/exit")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -159,12 +158,12 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     @Test @Tag("chEmail")
@@ -173,7 +172,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
 
         mockMvc.perform(patch("/profiles/chEmail")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -181,7 +180,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chEmail_Summary, "chEmail_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chEmail"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"email\":\"mail1@example.com\",\"role\":4}}",
             gson.toJson(answer.getValue()));
     }
@@ -193,12 +192,12 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chInfo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     @Test @Tag("chInfo")
@@ -207,7 +206,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
 
         mockMvc.perform(patch("/profiles/chInfo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -215,7 +214,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chInfo_Summary, "chInfo_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chInfo"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"more\":\"testInfo\"}}",
             gson.toJson(answer.getValue()));
     }
@@ -226,12 +225,12 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isUnauthorized();
 
         mockMvc.perform(patch("/profiles/chLogin")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenEmpty_Anonim"));
-        verify(sseService, times(0)).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: админ
@@ -244,7 +243,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin("nm")).thenReturn(null);
 
         mockMvc.perform(patch("/profiles/chLogin")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -252,7 +251,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
             }
             """)).andExpect(statusCode)
             .andDo(defaultSwaggerDocs(chLogin_Summary, "chLogin_whenGood_Admin"));
-        verify(sseService).sendEventFor(eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chLogin"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"oLogin\":\"nm12\",\"nLogin\":\"nm\"}}",
             gson.toJson(answer.getValue()));
     }
@@ -266,7 +265,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
                 .description("Логин пользователя")
             )
             .tag("ProfileController")
-            .requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
+            .requestHeaders(headerWithName(SecurityConfig.SSE_TOKEN_HEADER)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         return document("ProfileController/" + methodName, resource(snip.build()));
     }
@@ -280,7 +279,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(statusCode)
             .andDo(getProfile_Docs("getProfile_whenEmpty_Anonim"));
     }
@@ -293,7 +292,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         final ResultMatcher statusCode = status().isOk();
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"login\":\"nm12\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}},\"4\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))
             .andDo(getProfile_Docs("getProfile_whenGood_AuthLogin_Admin"));
@@ -308,7 +307,7 @@ public class ProfileControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin("nm12")).thenReturn(TestUtils.usersTest.get(4));
 
         mockMvc.perform(get("/profiles/getProfile/{login}", "nm12")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(statusCode)
             .andExpect(content().json("{\"login\":\"facere_a\",\"id\":9764,\"fio\":\"Силин А.К.\",\"roles\":{\"0\":{\"email\":\"example@mail.com\",\"parents\":{\"3872\":{\"name\":\"Якушева А.О.\",\"login\":\"esse_et\"}}}}}"))
             .andDo(getProfile_Docs("getProfile_whenGood_CustomLogin_Anonim"));

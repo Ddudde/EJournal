@@ -2,20 +2,22 @@ package ru.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.configs.SecurityConfig;
 import ru.data.DAO.auth.User;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.auth.AuthInnerDTO;
 import ru.data.DTO.controller.auth.AuthOutDTO;
-import ru.security.user.CustomToken;
+import ru.data.DTO.controller.auth.AuthServiceDTO;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.db.IDBService;
 import ru.services.interfaces.logic.IAuthService;
 import ru.services.interfaces.logic.ISSEService;
-import ru.services.logic.SSEService;
 
 import java.util.UUID;
 
@@ -36,12 +38,12 @@ public class AuthController {
     /** RU: [start] изменение подписки
      * @see DocsHelpController#point Описание */
     @PatchMapping("/infCon")
-    public ResponseEntity<AuthOutDTO> infCon(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        final User user = dbService.userByLogin(body.login);
-        sseService.changeSubscriber(auth.getUUID(), body.login, body.type, null, null, null, null);
+    public ResponseEntity<AuthOutDTO> infCon(@RequestBody AuthInnerDTO body, AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
+        sseService.changeSubscriber(auth.getUUID(), body.type, null, null, null, null);
         if(user == null) return ResponseEntity.ok().build();
 
-        final AuthOutDTO outDTO = authService.prepareConnection(body, sub, user);
+        final AuthOutDTO outDTO = authService.prepareConnection(body, user);
         return ResponseEntity.ok(outDTO);
     }
 
@@ -49,26 +51,21 @@ public class AuthController {
      * @see DocsHelpController#point Описание */
     @PreAuthorize("@code401.check(#sub != null)")
     @PatchMapping("/remCon")
-    public ResponseEntity<Void> remCon(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        if(sub.getLogin() != null) {
-            log.debug("subscription remCon " + auth.getUUID() + " was noclosed " + sub.getLogin());
-        } else {
-            SSEService.subscriptions.remove(UUID.fromString(auth.getUUID()));
-            log.debug("subscription remCon " + auth.getUUID() + " was closed");
-        }
-        sub.getSSE().complete();
+    public ResponseEntity<Void> closeConnetion(@AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
+        sseService.onCloseSSE(sub, UUID.fromString(auth.getUUID()), "remCon", auth.getUserId());
         return ResponseEntity.ok().build();
     }
 
     /** RU: авторизация пользователя
      * @see DocsHelpController#point Описание */
-    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
+    @PreAuthorize("@code401.check(@dbService.existUserByAuth(#auth))")
     @PostMapping("/auth")
-    public ResponseEntity<AuthOutDTO> auth(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<AuthServiceDTO> auth(@RequestBody AuthInnerDTO body, AuthToken auth) {
+        log.trace("auth!" + auth.toString());
+        final User user = dbService.userById(auth.getUserId());
 
-        final AuthOutDTO outDTO = authService.authUser(body, auth.getUUID(), user);
-        return ResponseEntity.ok(outDTO);
+        final AuthServiceDTO outDTO = authService.authUser(body, auth, user);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, outDTO.cookie).body(outDTO);
     }
 
     /** RU: регистрация пользователя
@@ -90,23 +87,35 @@ public class AuthController {
     public ResponseEntity<Void> checkInvCode(@RequestBody AuthInnerDTO body) {
         final User user = dbService.userByCode(body.code);
         if(user == null) return ResponseEntity.notFound().build();
+
         return ResponseEntity.ok().build();
+    }
+
+    /** RU: проверка заранее выданного рефреш токена и выдача нового вместе с JWT
+     * @see DocsHelpController#point Описание */
+    @GetMapping("/refreshToken")
+    public ResponseEntity<AuthServiceDTO> refreshToken(@CookieValue(value = SecurityConfig.NAME_OF_COOKIE) String token) {
+        final AuthServiceDTO outDTO = authService.validateRefresh(token);
+        if(outDTO == null) return ResponseEntity.badRequest().build();
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, outDTO.cookie).body(outDTO);
     }
 
     /** RU: установка/обновление инвайта для регистрации + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and (hasAuthority('ADMIN') or hasAuthority('HTEACHER'))""")
     @PatchMapping("/setCodePep")
-    public ResponseEntity<AuthOutDTO> setCodePep(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<AuthOutDTO> setCodePep(@RequestBody AuthInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
         final User user1 = dbService.userByLogin(body.id);
         if(user1 == null) return ResponseEntity.notFound().build();
+
         final Long schId = dbService.getFirstRole(user1.getRoles()).getYO().getId();
 
         final AuthOutDTO outDTO = authService.setupInviteCode(user1, schId);
-        sseService.sendEventFor("codPepL2C", outDTO, sub.getType(), "null", sub.getLvlGr(), "adm", "main");
-        sseService.sendEventFor("codPepL1C", outDTO, sub.getType(), schId +"", sub.getLvlGr(), "ht", "main");
+        sseService.sendEventFor(auth.getUserId(), "codPepL2C", outDTO, sub.getType(), "null", sub.getLvlGr(), "adm", "main");
+        sseService.sendEventFor(auth.getUserId(), "codPepL1C", outDTO, sub.getType(), schId +"", sub.getLvlGr(), "ht", "main");
         return ResponseEntity.ok(outDTO);
     }
 

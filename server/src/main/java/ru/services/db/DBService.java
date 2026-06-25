@@ -12,7 +12,6 @@ import ru.data.DAO.school.Group;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.Request;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.reps.NewsRepository;
 import ru.data.reps.SystRepository;
 import ru.data.reps.auth.SettingUserRepository;
@@ -21,6 +20,7 @@ import ru.data.reps.school.GroupRepository;
 import ru.data.reps.school.PeriodRepository;
 import ru.data.reps.school.RequestRepository;
 import ru.data.reps.school.SchoolRepository;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 import ru.services.interfaces.db.IDBService;
 
@@ -68,8 +68,9 @@ public class DBService implements IDBService {
     }
 
     @Override
-    public boolean existUserBySubscription(SubscriberDTO subscriberDTO) {
-        return existUserById(subscriberDTO.getUserId());
+    public boolean existUserByAuth(AuthToken authToken) {
+        log.trace("auth! " + authToken.toString());
+        return existUserById(authToken.getUserId());
     }
 
     @Override

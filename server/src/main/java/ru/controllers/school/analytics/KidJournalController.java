@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +17,7 @@ import ru.data.DAO.school.Period;
 import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.school.analytics.kidJournal.KidJournalOutDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.db.IDBService;
 import ru.services.interfaces.logic.ISSEService;
 import ru.services.interfaces.logic.school.analytics.IKidJournalService;
@@ -41,11 +40,11 @@ import java.util.List;
     /** RU: отправляет данные о итоговых оценках
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfoPers")
-    public ResponseEntity<KidJournalOutDTO> getInfoPers(@AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<KidJournalOutDTO> getInfoPers(AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final Role firstRole = dbService.getFirstRole(user.getRoles());
         final School sch = firstRole.getYO();
         final Group group = firstRole.getGrp();
@@ -61,11 +60,11 @@ import java.util.List;
     /** RU: [start] отправляет данные о оценках
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and (hasAuthority('KID') OR hasAuthority('PARENT'))""")
     @GetMapping("/getInfo")
-    public ResponseEntity<KidJournalOutDTO> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<KidJournalOutDTO> getInfo(AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final Role firstRole = dbService.getFirstRole(user.getRoles());
         final School sch = firstRole.getYO();
         final Group group = firstRole.getGrp();
@@ -74,7 +73,7 @@ import java.util.List;
         final KidJournalOutDTO outDTO = kidJournalService.prepareInfo(sch, group);
         if(outDTO == null) return ResponseEntity.notFound().build();
 
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.JOURNAL, sch.getId() +"", "main", "main", "main");
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.JOURNAL, sch.getId() +"", "main", "main", "main");
         return ResponseEntity.ok(outDTO);
     }
 }

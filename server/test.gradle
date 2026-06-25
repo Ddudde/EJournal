@@ -4,6 +4,15 @@ configurations {
     }
 }
 
+compileTestJava {
+//    include 'example/*'
+//    include 'config/*'
+//    include 'utils/*'
+//    include 'ru/controllers/ContactControllerTest.java'
+//    include 'ru/AbstractTestIntegration.java'
+//    exclude 'config/*'
+}
+
 dependencies {
     testImplementation 'org.junit.platform:junit-platform-suite'
     testImplementation "org.springframework.boot:spring-boot-starter-test:${spring_version}"

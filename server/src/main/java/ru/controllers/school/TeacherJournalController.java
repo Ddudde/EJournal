@@ -16,7 +16,7 @@ import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.school.teacherJournal.TeacherJournalInnerDTO;
 import ru.data.DTO.controller.school.teacherJournal.TeacherJournalOutDTO;
 import ru.data.DTO.service.data.GroupServiceDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.db.IDBService;
 import ru.services.interfaces.logic.ISSEService;
 import ru.services.interfaces.logic.school.ITeacherJournalService;
@@ -36,46 +36,46 @@ import ru.services.interfaces.logic.school.ITeacherJournalService;
     /** RU: создаёт домашнее задание на определённое занятие дня группе
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('TEACHER')""")
     @PostMapping("/addHomework")
-    public ResponseEntity<Void> addHomework(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<Void> addHomework(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final Group group = dbService.groupById(body.group);
         if (group == null) return ResponseEntity.notFound().build();
         final School school = user.getSelecRole().getYO();
 
         final TeacherJournalOutDTO outDTO = teacherJournalService.addHomework(body, sub, user, group, school);
-        sseService.sendEventFor("addHomeworkC", outDTO, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
+        sseService.sendEventFor(auth.getUserId(), "addHomeworkC", outDTO, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /** RU: создаёт оценку к определённому уроку либо целому периоду(итоговая оценка)
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('TEACHER')""")
     @PostMapping("/addMark")
-    public ResponseEntity<Void> addMark(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<Void> addMark(@RequestBody TeacherJournalInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final Group group = dbService.groupById(body.group);
         final User objU = dbService.userById(body.kid);
         if (group == null || objU == null) return ResponseEntity.notFound().build();
         final School school = user.getSelecRole().getYO();
 
         final TeacherJournalOutDTO outDTO = teacherJournalService.addMark(body, sub, school, user, group, objU);
-        sseService.sendEventFor("addMarkC", outDTO, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
+        sseService.sendEventFor(auth.getUserId(), "addMarkC", outDTO, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", sub.getLvlMore2());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /** RU: отправляет данные о оценках, домашних заданиях и итоговых оценках группы подчинённой преподавателю на дисциплине
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('TEACHER')""")
     @GetMapping("/getInfoP3/{groupId}")
-    public ResponseEntity<TeacherJournalOutDTO> getInfoPart3(@PathVariable Long groupId, @AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<TeacherJournalOutDTO> getInfoPart3(@PathVariable Long groupId, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final School school = user.getSelecRole().getYO();
         final Group group = dbService.groupById(groupId);
         if (group == null) return ResponseEntity.notFound().build();
@@ -87,31 +87,31 @@ import ru.services.interfaces.logic.school.ITeacherJournalService;
     /** RU: [start] отправляет данные о группах учебного центра подчинённые преподавателю на дисциплине
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('TEACHER')""")
     @GetMapping("/getInfoP2/{nameSubject}")
-    public ResponseEntity<GroupServiceDTO> getInfoPart2(CustomToken auth, @PathVariable String nameSubject, @AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<GroupServiceDTO> getInfoPart2(AuthToken auth, @PathVariable String nameSubject) {
+        final User user = dbService.userById(auth.getUserId());
         final School school = user.getSelecRole().getYO();
 
         final GroupServiceDTO outDTO = teacherJournalService.groupsByList(school.getId(), nameSubject, user.getId());
         if (outDTO == null) return ResponseEntity.notFound().build();
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.PJOURNAL, null, null, null, nameSubject);
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.PJOURNAL, null, null, null, nameSubject);
         return ResponseEntity.ok(outDTO);
     }
 
     /** RU: [start] отправляет данные о расписании, периодах обучения и дисциплинах преподавателя
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('TEACHER')""")
     @GetMapping("/getInfoP1")
-    public ResponseEntity<TeacherJournalOutDTO> getInfoPart1(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<TeacherJournalOutDTO> getInfoPart1(AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final School school = user.getSelecRole().getYO();
 
         final TeacherJournalOutDTO outDTO = teacherJournalService.prepareScheduleAndPeriods(school, user);
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.PJOURNAL, school.getId() +"", "main", "main", "main");
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.PJOURNAL, school.getId() +"", "main", "main", "main");
         return ResponseEntity.ok(outDTO);
     }
 

@@ -15,7 +15,7 @@ import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.people.teacher.TeacherOutDTO;
 import ru.data.DTO.controller.people.teacher.TeachersInnerDTO;
 import ru.data.DTO.service.school.TeacherServiceDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 import ru.services.interfaces.db.IDBService;
 import ru.services.interfaces.logic.ISSEService;
@@ -37,10 +37,10 @@ import ru.services.interfaces.logic.people.ITeacherService;
      * Не реализовано в клиенте.
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('HTEACHER')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<Void> remPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
         final User user1 = dbService.userById(body.id);
         final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
         if(user1 == null || group == null) {
@@ -48,7 +48,7 @@ import ru.services.interfaces.logic.people.ITeacherService;
         }
 
         final TeacherOutDTO outDTO = teacherService.deleteRoleUser(user1, group);
-        sseService.sendEventFor("remPepC", outDTO, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+        sseService.sendEventFor(auth.getUserId(), "remPepC", outDTO, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         return ResponseEntity.ok().build();
     }
 
@@ -56,39 +56,39 @@ import ru.services.interfaces.logic.people.ITeacherService;
      * Не реализовано в клиенте.
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('HTEACHER')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<Void> chPep(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
         final User user1 = dbService.userById(body.id);
         if(user1 == null) return ResponseEntity.notFound().build();
 
         final TeacherOutDTO outDTO = teacherService.changeFIO(user1, body.name);
-        sseService.sendEventFor("chPepC", outDTO, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+        sseService.sendEventFor(auth.getUserId(), "chPepC", outDTO, TypesConnect.TEACHERS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         return ResponseEntity.ok().build();
     }
 
     /** RU: создаёт нового учителя для учебного центра
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addTea")
-    public ResponseEntity<Void> addTea(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<Void> addTea(@RequestBody TeachersInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
         final School school = dbService.schoolById(Long.parseLong(sub.getLvlSch()));
         if(school == null) return ResponseEntity.notFound().build();
 
         final TeacherOutDTO outDTO = teacherService.addNewAccountWithRole(school, body.name);
-        sseService.sendEventFor("addTeaC", outDTO, TypesConnect.TEACHERS, sub.getLvlSch(), "main", "ht", "main");
+        sseService.sendEventFor(auth.getUserId(), "addTeaC", outDTO, TypesConnect.TEACHERS, sub.getLvlSch(), "main", "ht", "main");
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /** RU: [start] отправка списка учителей учебного центра
      * @see DocsHelpController#point Описание */
-    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
+    @PreAuthorize("@code401.check(@dbService.existUserByAuth(#auth))")
     @GetMapping("/getTeachers")
-    public ResponseEntity<TeacherServiceDTO> getTeachers(CustomToken auth, @AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<TeacherServiceDTO> getTeachers(AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final School school = user.getSelecRole().getYO();
         String role = "main";
         if(user.getRoles().containsKey(Roles.HTEACHER)) {
@@ -97,7 +97,7 @@ import ru.services.interfaces.logic.people.ITeacherService;
         if(school == null) return ResponseEntity.notFound().build();
 
         final TeacherServiceDTO outDTO = teacherService.teachersBySchool(school);
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.TEACHERS, school.getId()+"", "main", role, "main");
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.TEACHERS, school.getId()+"", "main", role, "main");
         return ResponseEntity.ok(outDTO);
     }
 

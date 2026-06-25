@@ -5,5 +5,10 @@ import lombok.Builder;
 import java.util.Map;
 
 @Builder
-public record AuthServiceDTO(Long kid, Map<Long, String> kids) {
+public class AuthServiceDTO {
+    public final Long kid;
+    public final Map<Long, String> kids;
+    public final AuthOutDTO bodyAuth;
+    public final String token;
+    public transient final String cookie;
 }

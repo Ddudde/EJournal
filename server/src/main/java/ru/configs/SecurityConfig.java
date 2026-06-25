@@ -24,15 +24,16 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.security.AuthenticationFilter;
+import ru.security.CustomExceptionTranslationFilter;
 import ru.security.CustomProvider;
+import ru.services.interfaces.IJwtService;
 import ru.services.interfaces.db.IDBService;
 
 /** RU: Начало описания security.
  * В БД пароли хранятся зашифрованно(BCryptPasswordEncoder).
- * Авторизация Token(UUID) в header "x-access-token".
+ * Аутентификация: JWT-Token в header "x-access-token".
  * Анонимные пользователи тоже наделяются токеном.
- * При авторизации в системе используются логин/пароль.
- * Они передаются без шифрования в POST auth/auth
+ * При аутентификации в системе используются Basic Auth.
  * И хранится токен в клиенте LocalStorage */
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
@@ -41,20 +42,25 @@ import ru.services.interfaces.db.IDBService;
     private final CustomProvider provider;
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
         PathPatternRequestMatcher.withDefaults().matcher("/console_db"),
+        PathPatternRequestMatcher.withDefaults().matcher("/auth/refreshToken"),
         PathPatternRequestMatcher.withDefaults().matcher("/console_db/*")
     );
     private static final RequestMatcher PROTECTED_URLS = new NegatedRequestMatcher(PUBLIC_URLS);
-    public static final String authTokenHeader = "x-access-token";
+    public static final String SSE_TOKEN_HEADER = "x-token";
+    public static final String ACCESS_TOKEN_HEADER = "x-access-token";
+    public static final String NAME_OF_COOKIE = "token";
     private final AuthenticationConfiguration authConfig;
     private final IDBService dbService;
+    private final IJwtService jwtService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(8);
+    private final CustomExceptionTranslationFilter exceptionTranslationFilter = new CustomExceptionTranslationFilter();
 
     private AuthenticationEntryPoint forbiddenEntryPoint() {
         return new HttpStatusEntryPoint(HttpStatus.FORBIDDEN);
     }
 
     private AuthenticationFilter authenticationFilter() throws Exception {
-        return new AuthenticationFilter(PROTECTED_URLS, authConfig.getAuthenticationManager(), bCryptPasswordEncoder, dbService);
+        return new AuthenticationFilter(PROTECTED_URLS, authConfig.getAuthenticationManager(), bCryptPasswordEncoder, dbService, jwtService);
     }
 
     @Bean
@@ -69,6 +75,7 @@ import ru.services.interfaces.db.IDBService;
             .httpBasic(AbstractHttpConfigurer::disable)// В AuthenticationFilter функционал
             .logout(AbstractHttpConfigurer::disable)
             .rememberMe(AbstractHttpConfigurer::disable)
+            .addFilterBefore(exceptionTranslationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(PUBLIC_URLS).permitAll()

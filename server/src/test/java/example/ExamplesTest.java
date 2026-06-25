@@ -19,7 +19,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import ru.configs.AppConfig;
 import ru.controllers.SSE.TypesConnect;
 import ru.security.user.Roles;
+import ru.services.JwtService;
 import ru.services.data.UserService;
+import ru.services.interfaces.IJwtService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +43,17 @@ import static java.util.Arrays.asList;
 @Slf4j
 @Disabled
 class ExamplesTest {
+
+    @Test
+    void testJWT() {
+        final IJwtService service = new JwtService();
+//        final String token = service.generateToken();
+//        log.trace(token);
+//        final List<String> roles = service.getInfoFromJWT(token).get("role", List.class);
+//        roles.stream().forEach(System.out::println);
+//        log.trace(String.valueOf(roles.get(1)));
+//        log.trace(String.valueOf(roles.get(1)));
+    }
 
     @Test
     void testDate() {

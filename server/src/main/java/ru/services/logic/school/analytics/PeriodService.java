@@ -8,13 +8,12 @@ import ru.controllers.school.analytics.KidJournalController;
 import ru.controllers.school.analytics.PeriodController;
 import ru.data.DAO.school.Period;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.school.analytics.period.PeriodOutBodyDTO;
 import ru.data.DTO.controller.school.analytics.period.PeriodOutDTO;
 import ru.data.DTO.controller.school.analytics.period.PeriodsInnerDTO;
 import ru.data.reps.school.PeriodRepository;
 import ru.data.reps.school.SchoolRepository;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.logic.school.analytics.IPeriodService;
 
 import java.text.ParseException;
@@ -77,7 +76,7 @@ public class PeriodService implements IPeriodService {
     /** RU: исходя из заданных периодов в школе и актуальной даты
      * выбирается активный период
      * В случае если дата между периодами, выбирается последний завершённый
-     * @see KidJournalController#getInfo(SubscriberDTO, CustomToken)  Пример использования */
+     * @see KidJournalController#getInfo(AuthToken)   Пример использования */
     @Override
     public Period getActualPeriodBySchool(School school) {
         try {

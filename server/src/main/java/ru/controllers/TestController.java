@@ -3,13 +3,11 @@ package ru.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.controllers.SSE.TypesConnect;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.test.TestInnerDTO;
 import ru.data.DTO.controller.test.TestOutDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.logic.ISSEService;
 import ru.services.interfaces.logic.ITestService;
 
@@ -26,10 +24,10 @@ import ru.services.interfaces.logic.ITestService;
     /** RU: изменяет параметры тестирования
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('ADMIN')""")
     @PutMapping("/chTests")
-    public ResponseEntity<TestOutDTO> chTests(@RequestBody TestInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<TestOutDTO> chTests(@RequestBody TestInnerDTO body, AuthToken auth) {
         final TestOutDTO outDTO = testService.changeTests(body);
         return ResponseEntity.ok(outDTO);
     }
@@ -37,13 +35,13 @@ import ru.services.interfaces.logic.ITestService;
     /** RU: [start] отправка инфы для тестов
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('ADMIN')""")
     @GetMapping("/getInfo")
-    public ResponseEntity<TestOutDTO> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
+    public ResponseEntity<TestOutDTO> getInfo(AuthToken auth) {
 
         final TestOutDTO outDTO = testService.prepareInfo();
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.TEST, "main", "main", "main", "main");
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.TEST, "main", "main", "main", "main");
         return ResponseEntity.ok(outDTO);
     }
 }

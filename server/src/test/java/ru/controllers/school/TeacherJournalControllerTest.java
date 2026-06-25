@@ -69,7 +69,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/pjournal/addHomework")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -79,7 +79,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     @Test @Tag("addHomework")
     @CustomUser(roles = Roles.TEACHER)
     void addHomework_whenGood_TEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -90,7 +90,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         when(group.getId()).thenReturn(20L);
 
         mockMvc.perform(post("/pjournal/addHomework")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -101,7 +101,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addHomework_Summary, "addHomework_whenGood_TEACHER"));
 
-        verify(sseService).sendEventFor(eq("addHomeworkC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addHomeworkC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"homework\":\"Упр. 6Стр. 103\",\"day\":\"10.06.22\"}",
             gson.toJson(answer.getValue()));
     }
@@ -112,7 +112,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/pjournal/addMark")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -122,7 +122,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     @Test @Tag("addMark")
     @CustomUser(roles = Roles.TEACHER)
     void addMark_whenPeriodMark_TEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -135,7 +135,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         prepareMarkPeriod();
 
         mockMvc.perform(post("/pjournal/addMark")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -150,7 +150,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenPeriodMark_TEACHER"));
 
-        verify(sseService).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"day\":\"10.06.22\",\"kid\":20,\"body\":{\"mark\":\"5\",\"type\":\"Химия\",\"weight\":1,\"per\":20}}",
             gson.toJson(answer.getValue()));
     }
@@ -163,7 +163,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     @Test @Tag("addMark")
     @CustomUser(roles = Roles.TEACHER)
     void addMark_whenExistMark_TEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -178,7 +178,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         prepareMarksForExistMark();
 
         mockMvc.perform(post("/pjournal/addMark")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -192,7 +192,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenExistMark_TEACHER"));
 
-        verify(sseService).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"day\":\"10.06.22,1\",\"kid\":20,\"body\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1}}",
             gson.toJson(answer.getValue()));
     }
@@ -211,7 +211,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     @Test @Tag("addMark")
     @CustomUser(roles = Roles.TEACHER)
     void addMark_whenGood_TEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -223,7 +223,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         when(group.getId()).thenReturn(20L);
 
         mockMvc.perform(post("/pjournal/addMark")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -237,7 +237,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addMark_Summary, "addMark_whenGood_TEACHER"));
 
-        verify(sseService).sendEventFor(eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addMarkC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"day\":\"10.06.22\",\"kid\":20,\"body\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1}}",
             gson.toJson(answer.getValue()));
     }
@@ -248,7 +248,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/pjournal/getInfoP3/{groupId}", 20L)
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoPart3_Summary, "getInfoPart3_whenEmpty_Anonim"));
     }
@@ -256,7 +256,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     @Test @Tag("getInfoPart3")
     @CustomUser(roles = Roles.TEACHER)
     void getInfoPart3_whenGood_TEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         final Group group = mock(Group.class);
         user.getSelecRole().setYO(sch1);
@@ -272,7 +272,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         prepareMarksByKid();
 
         mockMvc.perform(get("/pjournal/getInfoP3/{groupId}", 20L)
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyD\":{\"12.06.22\":\"Упр. 5Стр. 103\",\"10.06.22\":\"Упр. 6Стр. 103\",\"11.06.22\":\"Упр. 7Стр. 103\"},\"bodyK\":{\"3872\":{\"name\":\"Якушева А.О.\",\"days\":{\"10.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"12.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1}},\"avg\":{\"352\":\"Н\",\"3872\":\"5\",\"9764\":\"4\"}},\"1840\":{\"name\":\"Пестов Л.А.\",\"days\":{},\"avg\":{}},\"9764\":{\"name\":\"Силин А.К.\",\"days\":{},\"avg\":{}},\"1705\":{\"name\":\"Дроздов А.А.\",\"days\":{\"10.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"12.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,3\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,4\":{\"mark\":\"Н\",\"weight\":1},\"11.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,1\":{\"mark\":\"4\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,2\":{\"mark\":\"5\",\"type\":\"Ответ на уроке\",\"weight\":1},\"12.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22,0\":{\"mark\":\"2\",\"type\":\"Ответ на уроке\",\"weight\":1},\"10.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1},\"11.06.22\":{\"mark\":\"1\",\"type\":\"Ответ на уроке\",\"weight\":1}},\"avg\":{\"352\":\"Н\",\"3872\":\"5\",\"9764\":\"4\"}},\"3225\":{\"name\":\"Никифорова Н.А.\",\"days\":{},\"avg\":{}}}}"))
             .andDo(defaultSwaggerDocs(getInfoPart3_Summary, "getInfoPart3_whenGood_TEACHER"));
@@ -318,7 +318,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/pjournal/getInfoP2/{nameSubject}", "Math")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoPart2_Summary, "getInfoPart2_whenEmpty_Anonim"));
     }
@@ -326,7 +326,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     @Test @Tag("getInfoPart2")
     @CustomUser(roles = Roles.TEACHER)
     void getInfoPart2_whenGood_TEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         user.getSelecRole().setYO(sch1);
         when(user.getId()).thenReturn(20L);
@@ -334,7 +334,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         prepareGroup();
 
         mockMvc.perform(get("/pjournal/getInfoP2/{nameSubject}", "Math")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"firstG\":21,\"bodyG\":{\"21\":\"1А\",\"22\":\"1Б\",\"23\":\"1В\"}}"))
             .andDo(defaultSwaggerDocs(getInfoPart2_Summary, "getInfoPart2_whenGood_TEACHER"));
@@ -355,7 +355,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/pjournal/getInfoP1")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfoPart1_Summary, "getInfoPart1_whenEmpty_Anonim"));
     }
@@ -363,7 +363,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
     @Test @Tag("getInfoPart1")
     @CustomUser(roles = Roles.TEACHER)
     void getInfoPart1_whenGood_TEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         user.getSelecRole().setYO(sch1);
         when(user.getId()).thenReturn(20L);
@@ -373,7 +373,7 @@ public class TeacherJournalControllerTest extends AbstractTestIntegration {
         prepareLessons();
 
         mockMvc.perform(get("/pjournal/getInfoP1")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"min\":\"12.01.24\",\"max\":\"29.03.24\",\"bodyPred\":{\"0\":\"Англ.Яз.\",\"1\":\"Химия\",\"2\":\"Физика\"},\"bodyPers\":{\"352\":\"I четверть\",\"3872\":\"II четверть\",\"3456\":\"IV четверть\",\"9764\":\"III четверть\"},\"bodyS\":{}}"))
             .andDo(defaultSwaggerDocs(getInfoPart1_Summary, "getInfoPart1_whenGood_TEACHER"));

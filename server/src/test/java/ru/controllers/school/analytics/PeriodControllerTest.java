@@ -26,7 +26,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static utils.TestUtils.getSub;
+import static utils.TestUtils.getAuth;
 
 public class PeriodControllerTest extends AbstractTestIntegration {
     private final IDBService dbService;
@@ -51,7 +51,7 @@ public class PeriodControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(post("/periods/addPer")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isUnauthorized())
@@ -61,13 +61,13 @@ public class PeriodControllerTest extends AbstractTestIntegration {
     @Test @Tag("addPer")
     @CustomUser(roles = Roles.HTEACHER)
     void addPer_whenGood_HTEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getPeriods()).thenReturn(new ArrayList<>(TEST_UTILS.periods));
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(post("/periods/addPer")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -78,7 +78,7 @@ public class PeriodControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isCreated())
             .andDo(defaultSwaggerDocs(addPer_Summary, "addPer_whenGood_HTEACHER"));
 
-        verify(sseService).sendEventFor(eq("addPerC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("addPerC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"body\":{\"name\":\"II четверть\",\"perN\":\"12.11.23\",\"perK\":\"29.12.23\"}}",
             gson.toJson(answer.getValue()));
     }
@@ -89,7 +89,7 @@ public class PeriodControllerTest extends AbstractTestIntegration {
         when(dbService.userByLogin(any())).thenReturn(null);
 
         mockMvc.perform(get("/periods/getInfo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isUnauthorized())
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenEmpty_Anonim"));
     }
@@ -97,13 +97,13 @@ public class PeriodControllerTest extends AbstractTestIntegration {
     @Test @Tag("getInfo")
     @CustomUser(roles = Roles.HTEACHER)
     void getInfo_whenGood_HTEACHER() throws Exception {
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School sch1 = mock(School.class);
         when(sch1.getPeriods()).thenReturn(TEST_UTILS.periods);
         user.getSelecRole().setYO(sch1);
 
         mockMvc.perform(get("/periods/getInfo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"bodyP\":{\"0\":{\"name\":\"I четверть\",\"perN\":\"01.09.23\",\"perK\":\"03.11.23\"},\"1\":{\"name\":\"II четверть\",\"perN\":\"12.11.23\",\"perK\":\"29.12.23\"},\"2\":{\"name\":\"III четверть\",\"perN\":\"12.01.24\",\"perK\":\"29.03.24\"},\"3\":{\"name\":\"IV четверть\",\"perN\":\"01.04.24\",\"perK\":\"30.08.24\"}}}"))
             .andDo(defaultSwaggerDocs(getInfo_Summary, "getInfo_whenGood_HTEACHER"));

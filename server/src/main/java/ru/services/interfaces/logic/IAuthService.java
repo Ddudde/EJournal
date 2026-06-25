@@ -1,16 +1,19 @@
 package ru.services.interfaces.logic;
 
 import ru.data.DAO.auth.User;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.auth.AuthInnerDTO;
 import ru.data.DTO.controller.auth.AuthOutDTO;
+import ru.data.DTO.controller.auth.AuthServiceDTO;
+import ru.security.user.AuthToken;
 
 public interface IAuthService {
-    AuthOutDTO prepareConnection(AuthInnerDTO body, SubscriberDTO sub, User user);
+    AuthOutDTO prepareConnection(AuthInnerDTO body, User user);
 
-    AuthOutDTO authUser(AuthInnerDTO body, String uuid, User user);
+    AuthServiceDTO authUser(AuthInnerDTO body, AuthToken auth, User user);
 
     AuthOutDTO createUser(User invitedUser, AuthInnerDTO body);
 
     AuthOutDTO setupInviteCode(User invitedUser, Long schId);
+
+    AuthServiceDTO validateRefresh(String token);
 }

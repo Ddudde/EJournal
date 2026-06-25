@@ -1,7 +1,7 @@
 = Asciidoc
 Natik Muradov <myratoff25@gmail.com>
-:revnumber: v0.4.2
-:revdate: 16.01.2026
+:revnumber: v0.4.3
+:revdate: 13.06.2026
 :revremark: Основное описание сервера
 :sectnums:
 :hardbreaks-option:
@@ -12,8 +12,10 @@ Natik Muradov <myratoff25@gmail.com>
 
 ====
 Github: https://github.com/Ddudde/EJournal
-А также клиент вставлен в качестве подмодуля Git(папка /EJournal_Client/) в репозиторий сервера и можно увидеть соотношения коммитов сервера и клиента. 
+Клиент вставлен в качестве подмодуля Git(папка /EJournal_Client/) в репозиторий сервера и можно увидеть соотношения коммитов сервера и клиента.
+
 NOTE: Доки в ветке public репозитория клиента.
+
 Публикации в HTML и PDF форматах находятся в /docs/EJournal/asciiDoc/.
 Основное описание проекта здесь. Также есть дополнительные:
 Также в /docs/start-web.bat можно стартануть Python http server для просмотра документации
@@ -38,13 +40,13 @@ NOTE: БД H2 для тестирования, а PostgreSQL для осталь
 Intellij IDEA в качестве IDE
 BD: H2
 http://localhost:8080/console_db
-JDK: GraalVM 21
+JDK: GraalVM 25
 Сборка: Gradle 9.2.1
 БД: PostgreSQL 15 / H2
 
 Фреймворки:
 
-. Spring Boot 3.3.13
+. Spring Boot 3.5.9
 . Spring Security
 . JUnit 5
 . Hibernate
@@ -65,6 +67,14 @@ JDK: GraalVM 21
 . Lombok
 . Logback
 ====
+== Положительные стороны проекта
+====
+* Пуш-уведомления
+* JWT
+* Интеграция с Email (Пример: Отправка кода подтверждения)
+
+Coming soon...
+====
 == Использование
 ====
 Запускаем сервер
@@ -76,6 +86,18 @@ JDK: GraalVM 21
 Пароль: 1111
 Радуемся!
 ====
+== Безопасность
+====
+Авторизация происходит с классической Basic Auth
+Хранение в JWT(JWS) RFC https://datatracker.ietf.org/doc/html/rfc7515[7515]
+В связке refresh token(30 дней) + access token(15 минут),
+SHA384 с уникальным ключом для каждого пользователя
+
+Server-Sent Events:
+Хранение в UUID токенах.
+Подключение с одноразовым токеном с TTL меньше 15 минут.
+После подключения выдаётся токен с жизнью 15 минут.
+====
 == Секреты(ключи) сервера
 ====
 Расположение:
@@ -85,7 +107,7 @@ JDK: GraalVM 21
 
 Также с большинством ключей есть шаблоны, они расположены вместе с файлами, пример названия: secrets.gradle.template
 ====
-== Документы
+== Документация
 ====
 NOTE: Доки в ветке public репозитория клиента.
 JavaDoc, AsciiDoc и Swagger генерируются при помощи Gradle

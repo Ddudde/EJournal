@@ -55,12 +55,12 @@ public class ContactControllerTest extends AbstractTestIntegration {
     @CustomUser
     void chContact_whenEmpty_Portal_AdminUser() throws Exception {
         mockMvc.perform(put("/contacts/chContact")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isNotFound())
             .andDo(defaultSwaggerDocs(CH_CONTACT_SUMMARY, "chContact_whenEmpty_Portal_AdminUser"));
-        verify(sseService, times(0)).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService, times(0)).sendEventFor(any(), eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
     }
 
     /** RU: завуч для контактов школы
@@ -69,7 +69,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
     @CustomUser(roles = Roles.HTEACHER)
     void chContact_whenGood_YO_HTeacher() throws Exception {
         getSub().setLvlMore2("Yo");
-        final User user = dbService.userById(getSub().getUserId());
+        final User user = dbService.userById(getAuth().getUserId());
         final School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(dbService.getSyst().getContacts())
@@ -78,7 +78,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
             .thenReturn(getCloneContacts(TEST_UTILS.contactsTest.get(0)));
 
         mockMvc.perform(put("/contacts/chContact")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -90,7 +90,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
                 .andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(CH_CONTACT_SUMMARY, "chContact_whenGood_YO_HTeacher"));
 
-        verify(sseService).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"val\":\"А проект вышел большим...\",\"p\":\"mapPr\",\"p1\":\"text\"}",
             gson.toJson(answer.getValue()));
     }
@@ -105,7 +105,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
             .thenReturn(getCloneContacts(TEST_UTILS.contactsTest.getFirst()));
 
         mockMvc.perform(put("/contacts/chContact")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN)
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
             {
@@ -116,7 +116,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
             """)).andExpect(status().isOk())
             .andDo(defaultSwaggerDocs(CH_CONTACT_SUMMARY, "chContact_whenGood_Portal_AdminUser"));
 
-        verify(sseService).sendEventFor(eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
+        verify(sseService).sendEventFor(any(), eq("chContactC"), answer.capture(), any(), any(), any(), any(), any());
         assertEquals("{\"val\":\"А проект вышел большим...\",\"p\":\"mapPr\",\"p1\":\"text\"}",
             gson.toJson(answer.getValue()));
     }
@@ -129,7 +129,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
             .pathParameters(parameterWithName("type")
                 .type(SimpleType.STRING)
                 .description("Нужный тип: Por - портал, Yo - школы")
-            ).requestHeaders(headerWithName(SecurityConfig.authTokenHeader)
+            ).requestHeaders(headerWithName(SecurityConfig.SSE_TOKEN_HEADER)
                 .description("UUID-токен, авторизация, в ней подписка и пользователь"));
         if(!emptyResponse) {
             snip.responseFields(fieldWithPath("contact").description(""),
@@ -149,7 +149,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
         when(dbService.getSyst()).thenReturn(null);
 
         mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isNotFound())
             .andDo(getContacts_Docs("getContacts_whenEmpty_Portal_AdminUser", true));
     }
@@ -159,14 +159,14 @@ public class ContactControllerTest extends AbstractTestIntegration {
     @Test @Tag("getContacts")
     @CustomUser(roles = Roles.HTEACHER)
     void getContacts_whenGood_YO_HTeacher() throws Exception {
-        User user = dbService.userById(getSub().getUserId());
+        User user = dbService.userById(getAuth().getUserId());
         School school = mock(School.class);
         user.getSelecRole().setYO(school);
         when(school.getContacts())
             .thenReturn(TEST_UTILS.contactsTest.get(0));
 
         mockMvc.perform(get("/contacts/getContacts/{type}", "Yo")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))
             .andDo(getContacts_Docs("getContacts_whenGood_YO_HTeacher", false));
@@ -181,7 +181,7 @@ public class ContactControllerTest extends AbstractTestIntegration {
             .thenReturn(TEST_UTILS.contactsTest.get(0));
 
         mockMvc.perform(get("/contacts/getContacts/{type}", "Por")
-                .header(SecurityConfig.authTokenHeader, AppConfig.TEST_BEARER_TOKEN))
+                .header(SecurityConfig.SSE_TOKEN_HEADER, AppConfig.TEST_SSE_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string("{\"contact\":\"8 (800) 555 35 37\\n5 (353) 555 00 88\",\"mapPr\":{\"text\":\"Ближайшие станции метро:\\nАлександровский сад, 610 м (Филёвская линия, выход 5)\\nБиблиотека им. Ленина, 680 м (Сокольническая линия, выход 3)\\nАрбатская, 750 м (Арбатско-Покровская линия, выход 8)\",\"imgUrl\":\"/static/media/map.jpg\"}}"))
             .andDo(getContacts_Docs("getContacts_whenGood_Portal_AdminUser", false));

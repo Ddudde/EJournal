@@ -7,7 +7,6 @@ import ru.controllers.NewsController;
 import ru.data.DAO.News;
 import ru.data.DAO.Syst;
 import ru.data.DAO.school.School;
-import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.news.NewsInnerDTO;
 import ru.data.DTO.controller.news.NewsOutBodyDTO;
 import ru.data.DTO.controller.news.NewsOutDTO;
@@ -33,10 +32,10 @@ public class NewsService implements INewsService {
     private final IPushService pushService;
 
     @Override
-    public NewsOutDTO deleteNews(NewsInnerDTO body, SubscriberDTO sub, Syst syst, News news) {
+    public NewsOutDTO deleteNews(NewsInnerDTO body, String SSEchannel, Syst syst, News news) {
         final NewsOutDTO.NewsOutDTOBuilder dtoBuilder = NewsOutDTO.builder();
 
-        if (Objects.equals(sub.getLvlMore2(), "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
+        if (Objects.equals(SSEchannel, "Por") && syst != null && !ObjectUtils.isEmpty(syst.getNews())) {
             syst.getNews().remove(news);
             systRepository.saveAndFlush(syst);
         }

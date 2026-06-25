@@ -10,7 +10,7 @@ public enum Roles {
     public final int i;
 
     /** RU: даёт роль по переменной i, +1, чтобы не учитывать Анонима*/
-    public static Roles roleByI(int i) {
+    public static Roles roleByInteger(int i) {
         return Roles.values()[i+1];
     }
 }

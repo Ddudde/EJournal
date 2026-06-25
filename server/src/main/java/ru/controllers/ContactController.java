@@ -13,7 +13,7 @@ import ru.data.DAO.school.School;
 import ru.data.DTO.SubscriberDTO;
 import ru.data.DTO.controller.contact.ContactOutDTO;
 import ru.data.DTO.controller.contact.ContactsInnerDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.services.interfaces.db.IDBService;
 import ru.services.interfaces.logic.IContactService;
 import ru.services.interfaces.logic.ISSEService;
@@ -34,15 +34,15 @@ public class ContactController {
 
     /** RU: изменение контакта + Server Sent Events
      * @see DocsHelpController#point Описание */
-    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
+    @PreAuthorize("@code401.check(@dbService.existUserByAuth(#auth))")
     @PutMapping("/chContact")
-    public ResponseEntity<Void> chContact(@RequestBody ContactsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
-        final User user = dbService.userById(sub.getUserId());
-        Contacts contacts = contactService.prepareContactsForChangeContact(sub, user);
+    public ResponseEntity<Void> chContact(@RequestBody ContactsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
+        final Contacts contacts = contactService.prepareContactsForChangeContact(sub, user);
         if(contacts == null) return ResponseEntity.notFound().build();
 
         final ContactOutDTO outDTO = contactService.changeContact(body, contacts);
-        sseService.sendEventFor("chContactC", outDTO, TypesConnect.CONTACTS, sub.getLvlSch(), "main", "main", sub.getLvlMore2());
+        sseService.sendEventFor(auth.getUserId(), "chContactC", outDTO, TypesConnect.CONTACTS, sub.getLvlSch(), "main", "main", sub.getLvlMore2());
         return ResponseEntity.ok().build();
     }
 
@@ -50,8 +50,8 @@ public class ContactController {
      * @param type Нужный тип: Por - портал, Yo - школы
      * @see DocsHelpController#point Описание */
     @GetMapping("/getContacts/{type}")
-    public ResponseEntity<ContactOutDTO> getContacts(@PathVariable String type, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<ContactOutDTO> getContacts(@PathVariable String type, AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final Syst syst = dbService.getSyst();
         Long schId = null;
         Contacts contacts = null;
@@ -66,7 +66,7 @@ public class ContactController {
         if(contacts == null) return ResponseEntity.notFound().build();
 
         final ContactOutDTO outDTO = contactService.prepareContact(contacts);
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.CONTACTS, schId + "", "main", "main", type);
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.CONTACTS, schId + "", "main", "main", type);
         return ResponseEntity.ok(outDTO);
     }
 

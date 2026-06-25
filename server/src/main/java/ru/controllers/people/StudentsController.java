@@ -17,7 +17,7 @@ import ru.data.DTO.controller.people.students.StudentsInnerDTO;
 import ru.data.DTO.controller.people.students.StudentsOutDTO;
 import ru.data.DTO.service.data.GroupServiceDTO;
 import ru.data.DTO.service.data.userBody.UserServiceBodyUserDTO;
-import ru.security.user.CustomToken;
+import ru.security.user.AuthToken;
 import ru.security.user.Roles;
 import ru.services.interfaces.data.IGroupService;
 import ru.services.interfaces.data.IUserService;
@@ -45,10 +45,10 @@ import java.util.Map;
     /** RU: удаляет роль ученика у пользователя + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('HTEACHER')""")
     @DeleteMapping("/remPep")
-    public ResponseEntity<Void> remPep(@RequestBody StudentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<Void> remPep(@RequestBody StudentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
         final User user1 = dbService.userById(body.id);
         final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
         if (user1 == null || group == null) {
@@ -56,46 +56,46 @@ import java.util.Map;
         }
 
         final StudentsOutDTO outDTO = studentsService.deleteRoleUser(user1, group);
-        sseService.sendEventFor("remPepC", outDTO, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+        sseService.sendEventFor(auth.getUserId(), "remPepC", outDTO, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         return ResponseEntity.ok().build();
     }
 
     /** RU: изменяет ФИО ученика + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('HTEACHER')""")
     @PatchMapping("/chPep")
-    public ResponseEntity<Void> chPep(@RequestBody StudentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<Void> chPep(@RequestBody StudentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
         final User user1 = dbService.userById(body.id);
         if (user1 == null) return ResponseEntity.notFound().build();
 
         final StudentsOutDTO outDTO = studentsService.changeFIO(user1, body.name);
-        sseService.sendEventFor("chPepC", outDTO, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+        sseService.sendEventFor(auth.getUserId(), "chPepC", outDTO, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         return ResponseEntity.ok().build();
     }
 
     /** RU: создаёт пользователя-ученика и отправляет информацию + Server Sent Events
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('HTEACHER')""")
     @PostMapping("/addPep")
-    public ResponseEntity<Void> addPep(@RequestBody StudentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub) {
+    public ResponseEntity<Void> addPep(@RequestBody StudentsInnerDTO body, @AuthenticationPrincipal SubscriberDTO sub, AuthToken auth) {
         final Group group = dbService.groupById(Long.parseLong(sub.getLvlGr()));
         if (group == null) return ResponseEntity.notFound().build();
 
         final StudentsOutDTO outDTO = studentsService.addNewAccountWithRole(Long.parseLong(sub.getLvlSch()), group, body.name);
-        sseService.sendEventFor("addPepC", outDTO, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
+        sseService.sendEventFor(auth.getUserId(), "addPepC", outDTO, TypesConnect.STUDENTS, sub.getLvlSch(), sub.getLvlGr(), "main", "main");
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /** RU: отправляет список учеников группы
      * @see DocsHelpController#point Описание */
-    @PreAuthorize("@code401.check(@dbService.existUserBySubscription(#sub))")
+    @PreAuthorize("@code401.check(@dbService.existUserByAuth(#auth))")
     @GetMapping("/getStud/{grId}")
-    public ResponseEntity<Map<Long, UserServiceBodyUserDTO>> getStud(@PathVariable Long grId, @AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<Map<Long, UserServiceBodyUserDTO>> getStud(@PathVariable Long grId, AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
         final School school = dbService.getFirstRole(user.getRoles()).getYO();
         if (!user.getRoles().containsKey(Roles.HTEACHER)) {
             grId = dbService.getFirstRole(user.getRoles()).getGrp().getId();
@@ -106,32 +106,32 @@ import java.util.Map;
         }
 
         final Map<Long, UserServiceBodyUserDTO> outDTO = userService.usersByListEntity(group.getKids(), true);
-        sseService.changeSubscriber(auth.getUUID(), null, null, school.getId() + "", group.getId() + "", null, null);
+        sseService.changeSubscriber(auth.getUUID(), null, school.getId() + "", group.getId() + "", null, null);
         return ResponseEntity.ok(outDTO);
     }
 
     /** RU: [start] запускает клиента в раздел Одноклассники и подтверждает клиенту права
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and !hasAuthority('ADMIN')""")
     @GetMapping("/getInfo")
-    public ResponseEntity<Void> getInfo(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "main", "main");
+    public ResponseEntity<Void> getInfo(AuthToken auth) {
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.STUDENTS, "main", "main", "main", "main");
         return ResponseEntity.ok().build();
     }
 
     /** RU: [start] отправляет список групп учебного центра и подтверждает клиенту права
      * @see DocsHelpController#point Описание */
     @PreAuthorize("""
-        @code401.check(@dbService.existUserBySubscription(#sub))
+        @code401.check(@dbService.existUserByAuth(#auth))
         and hasAuthority('HTEACHER')""")
     @GetMapping("/getInfoFH")
-    public ResponseEntity<GroupServiceDTO> getInfoForHTeacher(@AuthenticationPrincipal SubscriberDTO sub, CustomToken auth) {
-        final User user = dbService.userById(sub.getUserId());
+    public ResponseEntity<GroupServiceDTO> getInfoForHTeacher(AuthToken auth) {
+        final User user = dbService.userById(auth.getUserId());
 
         final GroupServiceDTO outDTO = groupService.groupsBySchoolOfUser(user);
-        sseService.changeSubscriber(auth.getUUID(), null, TypesConnect.STUDENTS, "main", "main", "ht", "main");
+        sseService.changeSubscriber(auth.getUUID(), TypesConnect.STUDENTS, "main", "main", "ht", "main");
         return ResponseEntity.ok(outDTO);
     }
 }
