@@ -1,0 +1,36 @@
+configurations {
+    testCompileClasspath {
+        extendsFrom testAnnotationProcessor
+    }
+}
+
+compileTestJava {
+//    include 'example/*'
+//    include 'config/*'
+//    include 'utils/*'
+//    include 'ru/controllers/ContactControllerTest.java'
+//    include 'ru/AbstractTestIntegration.java'
+//    exclude 'config/*'
+}
+
+dependencies {
+    testImplementation 'org.junit.platform:junit-platform-suite'
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${spring_version}"
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly "org.projectlombok:lombok:${lombok_version}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+//        csv.required = true
+        xml.required = true
+    }
+}

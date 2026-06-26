@@ -1,0 +1,88 @@
+//глобальные переменные в gradle.properties
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${spring_version}"
+    id 'io.spring.dependency-management' version "1.1.7"
+    id 'war'
+    id 'org.asciidoctor.jvm.convert' version "${asciiDocPlugin_version}"
+    id 'org.asciidoctor.jvm.pdf' version "${asciiDocPlugin_version}"
+    id 'com.epages.restdocs-api-spec' version "${restdocs_version}"
+    id "org.sonarqube" version "5.0.0.4638"
+    id 'jacoco'
+}
+
+apply from: "$rootProject.projectDir/test.gradle"
+apply from: "$rootProject.projectDir/docs.gradle"
+apply from: "$rootProject.projectDir/secrets.gradle"
+
+group = 'ru'
+version = '1.0'
+
+bootRun {// запускаем обязательно через эту команду, чтобы передались секреты
+    systemProperty 'beginSecret', "${beginSecret}"
+    systemProperty 'middleSecret', "${middleSecret}"
+    systemProperty 'endSecret', "${endSecret}"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter:${spring_version}"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${spring_version}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${spring_version}"
+    implementation "org.springframework.boot:spring-boot-starter-mail:${spring_version}"
+    implementation "org.springframework.boot:spring-boot-starter-security:${spring_version}"
+    implementation ('com.google.code.gson:gson:2.10.1'){
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation 'io.jsonwebtoken:jjwt:0.12.3'
+    implementation ('com.github.javafaker:javafaker:1.0.2'){
+        exclude group: 'org.yaml', module: 'snakeyaml'
+    }
+//    implementation 'org.yaml:snakeyaml:1.30'
+    implementation ('com.google.firebase:firebase-admin:9.1.1'){
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+//    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation 'com.h2database:h2'
+//    implementation 'org.postgresql:postgresql'
+//    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${lombok_version}"
+}
+
+tasks.register('build_exe', Exec) {
+    workingDir 'D:\\Desk\\Rep\\EJournal\\server'
+    commandLine "launch4jc.exe", "exec.xml"
+}
+
+bootWar {
+    archiveFileName = "EJournal"
+}
+
+tasks.register('runnn_exe', Exec) {
+    dependsOn(bootWar)
+    dependsOn(build_exe)
+}
+
+sonar {
+    properties {
+        property "sonar.host.url", "${sonarURL}"
+        property "sonar.projectKey", "${sonarProjectName}"
+        property "sonar.projectName", "${sonarProjectName}"
+        property "sonar.token", "${sonarToken}"
+        property "sonar.scm.disabled", "True"
+        property "sonar.coverage.jacoco.xmlReportPath", "${layout.buildDirectory}/reports/jacoco.xml"
+    }
+}

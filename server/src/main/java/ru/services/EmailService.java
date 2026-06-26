@@ -1,0 +1,82 @@
+package ru.services;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import ru.controllers.main.SettingsController;
+import ru.data.DTO.controller.main.SettingsInnerDTO;
+import ru.security.user.AuthToken;
+import ru.services.interfaces.IEmailService;
+
+/** RU: сервис для работы с рассылками по электронной почте */
+@RequiredArgsConstructor
+@Service public class EmailService implements IEmailService {
+    private final JavaMailSender emailSender;
+
+    /** RU: адрес электронной почты с которой ведётся рассылка */
+    private final String from = "noooreplyejournal1@mail.ru";
+
+    /** RU: отправляет письмо
+     * @param subject заголовок письма */
+    private void sendHTMLMessage(String to, String subject, String text) {
+        try {
+            createAndSendMessage(to, subject, text);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createAndSendMessage(String to, String subject, String text) throws MessagingException {
+        MimeMessage mimeMessage = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(text, true);
+        emailSender.send(mimeMessage);
+    }
+
+    /** RU: посылает на указанную почту код подтверждения для регистрации
+     * @param to адрес электронной почты
+     * @param code код восстановления
+     * @see SettingsController#startEmail(SettingsInnerDTO, AuthToken)    Пример использования */
+    @SuppressWarnings("JavadocReference")
+    @Override
+    public void sendRegCode(String to, String code) {
+        String text = """
+            <h3>Здравствуйте!</h3>
+            <div>
+                Для подтверждения был указан ваш адрес электронной почты.<br>
+                Чтобы продолжить введите код: <b>%s</b><br>
+                Если это делали не вы, просто проигнорируйте письмо.<br>
+                Данный код действителен в течении этого дня(по МСК).
+            </div>
+            <h3>С уважением, портал EJournal.</h3>
+            """.formatted(code);
+        sendHTMLMessage(to, "Подтверждение регистрации в EJournal", text);
+    }
+
+    /** RU: посылает на указанную почту код подтверждения для восстановление/изменение пароля
+     * @param to адрес электронной почты
+     * @param code код восстановления
+     * @param title заголовок письма
+     * @see SettingsController#chPass(SettingsInnerDTO, AuthToken)    Пример использования */
+    @SuppressWarnings("JavadocReference")
+    @Override
+    public void sendRecCode(String to, String code, String title) {
+        String text = """
+            <h3>Здравствуйте!</h3>
+            <div>
+                Недавно был получен запрос на изменение пароля вашей учётной записи.<br>
+                Для изменения пароля введите код: <b>%s</b><br>
+                Если это делали не вы, просто проигнорируйте письмо.<br>
+                Данный код действителен в течении этого дня(по МСК).
+            </div>
+            <h3>С уважением, портал EJournal.</h3>
+            """.formatted(code);
+        sendHTMLMessage(to, title, text);
+    }
+}

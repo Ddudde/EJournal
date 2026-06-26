@@ -1,8 +1,8 @@
 = Asciidoc
 Natik Muradov <myratoff25@gmail.com>
-:revnumber: v0.2
-:revdate: 16.01.2025
-:revremark: Основное описание
+:revnumber: v0.4.3
+:revdate: 13.06.2026
+:revremark: Основное описание сервера
 :sectnums:
 :hardbreaks-option:
 :toc: left
@@ -12,67 +12,73 @@ Natik Muradov <myratoff25@gmail.com>
 
 ====
 Github: https://github.com/Ddudde/EJournal
+Клиент вставлен в качестве подмодуля Git(папка /EJournal_Client/) в репозиторий сервера и можно увидеть соотношения коммитов сервера и клиента.
+
+NOTE: Доки в ветке public репозитория клиента.
+
 Публикации в HTML и PDF форматах находятся в /docs/EJournal/asciiDoc/.
 Основное описание проекта здесь. Также есть дополнительные:
 Также в /docs/start-web.bat можно стартануть Python http server для просмотра документации
 
-* Swagger: link:/EJournal/swagger/htmlSwag/[]
-* JavaDoc: link:/EJournal/javaDoc/[]
-* AsciiDoc: link:/EJournal/asciiDoc/[]
+* Swagger: link:/EJournal_Client/swagger/htmlSwag/[]
+* JavaDoc: link:/EJournal_Client/javaDoc/[]
+* AsciiDoc-Server: link:/EJournal_Client/asciiDoc/[]
+* AsciiDoc-Client: link:/EJournal_Client/asciiDoc/client.html[]
 
 Сервер:
-Находится в /project/server
+https://github.com/Ddudde/EJournal
+Выполнен в классическом монолите
+Находится в /server
 http://localhost:8080
 Java, Spring, REST + Server Sent Events
 
-Клиент:
-Находится в /project/client
-http://localhost:3000/EJournal
-Github Pages: https://ddudde.github.io/EJournal/
-JS, React, Redux
 ====
 
-== Зависимости сервера
+== Технологии сервера
 ====
 NOTE: БД H2 для тестирования, а PostgreSQL для остального.
 Intellij IDEA в качестве IDE
 BD: H2
 http://localhost:8080/console_db
+JDK: GraalVM 25
+Сборка: Gradle 9.2.1
+БД: PostgreSQL 15 / H2
 
-. H2
-. PostgreSQL
-. Gradle
-. Spring Boot
-. Spring Boot Test
+Фреймворки:
+
+. Spring Boot 3.5.9
 . Spring Security
+. JUnit 5
+. Hibernate
+. Spring Data JPA
+
+Библиотеки/Технологии:
+
+. Spring REST Docs
 . JavaMail API
 . JavaFaker
-. JUnit
+. Firebase
+. GSON
+. Spring Boot Test
 . Mockito
 . Asciidoctor Gradle Plugin
 . Launch4j
 . Server-Sent Events
-. Hibernate
 . Lombok
-. Spring Data JPA
+. Logback
 ====
-== Зависимости клиента
+== Положительные стороны проекта
 ====
-NOTE: Vs Code в качестве IDE
+* Пуш-уведомления
+* JWT
+* Интеграция с Email (Пример: Отправка кода подтверждения)
 
-. Github Pages
-. Single Page Application
-. Progressive Web App
-. React
-. Redux
-. React Router
-. Firebase Cloud Messaging
-. React Helmet
+Coming soon...
 ====
 == Использование
 ====
 Запускаем сервер
-И запускаем клиент по одному из адресов: http://localhost:3000/EJournal
+И запускаем клиент по одному из адресов: http://localhost:5173/EJournal_Client/
 , https://ddudde.github.io/EJournal/
 Выбираем роль, допустим администратора
 И авторизируемся
@@ -80,8 +86,30 @@ NOTE: Vs Code в качестве IDE
 Пароль: 1111
 Радуемся!
 ====
-== Документы
+== Безопасность
 ====
+Авторизация происходит с классической Basic Auth
+Хранение в JWT(JWS) RFC https://datatracker.ietf.org/doc/html/rfc7515[7515]
+В связке refresh token(30 дней) + access token(15 минут),
+SHA384 с уникальным ключом для каждого пользователя
+
+Server-Sent Events:
+Хранение в UUID токенах.
+Подключение с одноразовым токеном с TTL меньше 15 минут.
+После подключения выдаётся токен с жизнью 15 минут.
+====
+== Секреты(ключи) сервера
+====
+Расположение:
+/secrets.gradle
+/src/main/resources/e-journalfcm-firebase-auth.json
+/src/main/resources/config/application.yaml
+
+Также с большинством ключей есть шаблоны, они расположены вместе с файлами, пример названия: secrets.gradle.template
+====
+== Документация
+====
+NOTE: Доки в ветке public репозитория клиента.
 JavaDoc, AsciiDoc и Swagger генерируются при помощи Gradle
 команды:
 gradle javadoc
@@ -143,7 +171,7 @@ beenDo - что уже сделано
 
 == Логгирование
 ====
-Логи сохраняются в папку: \project\server\logs.
+Логи сохраняются в папку: \server\logs.
 Slf4j + logback-spring
 ====
 

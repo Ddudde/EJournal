@@ -1,0 +1,15 @@
+app:
+    jwtExpirationInMs: '#{60000 * 15}'
+    debug: true
+    test: true
+    origins: http://localhost:5173, http://192.168.1.66:5173, https://ddudde.github.io, http://localhost:9001
+spring:
+    main:
+        allow-bean-definition-overriding: true
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        hibernate.ddl-auto: create-drop
+        show-sql: false
+    mail:
+        default-encoding: UTF-8
+        debug: true

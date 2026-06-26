@@ -1,0 +1,19 @@
+spring:
+    datasource:
+        url: 
+        username: 
+        password:
+        driverClassName: org.h2.Driver
+    h2.console:
+        enabled: true
+        path: 
+    mail:
+        host: 
+        username: 
+        password: 
+        port: 
+        properties.mail:
+            transport.protocol: 
+            smtp:
+                auth: 
+                ssl.enable: 
