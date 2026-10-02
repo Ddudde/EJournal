@@ -372,10 +372,10 @@ public class RandomizeService implements IRandomizeService {
             contactsSet.add(contacts.getId());
 
             final List<Period> periodsPerSch = periodRepository.saveAllAndFlush(asList(
-                new Period("I четверть", "01.09.25", "03.11.25"),
-                new Period("II четверть", "12.11.25", "29.12.25"),
-                new Period("III четверть", "12.01.26", "29.03.26"),
-                new Period("IV четверть", "01.04.26", "30.08.26")
+                new Period("I четверть", "01.09.26", "03.11.26"),
+                new Period("II четверть", "12.11.26", "29.12.26"),
+                new Period("III четверть", "12.01.27", "29.03.27"),
+                new Period("IV четверть", "01.04.27", "30.08.27")
             ));
             periods.addAll(periodsPerSch.stream()
                 .map(Period::getId).collect(Collectors.toCollection(HashSet::new)));
@@ -454,12 +454,8 @@ public class RandomizeService implements IRandomizeService {
             roleRepository.deleteAllById(roles);
             roles.clear();
         }
-//        if(!ObjectUtils.isEmpty(roles)) {
-//            roleRepository.deleteAllById(roles);
-//            roles.clear();
-//        }
         if(!ObjectUtils.isEmpty(groups)) {
-//            groupRepository.deleteAll(groups);
+            groupRepository.deleteAllById(groups);
             groups.clear();
         }
         if(!ObjectUtils.isEmpty(schools)) {
@@ -471,19 +467,19 @@ public class RandomizeService implements IRandomizeService {
             users.clear();
         }
         if(!ObjectUtils.isEmpty(periods)) {
-//            periodRepository.deleteAll(periods);
+            periodRepository.deleteAllById(periods);
             periods.clear();
         }
         if(!ObjectUtils.isEmpty(contactsSet)) {
-//            contactsRepository.deleteAll(contactsList);
+            contactsRepository.deleteAllById(contactsSet);
             contactsSet.clear();
         }
         if(!ObjectUtils.isEmpty(newsSet)) {
-//            newsRepository.deleteAll(newsList);
+            newsRepository.deleteAllById(newsSet);
             newsSet.clear();
         }
         if(!ObjectUtils.isEmpty(setts)) {
-//            settingUserRepository.deleteAll(setts);
+            settingUserRepository.deleteAllById(setts);
             setts.clear();
         }
     }

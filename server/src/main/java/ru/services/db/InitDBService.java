@@ -45,7 +45,7 @@ import java.util.Map;
             "Петров В.В.", Map.of(
             Roles.ADMIN, role
         ), Roles.ADMIN, setts));
-        if(AppConfig.TEST) randomService.createRandomData();
+//        if(AppConfig.TEST) randomService.createRandomData();
         checkDates();
     }
 

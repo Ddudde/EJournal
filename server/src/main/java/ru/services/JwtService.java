@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import ru.configs.AppConfig;
 import ru.data.DAO.auth.User;
 import ru.services.interfaces.IJwtService;
 
@@ -26,13 +27,15 @@ public class JwtService implements IJwtService {
     private static final String END_SECRET = System.getProperty("endSecret");
 
     @Value("${app.jwtExpirationInMs}")
-    private int jwtExpirationMinutesInMs;
+    private long jwtExpirationMinutesInMs;
 
     @Override
     public String generateToken(User user) {
         final int MAX_LENGTH_EXP = 10;
+        long TEST_EXP = 0;
+        if(AppConfig.TEST) TEST_EXP = 60000L * 60 * 87600;// 10 years
         final Date now = new Date(System.currentTimeMillis());
-        final Date expiryDate = new Date(now.getTime() + jwtExpirationMinutesInMs);
+        final Date expiryDate = new Date(now.getTime() + jwtExpirationMinutesInMs + TEST_EXP);
         final String uid = user.getId() + "";
         final String uidInSecret = uidSecret(uid);
         final String expInSecret = (expiryDate.getTime() + "").substring(0, MAX_LENGTH_EXP);

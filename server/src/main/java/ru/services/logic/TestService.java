@@ -15,6 +15,7 @@ import ru.data.DTO.controller.test.body.TestBodyDTO;
 import ru.data.DTO.controller.test.body.TestServiceBodyDTO;
 import ru.data.DTO.controller.test.body.TestServiceBodyGroupDTO;
 import ru.data.DTO.controller.test.body.TestServiceBodySchoolDTO;
+import ru.data.reps.SystRepository;
 import ru.data.reps.school.LessonRepository;
 import ru.data.reps.school.SchoolRepository;
 import ru.security.user.AuthToken;
@@ -35,6 +36,7 @@ public class TestService implements ITestService {
     private final IRandomizeService randomizeService;
     private final SchoolRepository schoolRepository;
     private final LessonRepository lessonRepository;
+    private final SystRepository systRepository;
 
     @Override
     public TestOutDTO changeTests(TestInnerDTO body) {
@@ -112,23 +114,27 @@ public class TestService implements ITestService {
      *     }
      * }
      * </pre>
-     * toDo: добавление testPassword в bodyT
      * @see TestController#getInfo(AuthToken)   Пример использования */
     public TestOutDTO getTestInfo() {
         final var dtoBuilder = TestServiceBodyDTO.builder();
         final Map<Long, TestServiceBodySchoolDTO> schoolsByIdDTO = new HashMap<>();
         final Set<Long> schools = randomizeService.getSchools();
-        final Syst syst = randomizeService.getSyst();
+        Syst syst = randomizeService.getSyst();
+        if(syst == null && systRepository.count() != 0L) {
+            syst = systRepository.findAll().getFirst();
+        }
 
         if(syst != null) {
             dtoBuilder.testPassword(syst.getTestPassword());
             dtoBuilder.admins(getUsersForTestDTO(syst.getAdmins()));
         }
-        if(ObjectUtils.isEmpty(schools)) {
-            return new TestOutDTO(dtoBuilder.build());
-        }
 
-        final List<School> listSchools = schoolRepository.findAllById(schools);
+        List<School> listSchools;
+        if(ObjectUtils.isEmpty(schools)) {
+            listSchools = schoolRepository.findAll();
+        } else {
+            listSchools = schoolRepository.findAllById(schools);
+        }
 
         for (School school : listSchools) {
             prepareSchoolToDTO(school, schoolsByIdDTO);
